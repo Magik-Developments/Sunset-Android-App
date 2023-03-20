@@ -2,4 +2,8 @@
     <string name="app_name">Sunset</string>
     <string name="hello">HELLO!</string>
     <string name="we_are_sunset">WE ARE SUNSET</string>
+    <string name="welcome_subtitle">Create an account or login to begin an adventure</string>
+    <string name="btn_continue_email">Continue with Email</string>
+    <string name="btn_continue_facebook">Continue with Facebook</string>
+    <string name="btn_continue_google">Continue with Google</string>
 </resources>

@@ -10,3 +10,13 @@ val primaryBoldDisplayM = TextStyle(
     fontFamily = FontFamily(Font(R.font.montserrat_bold)),
     fontSize = 39.sp
 )
+
+val secondaryRegularBodyL = TextStyle(
+    fontFamily = FontFamily(Font(R.font.montserrat_regular)),
+    fontSize = 16.sp
+)
+
+val secondarySemiboldHeadLineS = TextStyle(
+    fontFamily = FontFamily(Font(R.font.montserrat_semibold)),
+    fontSize = 19.sp
+)

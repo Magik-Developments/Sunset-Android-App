@@ -189,7 +189,7 @@ fun FacebookButton() {
     }
 }
 
-@Preview(showBackground = true, showSystemUi = true)
+@Preview(showBackground = true)
 @Composable
 fun WelcomeScreenPrev() {
     WelcomeScreen()

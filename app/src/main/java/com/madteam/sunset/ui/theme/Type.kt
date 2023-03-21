@@ -8,7 +8,7 @@ import com.madteam.sunset.R
 
 val primaryBoldDisplayM = TextStyle(
     fontFamily = FontFamily(Font(R.font.montserrat_bold)),
-    fontSize = 39.sp
+    fontSize = 33.sp
 )
 
 val secondaryRegularBodyL = TextStyle(
@@ -16,7 +16,7 @@ val secondaryRegularBodyL = TextStyle(
     fontSize = 16.sp
 )
 
-val secondarySemiboldHeadLineS = TextStyle(
+val secondarySemiBoldHeadLineS = TextStyle(
     fontFamily = FontFamily(Font(R.font.montserrat_semibold)),
     fontSize = 19.sp
 )

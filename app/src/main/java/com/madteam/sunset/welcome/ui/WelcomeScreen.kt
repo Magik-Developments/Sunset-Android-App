@@ -31,23 +31,23 @@ import com.madteam.sunset.R
 import com.madteam.sunset.R.string
 import com.madteam.sunset.ui.theme.primaryBoldDisplayM
 import com.madteam.sunset.ui.theme.secondaryRegularBodyL
-import com.madteam.sunset.ui.theme.secondarySemiboldHeadLineS
+import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
 
 @Composable
 fun WelcomeScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 24.dp),
+            .padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         SunsetLogoImage()
-        CustomSpacer(70.dp)
+        CustomSpacer(56.dp)
         MainTitle()
         CustomSpacer(size = 8.dp)
-        SubTitle()
-        CustomSpacer(size = 72.dp)
+        SubTitle(Modifier.align(Alignment.Start))
+        CustomSpacer(size = 56.dp)
         EmailButton()
         CustomSpacer(size = 16.dp)
         GoogleButton()
@@ -87,10 +87,11 @@ fun MainTitle() {
 }
 
 @Composable
-fun SubTitle() {
+fun SubTitle(modifier: Modifier) {
     Text(
         text = stringResource(string.welcome_subtitle),
-        style = secondaryRegularBodyL
+        style = secondaryRegularBodyL,
+        modifier = modifier
     )
 }
 
@@ -111,7 +112,7 @@ fun EmailButton() {
             modifier = Modifier.align(Alignment.CenterVertically),
             text = stringResource(string.btn_continue_email),
             color = Color(0xFFFFFFFF),
-            style = secondarySemiboldHeadLineS
+            style = secondarySemiBoldHeadLineS
         )
     }
 }
@@ -146,7 +147,7 @@ fun GoogleButton() {
                 modifier = Modifier.align(Alignment.Center),
                 text = stringResource(string.btn_continue_google),
                 color = Color(0xFF000000),
-                style = secondarySemiboldHeadLineS
+                style = secondarySemiBoldHeadLineS
             )
         }
     }
@@ -182,13 +183,13 @@ fun FacebookButton() {
                 modifier = Modifier.align(Alignment.Center),
                 text = stringResource(string.btn_continue_facebook),
                 color = Color(0xFF000000),
-                style = secondarySemiboldHeadLineS
+                style = secondarySemiBoldHeadLineS
             )
         }
     }
 }
 
-@Preview(showSystemUi = true, device = Devices.DEFAULT)
+@Preview(showSystemUi = true, device = Devices.PIXEL_4)
 @Composable
 fun WelcomeScreenPrev() {
     WelcomeScreen()

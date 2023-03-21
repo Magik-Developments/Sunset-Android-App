@@ -127,7 +127,7 @@ fun GoogleButton() {
         colors = ButtonDefaults.buttonColors(
             backgroundColor = Color(0xFFFFFFFF),
         ),
-        contentPadding = PaddingValues(start = 24.dp),
+        contentPadding = PaddingValues(start = 16.dp),
         shape = RoundedCornerShape(16.dp),
         border = BorderStroke(1.dp, Color(0xFF000000))
     ) {
@@ -140,7 +140,7 @@ fun GoogleButton() {
                 painter = painterResource(id = R.drawable.logo_google),
                 contentDescription = "Logo Google",
                 modifier = Modifier
-                    .size(width = 27.84.dp, height = 30.dp)
+                    .size(width = 24.dp, height = 24.dp)
                     .align(Alignment.CenterStart)
             )
             Text(
@@ -163,7 +163,7 @@ fun FacebookButton() {
         colors = ButtonDefaults.buttonColors(
             backgroundColor = Color(0xFFFFFFFF),
         ),
-        contentPadding = PaddingValues(start = 24.dp),
+        contentPadding = PaddingValues(start = 16.dp),
         shape = RoundedCornerShape(16.dp),
         border = BorderStroke(1.dp, Color(0xFF000000))
     ) {
@@ -176,7 +176,7 @@ fun FacebookButton() {
                 painter = painterResource(id = R.drawable.logo_facebook),
                 contentDescription = "Logo Google",
                 modifier = Modifier
-                    .size(width = 27.84.dp, height = 30.dp)
+                    .size(width = 24.dp, height = 24.dp)
                     .align(Alignment.CenterStart)
             )
             Text(
@@ -189,7 +189,7 @@ fun FacebookButton() {
     }
 }
 
-@Preview(showSystemUi = true, device = Devices.PIXEL_4)
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun WelcomeScreenPrev() {
     WelcomeScreen()

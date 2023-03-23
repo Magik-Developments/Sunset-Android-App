@@ -32,7 +32,12 @@ import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
 
 @Composable
 fun BottomSheetSignIn() {
-    Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom) {
+    Column(
+        Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Bottom,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        CardShade()
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -68,6 +73,19 @@ fun CardContent() {
         ForgotPasswordText()
         CustomSpacer(size = 40.dp)
         NotRegisteredSection()
+    }
+}
+
+@Composable
+fun CardShade() {
+    Card(
+        modifier = Modifier
+            .height(8.dp)
+            .width((LocalConfiguration.current.screenWidthDp * 0.8).dp),
+        backgroundColor = Color(0xFFFFe094),
+        shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp)
+    ) {
+
     }
 }
 

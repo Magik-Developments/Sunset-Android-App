@@ -10,11 +10,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Mail
 import androidx.compose.material.icons.outlined.Visibility
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,8 +20,8 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.madteam.sunset.R
 import com.madteam.sunset.R.string
@@ -58,7 +54,7 @@ fun CardContent() {
         modifier = Modifier.padding(horizontal = 36.dp)
     ) {
         CustomSpacer(size = 8.dp)
-        CardShape()
+        CardHandler()
         CustomSpacer(size = 16.dp)
         CardTitle()
         CardSubtitle()
@@ -76,7 +72,7 @@ fun CardContent() {
 }
 
 @Composable
-fun CardShape() {
+fun CardHandler() {
     Divider(
         color = Color(0xFFD9D9D9),
         thickness = 6.dp,
@@ -89,21 +85,25 @@ fun CardShape() {
 @Composable
 fun NotRegisteredSection() {
     Row(verticalAlignment = Alignment.CenterVertically) {
-            CustomDivider(Modifier.weight(0.5f))
-            NotRegisteredText(Modifier.weight(1f).padding(horizontal = 16.dp))
-            CustomDivider(Modifier.weight(0.5f))
+        CustomDivider(Modifier.weight(0.5f), color = Color(0xFFd9d9d9))
+        NotRegisteredText(
+            Modifier
+                .weight(1f)
+                .padding(horizontal = 16.dp)
+        )
+        CustomDivider(Modifier.weight(0.5f), color = Color(0xFFd9d9d9))
     }
     Column {
         CustomSpacer(size = 24.dp)
         Row {
             IconButtonLight(
-                ImageVector.Companion.vectorResource(id = R.drawable.logo_google),
-                string.google_icon_description,
+                buttonIcon = ImageVector.Companion.vectorResource(id = R.drawable.logo_google),
+                description = string.google_icon_description,
                 onClick = { /* TODO */ })
             CustomSpacer(size = 24.dp)
             IconButtonLight(
-                Icons.Outlined.Mail,
-                string.email_icon_description,
+                buttonIcon = Icons.Outlined.Mail,
+                description = string.email_icon_description,
                 onClick = {/* TODO */ })
         }
     }
@@ -147,10 +147,15 @@ fun NotRegisteredText(modifier: Modifier) {
 }
 
 @Composable
-fun CustomDivider(weight: Modifier) {
+fun CustomDivider(
+    modifier: Modifier,
+    height: Dp = 1.dp,
+    color: Color
+) {
     Divider(
-        color = Color(0xFF999999),
-        modifier = weight
+        color = color,
+        modifier = modifier,
+        thickness = height
     )
 }
 

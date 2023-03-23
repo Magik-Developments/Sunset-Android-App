@@ -8,8 +8,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.CheckCircle
-import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material.icons.outlined.Mail
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.runtime.Composable
@@ -41,7 +39,7 @@ fun BottomSheetSignIn() {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .height((LocalConfiguration.current.screenHeightDp * 0.8).dp),
+                .height((LocalConfiguration.current.screenHeightDp * 0.66).dp),
             backgroundColor = Color(0xFFFFB600),
             shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp)
         ) {
@@ -90,28 +88,22 @@ fun CardShape() {
 @Composable
 fun NotRegisteredSection() {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Column(Modifier.weight(0.5f)) {
             CustomDivider()
-        }
-        Column(
-            Modifier
-                .weight(1f)
-                .padding(horizontal = 16.dp)
-                .fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            NotRegisteredText()
-        }
-        Column(Modifier.weight(0.5f)) {
+            NotRegisteredText(Modifier.weight(1f))
             CustomDivider()
-        }
     }
     Column {
         CustomSpacer(size = 24.dp)
-        Row() {
-            IconButtonLight(ImageVector.Companion.vectorResource(id = R.drawable.logo_google), string.google_icon_description ,onClick = { /* TODO */ })
+        Row {
+            IconButtonLight(
+                ImageVector.Companion.vectorResource(id = R.drawable.logo_google),
+                string.google_icon_description,
+                onClick = { /* TODO */ })
             CustomSpacer(size = 24.dp)
-            IconButtonLight(Icons.Outlined.Mail, string.email_icon_description, onClick = {/* TODO */})
+            IconButtonLight(
+                Icons.Outlined.Mail,
+                string.email_icon_description,
+                onClick = {/* TODO */ })
         }
     }
 }
@@ -127,22 +119,23 @@ fun IconButtonLight(
         onClick = onClick,
         modifier = Modifier.background(Color.White, RoundedCornerShape(16.dp))
     ) {
-            Icon(
-                modifier = Modifier.size(24.dp, 24.dp),
-                imageVector = buttonIcon,
-                contentDescription = stringResource(description),
-                tint = iconTint
-            )
+        Icon(
+            modifier = Modifier.size(24.dp, 24.dp),
+            imageVector = buttonIcon,
+            contentDescription = stringResource(description),
+            tint = iconTint
+        )
     }
 }
 
 @Composable
-fun NotRegisteredText() {
-    Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+fun NotRegisteredText(modifier: Modifier) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier) {
         Text(
             text = stringResource(string.not_registered_yet),
             style = secondarySemiBoldBodyM,
-            color = Color(0xFF666666)
+            color = Color(0xFF666666),
+            maxLines = 1
         )
         Text(
             text = stringResource(string.sign_up_with),

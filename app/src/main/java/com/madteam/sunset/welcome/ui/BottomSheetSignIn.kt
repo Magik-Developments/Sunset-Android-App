@@ -24,6 +24,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.madteam.sunset.R
@@ -88,9 +89,9 @@ fun CardShape() {
 @Composable
 fun NotRegisteredSection() {
     Row(verticalAlignment = Alignment.CenterVertically) {
-            CustomDivider()
-            NotRegisteredText(Modifier.weight(1f))
-            CustomDivider()
+            CustomDivider(Modifier.weight(0.5f))
+            NotRegisteredText(Modifier.weight(1f).padding(horizontal = 16.dp))
+            CustomDivider(Modifier.weight(0.5f))
     }
     Column {
         CustomSpacer(size = 24.dp)
@@ -132,10 +133,10 @@ fun IconButtonLight(
 fun NotRegisteredText(modifier: Modifier) {
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier) {
         Text(
+            modifier = Modifier.fillMaxWidth(),
             text = stringResource(string.not_registered_yet),
             style = secondarySemiBoldBodyM,
             color = Color(0xFF666666),
-            maxLines = 1
         )
         Text(
             text = stringResource(string.sign_up_with),
@@ -146,9 +147,10 @@ fun NotRegisteredText(modifier: Modifier) {
 }
 
 @Composable
-fun CustomDivider() {
+fun CustomDivider(weight: Modifier) {
     Divider(
         color = Color(0xFF999999),
+        modifier = weight
     )
 }
 

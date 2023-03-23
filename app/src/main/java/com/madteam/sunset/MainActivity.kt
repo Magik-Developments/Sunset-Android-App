@@ -20,7 +20,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             SunsetTheme {
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
-                    WelcomeScreen()
                 }
             }
         }

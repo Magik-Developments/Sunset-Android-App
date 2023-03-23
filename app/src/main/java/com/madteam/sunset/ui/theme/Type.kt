@@ -20,3 +20,13 @@ val secondarySemiBoldHeadLineS = TextStyle(
     fontFamily = FontFamily(Font(R.font.montserrat_semibold)),
     fontSize = 19.sp
 )
+
+val secondarySemiBoldHeadLineM = TextStyle(
+    fontFamily = FontFamily(Font(R.font.montserrat_semibold)),
+    fontSize = 23.sp
+)
+
+val secondarySemiBoldBodyM = TextStyle(
+    fontFamily = FontFamily(Font(R.font.montserrat_semibold)),
+    fontSize = 13.sp
+)

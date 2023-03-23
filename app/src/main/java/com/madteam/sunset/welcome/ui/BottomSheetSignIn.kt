@@ -1,27 +1,16 @@
 package com.madteam.sunset.welcome.ui
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Card
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.Image
+import androidx.compose.material.icons.outlined.Mail
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -35,9 +24,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.madteam.sunset.R
 import com.madteam.sunset.R.string
 import com.madteam.sunset.ui.theme.secondaryRegularBodyL
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyM
@@ -50,7 +41,7 @@ fun BottomSheetSignIn() {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .height((LocalConfiguration.current.screenHeightDp * 0.57).dp),
+                .height((LocalConfiguration.current.screenHeightDp * 0.8).dp),
             backgroundColor = Color(0xFFFFB600),
             shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp)
         ) {
@@ -115,6 +106,34 @@ fun NotRegisteredSection() {
             CustomDivider()
         }
     }
+    Column {
+        CustomSpacer(size = 24.dp)
+        Row() {
+            IconButtonLight(ImageVector.Companion.vectorResource(id = R.drawable.logo_google), string.google_icon_description ,onClick = { /* TODO */ })
+            CustomSpacer(size = 24.dp)
+            IconButtonLight(Icons.Outlined.Mail, string.email_icon_description, onClick = {/* TODO */})
+        }
+    }
+}
+
+@Composable
+fun IconButtonLight(
+    buttonIcon: ImageVector,
+    @StringRes description: Int,
+    iconTint: Color = Color.Unspecified,
+    onClick: () -> Unit
+) {
+    IconButton(
+        onClick = onClick,
+        modifier = Modifier.background(Color.White, RoundedCornerShape(16.dp))
+    ) {
+            Icon(
+                modifier = Modifier.size(24.dp, 24.dp),
+                imageVector = buttonIcon,
+                contentDescription = stringResource(description),
+                tint = iconTint
+            )
+    }
 }
 
 @Composable
@@ -125,7 +144,11 @@ fun NotRegisteredText() {
             style = secondarySemiBoldBodyM,
             color = Color(0xFF666666)
         )
-        Text(text = stringResource(string.sign_up_with), style = secondarySemiBoldBodyM, color = Color(0xFF666666))
+        Text(
+            text = stringResource(string.sign_up_with),
+            style = secondarySemiBoldBodyM,
+            color = Color(0xFF666666)
+        )
     }
 }
 
@@ -159,7 +182,11 @@ fun SmallButtonDark(
         colors = ButtonDefaults.buttonColors(backgroundColor = Color.Black)
 
     ) {
-        Text(text = stringResource(id = text), style = secondarySemiBoldHeadLineS, color = Color.White)
+        Text(
+            text = stringResource(id = text),
+            style = secondarySemiBoldHeadLineS,
+            color = Color.White
+        )
     }
 }
 
@@ -192,14 +219,7 @@ fun EmailTextField(
         value = emailValue,
         onValueChange = onValueChange,
         hint = string.email_address,
-        textType = KeyboardType.Email,
-        endIcon = {
-            TextFieldIcon(
-                icon = Icons.Outlined.CheckCircle,
-                description = string.circle_check_icon_description,
-                iconTint = Color(0xFF53A653)
-            )
-        }
+        textType = KeyboardType.Email
     )
 }
 
@@ -209,7 +229,7 @@ fun DesignSystemTextField(
     onValueChange: (String) -> Unit,
     @StringRes hint: Int,
     textType: KeyboardType,
-    endIcon: @Composable () -> Unit
+    endIcon: @Composable () -> Unit = { Spacer(modifier = Modifier.size(0.dp)) }
 ) {
     TextField(
         value = value,

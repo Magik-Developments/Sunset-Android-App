@@ -18,4 +18,10 @@
     <string name="forgot_your_password">Forgot your password?</string>
     <string name="google_icon_description">Google Icon</string>
     <string name="email_icon_description">Email Icon</string>
+    <string name="get_started">Get started</string>
+    <string name="no_day_without_sunset">No day without sunset.</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="not_registered_yet_signup_with">Not registered yet? Sign Up with</string>
+    <string name="already_have_an_account">Already have an account?</string>
+    <string name="name">Name</string>
 </resources>

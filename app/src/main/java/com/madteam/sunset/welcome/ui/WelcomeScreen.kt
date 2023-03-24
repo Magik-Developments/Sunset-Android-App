@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.madteam.sunset.R
 import com.madteam.sunset.R.string
+import com.madteam.sunset.common.design_system.*
 import com.madteam.sunset.ui.theme.primaryBoldDisplayM
 import com.madteam.sunset.ui.theme.secondaryRegularBodyL
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
@@ -53,139 +54,6 @@ fun WelcomeScreen() {
         GoogleButton()
         CustomSpacer(size = 16.dp)
         FacebookButton()
-    }
-}
-
-@Composable
-fun SunsetLogoImage() {
-    Image(
-        modifier = Modifier.size(width = 214.dp, height = 197.dp),
-        painter = painterResource(id = R.drawable.logo_degrade),
-        contentDescription = "Sunset logo degrade"
-    )
-}
-
-@Composable
-fun CustomSpacer(size: Dp) {
-    Spacer(modifier = Modifier.size(size))
-}
-
-@Composable
-fun MainTitle() {
-    Column {
-        Text(
-            modifier = Modifier.fillMaxWidth(),
-            text = stringResource(string.hello),
-            style = primaryBoldDisplayM
-        )
-        Text(
-            modifier = Modifier.fillMaxWidth(),
-            text = stringResource(string.we_are_sunset),
-            style = primaryBoldDisplayM
-        )
-    }
-}
-
-@Composable
-fun SubTitle(modifier: Modifier) {
-    Text(
-        text = stringResource(string.welcome_subtitle),
-        style = secondaryRegularBodyL,
-        modifier = modifier
-    )
-}
-
-@Composable
-fun EmailButton() {
-    Button(
-        onClick = { /*TODO*/ },
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(48.dp)
-            .clip(RoundedCornerShape(16.dp)),
-        colors = ButtonDefaults.buttonColors(
-            backgroundColor = Color(0xFFFFB600),
-            contentColor = Color(0xFFFFFFFF),
-        )
-    ) {
-        Text(
-            modifier = Modifier.align(Alignment.CenterVertically),
-            text = stringResource(string.btn_continue_email),
-            color = Color(0xFFFFFFFF),
-            style = secondarySemiBoldHeadLineS
-        )
-    }
-}
-
-@Composable
-fun GoogleButton() {
-    Button(
-        onClick = { /*TODO*/ },
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(48.dp),
-        colors = ButtonDefaults.buttonColors(
-            backgroundColor = Color(0xFFFFFFFF),
-        ),
-        contentPadding = PaddingValues(start = 16.dp),
-        shape = RoundedCornerShape(16.dp),
-        border = BorderStroke(1.dp, Color(0xFF000000))
-    ) {
-        Box(
-            Modifier
-                .fillMaxSize()
-                .align(Alignment.CenterVertically)
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.logo_google),
-                contentDescription = "Logo Google",
-                modifier = Modifier
-                    .size(width = 24.dp, height = 24.dp)
-                    .align(Alignment.CenterStart)
-            )
-            Text(
-                modifier = Modifier.align(Alignment.Center),
-                text = stringResource(string.btn_continue_google),
-                color = Color(0xFF000000),
-                style = secondarySemiBoldHeadLineS
-            )
-        }
-    }
-}
-
-@Composable
-fun FacebookButton() {
-    Button(
-        onClick = { /*TODO*/ },
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(48.dp),
-        colors = ButtonDefaults.buttonColors(
-            backgroundColor = Color(0xFFFFFFFF),
-        ),
-        contentPadding = PaddingValues(start = 16.dp),
-        shape = RoundedCornerShape(16.dp),
-        border = BorderStroke(1.dp, Color(0xFF000000))
-    ) {
-        Box(
-            Modifier
-                .fillMaxSize()
-                .align(Alignment.CenterVertically)
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.logo_facebook),
-                contentDescription = "Logo Google",
-                modifier = Modifier
-                    .size(width = 24.dp, height = 24.dp)
-                    .align(Alignment.CenterStart)
-            )
-            Text(
-                modifier = Modifier.align(Alignment.Center),
-                text = stringResource(string.btn_continue_facebook),
-                color = Color(0xFF000000),
-                style = secondarySemiBoldHeadLineS
-            )
-        }
     }
 }
 

@@ -30,18 +30,19 @@ import com.madteam.sunset.ui.theme.secondarySemiBoldBodyM
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineM
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
 
+const val CARD_HEIGHT = 0.66
+
 @Composable
 fun BottomSheetSignIn() {
-    Column(
+    Box(
         Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Bottom,
-        horizontalAlignment = Alignment.CenterHorizontally
+        contentAlignment = Alignment.BottomCenter
     ) {
         CardShade()
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .height((LocalConfiguration.current.screenHeightDp * 0.66).dp),
+                .height((LocalConfiguration.current.screenHeightDp * CARD_HEIGHT).dp),
             backgroundColor = Color(0xFFFFB600),
             shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp)
         ) {
@@ -78,15 +79,13 @@ fun CardContent() {
 
 @Composable
 fun CardShade() {
-    Card(
+    Box(
         modifier = Modifier
-            .height(8.dp)
-            .width((LocalConfiguration.current.screenWidthDp * 0.8).dp),
-        backgroundColor = Color(0xFFFFe094),
-        shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp)
-    ) {
-
-    }
+            .height((LocalConfiguration.current.screenHeightDp * CARD_HEIGHT + 8).dp)
+            .width((LocalConfiguration.current.screenWidthDp * 0.8).dp)
+            .clip(RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp))
+            .background(Color(0xFFFFe094))
+    )
 }
 
 @Composable

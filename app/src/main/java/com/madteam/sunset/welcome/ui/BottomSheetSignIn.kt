@@ -3,10 +3,27 @@ package com.madteam.sunset.welcome.ui
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Card
+import androidx.compose.material.Divider
+import androidx.compose.material.Icon
+import androidx.compose.material.Text
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Mail
 import androidx.compose.material.icons.outlined.Visibility
@@ -74,6 +91,8 @@ fun CardContent() {
         ForgotPasswordText()
         CustomSpacer(size = 40.dp)
         NotRegisteredSection()
+        CustomSpacer(size = 24.dp)
+        RegisterIconButtons()
     }
 }
 
@@ -110,19 +129,20 @@ fun NotRegisteredSection() {
         )
         CustomDivider(Modifier.weight(0.5f), color = Color(0xFFd9d9d9))
     }
-    Column {
+}
+
+@Composable
+fun RegisterIconButtons() {
+    Row {
+        IconButtonLight(
+            buttonIcon = ImageVector.Companion.vectorResource(id = R.drawable.logo_google),
+            description = string.google_icon_description,
+            onClick = { /* TODO */ })
         CustomSpacer(size = 24.dp)
-        Row {
-            IconButtonLight(
-                buttonIcon = ImageVector.Companion.vectorResource(id = R.drawable.logo_google),
-                description = string.google_icon_description,
-                onClick = { /* TODO */ })
-            CustomSpacer(size = 24.dp)
-            IconButtonLight(
-                buttonIcon = Icons.Outlined.Mail,
-                description = string.email_icon_description,
-                onClick = {/* TODO */ })
-        }
+        IconButtonLight(
+            buttonIcon = Icons.Outlined.Mail,
+            description = string.email_icon_description,
+            onClick = {/* TODO */ })
     }
 }
 
@@ -133,9 +153,14 @@ fun IconButtonLight(
     iconTint: Color = Color.Unspecified,
     onClick: () -> Unit
 ) {
-    IconButton(
-        onClick = onClick,
-        modifier = Modifier.background(Color.White, RoundedCornerShape(16.dp))
+    Box(
+        modifier = Modifier
+            .height(50.dp)
+            .width(50.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(Color.White)
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center
     ) {
         Icon(
             modifier = Modifier.size(24.dp, 24.dp),

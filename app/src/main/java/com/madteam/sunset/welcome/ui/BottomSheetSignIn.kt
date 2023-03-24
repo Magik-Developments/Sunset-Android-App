@@ -1,14 +1,18 @@
 package com.madteam.sunset.welcome.ui
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -21,13 +25,9 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.Mail
 import androidx.compose.material.icons.outlined.Visibility
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,22 +35,31 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.madteam.sunset.R
 import com.madteam.sunset.R.string
 import com.madteam.sunset.ui.theme.secondaryRegularBodyL
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyM
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineM
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
 
+const val CARD_HEIGHT = 0.66
+
 @Composable
 fun BottomSheetSignIn() {
-    Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom) {
+    Box(
+        Modifier.fillMaxSize(),
+        contentAlignment = Alignment.BottomCenter
+    ) {
+        CardShade()
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .height((LocalConfiguration.current.screenHeightDp * 0.57).dp),
+                .height((LocalConfiguration.current.screenHeightDp * CARD_HEIGHT).dp),
             backgroundColor = Color(0xFFFFB600),
             shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp)
         ) {
@@ -68,7 +77,7 @@ fun CardContent() {
         modifier = Modifier.padding(horizontal = 36.dp)
     ) {
         CustomSpacer(size = 8.dp)
-        CardShape()
+        CardHandler()
         CustomSpacer(size = 16.dp)
         CardTitle()
         CardSubtitle()
@@ -82,11 +91,24 @@ fun CardContent() {
         ForgotPasswordText()
         CustomSpacer(size = 40.dp)
         NotRegisteredSection()
+        CustomSpacer(size = 24.dp)
+        RegisterIconButtons()
     }
 }
 
 @Composable
-fun CardShape() {
+fun CardShade() {
+    Box(
+        modifier = Modifier
+            .height((LocalConfiguration.current.screenHeightDp * CARD_HEIGHT + 8).dp)
+            .width((LocalConfiguration.current.screenWidthDp * 0.8).dp)
+            .clip(RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp))
+            .background(Color(0xFFFFe094))
+    )
+}
+
+@Composable
+fun CardHandler() {
     Divider(
         color = Color(0xFFD9D9D9),
         thickness = 6.dp,
@@ -99,40 +121,83 @@ fun CardShape() {
 @Composable
 fun NotRegisteredSection() {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Column(Modifier.weight(0.5f)) {
-            CustomDivider()
-        }
-        Column(
+        CustomDivider(Modifier.weight(0.5f), color = Color(0xFFd9d9d9))
+        NotRegisteredText(
             Modifier
                 .weight(1f)
                 .padding(horizontal = 16.dp)
-                .fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            NotRegisteredText()
-        }
-        Column(Modifier.weight(0.5f)) {
-            CustomDivider()
-        }
+        )
+        CustomDivider(Modifier.weight(0.5f), color = Color(0xFFd9d9d9))
     }
 }
 
 @Composable
-fun NotRegisteredText() {
-    Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+fun RegisterIconButtons() {
+    Row {
+        IconButtonLight(
+            buttonIcon = ImageVector.Companion.vectorResource(id = R.drawable.logo_google),
+            description = string.google_icon_description,
+            onClick = { /* TODO */ })
+        CustomSpacer(size = 24.dp)
+        IconButtonLight(
+            buttonIcon = Icons.Outlined.Mail,
+            description = string.email_icon_description,
+            onClick = {/* TODO */ })
+    }
+}
+
+@Composable
+fun IconButtonLight(
+    buttonIcon: ImageVector,
+    @StringRes description: Int,
+    iconTint: Color = Color.Unspecified,
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .height(50.dp)
+            .width(50.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(Color.White)
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            modifier = Modifier.size(24.dp, 24.dp),
+            imageVector = buttonIcon,
+            contentDescription = stringResource(description),
+            tint = iconTint
+        )
+    }
+}
+
+@Composable
+fun NotRegisteredText(modifier: Modifier) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier) {
         Text(
+            modifier = Modifier.fillMaxWidth(),
             text = stringResource(string.not_registered_yet),
+            style = secondarySemiBoldBodyM,
+            color = Color(0xFF666666),
+        )
+        Text(
+            text = stringResource(string.sign_up_with),
             style = secondarySemiBoldBodyM,
             color = Color(0xFF666666)
         )
-        Text(text = stringResource(string.sign_up_with), style = secondarySemiBoldBodyM, color = Color(0xFF666666))
     }
 }
 
 @Composable
-fun CustomDivider() {
+fun CustomDivider(
+    modifier: Modifier,
+    height: Dp = 1.dp,
+    color: Color
+) {
     Divider(
-        color = Color(0xFF999999),
+        color = color,
+        modifier = modifier,
+        thickness = height
     )
 }
 
@@ -159,7 +224,11 @@ fun SmallButtonDark(
         colors = ButtonDefaults.buttonColors(backgroundColor = Color.Black)
 
     ) {
-        Text(text = stringResource(id = text), style = secondarySemiBoldHeadLineS, color = Color.White)
+        Text(
+            text = stringResource(id = text),
+            style = secondarySemiBoldHeadLineS,
+            color = Color.White
+        )
     }
 }
 
@@ -192,14 +261,7 @@ fun EmailTextField(
         value = emailValue,
         onValueChange = onValueChange,
         hint = string.email_address,
-        textType = KeyboardType.Email,
-        endIcon = {
-            TextFieldIcon(
-                icon = Icons.Outlined.CheckCircle,
-                description = string.circle_check_icon_description,
-                iconTint = Color(0xFF53A653)
-            )
-        }
+        textType = KeyboardType.Email
     )
 }
 
@@ -209,7 +271,7 @@ fun DesignSystemTextField(
     onValueChange: (String) -> Unit,
     @StringRes hint: Int,
     textType: KeyboardType,
-    endIcon: @Composable () -> Unit
+    endIcon: @Composable () -> Unit = { Spacer(modifier = Modifier.size(0.dp)) }
 ) {
     TextField(
         value = value,

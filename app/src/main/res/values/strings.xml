@@ -16,4 +16,6 @@
     <string name="not_registered_yet">Not registered yet?</string>
     <string name="sign_up_with">Sign Up with</string>
     <string name="forgot_your_password">Forgot your password?</string>
+    <string name="google_icon_description">Google Icon</string>
+    <string name="email_icon_description">Email Icon</string>
 </resources>

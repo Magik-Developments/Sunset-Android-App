@@ -154,14 +154,14 @@ fun OtherLoginMethodsText(modifier: Modifier, @StringRes text: Int) {
 @Composable
 fun OtherLoginMethodsSection(@StringRes text: Int) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        CustomDivider(Modifier.weight(0.5f), color = Color(0xFFd9d9d9))
+        CustomDivider(Modifier.weight(0.5f), color = Color(0xFF999999))
         OtherLoginMethodsText(
             Modifier
                 .weight(1f)
                 .padding(horizontal = 16.dp),
             text = text
         )
-        CustomDivider(Modifier.weight(0.5f), color = Color(0xFFd9d9d9))
+        CustomDivider(Modifier.weight(0.5f), color = Color(0xFF999999))
     }
 }
 

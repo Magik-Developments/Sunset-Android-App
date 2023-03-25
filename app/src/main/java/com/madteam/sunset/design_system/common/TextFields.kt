@@ -19,7 +19,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.madteam.sunset.R
 import com.madteam.sunset.common.design_system.CustomSpacer
-import com.madteam.sunset.ui.theme.secondarySemiBoldBodyS
 
 @Composable
 fun DesignSystemTextField(
@@ -55,52 +54,43 @@ fun DesignSystemTextField(
 
 @Composable
 fun PasswordSecurityIndicator(passwordValue: String) {
+    val passwordSecurity = evaluatePasswordSecurity(passwordValue)
+    Row(modifier = Modifier
+        .fillMaxWidth()
+        .padding(start = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+       repeat(3) { level ->
+           val indicatorLevel = when(passwordSecurity){
+               PasswordStrength.WEAK -> 1
+               PasswordStrength.MEDIUM -> if (level < 2) 2 else 1
+               PasswordStrength.STRONG -> if (level < 2) 2 else 1
+               PasswordStrength.VERY_STRONG -> if (level < 2) 2 else 1
+           }
+           PasswordIndicatorBox(level = indicatorLevel)
+           if (level < 2) {
+               CustomSpacer(size = 6.dp)
+           }
+       }
+    }
+}
+
+enum class PasswordStrength {
+    WEAK, MEDIUM, STRONG, VERY_STRONG
+}
+
+fun evaluatePasswordSecurity(passwordValue: String): PasswordStrength {
     val hasLowerCase = passwordValue.matches(Regex(".*[a-z].*"))
     val hasUpperCase = passwordValue.matches(Regex(".*[A-Z].*"))
     val hasDigit = passwordValue.matches(Regex(".*\\d.*"))
     val hasSpecialChar = passwordValue.matches(Regex(".*[!@#\$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?].*"))
-    val passwordSecurity = when {
-        passwordValue.isBlank() -> 0
+
+    return when {
+        passwordValue.isBlank() -> PasswordStrength.WEAK
         passwordValue.length < 8 || !hasLowerCase || !hasUpperCase || !hasDigit ->
-            1
+            PasswordStrength.MEDIUM
         passwordValue.length < 12 || (!hasSpecialChar && hasDigit) ->
-            2
+            PasswordStrength.STRONG
         else ->
-            3
-    }
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .padding(start = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-        when (passwordSecurity) {
-            0 -> {
-                PasswordIndicatorBox(level = 1)
-                CustomSpacer(size = 6.dp)
-                PasswordIndicatorBox(level = 1)
-                CustomSpacer(size = 6.dp)
-                PasswordIndicatorBox(level = 1)
-            }
-            1 -> {
-                PasswordIndicatorBox(level = 2)
-                CustomSpacer(size = 6.dp)
-                PasswordIndicatorBox(level = 1)
-                CustomSpacer(size = 6.dp)
-                PasswordIndicatorBox(level = 1)
-            }
-            2 -> {
-                PasswordIndicatorBox(level = 2)
-                CustomSpacer(size = 6.dp)
-                PasswordIndicatorBox(level = 2)
-                CustomSpacer(size = 6.dp)
-                PasswordIndicatorBox(level = 1)
-            }
-            else -> {
-                PasswordIndicatorBox(level = 2)
-                CustomSpacer(size = 6.dp)
-                PasswordIndicatorBox(level = 2)
-                CustomSpacer(size = 6.dp)
-                PasswordIndicatorBox(level = 2)
-            }
-        }
+            PasswordStrength.VERY_STRONG
     }
 }
 

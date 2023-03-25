@@ -23,5 +23,5 @@
     <string name="sign_up">Sign Up</string>
     <string name="not_registered_yet_signup_with">Not registered yet? Sign Up with</string>
     <string name="already_have_an_account">Already have an account?</string>
-    <string name="name">Name</string>
+    <string name="username">Username</string>
 </resources>

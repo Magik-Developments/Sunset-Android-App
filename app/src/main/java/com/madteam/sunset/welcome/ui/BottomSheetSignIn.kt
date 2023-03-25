@@ -12,6 +12,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.madteam.sunset.R.string
 import com.madteam.sunset.common.design_system.*
+import com.madteam.sunset.design_system.common.*
 
 const val CARD_HEIGHT = 0.62
 

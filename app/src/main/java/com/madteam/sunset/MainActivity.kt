@@ -6,12 +6,13 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.madteam.sunset.ui.theme.SunsetTheme
-import com.madteam.sunset.welcome.ui.WelcomeScreen
+import com.madteam.sunset.welcome.ui.BottomSheetSignUp
+import com.madteam.sunset.welcome.ui.ModalBottomSheetLayout
 
 class MainActivity : ComponentActivity() {
 
@@ -19,8 +20,16 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             SunsetTheme {
+                val navController = rememberNavController()
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
-                    WelcomeScreen()
+                    NavHost(navController = navController, startDestination = "main") {
+                        composable(route = "main") {
+                            ModalBottomSheetLayout(navController)
+                        }
+                        composable(route = "second") {
+                            BottomSheetSignUp()
+                        }
+                    }
                 }
             }
         }

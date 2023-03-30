@@ -1,9 +1,16 @@
 package com.madteam.sunset.welcome.ui
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -11,27 +18,32 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.madteam.sunset.R.string
-import com.madteam.sunset.common.design_system.*
-import com.madteam.sunset.design_system.common.*
+import com.madteam.sunset.design_system.common.CardHandler
+import com.madteam.sunset.design_system.common.CardShade
+import com.madteam.sunset.design_system.common.CardSubtitle
+import com.madteam.sunset.design_system.common.CardTitle
+import com.madteam.sunset.design_system.common.CustomSpacer
+import com.madteam.sunset.design_system.common.EmailTextField
+import com.madteam.sunset.design_system.common.ForgotPasswordText
+import com.madteam.sunset.design_system.common.OtherLoginIconButtons
+import com.madteam.sunset.design_system.common.OtherLoginMethodsSection
+import com.madteam.sunset.design_system.common.PasswordTextField
+import com.madteam.sunset.design_system.common.PasswordVisibilityOffIcon
+import com.madteam.sunset.design_system.common.SmallButtonDark
 
-const val CARD_HEIGHT = 0.62
+const val CARD_HEIGHT = 0.67
 
 @Composable
 fun BottomSheetSignIn() {
-    Box(
-        Modifier.fillMaxSize(),
-        contentAlignment = Alignment.BottomCenter
+    //CardShade()
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height((LocalConfiguration.current.screenHeightDp * CARD_HEIGHT).dp),
+        backgroundColor = Color(0xFFFFB600),
+        shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp)
     ) {
-        CardShade()
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height((LocalConfiguration.current.screenHeightDp * CARD_HEIGHT).dp),
-            backgroundColor = Color(0xFFFFB600),
-            shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp)
-        ) {
-            CardContent()
-        }
+        CardContent()
     }
 }
 
@@ -51,7 +63,10 @@ fun CardContent() {
         CustomSpacer(size = 16.dp)
         EmailTextField(emailValue = emailValue, onValueChange = { emailValue = it })
         CustomSpacer(size = 16.dp)
-        PasswordTextField(passwordValue = passwordValue, onValueChange = { passwordValue = it }, endIcon =  {PasswordVisibilityOffIcon()})
+        PasswordTextField(
+            passwordValue = passwordValue,
+            onValueChange = { passwordValue = it },
+            endIcon = { PasswordVisibilityOffIcon() })
         CustomSpacer(size = 24.dp)
         SmallButtonDark(onClick = { /*TODO*/ }, text = string.sign_in)
         CustomSpacer(size = 16.dp)

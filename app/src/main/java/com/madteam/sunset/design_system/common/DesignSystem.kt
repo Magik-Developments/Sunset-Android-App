@@ -1,4 +1,4 @@
-package com.madteam.sunset.common.design_system
+package com.madteam.sunset.design_system.common
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background

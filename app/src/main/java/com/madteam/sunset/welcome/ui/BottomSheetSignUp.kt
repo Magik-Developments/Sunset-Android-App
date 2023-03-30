@@ -11,7 +11,6 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.madteam.sunset.R.string
-import com.madteam.sunset.common.design_system.*
 import com.madteam.sunset.design_system.common.*
 
 @Composable

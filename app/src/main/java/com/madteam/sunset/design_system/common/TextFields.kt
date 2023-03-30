@@ -18,7 +18,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.madteam.sunset.R
-import com.madteam.sunset.common.design_system.CustomSpacer
 
 @Composable
 fun DesignSystemTextField(

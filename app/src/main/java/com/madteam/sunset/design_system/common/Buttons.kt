@@ -24,14 +24,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.madteam.sunset.R
-import com.madteam.sunset.common.design_system.CustomSpacer
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
 
 
 @Composable
-fun EmailButton() {
+fun EmailButton(onClick: () -> Unit) {
     Button(
-        onClick = { /*TODO*/ },
+        onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
             .height(48.dp)

@@ -42,12 +42,12 @@ fun BottomSheetSignIn() {
         backgroundColor = Color(0xFFFFB600),
         shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp)
     ) {
-        CardContent()
+        CardContent(onSignInClick = { /*TODO*/ })
     }
 }
 
 @Composable
-fun CardContent() {
+fun CardContent(onSignInClick: () -> Unit) {
     var emailValue by remember { mutableStateOf("") }
     var passwordValue by remember { mutableStateOf("") }
     Column(
@@ -67,7 +67,7 @@ fun CardContent() {
             onValueChange = { passwordValue = it },
             endIcon = { PasswordVisibilityOffIcon() })
         CustomSpacer(size = 24.dp)
-        SmallButtonDark(onClick = { /*TODO*/ }, text = string.sign_in)
+        SmallButtonDark(onClick = onSignInClick, text = string.sign_in)
         CustomSpacer(size = 16.dp)
         ForgotPasswordText()
         CustomSpacer(size = 40.dp)

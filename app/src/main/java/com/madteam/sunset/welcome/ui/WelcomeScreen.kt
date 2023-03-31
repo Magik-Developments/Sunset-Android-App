@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.madteam.sunset.design_system.common.CustomSpacer
 import com.madteam.sunset.design_system.common.EmailButton
@@ -73,4 +74,10 @@ fun ModalBottomSheetLayout() {
             onGoogleClick = { /*TODO*/ },
             onFacebookClick = { /*TODO*/ })
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun WelcomeScreenPrev() {
+    ModalBottomSheetLayout()
 }

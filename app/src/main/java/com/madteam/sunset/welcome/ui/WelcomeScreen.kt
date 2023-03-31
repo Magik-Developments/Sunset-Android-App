@@ -16,9 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import com.madteam.sunset.design_system.common.CustomSpacer
 import com.madteam.sunset.design_system.common.EmailButton
 import com.madteam.sunset.design_system.common.FacebookButton
@@ -29,7 +27,11 @@ import com.madteam.sunset.design_system.common.SunsetLogoImage
 import kotlinx.coroutines.launch
 
 @Composable
-fun WelcomeScreen(onClick: () -> Unit) {
+fun WelcomeScreen(
+    onEmailClick: () -> Unit,
+    onGoogleClick: () -> Unit,
+    onFacebookClick: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -43,16 +45,16 @@ fun WelcomeScreen(onClick: () -> Unit) {
         CustomSpacer(size = 8.dp)
         SubTitle(Modifier.align(Alignment.Start))
         CustomSpacer(size = 56.dp)
-        EmailButton(onClick = onClick)
+        EmailButton(onClick = onEmailClick)
         CustomSpacer(size = 16.dp)
-        GoogleButton()
+        GoogleButton(onClick = onGoogleClick)
         CustomSpacer(size = 16.dp)
-        FacebookButton()
+        FacebookButton(onClick = onFacebookClick)
     }
 }
 
 @Composable
-fun ModalBottomSheetLayout(navController: NavHostController) {
+fun ModalBottomSheetLayout() {
     val sheetState = rememberModalBottomSheetState(initialValue = Hidden)
     val scope = rememberCoroutineScope()
     ModalBottomSheetLayout(
@@ -62,17 +64,13 @@ fun ModalBottomSheetLayout(navController: NavHostController) {
         },
         sheetState = sheetState,
     ) {
-        WelcomeScreen(onClick = {
-            navController.navigate("second")
-            scope.launch {
-                sheetState.animateTo(Expanded)
-            }
-        })
+        WelcomeScreen(
+            onEmailClick = {
+                scope.launch {
+                    sheetState.animateTo(Expanded)
+                }
+            },
+            onGoogleClick = { /*TODO*/ },
+            onFacebookClick = { /*TODO*/ })
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun WelcomeScreenPrev() {
-    WelcomeScreen(onClick = {})
 }

@@ -50,9 +50,9 @@ fun EmailButton(onClick: () -> Unit) {
 }
 
 @Composable
-fun GoogleButton() {
+fun GoogleButton(onClick: () -> Unit) {
     Button(
-        onClick = { /*TODO*/ },
+        onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
             .height(48.dp),
@@ -86,9 +86,9 @@ fun GoogleButton() {
 }
 
 @Composable
-fun FacebookButton() {
+fun FacebookButton(onClick: () -> Unit) {
     Button(
-        onClick = { /*TODO*/ },
+        onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
             .height(48.dp),

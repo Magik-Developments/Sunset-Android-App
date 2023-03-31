@@ -23,17 +23,17 @@ import com.madteam.sunset.design_system.common.CardSubtitle
 import com.madteam.sunset.design_system.common.CardTitle
 import com.madteam.sunset.design_system.common.CustomSpacer
 import com.madteam.sunset.design_system.common.EmailTextField
-import com.madteam.sunset.design_system.common.ForgotPasswordText
 import com.madteam.sunset.design_system.common.OtherLoginIconButtons
 import com.madteam.sunset.design_system.common.OtherLoginMethodsSection
+import com.madteam.sunset.design_system.common.PasswordSecurityIndicator
 import com.madteam.sunset.design_system.common.PasswordTextField
 import com.madteam.sunset.design_system.common.PasswordVisibilityOffIcon
 import com.madteam.sunset.design_system.common.SmallButtonDark
-
-const val CARD_HEIGHT = 0.67
+import com.madteam.sunset.design_system.common.SuccessIcon
+import com.madteam.sunset.design_system.common.UsernameTextField
 
 @Composable
-fun BottomSheetSignIn() {
+fun BottomSheetSignUp() {
     //CardShade()
     Card(
         modifier = Modifier
@@ -42,14 +42,15 @@ fun BottomSheetSignIn() {
         backgroundColor = Color(0xFFFFB600),
         shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp)
     ) {
-        CardContent(onSignInClick = { /*TODO*/ })
+        SignUpCardContent()
     }
 }
 
 @Composable
-fun CardContent(onSignInClick: () -> Unit) {
+fun SignUpCardContent() {
     var emailValue by remember { mutableStateOf("") }
     var passwordValue by remember { mutableStateOf("") }
+    var usernameValue by remember { mutableStateOf("") }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.padding(horizontal = 36.dp)
@@ -57,28 +58,30 @@ fun CardContent(onSignInClick: () -> Unit) {
         CustomSpacer(size = 8.dp)
         CardHandler()
         CustomSpacer(size = 16.dp)
-        CardTitle(string.welcome_back)
-        CardSubtitle(string.enter_details_below)
-        CustomSpacer(size = 16.dp)
-        EmailTextField(emailValue = emailValue, onValueChange = { emailValue = it })
+        CardTitle(string.get_started)
+        CardSubtitle(string.no_day_without_sunset)
+        CustomSpacer(size = 8.dp)
+        EmailTextField(emailValue = emailValue, onValueChange = { emailValue = it }, endIcon = { SuccessIcon() })
         CustomSpacer(size = 16.dp)
         PasswordTextField(
             passwordValue = passwordValue,
             onValueChange = { passwordValue = it },
             endIcon = { PasswordVisibilityOffIcon() })
-        CustomSpacer(size = 24.dp)
-        SmallButtonDark(onClick = onSignInClick, text = string.sign_in)
+        CustomSpacer(size = 8.dp)
+        PasswordSecurityIndicator()
         CustomSpacer(size = 16.dp)
-        ForgotPasswordText()
-        CustomSpacer(size = 40.dp)
-        OtherLoginMethodsSection(string.not_registered_yet_signup_with)
+        UsernameTextField(usernameValue = usernameValue, onValueChange = { usernameValue = it })
         CustomSpacer(size = 24.dp)
-        OtherLoginIconButtons(firstMethod = { /* TODO */ }, secondMethod = { /* TODO */ })
+        SmallButtonDark(onClick = { /*TODO*/ }, text = string.sign_up)
+        CustomSpacer(size = 16.dp)
+        OtherLoginMethodsSection(string.already_have_an_account)
+        CustomSpacer(size = 8.dp)
+        OtherLoginIconButtons(firstMethod = {/*todo*/ }, secondMethod = {/*todo*/ })
     }
 }
 
 @Preview(showSystemUi = true)
 @Composable
-fun BottomSheetSignInPreview() {
-    BottomSheetSignIn()
+fun BottomSheetSignUnPreview() {
+    BottomSheetSignUp()
 }

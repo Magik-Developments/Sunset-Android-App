@@ -6,12 +6,9 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import com.madteam.sunset.ui.theme.SunsetTheme
-import com.madteam.sunset.welcome.ui.WelcomeScreen
+import com.madteam.sunset.welcome.ui.ModalBottomSheetLayout
 
 class MainActivity : ComponentActivity() {
 
@@ -20,7 +17,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             SunsetTheme {
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
-                    WelcomeScreen()
+                    ModalBottomSheetLayout()
                 }
             }
         }

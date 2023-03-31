@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
-import androidx.navigation.compose.rememberNavController
 import com.madteam.sunset.ui.theme.SunsetTheme
 import com.madteam.sunset.welcome.ui.ModalBottomSheetLayout
 

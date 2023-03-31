@@ -3,7 +3,13 @@ package com.madteam.sunset.design_system.common
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Text
@@ -52,58 +58,24 @@ fun DesignSystemTextField(
 }
 
 @Composable
-fun PasswordSecurityIndicator(passwordValue: String) {
-    val passwordSecurity = evaluatePasswordSecurity(passwordValue)
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .padding(start = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-       repeat(3) { level ->
-           val indicatorLevel = when(passwordSecurity){
-               PasswordStrength.WEAK -> 1
-               PasswordStrength.MEDIUM -> if (level < 2) 2 else 1
-               PasswordStrength.STRONG -> if (level < 2) 2 else 1
-               PasswordStrength.VERY_STRONG -> if (level < 2) 2 else 1
-           }
-           PasswordIndicatorBox(level = indicatorLevel)
-           if (level < 2) {
-               CustomSpacer(size = 6.dp)
-           }
-       }
-    }
-}
-
-enum class PasswordStrength {
-    WEAK, MEDIUM, STRONG, VERY_STRONG
-}
-
-fun evaluatePasswordSecurity(passwordValue: String): PasswordStrength {
-    val hasLowerCase = passwordValue.matches(Regex(".*[a-z].*"))
-    val hasUpperCase = passwordValue.matches(Regex(".*[A-Z].*"))
-    val hasDigit = passwordValue.matches(Regex(".*\\d.*"))
-    val hasSpecialChar = passwordValue.matches(Regex(".*[!@#\$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?].*"))
-
-    return when {
-        passwordValue.isBlank() -> PasswordStrength.WEAK
-        passwordValue.length < 8 || !hasLowerCase || !hasUpperCase || !hasDigit ->
-            PasswordStrength.MEDIUM
-        passwordValue.length < 12 || (!hasSpecialChar && hasDigit) ->
-            PasswordStrength.STRONG
-        else ->
-            PasswordStrength.VERY_STRONG
+fun PasswordSecurityIndicator() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 8.dp), verticalAlignment = Alignment.CenterVertically
+    ) {
+        PasswordIndicatorBox()
     }
 }
 
 @Composable
-fun PasswordIndicatorBox(level: Int) {
-    val color = when (level) {
-        1 -> Color(0xFFD9D9D9)
-        2 -> Color(0xFF53A653)
-        else -> Color(0xFFD9D9D9)
-    }
-    Box(modifier = Modifier
-        .size(height = 6.dp, width = 28.dp)
-        .clip(RoundedCornerShape(50.dp))
-        .background(color = color))
+fun PasswordIndicatorBox() {
+    Box(
+        modifier = Modifier
+            .size(height = 6.dp, width = 28.dp)
+            .clip(RoundedCornerShape(50.dp))
+            .background(color = Color(0xFFD9D9D9))
+    )
 }
 
 @Composable

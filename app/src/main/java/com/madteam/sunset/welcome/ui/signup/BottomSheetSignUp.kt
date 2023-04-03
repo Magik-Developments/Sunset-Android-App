@@ -1,4 +1,4 @@
-package com.madteam.sunset.welcome.ui
+package com.madteam.sunset.welcome.ui.signup
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,10 +31,10 @@ import com.madteam.sunset.design_system.common.PasswordVisibilityOffIcon
 import com.madteam.sunset.design_system.common.SmallButtonDark
 import com.madteam.sunset.design_system.common.SuccessIcon
 import com.madteam.sunset.design_system.common.UsernameTextField
+import com.madteam.sunset.welcome.ui.signin.CARD_HEIGHT
 
 @Composable
 fun BottomSheetSignUp() {
-    //CardShade()
     Card(
         modifier = Modifier
             .fillMaxWidth()

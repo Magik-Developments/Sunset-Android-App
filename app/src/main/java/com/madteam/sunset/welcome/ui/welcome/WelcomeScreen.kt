@@ -2,6 +2,7 @@
 
 package com.madteam.sunset.welcome.ui
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,15 +10,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetLayout
-import androidx.compose.material.ModalBottomSheetValue.Expanded
-import androidx.compose.material.ModalBottomSheetValue.Hidden
-import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.madteam.sunset.design_system.common.CustomSpacer
 import com.madteam.sunset.design_system.common.EmailButton
 import com.madteam.sunset.design_system.common.FacebookButton
@@ -25,6 +26,8 @@ import com.madteam.sunset.design_system.common.GoogleButton
 import com.madteam.sunset.design_system.common.MainTitle
 import com.madteam.sunset.design_system.common.SubTitle
 import com.madteam.sunset.design_system.common.SunsetLogoImage
+import com.madteam.sunset.welcome.ui.signin.BottomSheetSignIn
+import com.madteam.sunset.welcome.ui.welcome.WelcomeViewModel
 import kotlinx.coroutines.launch
 
 @Composable
@@ -55,9 +58,10 @@ fun WelcomeScreen(
 }
 
 @Composable
-fun ModalBottomSheetLayout() {
-    val sheetState = rememberModalBottomSheetState(initialValue = Hidden)
-    val scope = rememberCoroutineScope()
+fun ModalBottomSheetLayout(welcomeViewModel: WelcomeViewModel = hiltViewModel()) {
+    val sheetState = welcomeViewModel.sheetState.collectAsState().value
+    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
     ModalBottomSheetLayout(
         sheetShape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp),
         sheetContent = {
@@ -66,13 +70,9 @@ fun ModalBottomSheetLayout() {
         sheetState = sheetState,
     ) {
         WelcomeScreen(
-            onEmailClick = {
-                scope.launch {
-                    sheetState.animateTo(Expanded)
-                }
-            },
-            onGoogleClick = { /*TODO*/ },
-            onFacebookClick = { /*TODO*/ })
+            onEmailClick = { coroutineScope.launch { welcomeViewModel.expandBottomSheet() } },
+            onGoogleClick = { Toast.makeText(context, "Do Google Login", Toast.LENGTH_SHORT).show() },
+            onFacebookClick = { Toast.makeText(context, "Do Facebook Login", Toast.LENGTH_SHORT).show() })
     }
 }
 

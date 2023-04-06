@@ -21,7 +21,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.madteam.sunset.R
-import com.madteam.sunset.ui.theme.primaryBoldDisplayM
+import com.madteam.sunset.ui.theme.primaryBoldDisplayS
 import com.madteam.sunset.ui.theme.secondaryRegularBodyL
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyM
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineM
@@ -54,12 +54,12 @@ fun MainTitle() {
         Text(
             modifier = Modifier.fillMaxWidth(),
             text = stringResource(R.string.hello),
-            style = primaryBoldDisplayM
+            style = primaryBoldDisplayS
         )
         Text(
             modifier = Modifier.fillMaxWidth(),
             text = stringResource(R.string.we_are_sunset),
-            style = primaryBoldDisplayM
+            style = primaryBoldDisplayS
         )
     }
 }

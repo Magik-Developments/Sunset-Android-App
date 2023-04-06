@@ -1,8 +1,13 @@
 package com.madteam.sunset.design_system.common
 
 import androidx.annotation.StringRes
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
@@ -11,7 +16,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -21,7 +25,6 @@ import com.madteam.sunset.ui.theme.primaryBoldDisplayM
 import com.madteam.sunset.ui.theme.secondaryRegularBodyL
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyM
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineM
-import com.madteam.sunset.welcome.ui.CARD_HEIGHT
 
 // Spacers
 
@@ -70,7 +73,6 @@ fun SubTitle(modifier: Modifier) {
     )
 }
 
-
 //Sign In / Sign Up Card
 
 @Composable
@@ -81,17 +83,6 @@ fun CardHandler() {
         modifier = Modifier
             .width(122.dp)
             .clip(RoundedCornerShape(50.dp))
-    )
-}
-
-@Composable
-fun CardShade() {
-    Box(
-        modifier = Modifier
-            .height((LocalConfiguration.current.screenHeightDp * CARD_HEIGHT + 8).dp)
-            .width((LocalConfiguration.current.screenWidthDp * 0.8).dp)
-            .clip(RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp))
-            .background(Color(0xFFFFe094))
     )
 }
 

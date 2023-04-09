@@ -8,7 +8,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import com.madteam.sunset.ui.theme.SunsetTheme
-import com.madteam.sunset.welcome.ui.ModalBottomSheetLayout
+import com.madteam.sunset.welcome.ui.welcome.ModalBottomSheetLayout
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

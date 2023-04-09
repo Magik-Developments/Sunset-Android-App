@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterialApi::class, ExperimentalMaterialApi::class)
 
-package com.madteam.sunset.welcome.ui
+package com.madteam.sunset.welcome.ui.welcome
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
@@ -27,7 +27,6 @@ import com.madteam.sunset.design_system.common.MainTitle
 import com.madteam.sunset.design_system.common.SubTitle
 import com.madteam.sunset.design_system.common.SunsetLogoImage
 import com.madteam.sunset.welcome.ui.signin.BottomSheetSignIn
-import com.madteam.sunset.welcome.ui.welcome.WelcomeViewModel
 import kotlinx.coroutines.launch
 
 @Composable
@@ -67,7 +66,7 @@ fun ModalBottomSheetLayout(welcomeViewModel: WelcomeViewModel = hiltViewModel())
         sheetContent = {
             BottomSheetSignIn()
         },
-        sheetState = sheetState,
+        sheetState = sheetState
     ) {
         WelcomeScreen(
             onEmailClick = { coroutineScope.launch { welcomeViewModel.expandBottomSheet() } },

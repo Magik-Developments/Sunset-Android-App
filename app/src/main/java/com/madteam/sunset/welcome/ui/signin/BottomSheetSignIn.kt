@@ -19,69 +19,78 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.madteam.sunset.R.string
-import com.madteam.sunset.design_system.common.*
-import com.madteam.sunset.navigation.SunsetRoutes.SignUpCard
+import com.madteam.sunset.common.navigation.SunsetRoutes.SignUpCard
+import com.madteam.sunset.design_system.common.CardHandler
+import com.madteam.sunset.design_system.common.CardSubtitle
+import com.madteam.sunset.design_system.common.CardTitle
+import com.madteam.sunset.design_system.common.CustomSpacer
+import com.madteam.sunset.design_system.common.EmailTextField
+import com.madteam.sunset.design_system.common.ForgotPasswordText
+import com.madteam.sunset.design_system.common.OtherLoginIconButtons
+import com.madteam.sunset.design_system.common.OtherLoginMethodsSection
+import com.madteam.sunset.design_system.common.PasswordTextField
+import com.madteam.sunset.design_system.common.PasswordVisibilityOffIcon
+import com.madteam.sunset.design_system.common.SmallButtonDark
 
 const val CARD_HEIGHT = 0.67
 
 @Composable
 fun BottomSheetSignIn(navController: NavHostController) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height((LocalConfiguration.current.screenHeightDp * CARD_HEIGHT).dp),
-        backgroundColor = Color(0xFFFFB600),
-        shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp)
-    ) {
-        CardContent(navController = navController)
-    }
+  Card(
+    modifier = Modifier
+        .fillMaxWidth()
+        .height((LocalConfiguration.current.screenHeightDp * CARD_HEIGHT).dp),
+    backgroundColor = Color(0xFFFFB600),
+    shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp)
+  ) {
+    CardContent(navController = navController)
+  }
 }
 
 @Composable
 fun CardContent(
-    signInViewModel: SignInViewModel = hiltViewModel(),
-    navController: NavHostController
+  signInViewModel: SignInViewModel = hiltViewModel(),
+  navController: NavHostController
 ) {
-    val emailValue = signInViewModel.email.collectAsState().value
-    val passwordValue = signInViewModel.password.collectAsState().value
-    val context = LocalContext.current
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(horizontal = 36.dp)
-    ) {
-        CustomSpacer(size = 8.dp)
-        CardHandler()
-        CustomSpacer(size = 16.dp)
-        CardTitle(string.welcome_back)
-        CardSubtitle(string.enter_details_below)
-        CustomSpacer(size = 16.dp)
-        EmailTextField(
-            emailValue = emailValue,
-            onValueChange = { signInViewModel.onValuesSignInChange(it, passwordValue) }
-        )
-        CustomSpacer(size = 16.dp)
-        PasswordTextField(
-            passwordValue = passwordValue,
-            onValueChange = { signInViewModel.onValuesSignInChange(emailValue, it) },
-            endIcon = { PasswordVisibilityOffIcon() })
-        CustomSpacer(size = 24.dp)
-        SmallButtonDark(
-            onClick = { Toast.makeText(context, "Siguiente pantalla", Toast.LENGTH_SHORT).show() },
-            text = string.sign_in
-        )
-        CustomSpacer(size = 16.dp)
-        ForgotPasswordText()
-        CustomSpacer(size = 40.dp)
-        OtherLoginMethodsSection(string.not_registered_yet_signup_with)
-        CustomSpacer(size = 24.dp)
-        OtherLoginIconButtons(
-            firstMethod = { Toast.makeText(context, "Do Google Login", Toast.LENGTH_SHORT).show() },
-            secondMethod = { navController.navigate(route = SignUpCard.route ) })
-    }
+  val emailValue = signInViewModel.email.collectAsState().value
+  val passwordValue = signInViewModel.password.collectAsState().value
+  val context = LocalContext.current
+  Column(
+    horizontalAlignment = Alignment.CenterHorizontally,
+    modifier = Modifier.padding(horizontal = 36.dp)
+  ) {
+    CustomSpacer(size = 8.dp)
+    CardHandler()
+    CustomSpacer(size = 16.dp)
+    CardTitle(string.welcome_back)
+    CardSubtitle(string.enter_details_below)
+    CustomSpacer(size = 16.dp)
+    EmailTextField(
+      emailValue = emailValue,
+      onValueChange = { signInViewModel.onValuesSignInChange(it, passwordValue) }
+    )
+    CustomSpacer(size = 16.dp)
+    PasswordTextField(
+      passwordValue = passwordValue,
+      onValueChange = { signInViewModel.onValuesSignInChange(emailValue, it) },
+      endIcon = { PasswordVisibilityOffIcon() })
+    CustomSpacer(size = 24.dp)
+    SmallButtonDark(
+      onClick = { Toast.makeText(context, "Siguiente pantalla", Toast.LENGTH_SHORT).show() },
+      text = string.sign_in
+    )
+    CustomSpacer(size = 16.dp)
+    ForgotPasswordText()
+    CustomSpacer(size = 40.dp)
+    OtherLoginMethodsSection(string.not_registered_yet_signup_with)
+    CustomSpacer(size = 24.dp)
+    OtherLoginIconButtons(
+      firstMethod = { Toast.makeText(context, "Do Google Login", Toast.LENGTH_SHORT).show() },
+      secondMethod = { navController.navigate(route = SignUpCard.route) })
+  }
 }
 
 @Preview(showSystemUi = true)
 @Composable
 fun BottomSheetSignInPreview() {
-
 }

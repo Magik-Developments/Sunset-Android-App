@@ -1,4 +1,4 @@
-package com.madteam.sunset.navigation
+package com.madteam.sunset.common.navigation
 
 sealed class SunsetRoutes(val route: String){
   object WelcomeScreen: SunsetRoutes(route = "welcome_screen")

@@ -1,6 +1,8 @@
 package com.madteam.sunset.welcome.ui.signin
 
+import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
+import com.madteam.sunset.common.navigation.SunsetRoutes.SignUpCard
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,4 +21,5 @@ class SignInViewModel @Inject constructor() : ViewModel() {
         _email.value = emailValue
         _password.value = passwordValue
     }
+
 }

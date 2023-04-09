@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.madteam.sunset.R.string
 import com.madteam.sunset.design_system.common.*
-import com.madteam.sunset.navigation.SunsetRoutes.SignInCard
+import com.madteam.sunset.common.navigation.SunsetRoutes.SignInCard
 import com.madteam.sunset.welcome.ui.signin.CARD_HEIGHT
 
 @Composable

@@ -34,8 +34,8 @@ import com.madteam.sunset.design_system.common.GoogleButton
 import com.madteam.sunset.design_system.common.MainTitle
 import com.madteam.sunset.design_system.common.SubTitle
 import com.madteam.sunset.design_system.common.SunsetLogoImage
-import com.madteam.sunset.navigation.SunsetNavigation
-import com.madteam.sunset.navigation.SunsetRoutes.SignInCard
+import com.madteam.sunset.common.navigation.SunsetNavigation
+import com.madteam.sunset.common.navigation.SunsetRoutes.SignInCard
 import com.madteam.sunset.welcome.ui.signin.CARD_HEIGHT
 import kotlinx.coroutines.launch
 

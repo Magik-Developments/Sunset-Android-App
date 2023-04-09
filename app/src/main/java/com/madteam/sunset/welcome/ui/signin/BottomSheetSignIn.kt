@@ -17,23 +17,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import com.madteam.sunset.R.string
-import com.madteam.sunset.design_system.common.CardHandler
-import com.madteam.sunset.design_system.common.CardSubtitle
-import com.madteam.sunset.design_system.common.CardTitle
-import com.madteam.sunset.design_system.common.CustomSpacer
-import com.madteam.sunset.design_system.common.EmailTextField
-import com.madteam.sunset.design_system.common.ForgotPasswordText
-import com.madteam.sunset.design_system.common.OtherLoginIconButtons
-import com.madteam.sunset.design_system.common.OtherLoginMethodsSection
-import com.madteam.sunset.design_system.common.PasswordTextField
-import com.madteam.sunset.design_system.common.PasswordVisibilityOffIcon
-import com.madteam.sunset.design_system.common.SmallButtonDark
+import com.madteam.sunset.design_system.common.*
+import com.madteam.sunset.navigation.SunsetRoutes.SignUpCard
 
 const val CARD_HEIGHT = 0.67
 
 @Composable
-fun BottomSheetSignIn() {
+fun BottomSheetSignIn(navController: NavHostController) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -41,12 +33,15 @@ fun BottomSheetSignIn() {
         backgroundColor = Color(0xFFFFB600),
         shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp)
     ) {
-        CardContent()
+        CardContent(navController = navController)
     }
 }
 
 @Composable
-fun CardContent(signInViewModel: SignInViewModel = hiltViewModel()) {
+fun CardContent(
+    signInViewModel: SignInViewModel = hiltViewModel(),
+    navController: NavHostController
+) {
     val emailValue = signInViewModel.email.collectAsState().value
     val passwordValue = signInViewModel.password.collectAsState().value
     val context = LocalContext.current
@@ -81,12 +76,12 @@ fun CardContent(signInViewModel: SignInViewModel = hiltViewModel()) {
         CustomSpacer(size = 24.dp)
         OtherLoginIconButtons(
             firstMethod = { Toast.makeText(context, "Do Google Login", Toast.LENGTH_SHORT).show() },
-            secondMethod = { Toast.makeText(context, "Go to Register Screen", Toast.LENGTH_SHORT).show() })
+            secondMethod = { navController.navigate(route = SignUpCard.route ) })
     }
 }
 
 @Preview(showSystemUi = true)
 @Composable
 fun BottomSheetSignInPreview() {
-    BottomSheetSignIn()
+
 }

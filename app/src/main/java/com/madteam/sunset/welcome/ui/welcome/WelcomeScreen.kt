@@ -1,11 +1,16 @@
-@file:OptIn(ExperimentalMaterialApi::class, ExperimentalMaterialApi::class)
+@file:OptIn(ExperimentalMaterialApi::class, ExperimentalMaterialApi::class,
+    ExperimentalMaterialApi::class
+)
 
 package com.madteam.sunset.welcome.ui.welcome
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
@@ -15,10 +20,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.madteam.sunset.design_system.common.CustomSpacer
 import com.madteam.sunset.design_system.common.EmailButton
 import com.madteam.sunset.design_system.common.FacebookButton
@@ -26,7 +34,9 @@ import com.madteam.sunset.design_system.common.GoogleButton
 import com.madteam.sunset.design_system.common.MainTitle
 import com.madteam.sunset.design_system.common.SubTitle
 import com.madteam.sunset.design_system.common.SunsetLogoImage
-import com.madteam.sunset.welcome.ui.signin.BottomSheetSignIn
+import com.madteam.sunset.navigation.SunsetNavigation
+import com.madteam.sunset.navigation.SunsetRoutes.SignInCard
+import com.madteam.sunset.welcome.ui.signin.CARD_HEIGHT
 import kotlinx.coroutines.launch
 
 @Composable
@@ -57,14 +67,16 @@ fun WelcomeScreen(
 }
 
 @Composable
-fun ModalBottomSheetLayout(welcomeViewModel: WelcomeViewModel = hiltViewModel()) {
+fun WelcomeScreenContent(welcomeViewModel: WelcomeViewModel = hiltViewModel()) {
     val sheetState = welcomeViewModel.sheetState.collectAsState().value
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     ModalBottomSheetLayout(
         sheetShape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp),
         sheetContent = {
-            BottomSheetSignIn()
+            Box(Modifier.fillMaxWidth().height((LocalConfiguration.current.screenHeightDp * CARD_HEIGHT).dp)) {
+                SunsetNavigation(SignInCard.route)
+            }
         },
         sheetState = sheetState
     ) {
@@ -78,5 +90,4 @@ fun ModalBottomSheetLayout(welcomeViewModel: WelcomeViewModel = hiltViewModel())
 @Preview(showBackground = true)
 @Composable
 fun WelcomeScreenPrev() {
-    ModalBottomSheetLayout()
 }

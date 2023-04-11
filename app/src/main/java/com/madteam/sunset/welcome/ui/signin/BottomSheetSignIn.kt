@@ -17,9 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import com.madteam.sunset.R.string
-import com.madteam.sunset.common.navigation.SunsetRoutes.SignUpCard
 import com.madteam.sunset.design_system.common.CardHandler
 import com.madteam.sunset.design_system.common.CardSubtitle
 import com.madteam.sunset.design_system.common.CardTitle
@@ -38,8 +36,8 @@ const val CARD_HEIGHT = 0.67
 fun BottomSheetSignIn(navigateToSignUp: () -> Unit) {
   Card(
     modifier = Modifier
-        .fillMaxWidth()
-        .height((LocalConfiguration.current.screenHeightDp * CARD_HEIGHT).dp),
+      .fillMaxWidth()
+      .height((LocalConfiguration.current.screenHeightDp * CARD_HEIGHT).dp),
     backgroundColor = Color(0xFFFFB600),
     shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp)
   ) {
@@ -86,7 +84,8 @@ fun CardContent(
     CustomSpacer(size = 24.dp)
     OtherLoginIconButtons(
       firstMethod = { Toast.makeText(context, "Do Google Login", Toast.LENGTH_SHORT).show() },
-      secondMethod = navigateToSignUp)
+      secondMethod = navigateToSignUp
+    )
   }
 }
 

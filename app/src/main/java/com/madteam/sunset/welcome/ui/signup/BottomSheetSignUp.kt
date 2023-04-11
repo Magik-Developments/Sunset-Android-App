@@ -20,15 +20,27 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.madteam.sunset.R.string
-import com.madteam.sunset.design_system.common.*
+import com.madteam.sunset.design_system.common.CardHandler
+import com.madteam.sunset.design_system.common.CardSubtitle
+import com.madteam.sunset.design_system.common.CardTitle
+import com.madteam.sunset.design_system.common.CustomSpacer
+import com.madteam.sunset.design_system.common.EmailTextField
+import com.madteam.sunset.design_system.common.OtherLoginIconButtons
+import com.madteam.sunset.design_system.common.OtherLoginMethodsSection
+import com.madteam.sunset.design_system.common.PasswordSecurityIndicator
+import com.madteam.sunset.design_system.common.PasswordTextField
+import com.madteam.sunset.design_system.common.PasswordVisibilityOffIcon
+import com.madteam.sunset.design_system.common.SmallButtonDark
+import com.madteam.sunset.design_system.common.SuccessIcon
+import com.madteam.sunset.design_system.common.UsernameTextField
 import com.madteam.sunset.welcome.ui.signin.CARD_HEIGHT
 
 @Composable
 fun BottomSheetSignUp(navigateToSignIn: () -> Unit) {
   Card(
     modifier = Modifier
-        .fillMaxWidth()
-        .height((LocalConfiguration.current.screenHeightDp * CARD_HEIGHT).dp),
+      .fillMaxWidth()
+      .height((LocalConfiguration.current.screenHeightDp * CARD_HEIGHT).dp),
     backgroundColor = Color(0xFFFFB600),
     shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp)
   ) {

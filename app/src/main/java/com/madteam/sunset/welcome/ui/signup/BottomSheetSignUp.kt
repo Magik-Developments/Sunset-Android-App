@@ -37,8 +37,8 @@ import com.madteam.sunset.welcome.ui.signin.CARD_HEIGHT
 fun BottomSheetSignUp() {
   Card(
     modifier = Modifier
-        .fillMaxWidth()
-        .height((LocalConfiguration.current.screenHeightDp * CARD_HEIGHT).dp),
+      .fillMaxWidth()
+      .height((LocalConfiguration.current.screenHeightDp * CARD_HEIGHT).dp),
     backgroundColor = Color(0xFFFFB600),
     shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp)
   ) {
@@ -64,18 +64,23 @@ fun SignUpCardContent() {
     EmailTextField(
       emailValue = emailValue,
       onValueChange = { emailValue = it },
-      endIcon = { SuccessIcon() })
+      endIcon = { SuccessIcon() }
+    )
     CustomSpacer(size = 16.dp)
     PasswordTextField(
       passwordValue = passwordValue,
       onValueChange = { passwordValue = it },
-      endIcon = { PasswordVisibilityOffIcon() })
+      endIcon = { PasswordVisibilityOffIcon() }
+    )
     CustomSpacer(size = 8.dp)
     PasswordSecurityIndicator()
     CustomSpacer(size = 16.dp)
-    UsernameTextField(usernameValue = usernameValue, onValueChange = { usernameValue = it })
+    UsernameTextField(
+      usernameValue = usernameValue,
+      onValueChange = { usernameValue = it }
+    )
     CustomSpacer(size = 24.dp)
-    SmallButtonDark(onClick = { /*TODO*/ }, text = string.sign_up)
+    SmallButtonDark(onClick = { /*TODO*/ }, text = string.sign_up, false)
     CustomSpacer(size = 16.dp)
     OtherLoginMethodsSection(string.already_have_an_account)
     CustomSpacer(size = 8.dp)

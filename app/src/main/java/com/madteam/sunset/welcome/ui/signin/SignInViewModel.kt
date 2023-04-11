@@ -15,8 +15,21 @@ class SignInViewModel @Inject constructor() : ViewModel() {
     private val _password = MutableStateFlow("")
     val password: StateFlow<String> = _password
 
+    private val _formError = MutableStateFlow(false)
+    val formError: StateFlow<Boolean> = _formError
+
     fun onValuesSignInChange(emailValue: String, passwordValue: String) {
         _email.value = emailValue
         _password.value = passwordValue
+        checkIfFormIsValid()
+    }
+
+    private fun checkIfEmailIsValid(): Boolean {
+        val emailRegex = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")
+        return emailRegex.matches(_email.value)
+    }
+
+    fun checkIfFormIsValid(){
+        _formError.value = (checkIfEmailIsValid() && _password.value.isNotBlank())
     }
 }

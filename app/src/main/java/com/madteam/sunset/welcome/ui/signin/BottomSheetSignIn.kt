@@ -35,7 +35,7 @@ import com.madteam.sunset.design_system.common.SmallButtonDark
 const val CARD_HEIGHT = 0.67
 
 @Composable
-fun BottomSheetSignIn(navController: NavHostController) {
+fun BottomSheetSignIn(navigateToSignUp: () -> Unit) {
   Card(
     modifier = Modifier
         .fillMaxWidth()
@@ -43,14 +43,14 @@ fun BottomSheetSignIn(navController: NavHostController) {
     backgroundColor = Color(0xFFFFB600),
     shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp)
   ) {
-    CardContent(navController = navController)
+    CardContent(navigateToSignUp = navigateToSignUp)
   }
 }
 
 @Composable
 fun CardContent(
   signInViewModel: SignInViewModel = hiltViewModel(),
-  navController: NavHostController
+  navigateToSignUp: () -> Unit
 ) {
   val emailValue = signInViewModel.email.collectAsState().value
   val passwordValue = signInViewModel.password.collectAsState().value
@@ -86,7 +86,7 @@ fun CardContent(
     CustomSpacer(size = 24.dp)
     OtherLoginIconButtons(
       firstMethod = { Toast.makeText(context, "Do Google Login", Toast.LENGTH_SHORT).show() },
-      secondMethod = { navController.navigate(route = SignUpCard.route) })
+      secondMethod = navigateToSignUp)
   }
 }
 

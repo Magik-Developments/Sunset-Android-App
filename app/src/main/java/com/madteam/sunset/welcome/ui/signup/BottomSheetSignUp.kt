@@ -19,14 +19,12 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import com.madteam.sunset.R.string
 import com.madteam.sunset.design_system.common.*
-import com.madteam.sunset.common.navigation.SunsetRoutes.SignInCard
 import com.madteam.sunset.welcome.ui.signin.CARD_HEIGHT
 
 @Composable
-fun BottomSheetSignUp(navController: NavHostController) {
+fun BottomSheetSignUp(navigateToSignIn: () -> Unit) {
   Card(
     modifier = Modifier
         .fillMaxWidth()
@@ -34,12 +32,12 @@ fun BottomSheetSignUp(navController: NavHostController) {
     backgroundColor = Color(0xFFFFB600),
     shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp)
   ) {
-    SignUpCardContent(navController)
+    SignUpCardContent(navigateToSignIn = navigateToSignIn)
   }
 }
 
 @Composable
-fun SignUpCardContent(navController: NavHostController) {
+fun SignUpCardContent(navigateToSignIn: () -> Unit) {
   var emailValue by remember { mutableStateOf("") }
   var passwordValue by remember { mutableStateOf("") }
   var usernameValue by remember { mutableStateOf("") }
@@ -75,7 +73,7 @@ fun SignUpCardContent(navController: NavHostController) {
     CustomSpacer(size = 8.dp)
     OtherLoginIconButtons(
       firstMethod = { Toast.makeText(context, "Do Google Login", Toast.LENGTH_SHORT).show() },
-      secondMethod = { navController.navigate(route = SignInCard.route ) }
+      secondMethod = navigateToSignIn
     )
   }
 }

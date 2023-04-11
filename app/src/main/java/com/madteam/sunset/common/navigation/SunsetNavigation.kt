@@ -16,8 +16,8 @@ fun SunsetNavigation(startDestination: String){
   val navController = rememberNavController()
   NavHost(navController = navController, startDestination = startDestination ){
     composable(WelcomeScreen.route) { WelcomeScreenContent() }
-    composable(SignInCard.route) { BottomSheetSignIn(navController) }
-    composable(SignUpCard.route) { BottomSheetSignUp(navController) }
+    composable(SignInCard.route) { BottomSheetSignIn(navigateToSignUp = {navController.navigate(SignUpCard.route)}) }
+    composable(SignUpCard.route) { BottomSheetSignUp(navigateToSignIn = {navController.navigate(SignInCard.route)}) }
   }
 
 }

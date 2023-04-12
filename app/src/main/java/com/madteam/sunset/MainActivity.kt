@@ -7,8 +7,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
+import com.madteam.sunset.common.navigation.SunsetNavigation
+import com.madteam.sunset.common.navigation.SunsetRoutes.WelcomeScreen
 import com.madteam.sunset.ui.theme.SunsetTheme
-import com.madteam.sunset.welcome.ui.welcome.ModalBottomSheetLayout
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -19,7 +20,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             SunsetTheme {
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
-                    ModalBottomSheetLayout()
+                    SunsetNavigation(WelcomeScreen.route)
                 }
             }
         }

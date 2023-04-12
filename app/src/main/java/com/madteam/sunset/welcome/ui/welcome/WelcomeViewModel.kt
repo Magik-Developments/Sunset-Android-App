@@ -26,5 +26,4 @@ class WelcomeViewModel @Inject constructor() : ViewModel() {
         _sheetState.value.animateTo(Expanded, animationSpec)
     }
 
-
 }

@@ -32,4 +32,5 @@ class SignInViewModel @Inject constructor() : ViewModel() {
   fun checkIfFormIsValid() {
     _formError.value = (checkIfEmailIsValid() && _password.value.isNotBlank())
   }
+  
 }

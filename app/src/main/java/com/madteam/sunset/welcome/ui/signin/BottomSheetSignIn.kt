@@ -52,6 +52,7 @@ fun CardContent(
 ) {
   val emailValue = signInViewModel.email.collectAsState().value
   val passwordValue = signInViewModel.password.collectAsState().value
+  val validForm = signInViewModel.formError.collectAsState().value
   val context = LocalContext.current
   Column(
     horizontalAlignment = Alignment.CenterHorizontally,

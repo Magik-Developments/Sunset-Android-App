@@ -8,10 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -19,6 +16,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.madteam.sunset.R.string
 import com.madteam.sunset.design_system.common.CardHandler
 import com.madteam.sunset.design_system.common.CardSubtitle
@@ -49,10 +47,17 @@ fun BottomSheetSignUp(navigateToSignIn: () -> Unit) {
 }
 
 @Composable
-fun SignUpCardContent(navigateToSignIn: () -> Unit) {
-  var emailValue by remember { mutableStateOf("") }
-  var passwordValue by remember { mutableStateOf("") }
-  var usernameValue by remember { mutableStateOf("") }
+fun SignUpCardContent(
+  navigateToSignIn: () -> Unit,
+  signUpViewModel: SignUpViewModel = hiltViewModel()
+) {
+  val emailValue = signUpViewModel.email.collectAsState().value
+  val passwordValue = signUpViewModel.password.collectAsState().value
+  val validForm = signUpViewModel.formError.collectAsState().value
+  val validEmail = signUpViewModel.validEmail.collectAsState().value
+  val validUsername = signUpViewModel.validUsername.collectAsState().value
+  val usernameValue = signUpViewModel.username.collectAsState().value
+  val passwordStrength = signUpViewModel.passwordStrength.collectAsState().value
   val context = LocalContext.current
 
   Column(
@@ -67,24 +72,29 @@ fun SignUpCardContent(navigateToSignIn: () -> Unit) {
     CustomSpacer(size = 8.dp)
     EmailTextField(
       emailValue = emailValue,
-      onValueChange = { emailValue = it },
-      endIcon = { SuccessIcon() }
+      onValueChange = { signUpViewModel.onValuesSignUpChange(it, passwordValue, usernameValue) },
+      endIcon = { if (validEmail) SuccessIcon() }
     )
     CustomSpacer(size = 16.dp)
     PasswordTextField(
       passwordValue = passwordValue,
-      onValueChange = { passwordValue = it },
+      onValueChange = {
+        signUpViewModel.onValuesSignUpChange(emailValue, it, usernameValue)
+      },
       endIcon = { PasswordVisibilityOffIcon() }
     )
     CustomSpacer(size = 8.dp)
-    PasswordSecurityIndicator()
+    PasswordSecurityIndicator(passwordStrength)
     CustomSpacer(size = 16.dp)
     UsernameTextField(
       usernameValue = usernameValue,
-      onValueChange = { usernameValue = it }
+      onValueChange = {
+        signUpViewModel.onValuesSignUpChange(emailValue, passwordValue, it)
+      },
+      endIcon = { if (validUsername) SuccessIcon() }
     )
     CustomSpacer(size = 24.dp)
-    SmallButtonDark(onClick = { /*TODO*/ }, text = string.sign_up, false)
+    SmallButtonDark(onClick = { /*TODO*/ }, text = string.sign_up, enabled = validForm)
     CustomSpacer(size = 16.dp)
     OtherLoginMethodsSection(string.already_have_an_account)
     CustomSpacer(size = 8.dp)

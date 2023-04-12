@@ -70,12 +70,13 @@ fun CardContent(
     CustomSpacer(size = 16.dp)
     PasswordTextField(
       passwordValue = passwordValue,
-      onValueChange = { signInViewModel.onValuesSignInChange(emailValue, it) },
-      endIcon = { PasswordVisibilityOffIcon() })
+      onValueChange = { signInViewModel.onValuesSignInChange(emailValue, it) }
+    )
     CustomSpacer(size = 24.dp)
     SmallButtonDark(
-      onClick = { Toast.makeText(context, "Siguiente pantalla", Toast.LENGTH_SHORT).show() },
-      text = string.sign_in
+      onClick = { signInViewModel.checkIfFormIsValid() },
+      text = string.sign_in,
+      enabled = validForm
     )
     CustomSpacer(size = 16.dp)
     ForgotPasswordText()

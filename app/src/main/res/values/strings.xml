@@ -24,4 +24,8 @@
     <string name="not_registered_yet_signup_with">Not registered yet? Sign Up with</string>
     <string name="already_have_an_account">Already have an account?</string>
     <string name="username">Username</string>
+    <string name="sunset_art_image_description">Vectorial art of a sunset on the beach</string>
+    <string name="privacy_dialog_title">In Sunset we value your privacy...</string>
+    <string name="privacy_dialog_description">By clicking Sign Up, you agree with our Terms. Please, read how we process your data in our Privacy Policy and Cookies Policy.</string>
+    <string name="read_policies">Read policies</string>
 </resources>

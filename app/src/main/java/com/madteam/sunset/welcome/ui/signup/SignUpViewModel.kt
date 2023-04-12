@@ -23,7 +23,16 @@ class SignUpViewModel @Inject constructor() : ViewModel() {
   private val _formError = MutableStateFlow(false)
   val formError: StateFlow<Boolean> = _formError
 
-  fun onValuesSignInChange(emailValue: String, passwordValue: String, usernameValue: String) {
+  private val _passwordStrength = MutableStateFlow(0)
+  val passwordStrength: StateFlow<Int> = _passwordStrength
+
+  private val _validEmail = MutableStateFlow(false)
+  val validEmail: StateFlow<Boolean> = _validEmail
+
+  private val _validUsername = MutableStateFlow(false)
+  val validUsername: StateFlow<Boolean> = _validUsername
+
+  fun onValuesSignUpChange(emailValue: String, passwordValue: String, usernameValue: String) {
     _email.value = emailValue
     _password.value = passwordValue
     _username.value = usernameValue
@@ -33,14 +42,22 @@ class SignUpViewModel @Inject constructor() : ViewModel() {
 
   private fun checkIfEmailIsValid(): Boolean {
     return Patterns.EMAIL_ADDRESS.matcher(_email.value).matches()
+    //todo: validar con firebase si el mail ya está registrado o no
   }
 
-  private fun checkPasswordStrength(): Int {
-    return Zxcvbn().measure(_password.value).score
+  private fun checkIfUsernameIsValid(): Boolean {
+    return (_username.value.length > 5)
+    // TODO: validar con firebase si el usuario ya existe o no
+  }
+
+  private fun checkPasswordStrength() {
+    _passwordStrength.value = Zxcvbn().measure(_password.value).score
   }
 
   private fun checkIfFormIsValid() {
-    _formError.value = (checkIfEmailIsValid() && _password.value.isNotBlank())
+    _formError.value = (checkIfEmailIsValid() && _passwordStrength.value > 0 && checkIfUsernameIsValid())
+    _validEmail.value = checkIfEmailIsValid()
+    _validUsername.value = checkIfUsernameIsValid()
   }
-  
+
 }

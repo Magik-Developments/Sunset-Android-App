@@ -71,23 +71,38 @@ fun DesignSystemTextField(
 }
 
 @Composable
-fun PasswordSecurityIndicator() {
+fun PasswordSecurityIndicator(passwordStrength: Int) {
   Row(
     modifier = Modifier
       .fillMaxWidth()
       .padding(start = 8.dp), verticalAlignment = Alignment.CenterVertically
   ) {
-    PasswordIndicatorBox()
+    val indicatorColor = when (passwordStrength) {
+      0 -> Color.Red
+      in 1..4 -> Color(0xFF53A653)
+      else -> Color.Transparent
+
+    }
+    val indicatorCount = when (passwordStrength) {
+      in 0..1 -> 1
+      in 2..3 -> 2
+      4 -> 3
+      else -> 0
+    }
+    repeat(indicatorCount) {
+      PasswordIndicatorBox(color = indicatorColor)
+      CustomSpacer(size = 6.dp)
+    }
   }
 }
 
 @Composable
-fun PasswordIndicatorBox() {
+fun PasswordIndicatorBox(color: Color) {
   Box(
     modifier = Modifier
       .size(height = 6.dp, width = 28.dp)
       .clip(RoundedCornerShape(50.dp))
-      .background(color = Color(0xFFD9D9D9))
+      .background(color = color)
   )
 }
 

@@ -30,6 +30,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.ImeAction.Companion
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -64,7 +66,7 @@ fun DesignSystemTextField(
     ),
     label = { Text(text = stringResource(hint)) },
     singleLine = true,
-    keyboardOptions = KeyboardOptions(keyboardType = textType),
+    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next, keyboardType = textType),
     trailingIcon = endIcon,
     visualTransformation = visualTransformation
   )

@@ -33,7 +33,6 @@ import com.madteam.sunset.design_system.common.SmallButtonDark
 import com.madteam.sunset.design_system.common.SuccessIcon
 import com.madteam.sunset.design_system.common.UsernameTextField
 import com.madteam.sunset.welcome.ui.signin.CARD_HEIGHT
-import com.madteam.sunset.welcome.ui.signup.ui.SignUpViewModel
 
 @Composable
 fun BottomSheetSignUp(navigateToSignIn: () -> Unit) {

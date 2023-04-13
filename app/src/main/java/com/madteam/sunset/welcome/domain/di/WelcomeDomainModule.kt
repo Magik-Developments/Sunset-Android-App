@@ -1,7 +1,7 @@
-package com.dgalan.rmultimateapp.login.domain.di
+package com.madteam.sunset.welcome.domain.di
 
-import com.dgalan.rmultimateapp.login.domain.interactor.FirebaseAuthInteractor
-import com.dgalan.rmultimateapp.login.domain.interactor.FirebaseAuthInteractorContract
+import com.madteam.sunset.welcome.domain.interactor.FirebaseAuthInteractor
+import com.madteam.sunset.welcome.domain.interactor.FirebaseAuthInteractorContract
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -9,7 +9,7 @@ import dagger.hilt.components.SingletonComponent
 
 @Module
 @InstallIn(SingletonComponent::class)
-object LoginDomainModule {
+object WelcomeDomainModule {
 
     @Provides
     fun provideFirebaseAuthInteractor(

@@ -1,10 +1,12 @@
-package com.dgalan.rmultimateapp.login.domain.interactor
+package com.madteam.sunset.welcome.domain.interactor
 
-import com.dgalan.rmultimateapp.login.data.repository.FirebaseAuthRepository
+import com.google.firebase.auth.AuthResult
+import com.madteam.sunset.welcome.data.FirebaseAuthRepository
 import javax.inject.Inject
 
 interface FirebaseAuthInteractorContract {
-    suspend fun doLogin(email: String, password: String)
+
+    suspend fun doSignUp(email: String, password: String, username: String): AuthResult?
 }
 
 class FirebaseAuthInteractor @Inject constructor(
@@ -12,7 +14,6 @@ class FirebaseAuthInteractor @Inject constructor(
 ) :
     FirebaseAuthInteractorContract {
 
-    override suspend fun doLogin(email: String, password: String) {
-        firebaseAuthRepository.doLogin(email, password)
-    }
+    override suspend fun doSignUp(email: String, password: String, username: String): AuthResult? =
+        firebaseAuthRepository.doSignUp(email, password, username)
 }

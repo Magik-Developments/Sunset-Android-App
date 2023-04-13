@@ -9,8 +9,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,6 +33,7 @@ import com.madteam.sunset.design_system.common.SmallButtonDark
 import com.madteam.sunset.design_system.common.SuccessIcon
 import com.madteam.sunset.design_system.common.UsernameTextField
 import com.madteam.sunset.welcome.ui.signin.CARD_HEIGHT
+import com.madteam.sunset.welcome.ui.signup.ui.SignUpViewModel
 
 @Composable
 fun BottomSheetSignUp(navigateToSignIn: () -> Unit) {

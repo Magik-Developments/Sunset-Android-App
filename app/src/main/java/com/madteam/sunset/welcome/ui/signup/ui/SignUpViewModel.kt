@@ -1,4 +1,4 @@
-package com.madteam.sunset.welcome.ui.signup
+package com.madteam.sunset.welcome.ui.signup.ui
 
 import android.util.Patterns
 import androidx.lifecycle.ViewModel

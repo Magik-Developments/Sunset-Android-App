@@ -9,6 +9,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,6 +25,7 @@ import com.madteam.sunset.design_system.common.CardSubtitle
 import com.madteam.sunset.design_system.common.CardTitle
 import com.madteam.sunset.design_system.common.CustomSpacer
 import com.madteam.sunset.design_system.common.EmailTextField
+import com.madteam.sunset.design_system.common.GDPRDialog
 import com.madteam.sunset.design_system.common.OtherLoginIconButtons
 import com.madteam.sunset.design_system.common.OtherLoginMethodsSection
 import com.madteam.sunset.design_system.common.PasswordSecurityIndicator
@@ -51,6 +54,7 @@ fun SignUpCardContent(
   navigateToSignIn: () -> Unit,
   signUpViewModel: SignUpViewModel = hiltViewModel()
 ) {
+  val context = LocalContext.current
   val emailValue = signUpViewModel.email.collectAsState().value
   val passwordValue = signUpViewModel.password.collectAsState().value
   val validForm = signUpViewModel.formError.collectAsState().value
@@ -58,7 +62,14 @@ fun SignUpCardContent(
   val validUsername = signUpViewModel.validUsername.collectAsState().value
   val usernameValue = signUpViewModel.username.collectAsState().value
   val passwordStrength = signUpViewModel.passwordStrength.collectAsState().value
-  val context = LocalContext.current
+  var showDialog = signUpViewModel.showDialog.collectAsState().value
+
+  if (showDialog) {
+    GDPRDialog(
+      setShowDialog = { showDialog = it },
+      readPoliciesClicked = { signUpViewModel.goToPoliciesScreen() },
+      acceptPoliciesClicked = { signUpViewModel.signUpIntent() })
+  }
 
   Column(
     horizontalAlignment = Alignment.CenterHorizontally,
@@ -94,7 +105,11 @@ fun SignUpCardContent(
       endIcon = { if (validUsername) SuccessIcon() }
     )
     CustomSpacer(size = 24.dp)
-    SmallButtonDark(onClick = { /*TODO*/ }, text = string.sign_up, enabled = validForm)
+    SmallButtonDark(
+      onClick = { signUpViewModel.showPrivacyDialog() },
+      text = string.sign_up,
+      enabled = validForm
+    )
     CustomSpacer(size = 16.dp)
     OtherLoginMethodsSection(string.already_have_an_account)
     CustomSpacer(size = 8.dp)

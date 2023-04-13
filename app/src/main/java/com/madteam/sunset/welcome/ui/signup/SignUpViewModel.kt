@@ -32,6 +32,9 @@ class SignUpViewModel @Inject constructor() : ViewModel() {
   private val _validUsername = MutableStateFlow(false)
   val validUsername: StateFlow<Boolean> = _validUsername
 
+  private val _showDialog = MutableStateFlow(false)
+  val showDialog: StateFlow<Boolean> = _showDialog
+
   fun onValuesSignUpChange(emailValue: String, passwordValue: String, usernameValue: String) {
     _email.value = emailValue
     _password.value = passwordValue
@@ -60,4 +63,15 @@ class SignUpViewModel @Inject constructor() : ViewModel() {
     _validUsername.value = checkIfUsernameIsValid()
   }
 
+  fun goToPoliciesScreen() {
+    _showDialog.value = false
+  }
+
+  fun signUpIntent() {
+    _showDialog.value = false
+  }
+
+  fun showPrivacyDialog() {
+    _showDialog.value = true
+  }
 }

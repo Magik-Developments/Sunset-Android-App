@@ -1,6 +1,5 @@
 package com.madteam.sunset.design_system.common
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -31,7 +30,7 @@ import com.madteam.sunset.ui.theme.secondarySemiBoldBodyL
 
 @Composable fun GDPRDialog(
   setShowDialog: (Boolean) -> Unit,
-  readPoliciesClicked: () -> Unit = { setShowDialog(false) },
+  readPoliciesClicked: () -> Unit ,
   acceptPoliciesClicked: () -> Unit
 ) {
   Dialog(onDismissRequest = { setShowDialog(false) }) {
@@ -66,7 +65,7 @@ import com.madteam.sunset.ui.theme.secondarySemiBoldBodyL
         CustomSpacer(size = 24.dp)
         Row(Modifier.fillMaxWidth()) {
           Button(
-            onClick = { /*TODO*/ },
+            onClick = readPoliciesClicked,
             modifier = Modifier
               .weight(1f)
               .height(60.dp),
@@ -81,7 +80,7 @@ import com.madteam.sunset.ui.theme.secondarySemiBoldBodyL
             )
           }
           Button(
-            onClick = { /*TODO*/ },
+            onClick = acceptPoliciesClicked,
             modifier = Modifier
               .weight(1f)
               .height(60.dp),

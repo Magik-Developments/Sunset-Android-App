@@ -62,12 +62,13 @@ fun SignUpCardContent(
   val validUsername = signUpViewModel.validUsername.collectAsState().value
   val usernameValue = signUpViewModel.username.collectAsState().value
   val passwordStrength = signUpViewModel.passwordStrength.collectAsState().value
-  val showDialog = rememberSaveable() { mutableStateOf(false) }
+  var showDialog = signUpViewModel.showDialog.collectAsState().value
 
-  if (showDialog.value) {
+  if (showDialog) {
     GDPRDialog(
-      setShowDialog = { showDialog.value = it },
-      acceptPoliciesClicked = {/* todo: try to make sign up */})
+      setShowDialog = { showDialog = it },
+      readPoliciesClicked = { signUpViewModel.goToPoliciesScreen() },
+      acceptPoliciesClicked = { signUpViewModel.signUpIntent() })
   }
 
   Column(
@@ -105,7 +106,7 @@ fun SignUpCardContent(
     )
     CustomSpacer(size = 24.dp)
     SmallButtonDark(
-      onClick = { showDialog.value = true },
+      onClick = { signUpViewModel.showPrivacyDialog() },
       text = string.sign_up,
       enabled = validForm
     )

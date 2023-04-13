@@ -18,12 +18,13 @@ private const val ANIM_DURATION = 500
 @HiltViewModel
 class WelcomeViewModel @Inject constructor() : ViewModel() {
 
-    private val _sheetState: MutableStateFlow<ModalBottomSheetState> = MutableStateFlow(ModalBottomSheetState(Hidden, isSkipHalfExpanded = true))
-    val sheetState: StateFlow<ModalBottomSheetState> = _sheetState
+  private val _sheetState: MutableStateFlow<ModalBottomSheetState> =
+    MutableStateFlow(ModalBottomSheetState(Hidden, isSkipHalfExpanded = true))
+  val sheetState: StateFlow<ModalBottomSheetState> = _sheetState
 
-    suspend fun expandBottomSheet() {
-        val animationSpec = TweenSpec<Float>(durationMillis = ANIM_DURATION, easing = FastOutSlowInEasing)
-        _sheetState.value.animateTo(Expanded, animationSpec)
-    }
-
+  suspend fun expandBottomSheet() {
+    val animationSpec =
+      TweenSpec<Float>(durationMillis = ANIM_DURATION, easing = FastOutSlowInEasing)
+    _sheetState.value.animateTo(Expanded, animationSpec)
+  }
 }

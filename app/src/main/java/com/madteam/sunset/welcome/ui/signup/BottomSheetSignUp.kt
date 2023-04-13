@@ -23,6 +23,7 @@ import com.madteam.sunset.design_system.common.CardSubtitle
 import com.madteam.sunset.design_system.common.CardTitle
 import com.madteam.sunset.design_system.common.CustomSpacer
 import com.madteam.sunset.design_system.common.EmailTextField
+import com.madteam.sunset.design_system.common.ErrorIcon
 import com.madteam.sunset.design_system.common.GDPRDialog
 import com.madteam.sunset.design_system.common.OtherLoginIconButtons
 import com.madteam.sunset.design_system.common.OtherLoginMethodsSection
@@ -82,7 +83,11 @@ fun SignUpCardContent(
     EmailTextField(
       emailValue = emailValue,
       onValueChange = { signUpViewModel.onValuesSignUpChange(it, passwordValue, usernameValue) },
-      endIcon = { if (validEmail) SuccessIcon() }
+      endIcon = {
+        if (validEmail) SuccessIcon() else if (emailValue.isNotBlank()) {
+          ErrorIcon()
+        }
+      }
     )
     CustomSpacer(size = 16.dp)
     PasswordTextField(
@@ -100,7 +105,11 @@ fun SignUpCardContent(
       onValueChange = {
         signUpViewModel.onValuesSignUpChange(emailValue, passwordValue, it)
       },
-      endIcon = { if (validUsername) SuccessIcon() }
+      endIcon = {
+        if (validUsername) SuccessIcon() else if (usernameValue.isNotBlank()) {
+          ErrorIcon()
+        }
+      }
     )
     CustomSpacer(size = 24.dp)
     SmallButtonDark(

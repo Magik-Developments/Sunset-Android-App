@@ -27,7 +27,6 @@ import com.madteam.sunset.design_system.common.ForgotPasswordText
 import com.madteam.sunset.design_system.common.OtherLoginIconButtons
 import com.madteam.sunset.design_system.common.OtherLoginMethodsSection
 import com.madteam.sunset.design_system.common.PasswordTextField
-import com.madteam.sunset.design_system.common.PasswordVisibilityOffIcon
 import com.madteam.sunset.design_system.common.SmallButtonDark
 
 const val CARD_HEIGHT = 0.67

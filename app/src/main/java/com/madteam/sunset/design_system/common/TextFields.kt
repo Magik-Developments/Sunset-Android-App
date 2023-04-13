@@ -62,6 +62,7 @@ fun DesignSystemTextField(
       focusedLabelColor = Color(0xFF999999),
       unfocusedLabelColor = Color(0xFF999999),
       focusedIndicatorColor = Color.Transparent,
+
       unfocusedIndicatorColor = Color.Transparent
     ),
     label = { Text(text = stringResource(hint)) },

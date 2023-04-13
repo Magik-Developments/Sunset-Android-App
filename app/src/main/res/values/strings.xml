@@ -28,4 +28,5 @@
     <string name="privacy_dialog_title">In Sunset we value your privacy...</string>
     <string name="privacy_dialog_description">By clicking Sign Up, you agree with our Terms. Please, read how we process your data in our Privacy Policy and Cookies Policy.</string>
     <string name="read_policies">Read policies</string>
+  <string name="invalid_form_icon_description">invalid form icon</string>
 </resources>

@@ -28,74 +28,75 @@ import com.madteam.sunset.ui.theme.primaryBoldHeadlineS
 import com.madteam.sunset.ui.theme.secondaryRegularBodyL
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyL
 
-@Composable fun GDPRDialog(
-  setShowDialog: (Boolean) -> Unit,
-  readPoliciesClicked: () -> Unit ,
-  acceptPoliciesClicked: () -> Unit
+@Composable
+fun GDPRDialog(
+    setShowDialog: (Boolean) -> Unit,
+    readPoliciesClicked: () -> Unit,
+    acceptPoliciesClicked: () -> Unit
 ) {
-  Dialog(onDismissRequest = { setShowDialog(false) }) {
-    Card(
-      shape = RoundedCornerShape(20.dp),
-      elevation = 2.dp,
-      modifier = Modifier.padding(horizontal = 24.dp)
-    ) {
-      Column() {
-        Image(
-          modifier = Modifier
-            .width(140.dp)
-            .height(140.dp)
-            .align(alignment = Alignment.CenterHorizontally),
-          painter = painterResource(id = R.drawable.sunset_vectorial_art_01),
-          contentDescription = stringResource(string.sunset_art_image_description),
-          alignment = Alignment.Center
-        )
-        Text(
-          modifier = Modifier.padding(horizontal = 24.dp),
-          text = stringResource(string.privacy_dialog_title),
-          style = primaryBoldHeadlineS,
-          textAlign = TextAlign.Center
-        )
-        CustomSpacer(size = 24.dp)
-        Text(
-          modifier = Modifier.padding(horizontal = 24.dp),
-          text = stringResource(string.privacy_dialog_description),
-          style = secondaryRegularBodyL,
-          textAlign = TextAlign.Center
-        )
-        CustomSpacer(size = 24.dp)
-        Row(Modifier.fillMaxWidth()) {
-          Button(
-            onClick = readPoliciesClicked,
-            modifier = Modifier
-              .weight(1f)
-              .height(60.dp),
-            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFFFE094)),
-            shape = RoundedCornerShape(0.dp)
-          ) {
-            Text(
-              text = stringResource(string.read_policies),
-              style = secondarySemiBoldBodyL,
-              color = Color.Black,
-              textAlign = TextAlign.Center
-            )
-          }
-          Button(
-            onClick = acceptPoliciesClicked,
-            modifier = Modifier
-              .weight(1f)
-              .height(60.dp),
-            colors = ButtonDefaults.buttonColors(backgroundColor = Color.Black),
-            shape = RoundedCornerShape(0.dp)
-          ) {
-            Text(
-              text = stringResource(string.sign_up),
-              style = secondarySemiBoldBodyL,
-              color = Color.White,
-              textAlign = Companion.Center
-            )
-          }
+    Dialog(onDismissRequest = { setShowDialog(false) }) {
+        Card(
+            shape = RoundedCornerShape(20.dp),
+            elevation = 2.dp,
+            modifier = Modifier.padding(horizontal = 24.dp)
+        ) {
+            Column() {
+                Image(
+                    modifier = Modifier
+                      .width(140.dp)
+                      .height(140.dp)
+                      .align(alignment = Alignment.CenterHorizontally),
+                    painter = painterResource(id = R.drawable.sunset_vectorial_art_01),
+                    contentDescription = stringResource(string.sunset_art_image_description),
+                    alignment = Alignment.Center
+                )
+                Text(
+                    modifier = Modifier.padding(horizontal = 24.dp),
+                    text = stringResource(string.privacy_dialog_title),
+                    style = primaryBoldHeadlineS,
+                    textAlign = TextAlign.Center
+                )
+                CustomSpacer(size = 24.dp)
+                Text(
+                    modifier = Modifier.padding(horizontal = 24.dp),
+                    text = stringResource(string.privacy_dialog_description),
+                    style = secondaryRegularBodyL,
+                    textAlign = TextAlign.Center
+                )
+                CustomSpacer(size = 24.dp)
+                Row(Modifier.fillMaxWidth()) {
+                    Button(
+                        onClick = readPoliciesClicked,
+                        modifier = Modifier
+                          .weight(1f)
+                          .height(60.dp),
+                        colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFFFE094)),
+                        shape = RoundedCornerShape(0.dp)
+                    ) {
+                        Text(
+                            text = stringResource(string.read_policies),
+                            style = secondarySemiBoldBodyL,
+                            color = Color.Black,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                    Button(
+                        onClick = acceptPoliciesClicked,
+                        modifier = Modifier
+                          .weight(1f)
+                          .height(60.dp),
+                        colors = ButtonDefaults.buttonColors(backgroundColor = Color.Black),
+                        shape = RoundedCornerShape(0.dp)
+                    ) {
+                        Text(
+                            text = stringResource(string.sign_up),
+                            style = secondarySemiBoldBodyL,
+                            color = Color.White,
+                            textAlign = Companion.Center
+                        )
+                    }
+                }
+            }
         }
-      }
     }
-  }
 }

@@ -10,27 +10,26 @@ import javax.inject.Inject
 @HiltViewModel
 class SignInViewModel @Inject constructor() : ViewModel() {
 
-  private val _email = MutableStateFlow("")
-  val email: StateFlow<String> = _email
+    private val _email = MutableStateFlow("")
+    val email: StateFlow<String> = _email
 
-  private val _password = MutableStateFlow("")
-  val password: StateFlow<String> = _password
+    private val _password = MutableStateFlow("")
+    val password: StateFlow<String> = _password
 
-  private val _formError = MutableStateFlow(false)
-  val formError: StateFlow<Boolean> = _formError
+    private val _formError = MutableStateFlow(false)
+    val formError: StateFlow<Boolean> = _formError
 
-  fun onValuesSignInChange(emailValue: String, passwordValue: String) {
-    _email.value = emailValue
-    _password.value = passwordValue
-    checkIfFormIsValid()
-  }
+    fun onValuesSignInChange(emailValue: String, passwordValue: String) {
+        _email.value = emailValue
+        _password.value = passwordValue
+        checkIfFormIsValid()
+    }
 
-  private fun checkIfEmailIsValid(): Boolean {
-    return Patterns.EMAIL_ADDRESS.matcher(_email.value).matches()
-  }
+    private fun checkIfEmailIsValid(): Boolean {
+        return Patterns.EMAIL_ADDRESS.matcher(_email.value).matches()
+    }
 
-  fun checkIfFormIsValid() {
-    _formError.value = (checkIfEmailIsValid() && _password.value.isNotBlank())
-  }
-  
+    fun checkIfFormIsValid() {
+        _formError.value = (checkIfEmailIsValid() && _password.value.isNotBlank())
+    }
 }

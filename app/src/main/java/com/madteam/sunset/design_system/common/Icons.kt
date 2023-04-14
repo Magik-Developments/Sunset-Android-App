@@ -15,41 +15,41 @@ import com.madteam.sunset.R.string
 
 @Composable
 fun PasswordVisibilityOffIcon() {
-  TextFieldIcon(
-    icon = Icons.Outlined.Visibility,
-    description = R.string.visibility_password_icon_description,
-    iconTint = Color(0xFF333333)
-  )
+    TextFieldIcon(
+        icon = Icons.Outlined.Visibility,
+        description = R.string.visibility_password_icon_description,
+        iconTint = Color(0xFF333333)
+    )
 }
 
 @Composable
 fun SuccessIcon() {
-  TextFieldIcon(
-    icon = Icons.Outlined.CheckCircle,
-    description = string.circle_check_icon_description,
-    iconTint = Color(0xFF53A653)
-  )
+    TextFieldIcon(
+        icon = Icons.Outlined.CheckCircle,
+        description = string.circle_check_icon_description,
+        iconTint = Color(0xFF53A653)
+    )
 }
 
 @Composable
 fun ErrorIcon() {
-  TextFieldIcon(
-    icon = Icons.Outlined.Cancel,
-    description = string.invalid_form_icon_description,
-    iconTint = Color.Red
-  )
+    TextFieldIcon(
+        icon = Icons.Outlined.Cancel,
+        description = string.invalid_form_icon_description,
+        iconTint = Color.Red
+    )
 }
 
 @Composable
 fun TextFieldIcon(
-  icon: ImageVector,
-  @StringRes description: Int,
-  iconTint: Color
+    icon: ImageVector,
+    @StringRes description: Int,
+    iconTint: Color
 ) {
-  Icon(
-    imageVector = icon,
-    contentDescription = stringResource(id = description),
-    tint = iconTint
-  )
+    Icon(
+        imageVector = icon,
+        contentDescription = stringResource(id = description),
+        tint = iconTint
+    )
 }
 

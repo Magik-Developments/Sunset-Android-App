@@ -33,61 +33,61 @@ const val CARD_HEIGHT = 0.67
 
 @Composable
 fun BottomSheetSignIn(navigateToSignUp: () -> Unit) {
-  Card(
-    modifier = Modifier
-      .fillMaxWidth()
-      .height((LocalConfiguration.current.screenHeightDp * CARD_HEIGHT).dp),
-    backgroundColor = Color(0xFFFFB600),
-    shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp)
-  ) {
-    CardContent(navigateToSignUp = navigateToSignUp)
-  }
+    Card(
+        modifier = Modifier
+          .fillMaxWidth()
+          .height((LocalConfiguration.current.screenHeightDp * CARD_HEIGHT).dp),
+        backgroundColor = Color(0xFFFFB600),
+        shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp)
+    ) {
+        CardContent(navigateToSignUp = navigateToSignUp)
+    }
 }
 
 @Composable
 fun CardContent(
-  signInViewModel: SignInViewModel = hiltViewModel(),
-  navigateToSignUp: () -> Unit
+    signInViewModel: SignInViewModel = hiltViewModel(),
+    navigateToSignUp: () -> Unit
 ) {
-  val emailValue = signInViewModel.email.collectAsState().value
-  val passwordValue = signInViewModel.password.collectAsState().value
-  val validForm = signInViewModel.formError.collectAsState().value
-  val context = LocalContext.current
-  Column(
-    horizontalAlignment = Alignment.CenterHorizontally,
-    modifier = Modifier.padding(horizontal = 36.dp)
-  ) {
-    CustomSpacer(size = 8.dp)
-    CardHandler()
-    CustomSpacer(size = 16.dp)
-    CardTitle(string.welcome_back)
-    CardSubtitle(string.enter_details_below)
-    CustomSpacer(size = 16.dp)
-    EmailTextField(
-      emailValue = emailValue,
-      onValueChange = { signInViewModel.onValuesSignInChange(it, passwordValue) }
-    )
-    CustomSpacer(size = 16.dp)
-    PasswordTextField(
-      passwordValue = passwordValue,
-      onValueChange = { signInViewModel.onValuesSignInChange(emailValue, it) }
-    )
-    CustomSpacer(size = 24.dp)
-    SmallButtonDark(
-      onClick = { signInViewModel.checkIfFormIsValid() },
-      text = string.sign_in,
-      enabled = validForm
-    )
-    CustomSpacer(size = 16.dp)
-    ForgotPasswordText()
-    CustomSpacer(size = 40.dp)
-    OtherLoginMethodsSection(string.not_registered_yet_signup_with)
-    CustomSpacer(size = 24.dp)
-    OtherLoginIconButtons(
-      firstMethod = { Toast.makeText(context, "Do Google Login", Toast.LENGTH_SHORT).show() },
-      secondMethod = navigateToSignUp
-    )
-  }
+    val emailValue = signInViewModel.email.collectAsState().value
+    val passwordValue = signInViewModel.password.collectAsState().value
+    val validForm = signInViewModel.formError.collectAsState().value
+    val context = LocalContext.current
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.padding(horizontal = 36.dp)
+    ) {
+        CustomSpacer(size = 8.dp)
+        CardHandler()
+        CustomSpacer(size = 16.dp)
+        CardTitle(string.welcome_back)
+        CardSubtitle(string.enter_details_below)
+        CustomSpacer(size = 16.dp)
+        EmailTextField(
+            emailValue = emailValue,
+            onValueChange = { signInViewModel.onValuesSignInChange(it, passwordValue) }
+        )
+        CustomSpacer(size = 16.dp)
+        PasswordTextField(
+            passwordValue = passwordValue,
+            onValueChange = { signInViewModel.onValuesSignInChange(emailValue, it) }
+        )
+        CustomSpacer(size = 24.dp)
+        SmallButtonDark(
+            onClick = { signInViewModel.checkIfFormIsValid() },
+            text = string.sign_in,
+            enabled = validForm
+        )
+        CustomSpacer(size = 16.dp)
+        ForgotPasswordText()
+        CustomSpacer(size = 40.dp)
+        OtherLoginMethodsSection(string.not_registered_yet_signup_with)
+        CustomSpacer(size = 24.dp)
+        OtherLoginIconButtons(
+            firstMethod = { Toast.makeText(context, "Do Google Login", Toast.LENGTH_SHORT).show() },
+            secondMethod = navigateToSignUp
+        )
+    }
 }
 
 @Preview(showSystemUi = true)

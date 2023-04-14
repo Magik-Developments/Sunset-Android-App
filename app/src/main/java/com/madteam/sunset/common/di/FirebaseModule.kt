@@ -1,8 +1,6 @@
 package com.madteam.sunset.common.di
 
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -13,10 +11,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object FirebaseModule {
 
-  @Singleton
-  @Provides
-  fun providesFirebaseAuth(): FirebaseAuth = FirebaseAuth.getInstance()
-
-
-
+    @Singleton
+    @Provides
+    fun providesFirebaseAuth(): FirebaseAuth = FirebaseAuth.getInstance()
 }

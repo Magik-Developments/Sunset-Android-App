@@ -6,20 +6,14 @@ import javax.inject.Inject
 
 interface FirebaseAuthInteractorContract {
 
-  suspend fun doSignUp(email: String, password: String, username: String): AuthResult?
-
-  suspend fun checkIfEmailExists(email: String): Boolean
+    suspend fun doSignUp(email: String, password: String, username: String): AuthResult?
 }
 
 class FirebaseAuthInteractor @Inject constructor(
-  private val firebaseAuthRepository: FirebaseAuthRepository
+    private val firebaseAuthRepository: FirebaseAuthRepository
 ) :
-  FirebaseAuthInteractorContract {
+    FirebaseAuthInteractorContract {
 
-  override suspend fun doSignUp(email: String, password: String, username: String): AuthResult? =
-    firebaseAuthRepository.doSignUp(email, password, username)
-
-  override suspend fun checkIfEmailExists(email: String): Boolean {
-    return firebaseAuthRepository.checkIfEmailExists(email)
-  }
+    override suspend fun doSignUp(email: String, password: String, username: String): AuthResult? =
+        firebaseAuthRepository.doSignUp(email, password, username)
 }

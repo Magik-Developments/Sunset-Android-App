@@ -7,18 +7,12 @@ import javax.inject.Inject
 
 interface FireBaseAuthRepositoryContract {
 
-  suspend fun doSignUp(email: String, password: String, username: String): AuthResult?
-  suspend fun checkIfEmailExists(email: String): Boolean
+    suspend fun doSignUp(email: String, password: String, username: String): AuthResult?
 }
 
 class FirebaseAuthRepository @Inject constructor(private val firebaseAuth: FirebaseAuth) :
-  FireBaseAuthRepositoryContract {
+    FireBaseAuthRepositoryContract {
 
-  override suspend fun doSignUp(email: String, password: String, username: String): AuthResult? =
-    firebaseAuth.createUserWithEmailAndPassword(email, password).await()
-
-  override suspend fun checkIfEmailExists(email: String): Boolean {
-    val signInMethods = firebaseAuth.fetchSignInMethodsForEmail(email).await().signInMethods
-    return !signInMethods.isNullOrEmpty()
-  }
+    override suspend fun doSignUp(email: String, password: String, username: String): AuthResult? =
+        firebaseAuth.createUserWithEmailAndPassword(email, password).await()
 }

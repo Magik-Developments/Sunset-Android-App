@@ -31,7 +31,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.ImeAction.Companion
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -40,132 +39,132 @@ import com.madteam.sunset.R
 
 @Composable
 fun DesignSystemTextField(
-  value: String,
-  onValueChange: (String) -> Unit,
-  @StringRes hint: Int,
-  textType: KeyboardType,
-  endIcon: @Composable () -> Unit,
-  visualTransformation: VisualTransformation = VisualTransformation.None
+    value: String,
+    onValueChange: (String) -> Unit,
+    @StringRes hint: Int,
+    textType: KeyboardType,
+    endIcon: @Composable () -> Unit,
+    visualTransformation: VisualTransformation = VisualTransformation.None
 ) {
-  TextField(
-    value = value,
-    onValueChange = onValueChange,
-    modifier = Modifier
-      .height(60.dp)
-      .fillMaxWidth()
-      .border(1.dp, Color(0xFF999999), RoundedCornerShape(8.dp)),
-    shape = RoundedCornerShape(8.dp),
-    colors = TextFieldDefaults.textFieldColors(
-      backgroundColor = Color.White,
-      textColor = Color(0xFF333333),
-      cursorColor = Color.Black,
-      focusedLabelColor = Color(0xFF999999),
-      unfocusedLabelColor = Color(0xFF999999),
-      focusedIndicatorColor = Color.Transparent,
+    TextField(
+        value = value,
+        onValueChange = onValueChange,
+        modifier = Modifier
+            .height(60.dp)
+            .fillMaxWidth()
+            .border(1.dp, Color(0xFF999999), RoundedCornerShape(8.dp)),
+        shape = RoundedCornerShape(8.dp),
+        colors = TextFieldDefaults.textFieldColors(
+            backgroundColor = Color.White,
+            textColor = Color(0xFF333333),
+            cursorColor = Color.Black,
+            focusedLabelColor = Color(0xFF999999),
+            unfocusedLabelColor = Color(0xFF999999),
+            focusedIndicatorColor = Color.Transparent,
 
-      unfocusedIndicatorColor = Color.Transparent
-    ),
-    label = { Text(text = stringResource(hint)) },
-    singleLine = true,
-    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next, keyboardType = textType),
-    trailingIcon = endIcon,
-    visualTransformation = visualTransformation
-  )
+            unfocusedIndicatorColor = Color.Transparent
+        ),
+        label = { Text(text = stringResource(hint)) },
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next, keyboardType = textType),
+        trailingIcon = endIcon,
+        visualTransformation = visualTransformation
+    )
 }
 
 @Composable
 fun PasswordSecurityIndicator(passwordStrength: Int) {
-  Row(
-    modifier = Modifier
-      .fillMaxWidth()
-      .padding(start = 8.dp), verticalAlignment = Alignment.CenterVertically
-  ) {
-    val indicatorColor = when (passwordStrength) {
-      0 -> Color.Red
-      in 1..4 -> Color(0xFF53A653)
-      else -> Color.Transparent
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 8.dp), verticalAlignment = Alignment.CenterVertically
+    ) {
+        val indicatorColor = when (passwordStrength) {
+            0 -> Color.Red
+            in 1..4 -> Color(0xFF53A653)
+            else -> Color.Transparent
 
+        }
+        val indicatorCount = when (passwordStrength) {
+            in 0..1 -> 1
+            in 2..3 -> 2
+            4 -> 3
+            else -> 0
+        }
+        repeat(indicatorCount) {
+            PasswordIndicatorBox(color = indicatorColor)
+            CustomSpacer(size = 6.dp)
+        }
     }
-    val indicatorCount = when (passwordStrength) {
-      in 0..1 -> 1
-      in 2..3 -> 2
-      4 -> 3
-      else -> 0
-    }
-    repeat(indicatorCount) {
-      PasswordIndicatorBox(color = indicatorColor)
-      CustomSpacer(size = 6.dp)
-    }
-  }
 }
 
 @Composable
 fun PasswordIndicatorBox(color: Color) {
-  Box(
-    modifier = Modifier
-      .size(height = 6.dp, width = 28.dp)
-      .clip(RoundedCornerShape(50.dp))
-      .background(color = color)
-  )
+    Box(
+        modifier = Modifier
+            .size(height = 6.dp, width = 28.dp)
+            .clip(RoundedCornerShape(50.dp))
+            .background(color = color)
+    )
 }
 
 @Composable
 fun PasswordTextField(
-  passwordValue: String,
-  onValueChange: (String) -> Unit,
-  endIcon: @Composable () -> Unit = { Spacer(modifier = Modifier.size(0.dp)) }
+    passwordValue: String,
+    onValueChange: (String) -> Unit,
+    endIcon: @Composable () -> Unit = { Spacer(modifier = Modifier.size(0.dp)) }
 ) {
-  var passwordVisible by rememberSaveable() { mutableStateOf(false) }
-  DesignSystemTextField(
-    value = passwordValue,
-    onValueChange = onValueChange,
-    hint = R.string.password,
-    textType = KeyboardType.Password,
-    endIcon = {
-      val image = if (passwordVisible) {
-        Icons.Outlined.Visibility
-      } else {
-        Icons.Outlined.VisibilityOff
-      }
-      IconButton(onClick = { passwordVisible = !passwordVisible }) {
-        Icon(imageVector = image, "")
-      }
-    },
-    visualTransformation = if (passwordVisible) {
-      VisualTransformation.None
-    } else {
-      PasswordVisualTransformation()
-    }
-  )
+    var passwordVisible by rememberSaveable() { mutableStateOf(false) }
+    DesignSystemTextField(
+        value = passwordValue,
+        onValueChange = onValueChange,
+        hint = R.string.password,
+        textType = KeyboardType.Password,
+        endIcon = {
+            val image = if (passwordVisible) {
+                Icons.Outlined.Visibility
+            } else {
+                Icons.Outlined.VisibilityOff
+            }
+            IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                Icon(imageVector = image, "")
+            }
+        },
+        visualTransformation = if (passwordVisible) {
+            VisualTransformation.None
+        } else {
+            PasswordVisualTransformation()
+        }
+    )
 }
 
 @Composable
 fun EmailTextField(
-  emailValue: String,
-  onValueChange: (String) -> Unit,
-  endIcon: @Composable () -> Unit = { Spacer(modifier = Modifier.size(0.dp)) }
+    emailValue: String,
+    onValueChange: (String) -> Unit,
+    endIcon: @Composable () -> Unit = { Spacer(modifier = Modifier.size(0.dp)) }
 ) {
-  DesignSystemTextField(
-    value = emailValue,
-    onValueChange = onValueChange,
-    hint = R.string.email_address,
-    textType = KeyboardType.Email,
-    endIcon = (endIcon)
-  )
+    DesignSystemTextField(
+        value = emailValue,
+        onValueChange = onValueChange,
+        hint = R.string.email_address,
+        textType = KeyboardType.Email,
+        endIcon = (endIcon)
+    )
 }
 
 @Composable
 fun UsernameTextField(
-  usernameValue: String,
-  onValueChange: (String) -> Unit,
-  endIcon: @Composable () -> Unit = { Spacer(modifier = Modifier.size(0.dp)) }
+    usernameValue: String,
+    onValueChange: (String) -> Unit,
+    endIcon: @Composable () -> Unit = { Spacer(modifier = Modifier.size(0.dp)) }
 ) {
-  DesignSystemTextField(
-    value = usernameValue,
-    onValueChange = onValueChange,
-    hint = R.string.username,
-    textType = KeyboardType.Text,
-    endIcon = (endIcon)
-  )
+    DesignSystemTextField(
+        value = usernameValue,
+        onValueChange = onValueChange,
+        hint = R.string.username,
+        textType = KeyboardType.Text,
+        endIcon = (endIcon)
+    )
 }
 

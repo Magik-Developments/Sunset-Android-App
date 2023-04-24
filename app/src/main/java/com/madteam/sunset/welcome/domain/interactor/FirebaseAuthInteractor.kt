@@ -8,14 +8,19 @@ import javax.inject.Inject
 
 interface FirebaseAuthInteractorContract {
 
-    fun doSignUp(email: String, password: String): Flow<Resource<AuthResult>>
+  fun doSignUp(email: String, password: String): Flow<Resource<AuthResult>>
+  fun doSignInWithPasswordAndEmail(email: String, password: String): Flow<Resource<AuthResult>>
 }
 
 class FirebaseAuthInteractor @Inject constructor(
-    private val firebaseAuthRepository: FirebaseAuthRepository
+  private val firebaseAuthRepository: FirebaseAuthRepository
 ) :
-    FirebaseAuthInteractorContract {
+  FirebaseAuthInteractorContract {
 
-    override fun doSignUp(email: String, password: String): Flow<Resource<AuthResult>> =
-        firebaseAuthRepository.doSignUp(email, password)
+  override fun doSignUp(email: String, password: String): Flow<Resource<AuthResult>> =
+    firebaseAuthRepository.doSignUp(email, password)
+
+  override fun doSignInWithPasswordAndEmail(email: String, password: String): Flow<Resource<AuthResult>> =
+    firebaseAuthRepository.doSignInWithPasswordAndEmail(email, password)
+
 }

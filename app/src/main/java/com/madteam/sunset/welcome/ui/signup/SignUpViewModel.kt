@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SignUpViewModel @Inject constructor(val firebaseAuthInteractor: FirebaseAuthInteractor) :
+class SignUpViewModel @Inject constructor(private val firebaseAuthInteractor: FirebaseAuthInteractor) :
     ViewModel() {
 
     private val _email = MutableStateFlow("")
@@ -29,9 +29,6 @@ class SignUpViewModel @Inject constructor(val firebaseAuthInteractor: FirebaseAu
 
     private val _formError = MutableStateFlow(false)
     val formError: StateFlow<Boolean> = _formError
-
-    private val _passwordStrength = MutableStateFlow(0)
-    val passwordStrength: StateFlow<Int> = _passwordStrength
 
     private val _validEmail = MutableStateFlow(false)
     val validEmail: StateFlow<Boolean> = _validEmail
@@ -61,15 +58,10 @@ class SignUpViewModel @Inject constructor(val firebaseAuthInteractor: FirebaseAu
         // TODO: validar con firebase si el usuario ya existe o no
     }
 
-    private fun checkPasswordStrength() {
-        _passwordStrength.value = Zxcvbn().measure(_password.value).score
-    }
-
     private fun checkIfFormIsValid() {
         checkIfEmailIsValid()
-        checkPasswordStrength()
         _formError.value =
-            (_validEmail.value && _passwordStrength.value > 0 && checkIfUsernameIsValid())
+            (_validEmail.value && _password.value.length > 6 && checkIfUsernameIsValid())
         _validUsername.value = checkIfUsernameIsValid()
     }
 

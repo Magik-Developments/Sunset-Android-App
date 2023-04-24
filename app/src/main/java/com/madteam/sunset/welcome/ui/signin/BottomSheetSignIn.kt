@@ -1,12 +1,14 @@
 package com.madteam.sunset.welcome.ui.signin
 
 import android.widget.Toast
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
@@ -49,10 +51,38 @@ fun CardContent(
     signInViewModel: SignInViewModel = hiltViewModel(),
     navigateToSignUp: () -> Unit
 ) {
+    val signInState = signInViewModel.signInState.collectAsState(initial = null).value
     val emailValue = signInViewModel.email.collectAsState().value
     val passwordValue = signInViewModel.password.collectAsState().value
     val validForm = signInViewModel.formError.collectAsState().value
     val context = LocalContext.current
+
+    when {
+        signInState?.isLoading == true -> {
+            Box(
+                contentAlignment = Alignment.TopCenter,
+                modifier = Modifier.padding(top = 20.dp)
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+        signInState?.isSuccess?.isNotEmpty() == true -> {
+            Box(contentAlignment = Alignment.Center) {
+                val success = signInState.isSuccess
+                Toast.makeText(context, "$success", Toast.LENGTH_SHORT).show()
+            }
+            signInViewModel.clearResource()
+        }
+        signInState?.isError?.isNotEmpty() == true -> {
+            Box(contentAlignment = Alignment.Center) {
+                val error = signInState.isError
+                Toast.makeText(context, "$error", Toast.LENGTH_SHORT).show()
+            }
+            signInViewModel.clearResource()
+        }
+    }
+
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.padding(horizontal = 36.dp)
@@ -74,7 +104,7 @@ fun CardContent(
         )
         CustomSpacer(size = 24.dp)
         SmallButtonDark(
-            onClick = { signInViewModel.checkIfFormIsValid() },
+            onClick = { signInViewModel.signInWithEmailAndPasswordIntent() },
             text = string.sign_in,
             enabled = validForm
         )

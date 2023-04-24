@@ -62,7 +62,6 @@ fun SignUpCardContent(
     val validEmail = signUpViewModel.validEmail.collectAsState().value
     val validUsername = signUpViewModel.validUsername.collectAsState().value
     val usernameValue = signUpViewModel.username.collectAsState().value
-    val passwordStrength = signUpViewModel.passwordStrength.collectAsState().value
     var showDialog = signUpViewModel.showDialog.collectAsState().value
     val signUpState = signUpViewModel.signUpState.collectAsState(initial = null).value
 
@@ -125,8 +124,6 @@ fun SignUpCardContent(
             },
             endIcon = { PasswordVisibilityOffIcon() }
         )
-        CustomSpacer(size = 8.dp)
-        PasswordSecurityIndicator(passwordStrength)
         CustomSpacer(size = 16.dp)
         UsernameTextField(
             usernameValue = usernameValue,

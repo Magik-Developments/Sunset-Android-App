@@ -1,12 +1,14 @@
 package com.madteam.sunset.welcome.ui.signup
 
 import android.widget.Toast
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
@@ -39,8 +41,8 @@ import com.madteam.sunset.welcome.ui.signin.CARD_HEIGHT
 fun BottomSheetSignUp(navigateToSignIn: () -> Unit) {
     Card(
         modifier = Modifier
-          .fillMaxWidth()
-          .height((LocalConfiguration.current.screenHeightDp * CARD_HEIGHT).dp),
+            .fillMaxWidth()
+            .height((LocalConfiguration.current.screenHeightDp * CARD_HEIGHT).dp),
         backgroundColor = Color(0xFFFFB600),
         shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp)
     ) {
@@ -62,6 +64,32 @@ fun SignUpCardContent(
     val usernameValue = signUpViewModel.username.collectAsState().value
     val passwordStrength = signUpViewModel.passwordStrength.collectAsState().value
     var showDialog = signUpViewModel.showDialog.collectAsState().value
+    val signUpState = signUpViewModel.signUpState.collectAsState(initial = null).value
+
+    when {
+        signUpState?.isLoading == true -> {
+            Box(
+                contentAlignment = Alignment.TopCenter,
+                modifier = Modifier.padding(top = 20.dp)
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+        signUpState?.isSuccess?.isNotEmpty() == true -> {
+            Box(contentAlignment = Alignment.Center) {
+                val success = signUpState.isSuccess
+                Toast.makeText(context, "$success", Toast.LENGTH_SHORT).show()
+            }
+            signUpViewModel.clearResource()
+        }
+        signUpState?.isError?.isNotEmpty() == true -> {
+            Box(contentAlignment = Alignment.Center) {
+                val error = signUpState.isError
+                Toast.makeText(context, "$error", Toast.LENGTH_SHORT).show()
+            }
+            signUpViewModel.clearResource()
+        }
+    }
 
     if (showDialog) {
         GDPRDialog(
@@ -129,5 +157,5 @@ fun SignUpCardContent(
 
 @Preview(showSystemUi = true)
 @Composable
-fun BottomSheetSignUnPreview() {
+fun BottomSheetSignUpPreview() {
 }

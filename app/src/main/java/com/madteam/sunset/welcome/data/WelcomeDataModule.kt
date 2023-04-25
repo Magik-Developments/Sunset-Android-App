@@ -13,4 +13,9 @@ object WelcomeDataModule {
     fun provideFirebaseAuthRepository(
         firebaseAuthRepository: FirebaseAuthRepository
     ): FireBaseAuthRepositoryContract = firebaseAuthRepository
+
+    @Provides
+    fun provideFirebaseFirestoreRepository(
+        firebaseFirestoreRepository: FirebaseFirestoreRepository
+    ): FirebaseFirestoreRepositoryContract = firebaseFirestoreRepository
 }

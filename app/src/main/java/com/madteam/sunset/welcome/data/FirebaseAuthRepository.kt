@@ -13,6 +13,7 @@ interface FireBaseAuthRepositoryContract {
 
   fun doSignUp(email: String, password: String): Flow<Resource<AuthResult>>
   fun doSignInWithPasswordAndEmail(email: String, password: String): Flow<Resource<AuthResult>>
+  fun deleteCurrentUser()
 }
 
 class FirebaseAuthRepository @Inject constructor(private val firebaseAuth: FirebaseAuth) :
@@ -27,7 +28,10 @@ class FirebaseAuthRepository @Inject constructor(private val firebaseAuth: Fireb
       emit(Resource.Error(it.message.toString()))
     }
 
-  override fun doSignInWithPasswordAndEmail(email: String, password: String): Flow<Resource<AuthResult>> =
+  override fun doSignInWithPasswordAndEmail(
+    email: String,
+    password: String
+  ): Flow<Resource<AuthResult>> =
     flow {
       emit(Resource.Loading())
       val result = firebaseAuth.signInWithEmailAndPassword(email, password).await()
@@ -35,4 +39,8 @@ class FirebaseAuthRepository @Inject constructor(private val firebaseAuth: Fireb
     }.catch {
       emit(Resource.Error(it.message.toString()))
     }
+
+  override fun deleteCurrentUser() {
+    firebaseAuth.currentUser?.delete()
+  }
 }

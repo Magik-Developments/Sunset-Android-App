@@ -10,6 +10,7 @@ interface FirebaseAuthInteractorContract {
 
   fun doSignUp(email: String, password: String): Flow<Resource<AuthResult>>
   fun doSignInWithPasswordAndEmail(email: String, password: String): Flow<Resource<AuthResult>>
+  fun deleteCurrentUser()
 }
 
 class FirebaseAuthInteractor @Inject constructor(
@@ -23,4 +24,7 @@ class FirebaseAuthInteractor @Inject constructor(
   override fun doSignInWithPasswordAndEmail(email: String, password: String): Flow<Resource<AuthResult>> =
     firebaseAuthRepository.doSignInWithPasswordAndEmail(email, password)
 
+  override fun deleteCurrentUser() {
+    firebaseAuthRepository.deleteCurrentUser()
+  }
 }

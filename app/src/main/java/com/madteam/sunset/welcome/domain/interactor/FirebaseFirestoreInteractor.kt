@@ -7,6 +7,7 @@ import javax.inject.Inject
 
 interface FirebaseFirestoreInteractorContract {
   fun createUserDatabase(email: String, username: String, provider: String): Flow<Resource<Unit>>
+  fun getProfileUsername(): String
 }
 
 class FirebaseFirestoreInteractor @Inject constructor(
@@ -16,4 +17,7 @@ class FirebaseFirestoreInteractor @Inject constructor(
   override fun createUserDatabase(email: String, username: String, provider: String): Flow<Resource<Unit>> =
     firebaseFirestoreRepository.createUserDatabase(email, username, provider)
 
+  override fun getProfileUsername(): String {
+    firebaseFirestoreRepository.getProfileUsername()
+  }
 }

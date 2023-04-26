@@ -3,17 +3,14 @@ package com.madteam.sunset.welcome.ui.signin
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.madteam.sunset.common.utils.Resource
 import com.madteam.sunset.common.utils.Resource.Error
 import com.madteam.sunset.common.utils.Resource.Loading
 import com.madteam.sunset.common.utils.Resource.Success
 import com.madteam.sunset.welcome.domain.interactor.FirebaseAuthInteractor
-import com.madteam.sunset.welcome.ui.signup.SingUpState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -50,19 +47,20 @@ class SignInViewModel @Inject constructor(private val firebaseAuthInteractor: Fi
 
   fun signInWithEmailAndPasswordIntent() {
     viewModelScope.launch {
-      firebaseAuthInteractor.doSignInWithPasswordAndEmail(_email.value, _password.value).collect { result ->
-        when (result) {
-          is Success -> {
-            _signInState.send(SignInState(isSuccess = "Sign In Success ${result.data?.user?.email}"))
-          }
-          is Error -> {
-            _signInState.send(SignInState(isError = result.message.toString()))
-          }
-          is Loading -> {
-            _signInState.send(SignInState(isLoading = true))
+      firebaseAuthInteractor.doSignInWithPasswordAndEmail(_email.value, _password.value)
+        .collect { result ->
+          when (result) {
+            is Success -> {
+              _signInState.send(SignInState(isSuccess = "Sign In Success ${result.data?.user?.email}"))
+            }
+            is Error -> {
+              _signInState.send(SignInState(isError = result.message.toString()))
+            }
+            is Loading -> {
+              _signInState.send(SignInState(isLoading = true))
+            }
           }
         }
-      }
     }
   }
 

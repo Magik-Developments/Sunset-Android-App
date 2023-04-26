@@ -13,6 +13,7 @@ import javax.inject.Inject
 
 interface FirebaseFirestoreRepositoryContract {
   fun createUserDatabase(email: String, username: String, provider: String): Flow<Resource<Unit>>
+  fun getProfileUsername(): String
 }
 
 class FirebaseFirestoreRepository @Inject constructor(private val firebaseFirestore: FirebaseFirestore) :
@@ -45,5 +46,9 @@ class FirebaseFirestoreRepository @Inject constructor(private val firebaseFirest
     emit(Resource.Success(Unit))
   }.catch {
     emit(Resource.Error(it.message.toString()))
+  }
+
+  override fun getProfileUsername(): String {
+    firebaseFirestore.collection("users").whereEqualTo("email", "")
   }
 }

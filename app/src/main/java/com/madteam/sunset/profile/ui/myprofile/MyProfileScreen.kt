@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.madteam.sunset.R
 import com.madteam.sunset.design_system.common.CustomSpacer
 import com.madteam.sunset.design_system.common.ProfileImage
@@ -40,7 +41,7 @@ fun MyProfileScreen(
     UserLocationText(location = "Terrassa, BCN")
     CustomSpacer(size = 48.dp)
     SmallButtonDark(
-      onClick = { /*TODO*/ },
+      onClick = { /* TODO */ },
       text = R.string.log_out,
       enabled = true
     )

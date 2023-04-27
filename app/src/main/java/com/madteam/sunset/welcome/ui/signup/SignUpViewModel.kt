@@ -1,9 +1,10 @@
 package com.madteam.sunset.welcome.ui.signup
 
+import android.os.Build.VERSION_CODES
 import android.util.Patterns
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.madteam.sunset.common.utils.Resource
 import com.madteam.sunset.common.utils.Resource.Error
 import com.madteam.sunset.common.utils.Resource.Loading
 import com.madteam.sunset.common.utils.Resource.Success
@@ -13,7 +14,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -46,7 +46,7 @@ class SignUpViewModel @Inject constructor(
   private val _showDialog = MutableStateFlow(false)
   val showDialog: StateFlow<Boolean> = _showDialog
 
-  private val _signUpState = Channel<SingUpState>()
+  private val _signUpState = Channel<SignUpState>()
   val signUpState = _signUpState.receiveAsFlow()
 
   fun onValuesSignUpChange(emailValue: String, passwordValue: String, usernameValue: String) {
@@ -62,7 +62,6 @@ class SignUpViewModel @Inject constructor(
 
   private fun checkIfUsernameIsValid(): Boolean {
     return (_username.value.length > 5)
-    // TODO: validar con firebase si el usuario ya existe o no
   }
 
   private fun checkIfFormIsValid() {
@@ -76,38 +75,39 @@ class SignUpViewModel @Inject constructor(
     _showDialog.value = false
   }
 
-  fun signUpIntent() {
+  @RequiresApi(VERSION_CODES.O) fun signUpIntent() {
     _showDialog.value = false
     viewModelScope.launch {
       firebaseAuthInteractor.doSignUp(_email.value, _password.value).collect { result ->
         when (result) {
           is Success -> {
             createUserDatabase(provider = "email")
-            _signUpState.send(SingUpState(isSuccess = "Sign Up Success"))
+            _signUpState.send(SignUpState(isSuccess = "Sign Up Success"))
           }
 
           is Loading -> {
-            _signUpState.send(SingUpState(isLoading = true))
+            _signUpState.send(SignUpState(isLoading = true))
           }
 
           is Error -> {
-            _signUpState.send(SingUpState(isError = result.message))
+            _signUpState.send(SignUpState(isError = result.message))
           }
         }
       }
     }
   }
 
+  @RequiresApi(VERSION_CODES.O)
   private fun createUserDatabase(provider: String) {
     viewModelScope.launch {
       firebaseFirestoreInteractor.createUserDatabase(_email.value, _username.value, provider).collect { result ->
         when (result) {
           is Success -> {
-            _signUpState.send(SingUpState(isSuccess = "Sign Up and DB created successfully"))
+            _signUpState.send(SignUpState(isSuccess = "Sign Up and DB created successfully"))
           }
           is Error -> {
             deleteCurrentUser()
-            _signUpState.send(SingUpState(isError = "Error, please try again later"))
+            _signUpState.send(SignUpState(isError = "Error, please try again later"))
           }
           is Loading -> {/* not necessary */}
         }
@@ -125,7 +125,7 @@ class SignUpViewModel @Inject constructor(
 
   fun clearResource() {
     viewModelScope.launch {
-      _signUpState.send(SingUpState())
+      _signUpState.send(SignUpState())
     }
   }
 }

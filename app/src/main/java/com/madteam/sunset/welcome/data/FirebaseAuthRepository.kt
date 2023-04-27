@@ -2,6 +2,7 @@ package com.madteam.sunset.welcome.data
 
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.madteam.sunset.common.utils.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -13,7 +14,8 @@ interface FireBaseAuthRepositoryContract {
 
   fun doSignUp(email: String, password: String): Flow<Resource<AuthResult>>
   fun doSignInWithPasswordAndEmail(email: String, password: String): Flow<Resource<AuthResult>>
-  fun deleteCurrentUser()
+  fun deleteCurrentUser(): Flow<Resource<Unit>>
+  fun getCurrentUser(): Flow<Resource<FirebaseUser>>
 }
 
 class FirebaseAuthRepository @Inject constructor(private val firebaseAuth: FirebaseAuth) :
@@ -40,7 +42,22 @@ class FirebaseAuthRepository @Inject constructor(private val firebaseAuth: Fireb
       emit(Resource.Error(it.message.toString()))
     }
 
-  override fun deleteCurrentUser() {
-    firebaseAuth.currentUser?.delete()
-  }
+  override fun deleteCurrentUser(): Flow<Resource<Unit>> =
+    flow {
+      emit(Resource.Loading())
+      firebaseAuth.currentUser?.delete()
+      emit(Resource.Success(Unit))
+    }.catch {
+      emit(Resource.Error(it.message.toString()))
+    }
+
+  override fun getCurrentUser(): Flow<Resource<FirebaseUser>> =
+    flow {
+      emit(Resource.Loading())
+      val currentUser = firebaseAuth.currentUser
+      emit(Resource.Success(currentUser!!))
+    }.catch {
+      emit(Resource.Error(it.message.toString()))
+    }
+
 }

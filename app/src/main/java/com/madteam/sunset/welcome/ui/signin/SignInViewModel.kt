@@ -7,6 +7,7 @@ import com.madteam.sunset.common.utils.Resource.Error
 import com.madteam.sunset.common.utils.Resource.Loading
 import com.madteam.sunset.common.utils.Resource.Success
 import com.madteam.sunset.welcome.domain.interactor.FirebaseAuthInteractor
+import com.madteam.sunset.welcome.ui.AuthViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +17,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SignInViewModel @Inject constructor(private val firebaseAuthInteractor: FirebaseAuthInteractor) :
+class SignInViewModel @Inject constructor(
+  private val firebaseAuthInteractor: FirebaseAuthInteractor,
+  private val authViewModel: AuthViewModel
+) :
   ViewModel() {
 
   private val _email = MutableStateFlow("")
@@ -28,9 +32,6 @@ class SignInViewModel @Inject constructor(private val firebaseAuthInteractor: Fi
   private val _formError = MutableStateFlow(false)
   val formError: StateFlow<Boolean> = _formError
 
-  private val _signInState = Channel<SignInState>()
-  val signInState = _signInState.receiveAsFlow()
-
   fun onValuesSignInChange(emailValue: String, passwordValue: String) {
     _email.value = emailValue
     _password.value = passwordValue
@@ -41,7 +42,7 @@ class SignInViewModel @Inject constructor(private val firebaseAuthInteractor: Fi
     return Patterns.EMAIL_ADDRESS.matcher(_email.value).matches()
   }
 
-  fun checkIfFormIsValid() {
+  private fun checkIfFormIsValid() {
     _formError.value = (checkIfEmailIsValid() && _password.value.isNotBlank())
   }
 
@@ -51,22 +52,19 @@ class SignInViewModel @Inject constructor(private val firebaseAuthInteractor: Fi
         .collect { result ->
           when (result) {
             is Success -> {
-              _signInState.send(SignInState(isSuccess = "Sign In Success ${result.data?.user?.email}"))
+              authViewModel.updateSignInState(SignInState(isSuccess = "Sign In Success ${result.data?.user?.email}"))
             }
+
             is Error -> {
-              _signInState.send(SignInState(isError = result.message.toString()))
+              authViewModel.updateSignInState(SignInState(isError = result.message.toString()))
             }
+
             is Loading -> {
-              _signInState.send(SignInState(isLoading = true))
+              authViewModel.updateSignInState(SignInState(isLoading = true))
             }
           }
         }
     }
   }
 
-  fun clearResource() {
-    viewModelScope.launch {
-      _signInState.send(SignInState())
-    }
-  }
 }

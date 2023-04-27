@@ -1,6 +1,7 @@
 package com.madteam.sunset.welcome.domain.interactor
 
 import com.google.firebase.auth.AuthResult
+import com.google.firebase.auth.FirebaseUser
 import com.madteam.sunset.common.utils.Resource
 import com.madteam.sunset.welcome.data.FirebaseAuthRepository
 import kotlinx.coroutines.flow.Flow
@@ -11,6 +12,7 @@ interface FirebaseAuthInteractorContract {
   fun doSignUp(email: String, password: String): Flow<Resource<AuthResult>>
   fun doSignInWithPasswordAndEmail(email: String, password: String): Flow<Resource<AuthResult>>
   fun deleteCurrentUser()
+  fun getCurrentUser(): Flow<Resource<FirebaseUser>>
 }
 
 class FirebaseAuthInteractor @Inject constructor(
@@ -27,4 +29,8 @@ class FirebaseAuthInteractor @Inject constructor(
   override fun deleteCurrentUser() {
     firebaseAuthRepository.deleteCurrentUser()
   }
+
+  override fun getCurrentUser(): Flow<Resource<FirebaseUser>> =
+    firebaseAuthRepository.getCurrentUser()
+
 }

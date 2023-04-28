@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Snackbar
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
@@ -22,8 +20,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.madteam.sunset.R.string
-import com.madteam.sunset.common.navigation.SunsetNavigation
-import com.madteam.sunset.common.navigation.SunsetRoutes.MyProfileScreen
 import com.madteam.sunset.design_system.common.CardHandler
 import com.madteam.sunset.design_system.common.CardSubtitle
 import com.madteam.sunset.design_system.common.CardTitle
@@ -34,7 +30,6 @@ import com.madteam.sunset.design_system.common.OtherLoginIconButtons
 import com.madteam.sunset.design_system.common.OtherLoginMethodsSection
 import com.madteam.sunset.design_system.common.PasswordTextField
 import com.madteam.sunset.design_system.common.SmallButtonDark
-import com.madteam.sunset.welcome.ui.AuthViewModel
 
 const val CARD_HEIGHT = 0.67
 
@@ -84,9 +79,8 @@ fun CardContent(
     }
 
     signInState?.isSuccess?.isNotEmpty() == true -> {
-      //navigateToMyProfileScreen()
-      //signInViewModel.clearResource()
-      navigateToWelcomeScreen()
+      navigateToMyProfileScreen()
+      signInViewModel.clearResource()
     }
 
     signInState?.isError?.isNotEmpty() == true -> {

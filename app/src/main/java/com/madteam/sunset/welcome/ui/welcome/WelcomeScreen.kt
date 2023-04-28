@@ -1,6 +1,6 @@
 @file:OptIn(
-    ExperimentalMaterialApi::class, ExperimentalMaterialApi::class,
-    ExperimentalMaterialApi::class
+  ExperimentalMaterialApi::class, ExperimentalMaterialApi::class,
+  ExperimentalMaterialApi::class
 )
 
 package com.madteam.sunset.welcome.ui.welcome
@@ -36,58 +36,79 @@ import com.madteam.sunset.design_system.common.MainTitle
 import com.madteam.sunset.design_system.common.SubTitle
 import com.madteam.sunset.design_system.common.SunsetLogoImage
 import com.madteam.sunset.welcome.ui.signin.CARD_HEIGHT
+import com.madteam.sunset.welcome.ui.signin.SignInState
+import com.madteam.sunset.welcome.ui.signin.SignInViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun WelcomeScreen(
-    onEmailClick: () -> Unit,
-    onGoogleClick: () -> Unit,
-    onFacebookClick: () -> Unit
+  onEmailClick: () -> Unit,
+  onGoogleClick: () -> Unit,
+  onFacebookClick: () -> Unit,
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        SunsetLogoImage()
-        CustomSpacer(56.dp)
-        MainTitle()
-        CustomSpacer(size = 8.dp)
-        SubTitle(Modifier.align(Alignment.Start))
-        CustomSpacer(size = 56.dp)
-        EmailButton(onClick = onEmailClick)
-        CustomSpacer(size = 16.dp)
-        GoogleButton(onClick = onGoogleClick)
-        CustomSpacer(size = 16.dp)
-        FacebookButton(onClick = onFacebookClick)
-    }
+  Column(
+    modifier = Modifier
+      .fillMaxSize()
+      .padding(horizontal = 16.dp),
+    horizontalAlignment = Alignment.CenterHorizontally,
+    verticalArrangement = Arrangement.Center
+  ) {
+    SunsetLogoImage()
+    CustomSpacer(56.dp)
+    MainTitle()
+    CustomSpacer(size = 8.dp)
+    SubTitle(Modifier.align(Alignment.Start))
+    CustomSpacer(size = 56.dp)
+    EmailButton(onClick = onEmailClick)
+    CustomSpacer(size = 16.dp)
+    GoogleButton(onClick = onGoogleClick)
+    CustomSpacer(size = 16.dp)
+    FacebookButton(onClick = onFacebookClick)
+  }
 }
 
 @Composable
-fun WelcomeScreenContent(welcomeViewModel: WelcomeViewModel = hiltViewModel()) {
-    val sheetState = welcomeViewModel.sheetState.collectAsState().value
-    val coroutineScope = rememberCoroutineScope()
-    val context = LocalContext.current
-    ModalBottomSheetLayout(
-        sheetShape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp),
-        sheetContent = {
-            Box(
-                Modifier
-                    .fillMaxWidth()
-                    .height((LocalConfiguration.current.screenHeightDp * CARD_HEIGHT).dp)
-            ) {
-                SunsetNavigation(SignInCard.route)
-            }
-        },
-        sheetState = sheetState
-    ) {
-        WelcomeScreen(
-            onEmailClick = { coroutineScope.launch { welcomeViewModel.expandBottomSheet() } },
-            onGoogleClick = { Toast.makeText(context, "Do Google Login", Toast.LENGTH_SHORT).show() },
-            onFacebookClick = { Toast.makeText(context, "Do Facebook Login", Toast.LENGTH_SHORT).show() })
+fun WelcomeScreenContent(
+  welcomeViewModel: WelcomeViewModel = hiltViewModel(),
+  navigateToMyProfileScreen: () -> Unit
+) {
+  val sheetState = welcomeViewModel.sheetState.collectAsState().value
+  val coroutineScope = rememberCoroutineScope()
+  val context = LocalContext.current
+  val signInState = welcomeViewModel.signInState.collectAsState(initial = null).value
+  println("")
+
+  when {
+    signInState?.isSuccess?.isNotEmpty() == true -> {
+      println("es success")
+      Box(contentAlignment = Alignment.Center) {
+        Toast.makeText(context, "navigating...", Toast.LENGTH_SHORT).show()
+      }
+      navigateToMyProfileScreen()
     }
+    signInState == null -> {
+      println("jeje es nulo")
+    }
+  }
+
+  ModalBottomSheetLayout(
+    sheetShape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp),
+    sheetContent = {
+      Box(
+        Modifier
+          .fillMaxWidth()
+          .height((LocalConfiguration.current.screenHeightDp * CARD_HEIGHT).dp)
+      ) {
+        SunsetNavigation(SignInCard.route)
+      }
+    },
+    sheetState = sheetState
+  ) {
+    WelcomeScreen(
+      onEmailClick = { coroutineScope.launch { welcomeViewModel.expandBottomSheet() } },
+      onGoogleClick = { Toast.makeText(context, "Do Google Login", Toast.LENGTH_SHORT).show() },
+      onFacebookClick = { Toast.makeText(context, "Do Facebook Login", Toast.LENGTH_SHORT).show() })
+  }
 }
 
 @Preview(showBackground = true)

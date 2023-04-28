@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Snackbar
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
@@ -39,7 +41,8 @@ const val CARD_HEIGHT = 0.67
 @Composable
 fun BottomSheetSignIn(
   navigateToSignUp: () -> Unit,
-  navigateToMyProfileScreen: () -> Unit
+  navigateToMyProfileScreen: () -> Unit,
+  navigateToWelcomeScreen: () -> Unit
 ) {
   Card(
     modifier = Modifier
@@ -50,7 +53,8 @@ fun BottomSheetSignIn(
   ) {
     CardContent(
       navigateToSignUp = navigateToSignUp,
-      navigateToMyProfileScreen = navigateToMyProfileScreen
+      navigateToMyProfileScreen = navigateToMyProfileScreen,
+      navigateToWelcomeScreen = navigateToWelcomeScreen
     )
   }
 }
@@ -58,11 +62,11 @@ fun BottomSheetSignIn(
 @Composable
 fun CardContent(
   signInViewModel: SignInViewModel = hiltViewModel(),
-  authViewModel: AuthViewModel = hiltViewModel(),
   navigateToSignUp: () -> Unit,
-  navigateToMyProfileScreen: () -> Unit
+  navigateToMyProfileScreen: () -> Unit,
+  navigateToWelcomeScreen: () -> Unit
 ) {
-  val signInState = authViewModel.signInState.collectAsState(initial = SignInState(isLoading = true)).value
+  val signInState = signInViewModel.signInState.collectAsState(initial = null).value
   println("signInState: $signInState")
   val emailValue = signInViewModel.email.collectAsState().value
   val passwordValue = signInViewModel.password.collectAsState().value
@@ -80,12 +84,9 @@ fun CardContent(
     }
 
     signInState?.isSuccess?.isNotEmpty() == true -> {
-      Box(contentAlignment = Alignment.Center) {
-        val success = signInState.isSuccess
-        Toast.makeText(context, "$success", Toast.LENGTH_SHORT).show()
-      }
-      navigateToMyProfileScreen()
-      authViewModel.clearResource()
+      //navigateToMyProfileScreen()
+      //signInViewModel.clearResource()
+      navigateToWelcomeScreen()
     }
 
     signInState?.isError?.isNotEmpty() == true -> {
@@ -93,7 +94,7 @@ fun CardContent(
         val error = signInState.isError
         Toast.makeText(context, "$error", Toast.LENGTH_SHORT).show()
       }
-      authViewModel.clearResource()
+      signInViewModel.clearResource()
     }
   }
 

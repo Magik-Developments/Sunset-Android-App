@@ -1,6 +1,7 @@
 package com.madteam.sunset.welcome.ui.signin
 
 import android.util.Patterns
+import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.madteam.sunset.common.utils.Resource.Error
@@ -31,6 +32,8 @@ class SignInViewModel @Inject constructor(
 
   private val _formError = MutableStateFlow(false)
   val formError: StateFlow<Boolean> = _formError
+
+  val signInState = authViewModel.signInState
 
   fun onValuesSignInChange(emailValue: String, passwordValue: String) {
     _email.value = emailValue
@@ -67,4 +70,9 @@ class SignInViewModel @Inject constructor(
     }
   }
 
+  fun clearResource() {
+    viewModelScope.launch {
+      authViewModel.clearResource()
+    }
+  }
 }

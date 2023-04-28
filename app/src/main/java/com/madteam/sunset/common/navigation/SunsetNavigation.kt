@@ -17,10 +17,10 @@ import com.madteam.sunset.welcome.ui.welcome.WelcomeScreenContent
 fun SunsetNavigation(startDestination: String) {
   val navController = rememberNavController()
   NavHost(navController = navController, startDestination = startDestination) {
-    composable(WelcomeScreen.route) { WelcomeScreenContent() }
+    composable(WelcomeScreen.route) { WelcomeScreenContent(navigateToMyProfileScreen = { navController.navigate(MyProfileScreen.route) }) }
     composable(SignInCard.route) {
       BottomSheetSignIn(navigateToSignUp = { navController.navigate(SignUpCard.route) },
-        navigateToMyProfileScreen = { navController.navigate(MyProfileScreen.route) })
+        navigateToMyProfileScreen = { navController.navigate(MyProfileScreen.route) }, navigateToWelcomeScreen = { navController.navigate(WelcomeScreen.route)})
     }
     composable(SignUpCard.route) {
       BottomSheetSignUp(navigateToSignIn = {

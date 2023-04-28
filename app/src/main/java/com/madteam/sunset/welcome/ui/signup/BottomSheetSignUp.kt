@@ -1,6 +1,8 @@
 package com.madteam.sunset.welcome.ui.signup
 
+import android.os.Build.VERSION_CODES
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -50,6 +52,7 @@ fun BottomSheetSignUp(navigateToSignIn: () -> Unit) {
     }
 }
 
+@RequiresApi(VERSION_CODES.O)
 @Composable
 fun SignUpCardContent(
     navigateToSignIn: () -> Unit,

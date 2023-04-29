@@ -123,11 +123,9 @@ fun BottomSheetSignInContent(
     ) {
         CustomSpacer(size = 8.dp)
         CardHandler()
-
         CustomSpacer(size = 16.dp)
         CardTitle(string.welcome_back)
         CardSubtitle(string.enter_details_below)
-
         CustomSpacer(size = 16.dp)
         EmailTextField(
             emailValue = userValueText,
@@ -136,7 +134,6 @@ fun BottomSheetSignInContent(
                 validateForm(userValueText, passwordTValueText)
             },
         )
-
         CustomSpacer(size = 16.dp)
         PasswordTextField(
             passwordValue = passwordTValueText,
@@ -145,7 +142,6 @@ fun BottomSheetSignInContent(
                 validateForm(userValueText, passwordTValueText)
             }
         )
-
         CustomSpacer(size = 24.dp)
         SmallButtonDark(
             onClick = { signInButton(userValueText, passwordTValueText) },

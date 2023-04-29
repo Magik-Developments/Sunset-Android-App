@@ -26,7 +26,6 @@ import com.madteam.sunset.ui.common.SunsetLogoImage
 import com.madteam.sunset.ui.screens.signin.BottomSheetSignInScreen
 import kotlinx.coroutines.launch
 
-
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun WelcomeScreen(
@@ -50,7 +49,6 @@ fun WelcomeScreen(
                         scaffoldState.bottomSheetState.expand()
                     } else {
                         scaffoldState.bottomSheetState.collapse()
-
                     }
                 }
             },
@@ -58,7 +56,6 @@ fun WelcomeScreen(
             onFacebookClick = { Toast.makeText(context, "Do Facebook Login", Toast.LENGTH_SHORT).show() })
     }
 }
-
 
 @Composable
 fun WelcomeContent(

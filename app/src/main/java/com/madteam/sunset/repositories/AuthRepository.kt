@@ -24,18 +24,13 @@ class AuthRepository @Inject constructor(
             emit(Resource.Error(it.message.toString()))
         }
 
-    override fun doSignInWithPasswordAndEmail(
+    override suspend fun doSignInWithPasswordAndEmail(
         email: String,
         password: String
-    ): Flow<Resource<AuthResult>> =
-        flow {
-            emit(Resource.Loading())
-            firebaseAuth.signInWithEmailAndPassword(email, password).await().let { result ->
-                emit(Resource.Success(result))
-            }
-        }.catch {
-            emit(Resource.Error(it.message.toString()))
-        }
+    ): Result<AuthResult> = kotlin.runCatching { // TODO: Yoy soy muy fan de la clase Result de kotlin.
+        firebaseAuth.signInWithEmailAndPassword(email, password).await()
+    }
+
 
     override fun deleteCurrentUser(): Flow<Resource<Unit>> =
         flow {
@@ -62,7 +57,7 @@ class AuthRepository @Inject constructor(
 // Si el dia de mñn quiere otro sistema de Auth, este contrato sigue siendo valido.
 interface AuthContract {
     fun doSignUp(email: String, password: String): Flow<Resource<AuthResult>>
-    fun doSignInWithPasswordAndEmail(email: String, password: String): Flow<Resource<AuthResult>>
+    suspend fun doSignInWithPasswordAndEmail(email: String, password: String): Result<AuthResult>
     fun deleteCurrentUser(): Flow<Resource<Unit>>
     fun getCurrentUser(): Flow<Resource<FirebaseUser>>
 }

@@ -24,6 +24,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.google.firebase.auth.AuthResult
+import com.madteam.sunset.BuildConfig
 import com.madteam.sunset.R.string
 import com.madteam.sunset.navigation.SunsetRoutes
 import com.madteam.sunset.ui.common.CardHandler
@@ -70,7 +71,7 @@ fun BottomSheetSignInScreen(
 
 @Composable
 fun BottomSheetSignInContent(
-    signInState: Resource<AuthResult>?,
+    signInState: Resource<AuthResult?>,
     isValidForm: Boolean,
     navigateTo: (String) -> Unit,
     validateForm: (String, String) -> Unit,
@@ -80,6 +81,12 @@ fun BottomSheetSignInContent(
     val context = LocalContext.current
     var userValueText by remember { mutableStateOf("") }
     var passwordTValueText by remember { mutableStateOf("") }
+
+    // Para que solo en DEBUG rellene el login y no tener que escribirlo todo el rato durante el testing
+    if(BuildConfig.DEBUG){
+        userValueText = "adriafernandez15@gmail.com"
+        passwordTValueText = "abc.1234"
+    }
 
     when (signInState) {
         is Resource.Loading -> {
@@ -92,9 +99,11 @@ fun BottomSheetSignInContent(
         }
 
         is Resource.Success -> {
-            navigateTo(SunsetRoutes.MyProfileScreen.route)
-            userValueText = ""
-            passwordTValueText = ""
+            if (signInState.data != null) {
+                navigateTo(SunsetRoutes.MyProfileScreen.route)
+                userValueText = ""
+                passwordTValueText = ""
+            }
         }
 
         is Resource.Error -> {

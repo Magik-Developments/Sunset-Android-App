@@ -17,7 +17,7 @@ class SignInViewModel @Inject constructor(
     private val authRepository: AuthContract
 ) : ViewModel() {
 
-    val signInState = MutableStateFlow<Resource<AuthResult>?>(null)
+    val signInState = MutableStateFlow<Resource<AuthResult?>>(Resource.Success(null))
     val isValidForm = MutableStateFlow(false)
 
     private fun isUserValid(email: String): Boolean {
@@ -33,8 +33,15 @@ class SignInViewModel @Inject constructor(
     }
 
     fun signInWithEmailAndPasswordIntent(email: String, password: String) = viewModelScope.launch {
-        authRepository.doSignInWithPasswordAndEmail(email, password).collectLatest {
-            signInState.value = it
-        }
+        signInState.value = Resource.Loading()
+        authRepository.doSignInWithPasswordAndEmail(email, password).fold(
+            onSuccess = {
+                signInState.value = Resource.Success(it)
+            },
+            onFailure = {
+                signInState.value = Resource.Error(it.message ?: "Login error")
+
+            }
+        )
     }
 }

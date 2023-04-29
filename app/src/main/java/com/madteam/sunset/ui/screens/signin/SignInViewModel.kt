@@ -8,7 +8,6 @@ import com.madteam.sunset.repositories.AuthContract
 import com.madteam.sunset.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -42,5 +41,9 @@ class SignInViewModel @Inject constructor(
                 signInState.value = Resource.Error(it.message ?: "Login error")
             }
         )
+    }
+
+    fun clearSignInState() {
+        signInState.value = Resource.Success(null)
     }
 }

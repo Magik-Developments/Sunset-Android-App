@@ -5,13 +5,21 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomSheetScaffold
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetState
+import androidx.compose.material.ModalBottomSheetValue.Hidden
 import androidx.compose.material.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -33,10 +41,12 @@ fun WelcomeScreen(
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
-    val scaffoldState = rememberBottomSheetScaffoldState()
+    val modalState = ModalBottomSheetState(initialValue = Hidden, isSkipHalfExpanded = true)
 
-    BottomSheetScaffold(
-        scaffoldState = scaffoldState,
+    ModalBottomSheetLayout(
+        sheetState = modalState,
+        sheetShape = RoundedCornerShape(40.dp, 40.dp, 0.dp, 0.dp),
+        sheetElevation = 10.dp,
         sheetContent = {
             // Sheet content
             BottomSheetSignInScreen(navController)
@@ -45,10 +55,10 @@ fun WelcomeScreen(
         WelcomeContent(
             onEmailClick = {
                 coroutineScope.launch {
-                    if (scaffoldState.bottomSheetState.isCollapsed) {
-                        scaffoldState.bottomSheetState.expand()
+                    if (!modalState.isVisible) {
+                        modalState.show()
                     } else {
-                        scaffoldState.bottomSheetState.collapse()
+                        modalState.hide()
                     }
                 }
             },

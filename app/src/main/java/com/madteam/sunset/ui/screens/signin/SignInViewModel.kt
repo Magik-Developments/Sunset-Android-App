@@ -40,7 +40,6 @@ class SignInViewModel @Inject constructor(
             },
             onFailure = {
                 signInState.value = Resource.Error(it.message ?: "Login error")
-
             }
         )
     }

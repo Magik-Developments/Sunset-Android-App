@@ -64,7 +64,8 @@ fun BottomSheetSignInScreen(
             isValidForm,
             navigateTo = navController::navigate,
             validateForm = viewModel::isValidForm,
-            signInButton = viewModel::signInWithEmailAndPasswordIntent
+            signInButton = viewModel::signInWithEmailAndPasswordIntent,
+            clearSignInState = viewModel::clearSignInState
         )
     }
 }
@@ -75,7 +76,8 @@ fun BottomSheetSignInContent(
     isValidForm: Boolean,
     navigateTo: (String) -> Unit,
     validateForm: (String, String) -> Unit,
-    signInButton: (String, String) -> Unit
+    signInButton: (String, String) -> Unit,
+    clearSignInState: () -> Unit
 ) {
 
     val context = LocalContext.current
@@ -83,7 +85,7 @@ fun BottomSheetSignInContent(
     var passwordTValueText by remember { mutableStateOf("") }
 
     // When running in DEBUG, login fields are autocompleted
-    if(BuildConfig.DEBUG){
+    if (BuildConfig.DEBUG) {
         userValueText = "adriafernandez15@gmail.com"
         passwordTValueText = "abc.1234"
         validateForm(userValueText, passwordTValueText)
@@ -102,8 +104,7 @@ fun BottomSheetSignInContent(
         is Resource.Success -> {
             if (signInState.data != null) {
                 navigateTo(SunsetRoutes.MyProfileScreen.route)
-                userValueText = ""
-                passwordTValueText = ""
+                clearSignInState()
             }
         }
 
@@ -111,8 +112,7 @@ fun BottomSheetSignInContent(
             Box(contentAlignment = Alignment.Center) {
                 Toast.makeText(context, "${signInState.message}", Toast.LENGTH_SHORT).show()
             }
-            userValueText = ""
-            passwordTValueText = ""
+            clearSignInState()
         }
 
     }

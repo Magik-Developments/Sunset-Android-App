@@ -82,7 +82,7 @@ fun BottomSheetSignInContent(
     var userValueText by remember { mutableStateOf("") }
     var passwordTValueText by remember { mutableStateOf("") }
 
-    // Para que solo en DEBUG rellene el login y no tener que escribirlo todo el rato durante el testing
+    // When running in DEBUG, login fields are autocompleted
     if(BuildConfig.DEBUG){
         userValueText = "adriafernandez15@gmail.com"
         passwordTValueText = "abc.1234"
@@ -114,9 +114,6 @@ fun BottomSheetSignInContent(
             passwordTValueText = ""
         }
 
-        null -> {
-            /*NO-OP*/
-        }
     }
 
     Column(

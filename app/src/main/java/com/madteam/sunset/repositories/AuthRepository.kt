@@ -24,13 +24,18 @@ class AuthRepository @Inject constructor(
             emit(Resource.Error(it.message.toString()))
         }
 
-    override suspend fun doSignInWithPasswordAndEmail(
+    override fun doSignInWithPasswordAndEmail(
         email: String,
         password: String
-    ): Result<AuthResult> = kotlin.runCatching { // TODO: Yoy soy muy fan de la clase Result de kotlin.
-        firebaseAuth.signInWithEmailAndPassword(email, password).await()
-    }
-
+    ): Flow<Resource<AuthResult?>> =
+        flow {
+            emit(Resource.Loading())
+            firebaseAuth.signInWithEmailAndPassword(email, password).await().let { result ->
+                emit(Resource.Success(result))
+            }
+        }.catch {
+            emit(Resource.Error(it.message.toString()))
+        }
 
     override fun deleteCurrentUser(): Flow<Resource<Unit>> =
         flow {
@@ -42,22 +47,19 @@ class AuthRepository @Inject constructor(
             emit(Resource.Error(it.message.toString()))
         }
 
-    override fun getCurrentUser(): Flow<Resource<FirebaseUser>> =
-        flow {
-            emit(Resource.Loading())  // No lo necesitas ya que firebaseAuth.currentUser no está suspend
-            firebaseAuth.currentUser?.let { currentUser ->
-                emit(Resource.Success(currentUser))
-            }
-        }.catch {
-            emit(Resource.Error(it.message.toString()))
-        }
+    override fun getCurrentUser(): FirebaseUser? =
+        firebaseAuth.currentUser
+
+    override fun logout() = firebaseAuth.signOut()
+
 }
 
 // Esto es un contrato genérico de Autenticación, no hace falta asociarlo a Firebase.
 // Si el dia de mñn quiere otro sistema de Auth, este contrato sigue siendo valido.
 interface AuthContract {
     fun doSignUp(email: String, password: String): Flow<Resource<AuthResult>>
-    suspend fun doSignInWithPasswordAndEmail(email: String, password: String): Result<AuthResult>
+    fun doSignInWithPasswordAndEmail(email: String, password: String): Flow<Resource<AuthResult?>>
     fun deleteCurrentUser(): Flow<Resource<Unit>>
-    fun getCurrentUser(): Flow<Resource<FirebaseUser>>
+    fun getCurrentUser(): FirebaseUser?
+    fun logout()
 }

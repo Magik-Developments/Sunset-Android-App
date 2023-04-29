@@ -1,8 +1,6 @@
 package com.madteam.sunset.ui.screens.signup
 
-import android.os.Build.VERSION_CODES
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,7 +29,6 @@ import com.madteam.sunset.ui.common.ErrorIcon
 import com.madteam.sunset.ui.common.GDPRDialog
 import com.madteam.sunset.ui.common.OtherLoginIconButtons
 import com.madteam.sunset.ui.common.OtherLoginMethodsSection
-import com.madteam.sunset.ui.common.PasswordSecurityIndicator
 import com.madteam.sunset.ui.common.PasswordTextField
 import com.madteam.sunset.ui.common.PasswordVisibilityOffIcon
 import com.madteam.sunset.ui.common.SmallButtonDark
@@ -52,7 +49,6 @@ fun BottomSheetSignUp(navigateToSignIn: () -> Unit) {
     }
 }
 
-@RequiresApi(VERSION_CODES.O)
 @Composable
 fun SignUpCardContent(
     navigateToSignIn: () -> Unit,

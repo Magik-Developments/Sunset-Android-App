@@ -1,6 +1,7 @@
 package com.madteam.sunset.repositories
 
 import com.google.firebase.firestore.FirebaseFirestore
+import com.madteam.sunset.model.UserProfile
 import com.madteam.sunset.utils.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -37,30 +38,30 @@ class DatabaseRepository @Inject constructor(
             "creation_date" to currentDate
         )
 
+        // FIXME: No deberias tener strings hardcoded ("users") en mitad del codigo, es mala practica.
+        // Si el dia de mñn quieres cambiar el nombre de la coleccion, vas a tener que cambiar este string en mil sitios.
         firebaseFirestore.collection("users").document(username).set(user).await()
         emit(Resource.Success(Unit))
     }.catch {
         emit(Resource.Error(it.message.toString()))
     }
 
-    override fun getProfileByUsername(email: String): Flow<Resource<String>> =
-        flow {
-            emit(Resource.Loading())
-            val userDocument = firebaseFirestore.collection("users")
-                .whereEqualTo("email", email)
-                .get()
-                .await()
-            for (document in userDocument) {
-                val userUsername: String = document.getString("username").toString()
-                emit(Resource.Success(userUsername))
+    // Tambien queria dejar un ejemplo de como retornar información a través de una lambda, ya que muchas veces
+    // no se puede hacer un return directamente porque a respuesta te la va a entregar firestore despues de realizar
+    // la petición, por eso esta funcion, retorna el UserProfile en una lambda cuando se recibe en el `addOnSuccessListener`
+    override fun getProfileByUsername(email: String, userProfileCallback: (UserProfile) -> Unit) {
+        // FIXME: No necesitas recorrer las colecciones, el documento que buscas es el del username!
+        firebaseFirestore.collection("users").document(email)
+            .get()
+            .addOnSuccessListener { userDocument ->
+                userDocument.toObject(UserProfile::class.java)?.let {
+                    userProfileCallback(it)
+                }
             }
-        }.catch {
-            emit(Resource.Error(it.message.toString()))
-        }
-
+    }
 }
 
 interface DatabaseContract {
     fun createUser(email: String, username: String, provider: String): Flow<Resource<Unit>>
-    fun getProfileByUsername(email: String): Flow<Resource<String>>
+    fun getProfileByUsername(email: String, userProfileCallback: (UserProfile) -> Unit)
 }

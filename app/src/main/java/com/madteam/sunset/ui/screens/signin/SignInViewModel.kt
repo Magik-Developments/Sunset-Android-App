@@ -8,6 +8,7 @@ import com.madteam.sunset.repositories.AuthContract
 import com.madteam.sunset.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -17,6 +18,12 @@ class SignInViewModel @Inject constructor(
 ) : ViewModel() {
 
     val signInState = MutableStateFlow<Resource<AuthResult?>>(Resource.Success(null))
+
+    //    val signInState :StateFlow<Resource<AuthResult>> = _signInState.stateIn(
+//        initialValue = Resource.Idle,
+//        scope = viewModelScope,
+//        started = SharingStarted.WhileSubscribed(5_000)
+//    )
     val isValidForm = MutableStateFlow(false)
 
     private fun isUserValid(email: String): Boolean {
@@ -32,15 +39,9 @@ class SignInViewModel @Inject constructor(
     }
 
     fun signInWithEmailAndPasswordIntent(email: String, password: String) = viewModelScope.launch {
-        signInState.value = Resource.Loading()
-        authRepository.doSignInWithPasswordAndEmail(email, password).fold(
-            onSuccess = {
-                signInState.value = Resource.Success(it)
-            },
-            onFailure = {
-                signInState.value = Resource.Error(it.message ?: "Login error")
-            }
-        )
+        authRepository.doSignInWithPasswordAndEmail(email, password).collectLatest {
+            signInState.value = it
+        }
     }
 
     fun clearSignInState() {

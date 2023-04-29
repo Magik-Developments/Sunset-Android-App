@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,10 +48,29 @@ fun BottomSheetSignInScreen(
     viewModel: SignInViewModel = hiltViewModel(),
 ) {
 
+    val context = LocalContext.current
     val signInState by viewModel.signInState.collectAsStateWithLifecycle()
-    println("signInState: $signInState")
-
     val isValidForm by viewModel.isValidForm.collectAsStateWithLifecycle()
+
+//    when (signInState) {
+//        is Resource.Loading -> {
+//            CircularProgressIndicator()
+//        }
+//
+//        is Resource.Success -> {
+//            if (signInState.data != null) {
+//                LaunchedEffect(true) {
+//                    navController.navigate(SunsetRoutes.MyProfileScreen.route)
+//                }
+//            }
+//        }
+//
+//        is Resource.Error -> {
+//            Box(contentAlignment = Alignment.Center) {
+//                Toast.makeText(context, "${signInState.message}", Toast.LENGTH_SHORT).show()
+//            }
+//        }
+//    }
 
     Card(
         modifier = Modifier
@@ -79,8 +99,8 @@ fun BottomSheetSignInContent(
     signInButton: (String, String) -> Unit,
     clearSignInState: () -> Unit
 ) {
-
     val context = LocalContext.current
+
     var userValueText by remember { mutableStateOf("") }
     var passwordTValueText by remember { mutableStateOf("") }
 
@@ -103,7 +123,9 @@ fun BottomSheetSignInContent(
 
         is Resource.Success -> {
             if (signInState.data != null) {
-                navigateTo(SunsetRoutes.MyProfileScreen.route)
+                LaunchedEffect(key1 = signInState.data) {
+                    navigateTo(SunsetRoutes.MyProfileScreen.route)
+                }
                 clearSignInState()
             }
         }
@@ -118,8 +140,7 @@ fun BottomSheetSignInContent(
     }
 
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(horizontal = 36.dp)
+        horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(horizontal = 36.dp)
     ) {
         CustomSpacer(size = 8.dp)
         CardHandler()
@@ -135,27 +156,20 @@ fun BottomSheetSignInContent(
             },
         )
         CustomSpacer(size = 16.dp)
-        PasswordTextField(
-            passwordValue = passwordTValueText,
-            onValueChange = { password ->
-                passwordTValueText = password
-                validateForm(userValueText, passwordTValueText)
-            }
-        )
+        PasswordTextField(passwordValue = passwordTValueText, onValueChange = { password ->
+            passwordTValueText = password
+            validateForm(userValueText, passwordTValueText)
+        })
         CustomSpacer(size = 24.dp)
         SmallButtonDark(
-            onClick = { signInButton(userValueText, passwordTValueText) },
-            text = string.sign_in,
-            enabled = isValidForm
+            onClick = { signInButton(userValueText, passwordTValueText) }, text = string.sign_in, enabled = isValidForm
         )
         CustomSpacer(size = 16.dp)
         ForgotPasswordText()
         CustomSpacer(size = 40.dp)
         OtherLoginMethodsSection(string.not_registered_yet_signup_with)
         CustomSpacer(size = 24.dp)
-        OtherLoginIconButtons(
-            firstMethod = { Toast.makeText(context, "Do Google Login", Toast.LENGTH_SHORT).show() },
-            secondMethod = { navigateTo(SunsetRoutes.SignUpCard.route) }
-        )
+        OtherLoginIconButtons(firstMethod = { Toast.makeText(context, "Do Google Login", Toast.LENGTH_SHORT).show() },
+            secondMethod = { navigateTo(SunsetRoutes.SignUpCard.route) })
     }
 }

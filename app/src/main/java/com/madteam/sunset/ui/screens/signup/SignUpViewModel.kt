@@ -1,8 +1,6 @@
 package com.madteam.sunset.ui.screens.signup
 
-import android.os.Build.VERSION_CODES
 import android.util.Patterns
-import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.madteam.sunset.repositories.AuthContract
@@ -74,7 +72,6 @@ class SignUpViewModel @Inject constructor(
         _showDialog.value = false
     }
 
-    @RequiresApi(VERSION_CODES.O)
     fun signUpIntent() {
         _showDialog.value = false
         viewModelScope.launch {
@@ -97,7 +94,6 @@ class SignUpViewModel @Inject constructor(
         }
     }
 
-    @RequiresApi(VERSION_CODES.O)
     private fun createUserDatabase(provider: String) {
         viewModelScope.launch {
             databaseRepository.createUser(_email.value, _username.value, provider).collect { result ->

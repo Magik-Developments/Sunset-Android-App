@@ -86,6 +86,7 @@ fun BottomSheetSignInContent(
     if(BuildConfig.DEBUG){
         userValueText = "adriafernandez15@gmail.com"
         passwordTValueText = "abc.1234"
+        validateForm(userValueText, passwordTValueText)
     }
 
     when (signInState) {

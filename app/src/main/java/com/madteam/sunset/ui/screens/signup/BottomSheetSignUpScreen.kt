@@ -49,7 +49,8 @@ import com.madteam.sunset.utils.Resource
 @Composable
 fun BottomSheetSignUpScreen(
     navController: NavController,
-    viewModel: SignUpViewModel = hiltViewModel()
+    viewModel: SignUpViewModel = hiltViewModel(),
+    modalOptions: () -> Unit
 ) {
 
     val signUpState by viewModel.signUpState.collectAsStateWithLifecycle()
@@ -65,6 +66,7 @@ fun BottomSheetSignUpScreen(
         BottomSheetSignUpContent(
             signUpState = signUpState,
             isValidForm = isValidForm,
+            modalOptions = modalOptions,
             isValidEmail = viewModel::isEmailValid,
             isValidUsername = viewModel::isUsernameValid,
             acceptDialogClicked = viewModel::signUpIntent,
@@ -80,6 +82,7 @@ fun BottomSheetSignUpScreen(
 fun BottomSheetSignUpContent(
     signUpState: Resource<AuthResult?>,
     isValidForm: Boolean,
+    modalOptions: () -> Unit,
     isValidEmail: (String) -> Boolean,
     isValidUsername: (String) -> Boolean,
     acceptDialogClicked: (String, String, String) -> Unit,
@@ -190,7 +193,7 @@ fun BottomSheetSignUpContent(
         CustomSpacer(size = 8.dp)
         OtherLoginIconButtons(
             firstMethod = { Toast.makeText(context, "Do Google Login", Toast.LENGTH_SHORT).show() },
-            secondMethod = { navigateTo(SunsetRoutes.SignInCard.route) }
+            secondMethod = { modalOptions() }
         )
     }
 }

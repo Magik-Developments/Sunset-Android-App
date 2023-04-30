@@ -38,6 +38,7 @@ import com.madteam.sunset.ui.common.OtherLoginIconButtons
 import com.madteam.sunset.ui.common.OtherLoginMethodsSection
 import com.madteam.sunset.ui.common.PasswordTextField
 import com.madteam.sunset.ui.common.SmallButtonDark
+import com.madteam.sunset.ui.screens.welcome.WelcomeScreenModalOptions
 import com.madteam.sunset.utils.Resource
 
 const val CARD_HEIGHT = 0.67
@@ -46,6 +47,7 @@ const val CARD_HEIGHT = 0.67
 fun BottomSheetSignInScreen(
     navController: NavController,
     viewModel: SignInViewModel = hiltViewModel(),
+    modalOptions: () -> Unit
 ) {
 
     val signInState by viewModel.signInState.collectAsStateWithLifecycle()
@@ -61,6 +63,7 @@ fun BottomSheetSignInScreen(
         BottomSheetSignInContent(
             signInState,
             isValidForm,
+            modalOptions = modalOptions,
             navigateTo = navController::navigate,
             validateForm = viewModel::isValidForm,
             signInButton = viewModel::signInWithEmailAndPasswordIntent,
@@ -73,6 +76,7 @@ fun BottomSheetSignInScreen(
 fun BottomSheetSignInContent(
     signInState: Resource<AuthResult?>,
     isValidForm: Boolean,
+    modalOptions: () -> Unit,
     navigateTo: (String) -> Unit,
     validateForm: (String, String) -> Unit,
     signInButton: (String, String) -> Unit,
@@ -148,6 +152,6 @@ fun BottomSheetSignInContent(
         OtherLoginMethodsSection(string.not_registered_yet_signup_with)
         CustomSpacer(size = 24.dp)
         OtherLoginIconButtons(firstMethod = { Toast.makeText(context, "Do Google Login", Toast.LENGTH_SHORT).show() },
-            secondMethod = { navigateTo(SunsetRoutes.SignUpCard.route) })
+            secondMethod = { modalOptions() })
     }
 }

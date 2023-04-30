@@ -12,6 +12,8 @@ import com.madteam.sunset.ui.screens.myprofile.MyProfileScreen
 import com.madteam.sunset.ui.screens.signin.BottomSheetSignInScreen
 import com.madteam.sunset.ui.screens.signup.BottomSheetSignUpScreen
 import com.madteam.sunset.ui.screens.welcome.WelcomeScreen
+import com.madteam.sunset.ui.screens.welcome.WelcomeScreenModalOptions.SIGN_IN
+import com.madteam.sunset.ui.screens.welcome.WelcomeScreenModalOptions.SIGN_UP
 
 @Composable
 fun SunsetNavigation() {
@@ -24,11 +26,11 @@ fun SunsetNavigation() {
         }
 
         composable(SignUpCard.route) {
-            WelcomeScreen(navController, modal = "signup")
+            WelcomeScreen(navController, modal = SIGN_UP)
         }
 
         composable(SignInCard.route) {
-            WelcomeScreen(navController, modal = "signin")
+            WelcomeScreen(navController, modal = SIGN_IN)
         }
 
         composable(MyProfileScreen.route) {

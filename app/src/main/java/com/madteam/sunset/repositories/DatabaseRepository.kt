@@ -46,17 +46,12 @@ class DatabaseRepository @Inject constructor(
         emit(Resource.Error(it.message.toString()))
     }
 
-    // Tambien queria dejar un ejemplo de como retornar información a través de una lambda, ya que muchas veces
-    // no se puede hacer un return directamente porque a respuesta te la va a entregar firestore despues de realizar
-    // la petición, por eso esta funcion, retorna el UserProfile en una lambda cuando se recibe en el `addOnSuccessListener`
     override fun getProfileByUsername(email: String, userProfileCallback: (UserProfile) -> Unit) {
-        // FIXME: No necesitas recorrer las colecciones, el documento que buscas es el del username!
-        firebaseFirestore.collection("users").document(email)
+        firebaseFirestore.collection("users").whereEqualTo("email", email)
+            .limit(1)
             .get()
             .addOnSuccessListener { userDocument ->
-                userDocument.toObject(UserProfile::class.java)?.let {
-                    userProfileCallback(it)
-                }
+                userProfileCallback(userDocument.toObjects(UserProfile::class.java)[0])
             }
     }
 }

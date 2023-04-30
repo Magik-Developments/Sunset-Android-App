@@ -29,6 +29,7 @@ import com.google.firebase.auth.AuthResult
 import com.madteam.sunset.R.string
 import com.madteam.sunset.navigation.SunsetRoutes
 import com.madteam.sunset.navigation.SunsetRoutes.MyProfileScreen
+import com.madteam.sunset.navigation.SunsetRoutes.WelcomeScreen
 import com.madteam.sunset.ui.common.CardHandler
 import com.madteam.sunset.ui.common.CardSubtitle
 import com.madteam.sunset.ui.common.CardTitle
@@ -111,7 +112,8 @@ fun BottomSheetSignUpContent(
         is Resource.Success -> {
             if (signUpState.data != null) {
                 LaunchedEffect(key1 = signUpState.data) {
-                    navigateTo(MyProfileScreen.route)
+                    navigateTo(WelcomeScreen.route)
+                    //TODO: Navigate to Email Confirmation Screen
                 }
                 clearSignUpState()
             }

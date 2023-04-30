@@ -36,7 +36,7 @@ class SignUpViewModel @Inject constructor(
         return (username.length > 5)
     }
 
-    fun isPasswordValid(password: String): Boolean {
+    private fun isPasswordValid(password: String): Boolean {
         return (password.length > MIN_PASSWORD_LENGTH)
     }
 

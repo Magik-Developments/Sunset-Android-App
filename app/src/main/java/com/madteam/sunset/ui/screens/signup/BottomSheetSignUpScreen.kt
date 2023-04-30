@@ -10,7 +10,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -19,7 +23,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import com.google.firebase.auth.AuthResult
 import com.madteam.sunset.R.string
+import com.madteam.sunset.navigation.SunsetRoutes
+import com.madteam.sunset.navigation.SunsetRoutes.MyProfileScreen
 import com.madteam.sunset.ui.common.CardHandler
 import com.madteam.sunset.ui.common.CardSubtitle
 import com.madteam.sunset.ui.common.CardTitle
@@ -35,9 +44,17 @@ import com.madteam.sunset.ui.common.SmallButtonDark
 import com.madteam.sunset.ui.common.SuccessIcon
 import com.madteam.sunset.ui.common.UsernameTextField
 import com.madteam.sunset.ui.screens.signin.CARD_HEIGHT
+import com.madteam.sunset.utils.Resource
 
 @Composable
-fun BottomSheetSignUp(navigateToSignIn: () -> Unit) {
+fun BottomSheetSignUpScreen(
+    navController: NavController,
+    viewModel: SignUpViewModel = hiltViewModel()
+) {
+
+    val signUpState by viewModel.signUpState.collectAsStateWithLifecycle()
+    val isValidForm by viewModel.isValidForm.collectAsStateWithLifecycle()
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -45,27 +62,41 @@ fun BottomSheetSignUp(navigateToSignIn: () -> Unit) {
         backgroundColor = Color(0xFFFFB600),
         shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp)
     ) {
-        SignUpCardContent(navigateToSignIn = navigateToSignIn)
+        BottomSheetSignUpContent(
+            signUpState = signUpState,
+            isValidForm = isValidForm,
+            isValidEmail = viewModel::isEmailValid,
+            isValidUsername = viewModel::isUsernameValid,
+            acceptDialogClicked = viewModel::signUpIntent,
+            readConditionsClicked = viewModel::goToPoliciesScreen,
+            validateForm = viewModel::isValidForm,
+            navigateTo = navController::navigate,
+            clearSignUpState = viewModel::clearSignUpState
+        )
     }
 }
 
 @Composable
-fun SignUpCardContent(
-    navigateToSignIn: () -> Unit,
-    signUpViewModel: SignUpViewModel = hiltViewModel()
+fun BottomSheetSignUpContent(
+    signUpState: Resource<AuthResult?>,
+    isValidForm: Boolean,
+    isValidEmail: (String) -> Boolean,
+    isValidUsername: (String) -> Boolean,
+    acceptDialogClicked: (String, String, String) -> Unit,
+    readConditionsClicked: () -> Unit,
+    validateForm: (String, String, String) -> Unit,
+    navigateTo: (String) -> Unit,
+    clearSignUpState: () -> Unit
 ) {
-    val context = LocalContext.current
-    val emailValue = signUpViewModel.email.collectAsState().value
-    val passwordValue = signUpViewModel.password.collectAsState().value
-    val validForm = signUpViewModel.formError.collectAsState().value
-    val validEmail = signUpViewModel.validEmail.collectAsState().value
-    val validUsername = signUpViewModel.validUsername.collectAsState().value
-    val usernameValue = signUpViewModel.username.collectAsState().value
-    var showDialog = signUpViewModel.showDialog.collectAsState().value
-    val signUpState = signUpViewModel.signUpState.collectAsState(initial = null).value
 
-    when {
-        signUpState?.isLoading == true -> {
+    val context = LocalContext.current
+    var showDialog by remember { mutableStateOf(false) }
+    var usernameValueText by remember { mutableStateOf("") }
+    var passwordValueText by remember { mutableStateOf("") }
+    var emailValueText by remember { mutableStateOf("") }
+
+    when (signUpState) {
+        is Resource.Loading -> {
             Box(
                 contentAlignment = Alignment.TopCenter,
                 modifier = Modifier.padding(top = 20.dp)
@@ -73,27 +104,35 @@ fun SignUpCardContent(
                 CircularProgressIndicator()
             }
         }
-        signUpState?.isSuccess?.isNotEmpty() == true -> {
-            Box(contentAlignment = Alignment.Center) {
-                val success = signUpState.isSuccess
-                Toast.makeText(context, "$success", Toast.LENGTH_SHORT).show()
+
+        is Resource.Success -> {
+            if (signUpState.data != null) {
+                LaunchedEffect(key1 = signUpState.data) {
+                    navigateTo(MyProfileScreen.route)
+                }
+                clearSignUpState()
             }
-            signUpViewModel.clearResource()
         }
-        signUpState?.isError?.isNotEmpty() == true -> {
+
+        is Resource.Error -> {
             Box(contentAlignment = Alignment.Center) {
-                val error = signUpState.isError
-                Toast.makeText(context, "$error", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "${signUpState.message}", Toast.LENGTH_SHORT).show()
             }
-            signUpViewModel.clearResource()
+            clearSignUpState()
         }
     }
 
     if (showDialog) {
         GDPRDialog(
             setShowDialog = { showDialog = it },
-            readPoliciesClicked = { signUpViewModel.goToPoliciesScreen() },
-            acceptPoliciesClicked = { signUpViewModel.signUpIntent() })
+            readPoliciesClicked = {
+                readConditionsClicked()
+                showDialog = false
+            },
+            acceptPoliciesClicked = {
+                acceptDialogClicked(emailValueText, passwordValueText, usernameValueText)
+                showDialog = false
+            })
     }
 
     Column(
@@ -107,46 +146,51 @@ fun SignUpCardContent(
         CardSubtitle(string.no_day_without_sunset)
         CustomSpacer(size = 8.dp)
         EmailTextField(
-            emailValue = emailValue,
-            onValueChange = { signUpViewModel.onValuesSignUpChange(it, passwordValue, usernameValue) },
+            emailValue = emailValueText,
+            onValueChange = { email ->
+                emailValueText = email
+                validateForm(emailValueText, passwordValueText, usernameValueText)
+            },
             endIcon = {
-                if (validEmail) SuccessIcon() else if (emailValue.isNotBlank()) {
+                if (isValidEmail(emailValueText)) SuccessIcon() else if (emailValueText.isNotBlank()) {
                     ErrorIcon()
                 }
             }
         )
         CustomSpacer(size = 16.dp)
         PasswordTextField(
-            passwordValue = passwordValue,
-            onValueChange = {
-                signUpViewModel.onValuesSignUpChange(emailValue, it, usernameValue)
+            passwordValue = passwordValueText,
+            onValueChange = { password ->
+                passwordValueText = password
+                validateForm(emailValueText, passwordValueText, usernameValueText)
             },
             endIcon = { PasswordVisibilityOffIcon() }
         )
         CustomSpacer(size = 16.dp)
         UsernameTextField(
-            usernameValue = usernameValue,
-            onValueChange = {
-                signUpViewModel.onValuesSignUpChange(emailValue, passwordValue, it)
+            usernameValue = usernameValueText,
+            onValueChange = { username ->
+                usernameValueText = username
+                validateForm(emailValueText, passwordValueText, usernameValueText)
             },
             endIcon = {
-                if (validUsername) SuccessIcon() else if (usernameValue.isNotBlank()) {
+                if (isValidUsername(usernameValueText)) SuccessIcon() else if (usernameValueText.isNotBlank()) {
                     ErrorIcon()
                 }
             }
         )
         CustomSpacer(size = 24.dp)
         SmallButtonDark(
-            onClick = { signUpViewModel.showPrivacyDialog() },
+            onClick = { showDialog = true },
             text = string.sign_up,
-            enabled = validForm
+            enabled = isValidForm
         )
         CustomSpacer(size = 16.dp)
         OtherLoginMethodsSection(string.already_have_an_account)
         CustomSpacer(size = 8.dp)
         OtherLoginIconButtons(
             firstMethod = { Toast.makeText(context, "Do Google Login", Toast.LENGTH_SHORT).show() },
-            secondMethod = navigateToSignIn
+            secondMethod = { navigateTo(SunsetRoutes.SignInCard.route) }
         )
     }
 }

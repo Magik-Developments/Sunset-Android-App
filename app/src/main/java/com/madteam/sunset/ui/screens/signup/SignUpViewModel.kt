@@ -67,11 +67,14 @@ class SignUpViewModel @Inject constructor(
         viewModelScope.launch {
             val userEmail = authResult.data!!.user!!.email!!
             val userProvider = authResult.data.user!!.providerId
-            databaseRepository.createUser(userEmail, username, userProvider).collect { result ->
+            databaseRepository.createUser(userEmail, username, userProvider).collectLatest { result ->
                 when (result) {
                     is Error -> {
                         deleteCurrentUser()
                         signUpState.value = Error("No se ha podido completar el registro. Intentelo de nuevo.")
+                    }
+                    is Success -> {
+                        signUpState.value = authResult
                     }
 
                     else -> { /* Not necessary */ }

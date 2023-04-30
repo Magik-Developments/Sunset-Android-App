@@ -3,18 +3,20 @@ package com.madteam.sunset.ui.screens.signup
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.AuthResult
 import com.madteam.sunset.repositories.AuthContract
 import com.madteam.sunset.repositories.DatabaseContract
+import com.madteam.sunset.utils.Resource
 import com.madteam.sunset.utils.Resource.Error
-import com.madteam.sunset.utils.Resource.Loading
 import com.madteam.sunset.utils.Resource.Success
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+private const val MIN_PASSWORD_LENGTH = 6
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
@@ -22,94 +24,59 @@ class SignUpViewModel @Inject constructor(
     private val databaseRepository: DatabaseContract,
 ) : ViewModel() {
 
-    private val _email = MutableStateFlow("")
-    val email: StateFlow<String> = _email
+    val isValidForm = MutableStateFlow(false)
 
-    private val _password = MutableStateFlow("")
-    val password: StateFlow<String> = _password
+    val signUpState = MutableStateFlow<Resource<AuthResult?>>(Resource.Success(null))
 
-    private val _username = MutableStateFlow("")
-    val username: StateFlow<String> = _username
-
-    private val _formError = MutableStateFlow(false)
-    val formError: StateFlow<Boolean> = _formError
-
-    private val _validEmail = MutableStateFlow(false)
-    val validEmail: StateFlow<Boolean> = _validEmail
-
-    private val _validUsername = MutableStateFlow(false)
-    val validUsername: StateFlow<Boolean> = _validUsername
-
-    private val _showDialog = MutableStateFlow(false)
-    val showDialog: StateFlow<Boolean> = _showDialog
-
-    private val _signUpState = Channel<SignUpState>()
-    val signUpState = _signUpState.receiveAsFlow()
-
-    fun onValuesSignUpChange(emailValue: String, passwordValue: String, usernameValue: String) {
-        _email.value = emailValue
-        _password.value = passwordValue
-        _username.value = usernameValue
-        checkIfFormIsValid()
+    fun isEmailValid(email: String): Boolean {
+        return Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
 
-    private fun checkIfEmailIsValid() {
-        _validEmail.value = Patterns.EMAIL_ADDRESS.matcher(_email.value).matches()
+    fun isUsernameValid(username: String): Boolean {
+        return (username.length > 5)
     }
 
-    private fun checkIfUsernameIsValid(): Boolean {
-        return (_username.value.length > 5)
+    fun isPasswordValid(password: String): Boolean {
+        return (password.length > MIN_PASSWORD_LENGTH)
     }
 
-    private fun checkIfFormIsValid() {
-        checkIfEmailIsValid()
-        _formError.value =
-            (_validEmail.value && _password.value.length > 6 && checkIfUsernameIsValid())
-        _validUsername.value = checkIfUsernameIsValid()
+    fun isValidForm(email: String, password: String, username: String) {
+        isValidForm.value = (isEmailValid(email) && isUsernameValid(username) && isPasswordValid(password))
     }
 
     fun goToPoliciesScreen() {
-        _showDialog.value = false
+        //TODO: Go to policies Screen
     }
 
-    fun signUpIntent() {
-        _showDialog.value = false
+    fun signUpIntent(email: String, password: String, username: String) {
         viewModelScope.launch {
-            authRepository.doSignUp(_email.value, _password.value).collect { result ->
+            authRepository.doSignUpWithPasswordAndEmail(email, password).collectLatest { result ->
                 when (result) {
                     is Success -> {
-                        createUserDatabase(provider = "email")
-                        _signUpState.send(SignUpState(isSuccess = "Sign Up Success"))
+                        createUserDatabase(result, username)
                     }
 
-                    is Loading -> {
-                        _signUpState.send(SignUpState(isLoading = true))
-                    }
-
-                    is Error -> {
-                        _signUpState.send(SignUpState(isError = result.message))
-                    }
+                    else -> { /* Not necessary */ }
                 }
+                signUpState.value = result
             }
         }
     }
 
-    private fun createUserDatabase(provider: String) {
+    private fun createUserDatabase(authResult: Resource<AuthResult?>, username: String) {
         viewModelScope.launch {
-            databaseRepository.createUser(_email.value, _username.value, provider).collect { result ->
+            val userEmail = authResult.data!!.user!!.email!!
+            val userProvider = authResult.data.user!!.providerId
+            databaseRepository.createUser(userEmail, username, userProvider).collect { result ->
                 when (result) {
-                    is Success -> {
-                        _signUpState.send(SignUpState(isSuccess = "Sign Up and DB created successfully"))
-                    }
-
                     is Error -> {
                         deleteCurrentUser()
-                        _signUpState.send(SignUpState(isError = "Error, please try again later"))
+                        signUpState.value = Error("No se ha podido completar el registro. Intentelo de nuevo.")
                     }
 
-                    is Loading -> {/* not necessary */
-                    }
+                    else -> { /* Not necessary */ }
                 }
+
             }
         }
     }
@@ -118,13 +85,7 @@ class SignUpViewModel @Inject constructor(
         authRepository.deleteCurrentUser()
     }
 
-    fun showPrivacyDialog() {
-        _showDialog.value = true
-    }
-
-    fun clearResource() {
-        viewModelScope.launch {
-            _signUpState.send(SignUpState())
-        }
+    fun clearSignUpState() {
+        signUpState.value = Resource.Success(null)
     }
 }

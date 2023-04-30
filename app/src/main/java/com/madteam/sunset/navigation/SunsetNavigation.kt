@@ -5,8 +5,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.madteam.sunset.navigation.SunsetRoutes.MyProfileScreen
+import com.madteam.sunset.navigation.SunsetRoutes.SignUpCard
 import com.madteam.sunset.navigation.SunsetRoutes.WelcomeScreen
 import com.madteam.sunset.ui.screens.myprofile.MyProfileScreen
+import com.madteam.sunset.ui.screens.signup.BottomSheetSignUpScreen
 import com.madteam.sunset.ui.screens.welcome.WelcomeScreen
 
 @Composable
@@ -17,6 +19,10 @@ fun SunsetNavigation() {
 
         composable(WelcomeScreen.route) {
             WelcomeScreen(  navController)
+        }
+
+        composable(SignUpCard.route) {
+            BottomSheetSignUpScreen(navController)
         }
 
 //        composable(SignInCard.route) {

@@ -44,7 +44,7 @@ class DatabaseRepository @Inject constructor(
         emit(Resource.Error(it.message.toString()))
     }
 
-    override fun getProfileByUsername(email: String, userProfileCallback: (UserProfile) -> Unit) {
+    override fun getUserByEmail(email: String, userProfileCallback: (UserProfile) -> Unit) {
         firebaseFirestore.collection(USERS_COLLECTION_PATH).whereEqualTo("email", email)
             .limit(1)
             .get()
@@ -56,5 +56,5 @@ class DatabaseRepository @Inject constructor(
 
 interface DatabaseContract {
     fun createUser(email: String, username: String, provider: String): Flow<Resource<Unit>>
-    fun getProfileByUsername(email: String, userProfileCallback: (UserProfile) -> Unit)
+    fun getUserByEmail(email: String, userProfileCallback: (UserProfile) -> Unit)
 }

@@ -84,7 +84,7 @@ fun BottomSheetSignInContent(
     var passwordTValueText by remember { mutableStateOf("") }
 
     if (BuildConfig.DEBUG) {
-        userValueText = "adriafernandez15@gmail.com"
+        userValueText = "test@sunset.app"
         passwordTValueText = "abc.1234"
         validateForm(userValueText, passwordTValueText)
     }

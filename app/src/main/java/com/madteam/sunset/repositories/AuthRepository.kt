@@ -14,7 +14,7 @@ class AuthRepository @Inject constructor(
     private val firebaseAuth: FirebaseAuth
 ) : AuthContract {
 
-    override fun doSignUp(email: String, password: String): Flow<Resource<AuthResult>> =
+    override fun doSignUpWithPasswordAndEmail(email: String, password: String): Flow<Resource<AuthResult?>> =
         flow {
             emit(Resource.Loading())
             firebaseAuth.createUserWithEmailAndPassword(email, password).await().let { result ->
@@ -54,10 +54,8 @@ class AuthRepository @Inject constructor(
 
 }
 
-// Esto es un contrato genérico de Autenticación, no hace falta asociarlo a Firebase.
-// Si el dia de mñn quiere otro sistema de Auth, este contrato sigue siendo valido.
 interface AuthContract {
-    fun doSignUp(email: String, password: String): Flow<Resource<AuthResult>>
+    fun doSignUpWithPasswordAndEmail(email: String, password: String): Flow<Resource<AuthResult?>>
     fun doSignInWithPasswordAndEmail(email: String, password: String): Flow<Resource<AuthResult?>>
     fun deleteCurrentUser(): Flow<Resource<Unit>>
     fun getCurrentUser(): FirebaseUser?

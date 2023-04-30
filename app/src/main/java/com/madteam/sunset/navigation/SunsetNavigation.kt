@@ -24,11 +24,11 @@ fun SunsetNavigation() {
         }
 
         composable(SignUpCard.route) {
-            BottomSheetSignUpScreen(navController)
+            WelcomeScreen(navController, modal = "signup")
         }
 
         composable(SignInCard.route) {
-            BottomSheetSignInScreen(navController)
+            WelcomeScreen(navController, modal = "signin")
         }
 
         composable(MyProfileScreen.route) {

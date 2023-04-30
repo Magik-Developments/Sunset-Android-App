@@ -14,6 +14,7 @@ import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue.Hidden
 import androidx.compose.material.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,26 +33,47 @@ import com.madteam.sunset.ui.common.MainTitle
 import com.madteam.sunset.ui.common.SubTitle
 import com.madteam.sunset.ui.common.SunsetLogoImage
 import com.madteam.sunset.ui.screens.signin.BottomSheetSignInScreen
+import com.madteam.sunset.ui.screens.signup.BottomSheetSignUpScreen
+import com.madteam.sunset.ui.screens.welcome.WelcomeScreenModalOptions.DEFAULT
+import com.madteam.sunset.ui.screens.welcome.WelcomeScreenModalOptions.SIGN_IN
+import com.madteam.sunset.ui.screens.welcome.WelcomeScreenModalOptions.SIGN_UP
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun WelcomeScreen(
-    navController: NavController
+    navController: NavController,
+    modal: WelcomeScreenModalOptions = DEFAULT
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val modalState = ModalBottomSheetState(initialValue = Hidden, isSkipHalfExpanded = true)
+
+    //Fixme: No se debe usar launch, usar LaunchedEffects
+    coroutineScope.launch {
+        if (modal != DEFAULT) {
+            modalState.show()
+        }
+    }
 
     ModalBottomSheetLayout(
         sheetState = modalState,
         sheetShape = RoundedCornerShape(40.dp, 40.dp, 0.dp, 0.dp),
         sheetElevation = 10.dp,
         sheetContent = {
-            // Sheet content
-            BottomSheetSignInScreen(navController)
+            when (modal) {
+                SIGN_IN -> {
+                    BottomSheetSignInScreen(navController)
+                }
+                SIGN_UP -> {
+                    BottomSheetSignUpScreen(navController)
+                }
+                else -> {
+                    BottomSheetSignInScreen(navController)
+                }
+            }
+
         }) {
-        // Screen content
         WelcomeContent(
             onEmailClick = {
                 coroutineScope.launch {
@@ -92,6 +114,12 @@ fun WelcomeContent(
         CustomSpacer(size = 16.dp)
         FacebookButton(onClick = onFacebookClick)
     }
+}
+
+enum class WelcomeScreenModalOptions {
+    SIGN_IN,
+    SIGN_UP,
+    DEFAULT
 }
 
 @Preview(showBackground = true)

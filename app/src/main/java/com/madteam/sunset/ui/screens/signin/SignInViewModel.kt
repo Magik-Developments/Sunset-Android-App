@@ -18,12 +18,6 @@ class SignInViewModel @Inject constructor(
 ) : ViewModel() {
 
     val signInState = MutableStateFlow<Resource<AuthResult?>>(Resource.Success(null))
-
-    //    val signInState :StateFlow<Resource<AuthResult>> = _signInState.stateIn(
-//        initialValue = Resource.Idle,
-//        scope = viewModelScope,
-//        started = SharingStarted.WhileSubscribed(5_000)
-//    )
     val isValidForm = MutableStateFlow(false)
 
     private fun isUserValid(email: String): Boolean {

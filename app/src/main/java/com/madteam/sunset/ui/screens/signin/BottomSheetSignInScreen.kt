@@ -48,29 +48,8 @@ fun BottomSheetSignInScreen(
     viewModel: SignInViewModel = hiltViewModel(),
 ) {
 
-    val context = LocalContext.current
     val signInState by viewModel.signInState.collectAsStateWithLifecycle()
     val isValidForm by viewModel.isValidForm.collectAsStateWithLifecycle()
-
-//    when (signInState) {
-//        is Resource.Loading -> {
-//            CircularProgressIndicator()
-//        }
-//
-//        is Resource.Success -> {
-//            if (signInState.data != null) {
-//                LaunchedEffect(true) {
-//                    navController.navigate(SunsetRoutes.MyProfileScreen.route)
-//                }
-//            }
-//        }
-//
-//        is Resource.Error -> {
-//            Box(contentAlignment = Alignment.Center) {
-//                Toast.makeText(context, "${signInState.message}", Toast.LENGTH_SHORT).show()
-//            }
-//        }
-//    }
 
     Card(
         modifier = Modifier
@@ -104,7 +83,6 @@ fun BottomSheetSignInContent(
     var userValueText by remember { mutableStateOf("") }
     var passwordTValueText by remember { mutableStateOf("") }
 
-    // When running in DEBUG, login fields are autocompleted
     if (BuildConfig.DEBUG) {
         userValueText = "adriafernandez15@gmail.com"
         passwordTValueText = "abc.1234"

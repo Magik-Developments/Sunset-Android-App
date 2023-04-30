@@ -19,8 +19,8 @@ class MyProfileViewModel @Inject constructor(
 
     init {
         authRepository.getCurrentUser()?.let { user ->
-            databaseRepository.getProfileByUsername(user.email!!) {
-                username.value = it.email
+            databaseRepository.getUserByEmail(user.email!!) {
+                username.value = it.username
             }
         }
     }

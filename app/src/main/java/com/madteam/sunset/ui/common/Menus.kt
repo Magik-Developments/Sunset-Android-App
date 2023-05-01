@@ -26,6 +26,10 @@ import com.madteam.sunset.utils.shadow
 
 @Composable
 fun SunsetBottomNavigation() {
+
+  val unselectedContentColor = Color(0xB3FFB600)
+  val selectedContentColor = Color(0xFF000000)
+
   var selected by remember { mutableStateOf(4) }
   BottomNavigation(
     modifier = Modifier
@@ -45,7 +49,7 @@ fun SunsetBottomNavigation() {
           .height(32.dp)
           .width(32.dp)
       )
-    }, unselectedContentColor = Color(0xB3FFB600), selectedContentColor = Color.Black)
+    }, unselectedContentColor = unselectedContentColor, selectedContentColor = selectedContentColor)
     BottomNavigationItem(selected = selected == 1, onClick = { selected = 1 }, icon = {
       Icon(
         imageVector = Icons.Default.Search, contentDescription = "Search Icon",
@@ -53,7 +57,7 @@ fun SunsetBottomNavigation() {
           .height(32.dp)
           .width(32.dp)
       )
-    }, unselectedContentColor = Color(0xB3FFB600), selectedContentColor = Color.Black)
+    }, unselectedContentColor = unselectedContentColor, selectedContentColor = selectedContentColor)
     BottomNavigationItem(selected = selected == 2, onClick = { selected = 2 }, icon = {
       Icon(
         imageVector = Icons.Default.AddCircle, contentDescription = "Add Circle Icon",
@@ -61,7 +65,7 @@ fun SunsetBottomNavigation() {
           .height(32.dp)
           .width(32.dp)
       )
-    }, unselectedContentColor = Color(0xB3FFB600), selectedContentColor = Color.Black)
+    }, unselectedContentColor = unselectedContentColor, selectedContentColor = selectedContentColor)
     BottomNavigationItem(selected = selected == 3, onClick = { selected = 3 }, icon = {
       Icon(
         imageVector = Icons.Default.Favorite, contentDescription = "Favorite Icon",
@@ -69,7 +73,7 @@ fun SunsetBottomNavigation() {
           .height(32.dp)
           .width(32.dp)
       )
-    }, unselectedContentColor = Color(0xB3FFB600), selectedContentColor = Color.Black)
+    }, unselectedContentColor = unselectedContentColor, selectedContentColor = selectedContentColor)
     BottomNavigationItem(selected = selected == 4, onClick = { selected = 4 }, icon = {
       Icon(
         imageVector = Icons.Default.Person,
@@ -78,7 +82,7 @@ fun SunsetBottomNavigation() {
           .height(32.dp)
           .width(32.dp)
       )
-    }, unselectedContentColor = Color(0xB3FFB600), selectedContentColor = Color.Black)
+    }, unselectedContentColor = unselectedContentColor, selectedContentColor = selectedContentColor)
   }
 }
 

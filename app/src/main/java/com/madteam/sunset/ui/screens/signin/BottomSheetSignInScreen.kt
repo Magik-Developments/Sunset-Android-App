@@ -147,7 +147,7 @@ fun BottomSheetSignInContent(
             onClick = { signInButton(userValueText, passwordTValueText) }, text = string.sign_in, enabled = isValidForm
         )
         CustomSpacer(size = 16.dp)
-        ForgotPasswordText()
+        ForgotPasswordText( onClick = {navigateTo(SunsetRoutes.LostPasswordScreen.route)})
         CustomSpacer(size = 40.dp)
         OtherLoginMethodsSection(string.not_registered_yet_signup_with)
         CustomSpacer(size = 24.dp)

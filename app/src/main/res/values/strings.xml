@@ -31,4 +31,5 @@
   <string name="invalid_form_icon_description">invalid form icon</string>
   <string name="profile_user_image_description">Profile user image</string>
     <string name="log_out">Log out</string>
+  <string name="send_link">Send link</string>
 </resources>

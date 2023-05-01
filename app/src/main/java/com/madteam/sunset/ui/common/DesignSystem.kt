@@ -1,6 +1,8 @@
 package com.madteam.sunset.ui.common
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -103,12 +105,14 @@ fun CardSubtitle(text: Int) {
 }
 
 @Composable
-fun ForgotPasswordText() {
-    Text(
-        text = stringResource(R.string.forgot_your_password),
-        style = secondarySemiBoldBodyM,
-        color = Color(0xFF333333)
-    )
+fun ForgotPasswordText(onClick: () -> Unit) {
+    Box(modifier = Modifier.clickable(onClick = onClick)) {
+        Text(
+            text = stringResource(R.string.forgot_your_password),
+            style = secondarySemiBoldBodyM,
+            color = Color(0xFF333333)
+        )
+    }
 }
 
 @Composable

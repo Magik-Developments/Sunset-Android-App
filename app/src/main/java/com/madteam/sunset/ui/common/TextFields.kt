@@ -44,6 +44,7 @@ fun DesignSystemTextField(
     @StringRes hint: Int,
     textType: KeyboardType,
     endIcon: @Composable () -> Unit,
+    enabled: Boolean = true,
     visualTransformation: VisualTransformation = VisualTransformation.None
 ) {
     TextField(
@@ -68,6 +69,7 @@ fun DesignSystemTextField(
         singleLine = true,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next, keyboardType = textType),
         trailingIcon = endIcon,
+        enabled = enabled,
         visualTransformation = visualTransformation
     )
 }
@@ -142,6 +144,7 @@ fun PasswordTextField(
 fun EmailTextField(
     emailValue: String,
     onValueChange: (String) -> Unit,
+    enabled: Boolean = true,
     endIcon: @Composable () -> Unit = { Spacer(modifier = Modifier.size(0.dp)) }
 ) {
     DesignSystemTextField(
@@ -149,6 +152,7 @@ fun EmailTextField(
         onValueChange = onValueChange,
         hint = R.string.email_address,
         textType = KeyboardType.Email,
+        enabled = enabled,
         endIcon = (endIcon)
     )
 }

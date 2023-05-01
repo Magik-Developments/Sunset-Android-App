@@ -1,9 +1,12 @@
 package com.madteam.sunset.ui.screens.myprofile
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.BottomNavigation
+import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -18,6 +21,7 @@ import com.madteam.sunset.R
 import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.ProfileImage
 import com.madteam.sunset.ui.common.SmallButtonDark
+import com.madteam.sunset.ui.common.SunsetBottomNavigation
 import com.madteam.sunset.ui.common.UserLocationText
 import com.madteam.sunset.ui.common.UserUsernameText
 
@@ -32,9 +36,19 @@ fun MyProfileScreen(
     if (navigateUp)
         navController.navigateUp()
 
-    MyProfileContent(username) {
-        viewModel.logOut()
-    }
+    Scaffold(
+        bottomBar = { SunsetBottomNavigation() },
+        content = { paddingValues ->
+            Box(
+                modifier = Modifier.padding(paddingValues),
+                contentAlignment = Alignment.Center
+            ) {
+                MyProfileContent(username) {
+                    viewModel.logOut()
+                }
+            }
+        }
+    )
 }
 
 @Composable

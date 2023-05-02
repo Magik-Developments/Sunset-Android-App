@@ -32,4 +32,7 @@
   <string name="profile_user_image_description">Profile user image</string>
     <string name="log_out">Log out</string>
   <string name="send_link">Send link</string>
+  <string name="almost_done">Almost done! 😎</string>
+    <string name="verify_account_description">Check your inbox and verify your account.</string>
+  <string name="im_verified">I\'m verified</string>
 </resources>

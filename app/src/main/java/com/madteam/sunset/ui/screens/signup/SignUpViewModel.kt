@@ -11,7 +11,6 @@ import com.madteam.sunset.utils.Resource.Error
 import com.madteam.sunset.utils.Resource.Success
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -56,7 +55,8 @@ class SignUpViewModel @Inject constructor(
                         createUserDatabase(result, username)
                     }
 
-                    else -> { /* Not necessary */ }
+                    else -> { /* Not necessary */
+                    }
                 }
                 signUpState.value = result
             }
@@ -73,11 +73,13 @@ class SignUpViewModel @Inject constructor(
                         deleteCurrentUser()
                         signUpState.value = Error("No se ha podido completar el registro. Intentelo de nuevo.")
                     }
+
                     is Success -> {
                         signUpState.value = authResult
                     }
 
-                    else -> { /* Not necessary */ }
+                    else -> { /* Not necessary */
+                    }
                 }
 
             }

@@ -11,20 +11,20 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LostPasswordViewModel @Inject constructor(
-  private val authRepository: AuthContract
+    private val authRepository: AuthContract
 ) : ViewModel() {
 
-  val isValidForm = MutableStateFlow(false)
+    val isValidForm = MutableStateFlow(false)
 
-  fun validateForm(email: String) {
-    isValidForm.value = isEmailValid(email)
-  }
+    fun validateForm(email: String) {
+        isValidForm.value = isEmailValid(email)
+    }
 
-  private fun isEmailValid(email: String): Boolean {
-    return Patterns.EMAIL_ADDRESS.matcher(email).matches()
-  }
+    private fun isEmailValid(email: String): Boolean {
+        return Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    }
 
-  fun resetPasswordWithEmailIntent(email: String) = viewModelScope.launch {
-    authRepository.resetPasswordWithEmailIntent(email)
-  }
+    fun resetPasswordWithEmailIntent(email: String) = viewModelScope.launch {
+        authRepository.resetPasswordWithEmailIntent(email)
+    }
 }

@@ -43,9 +43,9 @@ fun GDPRDialog(
             Column() {
                 Image(
                     modifier = Modifier
-                      .width(140.dp)
-                      .height(140.dp)
-                      .align(alignment = Alignment.CenterHorizontally),
+                        .width(140.dp)
+                        .height(140.dp)
+                        .align(alignment = Alignment.CenterHorizontally),
                     painter = painterResource(id = R.drawable.sunset_vectorial_art_01),
                     contentDescription = stringResource(string.sunset_art_image_description),
                     alignment = Alignment.Center
@@ -68,8 +68,8 @@ fun GDPRDialog(
                     Button(
                         onClick = readPoliciesClicked,
                         modifier = Modifier
-                          .weight(1f)
-                          .height(60.dp),
+                            .weight(1f)
+                            .height(60.dp),
                         colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFFFE094)),
                         shape = RoundedCornerShape(0.dp)
                     ) {
@@ -83,8 +83,8 @@ fun GDPRDialog(
                     Button(
                         onClick = acceptPoliciesClicked,
                         modifier = Modifier
-                          .weight(1f)
-                          .height(60.dp),
+                            .weight(1f)
+                            .height(60.dp),
                         colors = ButtonDefaults.buttonColors(backgroundColor = Color.Black),
                         shape = RoundedCornerShape(0.dp)
                     ) {

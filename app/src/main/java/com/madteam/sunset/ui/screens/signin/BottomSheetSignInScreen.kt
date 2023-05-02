@@ -38,7 +38,6 @@ import com.madteam.sunset.ui.common.OtherLoginIconButtons
 import com.madteam.sunset.ui.common.OtherLoginMethodsSection
 import com.madteam.sunset.ui.common.PasswordTextField
 import com.madteam.sunset.ui.common.SmallButtonDark
-import com.madteam.sunset.ui.screens.welcome.WelcomeScreenModalOptions
 import com.madteam.sunset.utils.Resource
 
 const val CARD_HEIGHT = 0.67
@@ -144,10 +143,12 @@ fun BottomSheetSignInContent(
         })
         CustomSpacer(size = 24.dp)
         SmallButtonDark(
-            onClick = { signInButton(userValueText, passwordTValueText) }, text = string.sign_in, enabled = isValidForm
+            onClick = { signInButton(userValueText, passwordTValueText) },
+            text = string.sign_in,
+            enabled = isValidForm
         )
         CustomSpacer(size = 16.dp)
-        ForgotPasswordText( onClick = {navigateTo(SunsetRoutes.LostPasswordScreen.route)})
+        ForgotPasswordText(onClick = { navigateTo(SunsetRoutes.LostPasswordScreen.route) })
         CustomSpacer(size = 40.dp)
         OtherLoginMethodsSection(string.not_registered_yet_signup_with)
         CustomSpacer(size = 24.dp)

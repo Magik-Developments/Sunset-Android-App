@@ -30,63 +30,63 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun WelcomeScreen(
-  navController: NavController
+    navController: NavController
 ) {
-  val context = LocalContext.current
-  val coroutineScope = rememberCoroutineScope()
-  val modalState = ModalBottomSheetState(initialValue = Hidden, isSkipHalfExpanded = true)
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val modalState = ModalBottomSheetState(initialValue = Hidden, isSkipHalfExpanded = true)
 
-  ModalBottomSheetLayout(
-    sheetState = modalState,
-    sheetShape = RoundedCornerShape(40.dp, 40.dp, 0.dp, 0.dp),
-    sheetElevation = 10.dp,
-    sheetContent = {
-      BottomSheetLoginScreen(navController = navController)
-    }) {
-    WelcomeContent(
-      onEmailClick = {
-        coroutineScope.launch {
-          if (!modalState.isVisible) {
-            modalState.show()
-          } else {
-            modalState.hide()
-          }
-        }
-      },
-      onGoogleClick = { Toast.makeText(context, "Do Google Login", Toast.LENGTH_SHORT).show() },
-      onFacebookClick = { Toast.makeText(context, "Do Facebook Login", Toast.LENGTH_SHORT).show() })
-  }
+    ModalBottomSheetLayout(
+        sheetState = modalState,
+        sheetShape = RoundedCornerShape(40.dp, 40.dp, 0.dp, 0.dp),
+        sheetElevation = 10.dp,
+        sheetContent = {
+            BottomSheetLoginScreen(navController = navController)
+        }) {
+        WelcomeContent(
+            onEmailClick = {
+                coroutineScope.launch {
+                    if (!modalState.isVisible) {
+                        modalState.show()
+                    } else {
+                        modalState.hide()
+                    }
+                }
+            },
+            onGoogleClick = { Toast.makeText(context, "Do Google Login", Toast.LENGTH_SHORT).show() },
+            onFacebookClick = { Toast.makeText(context, "Do Facebook Login", Toast.LENGTH_SHORT).show() })
+    }
 }
 
 @Composable
 fun WelcomeContent(
-  onEmailClick: () -> Unit,
-  onGoogleClick: () -> Unit,
-  onFacebookClick: () -> Unit,
+    onEmailClick: () -> Unit,
+    onGoogleClick: () -> Unit,
+    onFacebookClick: () -> Unit,
 ) {
-  Column(
-    modifier = Modifier
-      .fillMaxSize()
-      .padding(horizontal = 16.dp),
-    horizontalAlignment = Alignment.CenterHorizontally,
-    verticalArrangement = Arrangement.Center
-  ) {
-    SunsetLogoImage()
-    CustomSpacer(56.dp)
-    MainTitle()
-    CustomSpacer(size = 8.dp)
-    SubTitle(Modifier.align(Alignment.Start))
-    CustomSpacer(size = 56.dp)
-    EmailButton(onClick = onEmailClick)
-    CustomSpacer(size = 16.dp)
-    GoogleButton(onClick = onGoogleClick)
-    CustomSpacer(size = 16.dp)
-    FacebookButton(onClick = onFacebookClick)
-  }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        SunsetLogoImage()
+        CustomSpacer(56.dp)
+        MainTitle()
+        CustomSpacer(size = 8.dp)
+        SubTitle(Modifier.align(Alignment.Start))
+        CustomSpacer(size = 56.dp)
+        EmailButton(onClick = onEmailClick)
+        CustomSpacer(size = 16.dp)
+        GoogleButton(onClick = onGoogleClick)
+        CustomSpacer(size = 16.dp)
+        FacebookButton(onClick = onFacebookClick)
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun WelcomeScreenPrev() {
-  WelcomeContent({}, {}, {})
+    WelcomeContent({}, {}, {})
 }

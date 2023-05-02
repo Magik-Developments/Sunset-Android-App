@@ -55,6 +55,7 @@ class DatabaseRepository @Inject constructor(
 }
 
 interface DatabaseContract {
+
     fun createUser(email: String, username: String, provider: String): Flow<Resource<Unit>>
     fun getUserByEmail(email: String, userProfileCallback: (UserProfile) -> Unit)
 }

@@ -38,9 +38,9 @@ fun EmailButton(onClick: () -> Unit) {
     Button(
         onClick = onClick,
         modifier = Modifier
-          .fillMaxWidth()
-          .height(48.dp)
-          .clip(RoundedCornerShape(16.dp)),
+            .fillMaxWidth()
+            .height(48.dp)
+            .clip(RoundedCornerShape(16.dp)),
         colors = ButtonDefaults.buttonColors(
             backgroundColor = Color(0xFFFFB600),
             contentColor = Color(0xFFFFFFFF),
@@ -60,8 +60,8 @@ fun GoogleButton(onClick: () -> Unit) {
     Button(
         onClick = onClick,
         modifier = Modifier
-          .fillMaxWidth()
-          .height(48.dp),
+            .fillMaxWidth()
+            .height(48.dp),
         colors = ButtonDefaults.buttonColors(
             backgroundColor = Color(0xFFFFFFFF),
         ),
@@ -70,16 +70,16 @@ fun GoogleButton(onClick: () -> Unit) {
         border = BorderStroke(1.dp, Color(0xFF000000))
     ) {
         Box(
-          Modifier
-            .fillMaxSize()
-            .align(Alignment.CenterVertically)
+            Modifier
+                .fillMaxSize()
+                .align(Alignment.CenterVertically)
         ) {
             Image(
                 painter = painterResource(id = R.drawable.logo_google),
                 contentDescription = "Logo Google",
                 modifier = Modifier
-                  .size(width = 24.dp, height = 24.dp)
-                  .align(Alignment.CenterStart)
+                    .size(width = 24.dp, height = 24.dp)
+                    .align(Alignment.CenterStart)
             )
             Text(
                 modifier = Modifier.align(Alignment.Center),
@@ -96,8 +96,8 @@ fun FacebookButton(onClick: () -> Unit) {
     Button(
         onClick = onClick,
         modifier = Modifier
-          .fillMaxWidth()
-          .height(48.dp),
+            .fillMaxWidth()
+            .height(48.dp),
         colors = ButtonDefaults.buttonColors(
             backgroundColor = Color(0xFFFFFFFF),
         ),
@@ -106,16 +106,16 @@ fun FacebookButton(onClick: () -> Unit) {
         border = BorderStroke(1.dp, Color(0xFF000000))
     ) {
         Box(
-          Modifier
-            .fillMaxSize()
-            .align(Alignment.CenterVertically)
+            Modifier
+                .fillMaxSize()
+                .align(Alignment.CenterVertically)
         ) {
             Image(
                 painter = painterResource(id = R.drawable.logo_facebook),
                 contentDescription = "Logo Google",
                 modifier = Modifier
-                  .size(width = 24.dp, height = 24.dp)
-                  .align(Alignment.CenterStart)
+                    .size(width = 24.dp, height = 24.dp)
+                    .align(Alignment.CenterStart)
             )
             Text(
                 modifier = Modifier.align(Alignment.Center),
@@ -137,8 +137,8 @@ fun SmallButtonDark(
         onClick = onClick,
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier
-          .width(150.dp)
-          .height(48.dp),
+            .width(150.dp)
+            .height(48.dp),
         colors = ButtonDefaults.buttonColors(
             backgroundColor = Color.Black,
             disabledBackgroundColor = Color(0x80000000),
@@ -184,11 +184,11 @@ fun IconButtonLight(
 ) {
     Box(
         modifier = Modifier
-          .height(50.dp)
-          .width(50.dp)
-          .clip(RoundedCornerShape(16.dp))
-          .background(Color.White)
-          .clickable(onClick = onClick),
+            .height(50.dp)
+            .width(50.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(Color.White)
+            .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
         Icon(

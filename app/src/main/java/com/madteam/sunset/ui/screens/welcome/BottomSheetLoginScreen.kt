@@ -13,19 +13,18 @@ import com.madteam.sunset.ui.screens.welcome.WelcomeScreenModalOptions.SIGN_UP
 
 @Composable
 fun BottomSheetLoginScreen(
-  navController: NavController
+    navController: NavController
 ) {
 
-  var modalOptions by remember { mutableStateOf(SIGN_IN) }
+    var modalOptions by remember { mutableStateOf(SIGN_IN) }
 
-  when (modalOptions) {
-    SIGN_IN -> BottomSheetSignInScreen(navController) { modalOptions = SIGN_UP }
-    SIGN_UP -> BottomSheetSignUpScreen(navController) { modalOptions = SIGN_IN }
-  }
-
+    when (modalOptions) {
+        SIGN_IN -> BottomSheetSignInScreen(navController) { modalOptions = SIGN_UP }
+        SIGN_UP -> BottomSheetSignUpScreen(navController) { modalOptions = SIGN_IN }
+    }
 }
 
 enum class WelcomeScreenModalOptions {
-  SIGN_IN,
-  SIGN_UP
+    SIGN_IN,
+    SIGN_UP
 }

@@ -110,11 +110,8 @@ fun BottomSheetSignUpContent(
       if (signUpState.data != null) {
         LaunchedEffect(key1 = signUpState.data) {
           navigateTo(
-            "verify_account_screen/pass=${passwordValueText}"
-
-          )
+            "verify_account_screen/pass=${passwordValueText}")
         }
-        clearSignUpState()
       }
     }
 

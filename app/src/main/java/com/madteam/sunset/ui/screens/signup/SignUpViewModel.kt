@@ -19,78 +19,80 @@ private const val MIN_PASSWORD_LENGTH = 6
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
-    private val authRepository: AuthContract,
-    private val databaseRepository: DatabaseContract,
+  private val authRepository: AuthContract,
+  private val databaseRepository: DatabaseContract,
 ) : ViewModel() {
 
-    val isValidForm = MutableStateFlow(false)
+  val isValidForm = MutableStateFlow(false)
 
-    val signUpState = MutableStateFlow<Resource<AuthResult?>>(Resource.Success(null))
+  val signUpState = MutableStateFlow<Resource<AuthResult?>>(Success(null))
 
-    fun isEmailValid(email: String): Boolean {
-        return Patterns.EMAIL_ADDRESS.matcher(email).matches()
-    }
+  fun isEmailValid(email: String): Boolean {
+    return Patterns.EMAIL_ADDRESS.matcher(email).matches()
+  }
 
-    fun isUsernameValid(username: String): Boolean {
-        return (username.length > 5)
-    }
+  fun isUsernameValid(username: String): Boolean {
+    return (username.length > 5)
+  }
 
-    private fun isPasswordValid(password: String): Boolean {
-        return (password.length > MIN_PASSWORD_LENGTH)
-    }
+  private fun isPasswordValid(password: String): Boolean {
+    return (password.length > MIN_PASSWORD_LENGTH)
+  }
 
-    fun isValidForm(email: String, password: String, username: String) {
-        isValidForm.value = (isEmailValid(email) && isUsernameValid(username) && isPasswordValid(password))
-    }
+  fun isValidForm(email: String, password: String, username: String) {
+    isValidForm.value =
+      (isEmailValid(email) && isUsernameValid(username) && isPasswordValid(password))
+  }
 
-    fun goToPoliciesScreen() {
-        //TODO: Go to policies Screen
-    }
+  fun goToPoliciesScreen() {
+    //TODO: Go to policies Screen
+  }
 
-    fun signUpIntent(email: String, password: String, username: String) {
-        viewModelScope.launch {
-            authRepository.doSignUpWithPasswordAndEmail(email, password).collectLatest { result ->
-                when (result) {
-                    is Success -> {
-                        createUserDatabase(result, username)
-                    }
+  fun signUpIntent(email: String, password: String, username: String) {
+    viewModelScope.launch {
+      authRepository.doSignUpWithPasswordAndEmail(email, password).collectLatest { result ->
+        when (result) {
+          is Success -> {
+            createUserDatabase(result, username)
+          }
 
-                    else -> { /* Not necessary */
-                    }
-                }
-                signUpState.value = result
-            }
+          else -> { /* Not necessary */
+          }
         }
+        signUpState.value = result
+      }
+      signUpState.value = Success(null)
     }
+  }
 
-    private fun createUserDatabase(authResult: Resource<AuthResult?>, username: String) {
-        viewModelScope.launch {
-            val userEmail = authResult.data!!.user!!.email!!
-            val userProvider = authResult.data.user!!.providerId
-            databaseRepository.createUser(userEmail, username, userProvider).collectLatest { result ->
-                when (result) {
-                    is Error -> {
-                        deleteCurrentUser()
-                        signUpState.value = Error("No se ha podido completar el registro. Intentelo de nuevo.")
-                    }
+  private fun createUserDatabase(authResult: Resource<AuthResult?>, username: String) {
+    viewModelScope.launch {
+      val userEmail = authResult.data!!.user!!.email!!
+      val userProvider = authResult.data.user!!.providerId
+      databaseRepository.createUser(userEmail, username, userProvider).collectLatest { result ->
+        when (result) {
+          is Error -> {
+            deleteCurrentUser()
+            signUpState.value = Error("No se ha podido completar el registro. Intentelo de nuevo.")
+          }
 
-                    is Success -> {
-                        signUpState.value = authResult
-                    }
+          is Success -> {
+            signUpState.value = authResult
+          }
 
-                    else -> { /* Not necessary */
-                    }
-                }
-
-            }
+          else -> { /* Not necessary */
+          }
         }
-    }
 
-    private fun deleteCurrentUser() {
-        authRepository.deleteCurrentUser()
+      }
     }
+  }
+
+  private fun deleteCurrentUser() {
+    authRepository.deleteCurrentUser()
+  }
 
     fun clearSignUpState() {
-        signUpState.value = Resource.Success(null)
+        signUpState.value = Success(null)
     }
 }

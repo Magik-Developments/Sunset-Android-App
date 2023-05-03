@@ -13,15 +13,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -32,6 +28,7 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.madteam.sunset.R
 import com.madteam.sunset.R.string
+import com.madteam.sunset.navigation.SunsetRoutes
 import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.SmallButtonDark
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineL
@@ -39,35 +36,44 @@ import com.madteam.sunset.ui.theme.primaryBoldHeadlineS
 import com.madteam.sunset.ui.theme.primaryMediumHeadlineS
 
 @Composable
-fun LostPasswordScreen(
+fun VerifyAccountScreen(
+  navController: NavController,
   viewModel: VerifyAccountViewModel = hiltViewModel(),
-  navController: NavController
+  pass: String,
 ) {
 
   val resendCounter by viewModel.resendCounter.collectAsStateWithLifecycle()
+  val recheckCounter by viewModel.recheckCounter.collectAsStateWithLifecycle()
+  val isVerified by viewModel.userVerified.collectAsStateWithLifecycle()
 
-  LostPasswordContent(
+  VerifyAccountContent(
+    credential = pass,
     resendText = resendCounter,
-    resendButton = viewModel::sendVerifyEmailIntent
+    recheckCounter = recheckCounter,
+    isVerified = isVerified,
+    resendButton = viewModel::sendVerifyEmailIntent,
+    checkButton = viewModel::checkIfUserIsVerified,
+    navigateTo = navController::navigate
   )
 }
 
 @Composable
-fun LostPasswordContent(
-  sendButton: (String) -> Unit = { },
-  validateForm: (String) -> Unit = { },
-  navigateTo: (String) -> Unit = { },
+fun VerifyAccountContent(
+  credential: String,
   resendText: Int,
-  resendButton: () -> Unit
+  recheckCounter: Int,
+  isVerified: Boolean,
+  resendButton: () -> Unit,
+  checkButton: (String) -> Unit,
+  navigateTo: (String) -> Unit
 ) {
 
   val mainAnimComposition by rememberLottieComposition(spec = LottieCompositionSpec.RawRes(R.raw.sunsetmountains))
-  val successAnimComposition by rememberLottieComposition(spec = LottieCompositionSpec.RawRes(R.raw.sunsetlighthouse))
-
-  var emailValueText by remember { mutableStateOf("") }
-  var emailSent by remember { mutableStateOf(false) }
+  val successAnimComposition by rememberLottieComposition(spec = LottieCompositionSpec.RawRes(R.raw.confetti))
 
   val resendColor = if (resendText > 0) { Color(0xFF999999) } else { Color(0xFFFFB600) }
+  val title = if (isVerified) { string.welcome_aboard } else { string.almost_done }
+  val subtitle = if (isVerified) { string.welcome_verify } else { string.verify_account_description }
 
   Column(
     modifier = Modifier
@@ -77,22 +83,33 @@ fun LostPasswordContent(
     horizontalAlignment = Alignment.CenterHorizontally
   ) {
     CustomSpacer(size = 48.dp)
-    LottieAnimation(
-      modifier = Modifier
-        .height(250.dp)
-        .width(250.dp),
-      composition = mainAnimComposition,
-      iterations = LottieConstants.IterateForever
-    )
+    Box() {
+      LottieAnimation(
+        modifier = Modifier
+          .height(250.dp)
+          .width(250.dp),
+        composition = mainAnimComposition,
+        iterations = LottieConstants.IterateForever
+      )
+      if (isVerified) {
+        LottieAnimation(
+          modifier = Modifier
+            .height(300.dp)
+            .width(300.dp),
+          composition = successAnimComposition,
+          iterations = 1
+        )
+      }
+    }
     CustomSpacer(size = 80.dp)
     Text(
-      text = stringResource(string.almost_done),
+      text = stringResource(title),
       style = primaryBoldHeadlineL,
       color = Color(0xFF333333)
     )
     CustomSpacer(size = 24.dp)
     Text(
-      text = stringResource(string.verify_account_description),
+      text = stringResource(subtitle),
       style = primaryBoldHeadlineS,
       color = Color(0xFF999999),
       textAlign = TextAlign.Center
@@ -102,10 +119,15 @@ fun LostPasswordContent(
       verticalArrangement = Arrangement.Bottom,
       horizontalAlignment = Alignment.CenterHorizontally
     ) {
-      SmallButtonDark(onClick = {
-        sendButton(emailValueText)
-        emailSent = true
-      }, text = string.im_verified, enabled = isValidForm && !emailSent)
+      if (isVerified) {
+        SmallButtonDark(onClick = {
+          navigateTo(SunsetRoutes.MyProfileScreen.route)
+        }, text = string.continue_text, enabled = true)
+      } else {
+        SmallButtonDark(onClick = {
+          checkButton(credential)
+        }, text = string.im_verified, enabled = recheckCounter == 0)
+      }
       CustomSpacer(size = 48.dp)
       Row() {
         Text(text = "Not arriving?", style = primaryMediumHeadlineS, color = Color(0xFF999999))

@@ -35,4 +35,7 @@
   <string name="almost_done">Almost done! 😎</string>
     <string name="verify_account_description">Check your inbox and verify your account.</string>
   <string name="im_verified">I\'m verified</string>
+  <string name="welcome_aboard">Welcome aboard 🥳</string>
+  <string name="welcome_verify">You’re about to discover amazing\nSunsets ☀️</string>
+  <string name="continue_text">Continue</string>
 </resources>

@@ -1,8 +1,7 @@
 package com.madteam.sunset.repositories
 
-import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.AuthResult
-import com.google.firebase.auth.EmailAuthCredential
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.madteam.sunset.utils.Resource
@@ -69,18 +68,23 @@ class AuthRepository @Inject constructor(
   override fun checkIfUserEmailIsVerified(credential: String): Flow<Resource<Boolean>> =
     flow {
       emit(Resource.Loading())
-      val userEmail = firebaseAuth.currentUser!!.email!!
-      doSignInWithPasswordAndEmail(userEmail, credential)
       val isVerified = firebaseAuth.currentUser?.isEmailVerified
       if (isVerified == true) {
         emit(Resource.Success(true))
-      } else if (isVerified == false){
+      } else if (isVerified == false) {
         emit(Resource.Success(false))
       }
     }.catch {
       emit(Resource.Error(it.message.toString()))
     }
 
+  override fun reauthenticateUser(credential: String): Flow<Resource<Unit>> =
+    flow {
+      val userEmail = firebaseAuth.currentUser?.email!!
+      val emailCredential = EmailAuthProvider
+        .getCredential(userEmail, credential)
+      firebaseAuth.currentUser?.reauthenticate(emailCredential)?.await()
+    }
 }
 
 interface AuthContract {
@@ -93,4 +97,5 @@ interface AuthContract {
   fun resetPasswordWithEmailIntent(email: String)
   fun sendVerifyEmailIntent()
   fun checkIfUserEmailIsVerified(credential: String): Flow<Resource<Boolean>>
+  fun reauthenticateUser(credential: String): Flow<Resource<Unit>>
 }

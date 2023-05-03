@@ -7,6 +7,7 @@ import com.madteam.sunset.utils.Resource.Success
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -47,6 +48,7 @@ class VerifyAccountViewModel @Inject constructor(
   }
 
   fun checkIfUserIsVerified(credential: String) = viewModelScope.launch {
+    authRepository.reauthenticateUser(credential).collect()
     authRepository.checkIfUserEmailIsVerified(credential).collectLatest { result ->
       when (result) {
         is Success -> {

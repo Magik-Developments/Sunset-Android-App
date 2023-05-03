@@ -16,6 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -71,9 +72,21 @@ fun VerifyAccountContent(
   val mainAnimComposition by rememberLottieComposition(spec = LottieCompositionSpec.RawRes(R.raw.sunsetmountains))
   val successAnimComposition by rememberLottieComposition(spec = LottieCompositionSpec.RawRes(R.raw.confetti))
 
-  val resendColor = if (resendText > 0) { Color(0xFF999999) } else { Color(0xFFFFB600) }
-  val title = if (isVerified) { string.welcome_aboard } else { string.almost_done }
-  val subtitle = if (isVerified) { string.welcome_verify } else { string.verify_account_description }
+  val resendColor = if (resendText > 0) {
+    Color(0xFF999999)
+  } else {
+    Color(0xFFFFB600)
+  }
+  val title = if (isVerified) {
+    string.welcome_aboard
+  } else {
+    string.almost_done
+  }
+  val subtitle = if (isVerified) {
+    string.welcome_verify
+  } else {
+    string.verify_account_description
+  }
 
   Column(
     modifier = Modifier
@@ -83,19 +96,20 @@ fun VerifyAccountContent(
     horizontalAlignment = Alignment.CenterHorizontally
   ) {
     CustomSpacer(size = 48.dp)
-    Box() {
+    Box(
+      contentAlignment = Alignment.Center,
+      modifier = Modifier
+        .height(300.dp)
+        .width(300.dp)
+    ) {
       LottieAnimation(
-        modifier = Modifier
-          .height(250.dp)
-          .width(250.dp),
+        contentScale = ContentScale.Crop,
         composition = mainAnimComposition,
         iterations = LottieConstants.IterateForever
       )
       if (isVerified) {
         LottieAnimation(
-          modifier = Modifier
-            .height(300.dp)
-            .width(300.dp),
+          contentScale = ContentScale.Crop,
           composition = successAnimComposition,
           iterations = 1
         )
@@ -127,17 +141,21 @@ fun VerifyAccountContent(
         SmallButtonDark(onClick = {
           checkButton(credential)
         }, text = string.im_verified, enabled = recheckCounter == 0)
-      }
-      CustomSpacer(size = 48.dp)
-      Row() {
-        Text(text = "Not arriving?", style = primaryMediumHeadlineS, color = Color(0xFF999999))
-        CustomSpacer(size = 24.dp)
-        Box(modifier = Modifier.clickable(onClick = { resendButton() })) {
-          Text(text = "Resend", style = primaryMediumHeadlineS, color = resendColor)
-        }
-        CustomSpacer(size = 8.dp)
-        if (resendText > 0) {
-          Text(text = "($resendText s)", style = primaryMediumHeadlineS, color = Color(0xFF999999))
+        CustomSpacer(size = 48.dp)
+        Row() {
+          Text(text = "Not arriving?", style = primaryMediumHeadlineS, color = Color(0xFF999999))
+          CustomSpacer(size = 24.dp)
+          Box(modifier = Modifier.clickable(onClick = { resendButton() })) {
+            Text(text = "Resend", style = primaryMediumHeadlineS, color = resendColor)
+          }
+          CustomSpacer(size = 8.dp)
+          if (resendText > 0) {
+            Text(
+              text = "($resendText s)",
+              style = primaryMediumHeadlineS,
+              color = Color(0xFF999999)
+            )
+          }
         }
       }
       CustomSpacer(size = 40.dp)

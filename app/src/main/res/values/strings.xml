@@ -38,4 +38,5 @@
   <string name="welcome_aboard">Welcome aboard 🥳</string>
   <string name="welcome_verify">You’re about to discover amazing\nSunsets ☀️</string>
   <string name="continue_text">Continue</string>
+  <string name="not_valid_email_error">Introduce a valid email</string>
 </resources>

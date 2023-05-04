@@ -96,9 +96,12 @@ dependencies {
     //Compose Previews
     implementation 'androidx.compose.ui:ui-tooling-preview'
     implementation 'androidx.compose.ui:ui-tooling'
+    implementation 'com.google.accompanist:accompanist-navigation-animation:0.30.1'
+
+    //Material
     implementation 'androidx.compose.material:material'
     implementation 'androidx.compose.material:material-icons-extended'
-    implementation 'com.google.accompanist:accompanist-navigation-animation:0.30.1'
+    implementation 'androidx.compose.material3:material3:1.1.0-rc01'
 
     //Lottie
     implementation 'com.airbnb.android:lottie-compose:6.0.0'

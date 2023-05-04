@@ -26,6 +26,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.google.firebase.auth.AuthResult
+import com.madteam.sunset.R
 import com.madteam.sunset.R.string
 import com.madteam.sunset.ui.common.CardHandler
 import com.madteam.sunset.ui.common.CardSubtitle
@@ -153,6 +154,8 @@ fun BottomSheetSignUpContent(
         emailValueText = email
         validateForm(emailValueText, passwordValueText, usernameValueText)
       },
+      isError = (!isValidEmail(emailValueText) && emailValueText.isNotBlank()),
+      errorMessage = string.not_valid_email_error,
       endIcon = {
         if (isValidEmail(emailValueText)) SuccessIcon() else if (emailValueText.isNotBlank()) {
           ErrorIcon()

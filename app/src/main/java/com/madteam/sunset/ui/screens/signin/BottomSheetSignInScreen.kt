@@ -87,7 +87,7 @@ fun BottomSheetSignInContent(
     var passwordTValueText by remember { mutableStateOf("") }
 
     if (BuildConfig.DEBUG) {
-        userValueText = "sunsetapp@test.com"
+        userValueText = "adriafernandez14@gmail.com"
         passwordTValueText = "abc.1234"
         validateForm(userValueText, passwordTValueText)
     }
@@ -103,9 +103,15 @@ fun BottomSheetSignInContent(
         }
 
         is Resource.Success -> {
-            if (signInState.data != null) {
+            if (signInState.data != null && signInState.data.user!!.isEmailVerified) {
                 LaunchedEffect(key1 = signInState.data) {
                     navigateTo(SunsetRoutes.MyProfileScreen.route)
+                }
+                clearSignInState()
+            } else if (signInState.data != null && !signInState.data.user!!.isEmailVerified){
+                LaunchedEffect(key1 = signInState.data) {
+                    navigateTo(
+                        "verify_account_screen/pass=${passwordTValueText}")
                 }
                 clearSignInState()
             }

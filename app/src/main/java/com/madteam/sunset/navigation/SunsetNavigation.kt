@@ -5,6 +5,8 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
@@ -15,6 +17,7 @@ import com.madteam.sunset.navigation.SunsetRoutes.SignUpCard
 import com.madteam.sunset.navigation.SunsetRoutes.WelcomeScreen
 import com.madteam.sunset.ui.screens.lostpassword.LostPasswordScreen
 import com.madteam.sunset.ui.screens.myprofile.MyProfileScreen
+import com.madteam.sunset.ui.screens.verifyaccount.VerifyAccountScreen
 import com.madteam.sunset.ui.screens.welcome.WelcomeScreen
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -38,6 +41,21 @@ fun SunsetNavigation() {
 
         composable(MyProfileScreen.route) {
             MyProfileScreen(navController)
+        }
+
+        composable(
+            route = "verify_account_screen/pass={pass}",
+            arguments = listOf(
+                navArgument("pass"){
+                    type = NavType.StringType
+                    defaultValue = ""
+                }
+            )
+        ) { backStackEntry ->
+            val pass = backStackEntry.arguments?.getString("pass")
+            pass?.let {
+                VerifyAccountScreen(navController = navController, pass = pass)
+            }
         }
 
         composable(

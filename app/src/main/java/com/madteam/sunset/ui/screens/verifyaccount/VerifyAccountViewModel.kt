@@ -29,9 +29,17 @@ class VerifyAccountViewModel @Inject constructor(
     startResendCountDown()
   }
 
+  private fun resetResendCounter() {
+    resendCounter.value = RESEND_TIME
+  }
+
+  private fun resetRecheckCounter() {
+    recheckCounter.value = RECHECK_TIME
+  }
+
   private fun startResendCountDown() = viewModelScope.launch {
     if (resendCounter.value <= 0) {
-      resendCounter.value = RESEND_TIME
+      resetResendCounter()
       while (resendCounter.value > 0) {
         delay(1000)
         resendCounter.value--
@@ -48,6 +56,7 @@ class VerifyAccountViewModel @Inject constructor(
 
   fun sendVerifyEmailIntent() = viewModelScope.launch {
     authRepository.sendVerifyEmailIntent()
+    startResendCountDown()
   }
 
   fun checkIfUserIsVerified(credential: String) = viewModelScope.launch {
@@ -62,7 +71,7 @@ class VerifyAccountViewModel @Inject constructor(
       }
     }
     if (!userVerified.value) {
-      recheckCounter.value = RECHECK_TIME
+      resetRecheckCounter()
       startRecheckCountDown()
     }
   }

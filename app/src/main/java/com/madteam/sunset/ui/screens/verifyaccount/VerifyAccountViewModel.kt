@@ -12,6 +12,9 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+private const val RESEND_TIME = 60
+private const val RECHECK_TIME = 10
+
 @HiltViewModel
 class VerifyAccountViewModel @Inject constructor(
   private val authRepository: AuthContract
@@ -28,7 +31,7 @@ class VerifyAccountViewModel @Inject constructor(
 
   private fun startResendCountDown() = viewModelScope.launch {
     if (resendCounter.value <= 0) {
-      resendCounter.value = 120
+      resendCounter.value = RESEND_TIME
       while (resendCounter.value > 0) {
         delay(1000)
         resendCounter.value--
@@ -59,7 +62,7 @@ class VerifyAccountViewModel @Inject constructor(
       }
     }
     if (!userVerified.value) {
-      recheckCounter.value = 10
+      recheckCounter.value = RECHECK_TIME
       startRecheckCountDown()
     }
   }

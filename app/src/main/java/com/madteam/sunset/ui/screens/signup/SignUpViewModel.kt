@@ -4,6 +4,7 @@ import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.AuthResult
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.madteam.sunset.repositories.AuthContract
 import com.madteam.sunset.repositories.DatabaseContract
 import com.madteam.sunset.utils.Resource
@@ -56,13 +57,17 @@ class SignUpViewModel @Inject constructor(
             createUserDatabase(result, username)
           }
 
-          else -> { /* Not necessary */
+          is Error -> {
+            signUpState.value = Error(result.message.toString())
+          }
+
+          else -> {
+            signUpState.value = Error(result.message.toString())
           }
         }
-        signUpState.value = result
       }
-      signUpState.value = Success(null)
     }
+    signUpState.value = Success(null)
   }
 
   private fun createUserDatabase(authResult: Resource<AuthResult?>, username: String) {
@@ -72,8 +77,12 @@ class SignUpViewModel @Inject constructor(
       databaseRepository.createUser(userEmail, username, userProvider).collectLatest { result ->
         when (result) {
           is Error -> {
+            if (result.message == "e_user_already_exists") {
+              signUpState.value = Error("e_user_already_exists")
+            } else {
+              signUpState.value = Error("Error signing up")
+            }
             deleteCurrentUser()
-            signUpState.value = Error("No se ha podido completar el registro. Intentelo de nuevo.")
           }
 
           is Success -> {
@@ -89,10 +98,12 @@ class SignUpViewModel @Inject constructor(
   }
 
   private fun deleteCurrentUser() {
-    authRepository.deleteCurrentUser()
+    viewModelScope.launch {
+      authRepository.deleteCurrentUser().collectLatest { }
+    }
   }
 
-    fun clearSignUpState() {
-        signUpState.value = Success(null)
-    }
+  fun clearSignUpState() {
+    signUpState.value = Success(null)
+  }
 }

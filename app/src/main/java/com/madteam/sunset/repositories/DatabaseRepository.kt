@@ -20,13 +20,13 @@ class DatabaseRepository @Inject constructor(
         email: String,
         username: String,
         provider: String
-    ): Flow<Resource<Unit>> = flow {
+    ): Flow<Resource<String>> = flow {
         emit(Resource.Loading())
 
         val userDocument = firebaseFirestore.collection(USERS_COLLECTION_PATH).document(username)
         val documentSnapshot = userDocument.get().await()
         if (documentSnapshot.exists()) {
-            emit(Resource.Error("El usuario ya existe en la base de datos"))
+            emit(Resource.Error("e_user_already_exists"))
             return@flow
         }
 
@@ -39,7 +39,7 @@ class DatabaseRepository @Inject constructor(
         )
 
         firebaseFirestore.collection(USERS_COLLECTION_PATH).document(username).set(user).await()
-        emit(Resource.Success(Unit))
+        emit(Resource.Success("User database has been created"))
     }.catch {
         emit(Resource.Error(it.message.toString()))
     }
@@ -56,6 +56,6 @@ class DatabaseRepository @Inject constructor(
 
 interface DatabaseContract {
 
-    fun createUser(email: String, username: String, provider: String): Flow<Resource<Unit>>
+    fun createUser(email: String, username: String, provider: String): Flow<Resource<String>>
     fun getUserByEmail(email: String, userProfileCallback: (UserProfile) -> Unit)
 }

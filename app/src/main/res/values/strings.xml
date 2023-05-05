@@ -43,4 +43,5 @@
   <string name="not_valid_username">Introduce a valid username</string>
   <string name="user_already_exists">Username is not available</string>
   <string name="email_already_used">Email is already used</string>
+  <string name="invalid_email_or_password">Invalid email or password</string>
 </resources>

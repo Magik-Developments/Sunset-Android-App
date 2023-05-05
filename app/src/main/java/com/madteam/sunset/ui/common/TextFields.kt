@@ -87,9 +87,9 @@ fun DesignSystemTextField(
       enabled = enabled,
       visualTransformation = visualTransformation
     )
-    if (isError) {
+    if (isError && errorMessage != null) {
       Text(
-        text = stringResource(errorMessage!!),
+        text = stringResource(errorMessage),
         color = MaterialTheme.colorScheme.error,
         style = MaterialTheme.typography.labelMedium,
         textAlign = TextAlign.Start,

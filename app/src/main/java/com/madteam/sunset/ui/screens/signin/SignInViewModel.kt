@@ -41,4 +41,8 @@ class SignInViewModel @Inject constructor(
     fun clearSignInState() {
         signInState.value = Resource.Success(null)
     }
+
+    fun isValidEmail(email: String): Boolean {
+        return Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    }
 }

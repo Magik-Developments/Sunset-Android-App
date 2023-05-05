@@ -39,4 +39,8 @@
   <string name="welcome_verify">You’re about to discover amazing\nSunsets ☀️</string>
   <string name="continue_text">Continue</string>
   <string name="not_valid_email_error">Introduce a valid email</string>
+  <string name="not_valid_password">Password must have more than 6 characters</string>
+  <string name="not_valid_username">Introduce a valid username</string>
+  <string name="user_already_exists">Username is not available</string>
+  <string name="email_already_used">Email is already used</string>
 </resources>

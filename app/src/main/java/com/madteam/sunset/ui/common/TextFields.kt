@@ -60,6 +60,7 @@ fun DesignSystemTextField(
         Modifier
           .height(60.dp)
           .fillMaxWidth()
+          .border(1.dp, Color(0xFF999999), RoundedCornerShape(8.dp) )
       },
       shape = RoundedCornerShape(8.dp),
       colors = TextFieldDefaults.textFieldColors(

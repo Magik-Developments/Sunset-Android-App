@@ -26,7 +26,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.google.firebase.auth.AuthResult
-import com.madteam.sunset.R
 import com.madteam.sunset.R.string
 import com.madteam.sunset.ui.common.CardHandler
 import com.madteam.sunset.ui.common.CardSubtitle
@@ -96,6 +95,8 @@ fun BottomSheetSignUpContent(
   var usernameValueText by remember { mutableStateOf("") }
   var passwordValueText by remember { mutableStateOf("") }
   var emailValueText by remember { mutableStateOf("") }
+  var userAlreadyExists by remember { mutableStateOf(false) }
+  var emailAlreadyInUse by remember { mutableStateOf(false) }
 
   when (signUpState) {
     is Resource.Loading -> {
@@ -111,15 +112,18 @@ fun BottomSheetSignUpContent(
       if (signUpState.data != null) {
         LaunchedEffect(key1 = signUpState.data) {
           navigateTo(
-            "verify_account_screen/pass=${passwordValueText}")
+            "verify_account_screen/pass=${passwordValueText}"
+          )
           clearSignUpState()
         }
       }
     }
 
     is Resource.Error -> {
-      Box(contentAlignment = Alignment.Center) {
-        Toast.makeText(context, "${signUpState.message}", Toast.LENGTH_SHORT).show()
+      if (signUpState.message == "e_user_already_exists") {
+        userAlreadyExists = true
+      } else if (signUpState.message == "The email address is already in use by another account.") {
+        emailAlreadyInUse = true
       }
       clearSignUpState()
     }
@@ -153,11 +157,16 @@ fun BottomSheetSignUpContent(
       onValueChange = { email ->
         emailValueText = email
         validateForm(emailValueText, passwordValueText, usernameValueText)
+        emailAlreadyInUse = false
       },
-      isError = (!isValidEmail(emailValueText) && emailValueText.isNotBlank()),
-      errorMessage = string.not_valid_email_error,
+      isError = (!isValidEmail(emailValueText) && emailValueText.isNotBlank() || emailAlreadyInUse),
+      errorMessage = if (emailAlreadyInUse) {
+        string.email_already_used
+      } else {
+        string.not_valid_email_error
+      },
       endIcon = {
-        if (isValidEmail(emailValueText)) SuccessIcon() else if (emailValueText.isNotBlank()) {
+        if (isValidEmail(emailValueText) && !emailAlreadyInUse) SuccessIcon() else if (emailValueText.isNotBlank()) {
           ErrorIcon()
         }
       }
@@ -169,6 +178,8 @@ fun BottomSheetSignUpContent(
         passwordValueText = password
         validateForm(emailValueText, passwordValueText, usernameValueText)
       },
+      isError = (passwordValueText.length < 7 && passwordValueText.isNotBlank()),
+      errorMessage = string.not_valid_password,
       endIcon = { PasswordVisibilityOffIcon() }
     )
     CustomSpacer(size = 16.dp)
@@ -177,9 +188,16 @@ fun BottomSheetSignUpContent(
       onValueChange = { username ->
         usernameValueText = username
         validateForm(emailValueText, passwordValueText, usernameValueText)
+        userAlreadyExists = false
+      },
+      isError = (!isValidUsername(usernameValueText) && usernameValueText.isNotBlank() || userAlreadyExists),
+      errorMessage = if (userAlreadyExists) {
+        string.user_already_exists
+      } else {
+        string.not_valid_username
       },
       endIcon = {
-        if (isValidUsername(usernameValueText)) SuccessIcon() else if (usernameValueText.isNotBlank()) {
+        if (isValidUsername(usernameValueText) && !userAlreadyExists) SuccessIcon() else if (usernameValueText.isNotBlank()) {
           ErrorIcon()
         }
       }
@@ -188,7 +206,7 @@ fun BottomSheetSignUpContent(
     SmallButtonDark(
       onClick = { showDialog = true },
       text = string.sign_up,
-      enabled = isValidForm
+      enabled = isValidForm && !userAlreadyExists && !emailAlreadyInUse
     )
     CustomSpacer(size = 16.dp)
     OtherLoginMethodsSection(string.already_have_an_account)

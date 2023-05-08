@@ -33,6 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.madteam.sunset.R
+import com.madteam.sunset.ui.theme.secondarySemiBoldBodyM
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyS
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
 
@@ -213,8 +214,8 @@ fun ThinButtonLight(
         onClick = onClick,
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier
-            .width(80.dp)
-            .height(24.dp),
+            .width(88.dp)
+            .height(32.dp),
         border = BorderStroke(1.dp, Color.Black),
         colors = ButtonDefaults.buttonColors(
             backgroundColor = Color.White,
@@ -227,7 +228,7 @@ fun ThinButtonLight(
     ) {
         Text(
             text = stringResource(id = text),
-            style = secondarySemiBoldBodyS,
+            style = secondarySemiBoldBodyM,
             color = Color(0xFF333333)
         )
     }

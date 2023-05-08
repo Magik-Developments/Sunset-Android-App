@@ -12,6 +12,7 @@ import com.madteam.sunset.ui.theme.secondaryRegularBodyM
 import com.madteam.sunset.ui.theme.secondaryRegularHeadlineS
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyL
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyM
+import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
 
 @Composable
 fun UserUsernameText(username: String) {
@@ -26,7 +27,7 @@ fun UserUsernameText(username: String) {
 fun UserLocationText(location: String) {
   Text(
     text = location,
-    style = secondaryRegularBodyL,
+    style = secondaryRegularHeadlineS,
     color = Color(0xFF333333)
   )
 }
@@ -35,7 +36,7 @@ fun UserLocationText(location: String) {
 fun UserNameText(userName: String) {
   Text(
     text = userName,
-    style = secondarySemiBoldBodyL,
+    style = secondarySemiBoldHeadLineS,
     color = Color(0xFF333333)
   )
 }
@@ -44,12 +45,12 @@ fun UserNameText(userName: String) {
 fun FollowsUserStates(){
   // TODO: Do this component properly
   Row(verticalAlignment = Alignment.CenterVertically) {
-    Text(text = "340", style = secondarySemiBoldBodyM)
+    Text(text = "340", style = secondarySemiBoldBodyL)
     CustomSpacer(size = 8.dp)
-    Text(text = "Following", style = secondaryRegularBodyM)
+    Text(text = "Following", style = secondaryRegularBodyL)
     CustomSpacer(size = 24.dp)
-    Text(text = "87", style = secondarySemiBoldBodyM)
+    Text(text = "87", style = secondarySemiBoldBodyL)
     CustomSpacer(size = 8.dp)
-    Text(text = "Followers", style = secondaryRegularBodyM)
+    Text(text = "Followers", style = secondaryRegularBodyL)
   }
 }

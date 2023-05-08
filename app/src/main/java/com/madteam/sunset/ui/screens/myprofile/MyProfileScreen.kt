@@ -1,7 +1,6 @@
 package com.madteam.sunset.ui.screens.myprofile
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -66,7 +65,7 @@ fun MyProfileContent(
     modifier = Modifier
       .fillMaxSize()
       .fillMaxWidth()
-      .padding(horizontal = 24.dp)
+      .padding(horizontal = 16.dp)
       .background(Color.White)
   ) {
     CustomSpacer(size = 16.dp)
@@ -78,14 +77,15 @@ fun MyProfileContent(
     }
     CustomSpacer(size = 8.dp)
     ProfileImage(image = R.drawable.logo_degrade, size = 80.dp)
-    CustomSpacer(size = 8.dp)
+    CustomSpacer(size = 16.dp)
     UserNameText(userName = "Adrià Fernández Arans")
     CustomSpacer(size = 8.dp)
     Row(verticalAlignment = Alignment.CenterVertically) {
       UserLocationText(location = "🗺️ Terrassa, BCN")
-      Column(modifier = Modifier
-        .fillMaxWidth()
-        .padding(end = 36.dp), horizontalAlignment = Alignment.End) {
+      Column(
+        modifier = Modifier
+          .fillMaxWidth(), horizontalAlignment = Alignment.End
+      ) {
         ThinButtonLight(onClick = { /*TODO*/ }, text = R.string.edit_profile)
       }
     }

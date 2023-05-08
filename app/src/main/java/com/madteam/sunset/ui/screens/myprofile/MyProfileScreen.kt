@@ -1,9 +1,12 @@
 package com.madteam.sunset.ui.screens.myprofile
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
@@ -18,67 +21,87 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.madteam.sunset.R
 import com.madteam.sunset.ui.common.CustomSpacer
+import com.madteam.sunset.ui.common.FollowsUserStates
+import com.madteam.sunset.ui.common.MenuIconButton
 import com.madteam.sunset.ui.common.ProfileImage
 import com.madteam.sunset.ui.common.SmallButtonDark
 import com.madteam.sunset.ui.common.SunsetBottomNavigation
+import com.madteam.sunset.ui.common.ThinButtonLight
 import com.madteam.sunset.ui.common.UserLocationText
+import com.madteam.sunset.ui.common.UserNameText
 import com.madteam.sunset.ui.common.UserUsernameText
 
 @Composable
 fun MyProfileScreen(
-    navController: NavController,
-    viewModel: MyProfileViewModel = hiltViewModel(),
+  navController: NavController,
+  viewModel: MyProfileViewModel = hiltViewModel(),
 ) {
-    val username by viewModel.username.collectAsStateWithLifecycle()
-    val navigateUp by viewModel.navigateUp.collectAsStateWithLifecycle()
+  val username by viewModel.username.collectAsStateWithLifecycle()
+  val navigateUp by viewModel.navigateUp.collectAsStateWithLifecycle()
 
-    if (navigateUp)
-        navController.navigateUp()
+  if (navigateUp)
+    navController.navigateUp()
 
-    Scaffold(
-        bottomBar = { SunsetBottomNavigation() },
-        content = { paddingValues ->
-            Box(
-                modifier = Modifier.padding(paddingValues),
-                contentAlignment = Alignment.Center
-            ) {
-                MyProfileContent(username) {
-                    viewModel.logOut()
-                }
-            }
+  Scaffold(
+    bottomBar = { SunsetBottomNavigation() },
+    content = { paddingValues ->
+      Box(
+        modifier = Modifier.padding(paddingValues),
+        contentAlignment = Alignment.Center
+      ) {
+        MyProfileContent(username) {
+          viewModel.logOut()
         }
-    )
+      }
+    }
+  )
 }
 
 @Composable
 fun MyProfileContent(
-    username: String,
-    logout: () -> Unit
+  username: String,
+  logout: () -> Unit
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp)
-            .background(Color.White),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        CustomSpacer(size = 40.dp)
-        ProfileImage(image = R.drawable.logo_degrade)
-        CustomSpacer(size = 24.dp)
-        UserUsernameText(username = username)
-        CustomSpacer(size = 8.dp)
-        UserLocationText(location = "Terrassa, BCN")
-        CustomSpacer(size = 48.dp)
-        SmallButtonDark(
-            onClick = logout,
-            text = R.string.log_out,
-            enabled = true
-        )
+  Column(
+    modifier = Modifier
+      .fillMaxSize()
+      .fillMaxWidth()
+      .padding(horizontal = 24.dp)
+      .background(Color.White)
+  ) {
+    CustomSpacer(size = 16.dp)
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+      UserUsernameText(username = username)
+      Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.End) {
+        MenuIconButton(onClick = { /*TODO*/ })
+      }
     }
+    CustomSpacer(size = 8.dp)
+    ProfileImage(image = R.drawable.logo_degrade, size = 80.dp)
+    CustomSpacer(size = 8.dp)
+    UserNameText(userName = "Adrià Fernández Arans")
+    CustomSpacer(size = 8.dp)
+    Row(verticalAlignment = Alignment.CenterVertically) {
+      UserLocationText(location = "🗺️ Terrassa, BCN")
+      Column(modifier = Modifier
+        .fillMaxWidth()
+        .padding(end = 36.dp), horizontalAlignment = Alignment.End) {
+        ThinButtonLight(onClick = { /*TODO*/ }, text = R.string.edit_profile)
+      }
+    }
+    CustomSpacer(size = 8.dp)
+    FollowsUserStates()
+    CustomSpacer(size = 48.dp)
+    SmallButtonDark(
+      onClick = logout,
+      text = R.string.log_out,
+      enabled = true
+    )
+  }
 }
 
 @Composable
 @Preview
 fun MyProfileScreenPreview() {
-    MyProfileContent("My name") {}
+  MyProfileContent("My name") {}
 }

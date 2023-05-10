@@ -36,7 +36,7 @@ fun BottomSheetEditProfileScreen() {
   Card(
     modifier = Modifier
       .fillMaxWidth()
-      .height((LocalConfiguration.current.screenHeightDp * 0.90).dp),
+      .height((LocalConfiguration.current.screenHeightDp * 0.98).dp),
     backgroundColor = Color.White,
     shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
   ) {

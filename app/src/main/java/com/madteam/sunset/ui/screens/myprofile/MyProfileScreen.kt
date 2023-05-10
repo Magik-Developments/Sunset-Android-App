@@ -1,6 +1,7 @@
 package com.madteam.sunset.ui.screens.myprofile
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -69,25 +70,26 @@ fun MyProfileContent(
       .background(Color.White)
   ) {
     CustomSpacer(size = 16.dp)
-    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+    Row(
+      verticalAlignment = Alignment.CenterVertically,
+      modifier = Modifier.fillMaxWidth(),
+      horizontalArrangement = Arrangement.SpaceBetween
+    ) {
       UserUsernameText(username = username)
-      Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.End) {
-        MenuIconButton(onClick = { /*TODO*/ })
-      }
+      MenuIconButton(onClick = { /*TODO*/ })
     }
     CustomSpacer(size = 8.dp)
     ProfileImage(image = R.drawable.logo_degrade, size = 80.dp)
     CustomSpacer(size = 16.dp)
     UserNameText(userName = "Adrià Fernández Arans")
     CustomSpacer(size = 8.dp)
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    Row(
+      verticalAlignment = Alignment.CenterVertically,
+      modifier = Modifier.fillMaxWidth(),
+      horizontalArrangement = Arrangement.SpaceBetween
+    ) {
       UserLocationText(location = "🗺️ Terrassa, BCN")
-      Column(
-        modifier = Modifier
-          .fillMaxWidth(), horizontalAlignment = Alignment.End
-      ) {
-        ThinButtonLight(onClick = { /*TODO*/ }, text = R.string.edit_profile)
-      }
+      ThinButtonLight(onClick = { /*TODO*/ }, text = R.string.edit_profile)
     }
     CustomSpacer(size = 8.dp)
     FollowsUserStates()

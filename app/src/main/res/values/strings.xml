@@ -45,4 +45,7 @@
   <string name="email_already_used">Email is already used</string>
   <string name="invalid_email_or_password">Invalid email or password</string>
   <string name="edit_profile">Edit profile</string>
+  <string name="name">Name</string>
+  <string name="location">Location</string>
+  <string name="save">Save</string>
 </resources>

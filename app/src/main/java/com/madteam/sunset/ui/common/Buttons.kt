@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
@@ -31,6 +33,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.madteam.sunset.R
+import com.madteam.sunset.ui.theme.secondarySemiBoldBodyM
+import com.madteam.sunset.ui.theme.secondarySemiBoldBodyS
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
 
 @Composable
@@ -196,6 +200,36 @@ fun IconButtonLight(
             imageVector = buttonIcon,
             contentDescription = stringResource(description),
             tint = iconTint
+        )
+    }
+}
+
+@Composable
+fun ThinButtonLight(
+    onClick: () -> Unit,
+    @StringRes text: Int,
+    enabled: Boolean = true
+) {
+    Button(
+        onClick = onClick,
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier
+            .width(88.dp)
+            .height(32.dp),
+        border = BorderStroke(1.dp, Color.Black),
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = Color.White,
+            disabledBackgroundColor = Color(0x80000000),
+            disabledContentColor = Color(0x80FFFFFF)
+        ),
+        enabled = enabled,
+        contentPadding = PaddingValues(0.dp)
+
+    ) {
+        Text(
+            text = stringResource(id = text),
+            style = secondarySemiBoldBodyM,
+            color = Color(0xFF333333)
         )
     }
 }

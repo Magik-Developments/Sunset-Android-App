@@ -70,7 +70,8 @@ fun DesignSystemTextField(
         focusedLabelColor = Color(0xFF999999),
         unfocusedLabelColor = Color(0xFF999999),
         focusedIndicatorColor = Color.Transparent,
-        unfocusedIndicatorColor = Color.Transparent
+        unfocusedIndicatorColor = Color.Transparent,
+        disabledIndicatorColor = Color.Transparent
       ),
       label = {
         Text(
@@ -155,9 +156,32 @@ fun EmailTextField(
 }
 
 @Composable
+fun GenericTextField(
+  value: String,
+  onValueChange: (String) -> Unit,
+  isError: Boolean = false,
+  errorMessage: Int? = null,
+  @StringRes hint: Int,
+  enabled: Boolean = true,
+  endIcon: @Composable () -> Unit = { Spacer(modifier = Modifier.size(0.dp)) }
+) {
+  DesignSystemTextField(
+    value = value,
+    isError = isError,
+    errorMessage = errorMessage,
+    onValueChange = onValueChange,
+    hint = hint,
+    textType = KeyboardType.Text,
+    enabled = enabled,
+    endIcon = (endIcon)
+  )
+}
+
+@Composable
 fun UsernameTextField(
   usernameValue: String,
   onValueChange: (String) -> Unit,
+  enabled: Boolean = true,
   isError: Boolean = false,
   errorMessage: Int? = null,
   endIcon: @Composable () -> Unit = { Spacer(modifier = Modifier.size(0.dp)) }
@@ -169,7 +193,8 @@ fun UsernameTextField(
     onValueChange = onValueChange,
     hint = R.string.username,
     textType = KeyboardType.Text,
-    endIcon = (endIcon)
+    endIcon = (endIcon),
+    enabled = enabled
   )
 }
 

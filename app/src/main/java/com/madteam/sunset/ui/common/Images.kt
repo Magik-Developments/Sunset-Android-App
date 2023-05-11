@@ -10,19 +10,21 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.madteam.sunset.R.string
 
 @Composable
 fun ProfileImage(
-    @DrawableRes image: Int
+    @DrawableRes image: Int,
+    size: Dp
 ) {
     Image(
         painter = painterResource(id = image),
         contentDescription = stringResource(string.profile_user_image_description),
         contentScale = ContentScale.Crop,
         modifier = Modifier
-            .size(130.dp)
+            .size(size)
             .clip(CircleShape)
     )
 }

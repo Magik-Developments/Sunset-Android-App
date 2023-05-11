@@ -52,9 +52,11 @@ fun MyProfileScreen(
   val editProfileModalState =
     ModalBottomSheetState(initialValue = Hidden, isSkipHalfExpanded = true)
   val username by viewModel.username.collectAsStateWithLifecycle()
+  val name by viewModel.name.collectAsStateWithLifecycle()
+  val location by viewModel.location.collectAsStateWithLifecycle()
   val navigateUp by viewModel.navigateUp.collectAsStateWithLifecycle()
 
-   if (navigateUp)
+  if (navigateUp)
     navController.navigateUp()
 
   ModalBottomSheetLayout(
@@ -72,6 +74,8 @@ fun MyProfileScreen(
         ) {
           MyProfileContent(
             username = username,
+            name = name,
+            location = location,
             onEditProfileClick = { coroutineScope.launch { editProfileModalState.show() } },
             logout = { viewModel.logOut() }
           )
@@ -84,6 +88,8 @@ fun MyProfileScreen(
 @Composable
 fun MyProfileContent(
   username: String,
+  name: String,
+  location: String,
   logout: () -> Unit,
   onEditProfileClick: () -> Unit
 ) {
@@ -105,15 +111,23 @@ fun MyProfileContent(
     }
     CustomSpacer(size = 8.dp)
     ProfileImage(image = R.drawable.logo_degrade, size = 80.dp)
-    CustomSpacer(size = 16.dp)
-    UserNameText(userName = "Adrià Fernández Arans")
-    CustomSpacer(size = 8.dp)
+    if (name.isNotBlank()) {
+      CustomSpacer(size = 16.dp)
+      UserNameText(userName = name)
+      CustomSpacer(size = 8.dp)
+    }
     Row(
       verticalAlignment = Alignment.CenterVertically,
       modifier = Modifier.fillMaxWidth(),
-      horizontalArrangement = Arrangement.SpaceBetween
+      horizontalArrangement = if (location.isNotBlank()) {
+        Arrangement.SpaceBetween
+      } else {
+        Arrangement.Center
+      }
     ) {
-      UserLocationText(location = "🗺️ Terrassa, BCN")
+      if (location.isNotBlank()) {
+        UserLocationText(location = location)
+      }
       ThinButtonLight(onClick = onEditProfileClick, text = R.string.edit_profile)
     }
     CustomSpacer(size = 8.dp)
@@ -130,5 +144,5 @@ fun MyProfileContent(
 @Composable
 @Preview
 fun MyProfileScreenPreview() {
-  MyProfileContent("My name", {}) {}
+  MyProfileContent("adriaa12", "Adrià Fernández", "🗺️ Terrassa, Bcn", {}) {}
 }

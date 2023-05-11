@@ -180,6 +180,7 @@ fun GenericTextField(
 fun UsernameTextField(
   usernameValue: String,
   onValueChange: (String) -> Unit,
+  enabled: Boolean = true,
   isError: Boolean = false,
   errorMessage: Int? = null,
   endIcon: @Composable () -> Unit = { Spacer(modifier = Modifier.size(0.dp)) }
@@ -191,7 +192,8 @@ fun UsernameTextField(
     onValueChange = onValueChange,
     hint = R.string.username,
     textType = KeyboardType.Text,
-    endIcon = (endIcon)
+    endIcon = (endIcon),
+    enabled = enabled
   )
 }
 

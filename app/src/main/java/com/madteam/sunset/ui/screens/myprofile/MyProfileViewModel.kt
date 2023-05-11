@@ -14,6 +14,8 @@ class MyProfileViewModel @Inject constructor(
 ) : ViewModel() {
 
     val username = MutableStateFlow("")
+    val name = MutableStateFlow("")
+    val location = MutableStateFlow("")
 
     val navigateUp = MutableStateFlow(false) // Fixme: hacer esto bien...
 
@@ -21,6 +23,8 @@ class MyProfileViewModel @Inject constructor(
         authRepository.getCurrentUser()?.let { user ->
             databaseRepository.getUserByEmail(user.email!!) {
                 username.value = it.username
+                name.value = it.name
+                location.value = it.location
             }
         }
     }

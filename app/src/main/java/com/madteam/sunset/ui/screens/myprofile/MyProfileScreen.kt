@@ -55,7 +55,7 @@ fun MyProfileScreen(
   val username by viewModel.username.collectAsStateWithLifecycle()
   val name by viewModel.name.collectAsStateWithLifecycle()
   val location by viewModel.location.collectAsStateWithLifecycle()
-  val navigateUp by viewModel.navigateUp.collectAsStateWithLifecycle()
+  val navigateUp by viewModel.navigateWelcomeScreen.collectAsStateWithLifecycle()
 
   if (navigateUp)
     navController.navigateUp()

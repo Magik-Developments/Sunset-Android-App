@@ -17,13 +17,13 @@ class MyProfileViewModel @Inject constructor(
     val name = MutableStateFlow("")
     val location = MutableStateFlow("")
 
-    val navigateUp = MutableStateFlow(false) // Fixme: hacer esto bien...
+    val navigateWelcomeScreen = MutableStateFlow(false)
 
     init {
         initUI()
     }
 
-    fun initUI() {
+    private fun initUI() {
         authRepository.getCurrentUser()?.let { user ->
             databaseRepository.getUserByEmail(user.email!!) {
                 username.value = it.username
@@ -35,6 +35,6 @@ class MyProfileViewModel @Inject constructor(
 
     fun logOut() {
         authRepository.logout()
-        navigateUp.value = true
+        navigateWelcomeScreen.value = true
     }
 }

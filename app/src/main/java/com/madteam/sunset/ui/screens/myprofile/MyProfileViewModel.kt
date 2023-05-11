@@ -20,6 +20,10 @@ class MyProfileViewModel @Inject constructor(
     val navigateUp = MutableStateFlow(false) // Fixme: hacer esto bien...
 
     init {
+        initUI()
+    }
+
+    fun initUI() {
         authRepository.getCurrentUser()?.let { user ->
             databaseRepository.getUserByEmail(user.email!!) {
                 username.value = it.username

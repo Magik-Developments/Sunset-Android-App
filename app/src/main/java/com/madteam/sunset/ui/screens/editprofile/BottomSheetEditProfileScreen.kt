@@ -13,6 +13,9 @@ import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -73,6 +76,8 @@ fun BottomSheetEditProfileContent(
   saveData: () -> Unit
 ) {
 
+  var dataHasChanged by remember { mutableStateOf(false) }
+
   Column(
     modifier = Modifier
       .fillMaxSize()
@@ -117,7 +122,10 @@ fun BottomSheetEditProfileContent(
       CustomSpacer(size = 8.dp)
       GenericTextField(
         value = nameValue,
-        onValueChange = { updateName(it) },
+        onValueChange = {
+          updateName(it)
+          dataHasChanged = true
+        },
         hint = R.string.name
       )
       CustomSpacer(size = 16.dp)
@@ -125,7 +133,10 @@ fun BottomSheetEditProfileContent(
       CustomSpacer(size = 8.dp)
       GenericTextField(
         value = locationValue,
-        onValueChange = { updateLocation(it) },
+        onValueChange = {
+          updateLocation(it)
+          dataHasChanged = true
+        },
         hint = R.string.location
       )
       CustomSpacer(size = 16.dp)
@@ -138,7 +149,10 @@ fun BottomSheetEditProfileContent(
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Bottom
     ) {
-      SmallButtonDark(onClick = { saveData() }, text = R.string.save, enabled = true)
+      SmallButtonDark(onClick = {
+        saveData()
+        dataHasChanged = false
+      }, text = R.string.save, enabled = dataHasChanged)
       CustomSpacer(size = 24.dp)
     }
   }

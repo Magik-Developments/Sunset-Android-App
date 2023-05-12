@@ -10,11 +10,13 @@ import androidx.navigation.navArgument
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
+import com.madteam.sunset.navigation.SunsetRoutes.DiscoverScreen
 import com.madteam.sunset.navigation.SunsetRoutes.LostPasswordScreen
 import com.madteam.sunset.navigation.SunsetRoutes.MyProfileScreen
 import com.madteam.sunset.navigation.SunsetRoutes.SignInCard
 import com.madteam.sunset.navigation.SunsetRoutes.SignUpCard
 import com.madteam.sunset.navigation.SunsetRoutes.WelcomeScreen
+import com.madteam.sunset.ui.screens.discover.DiscoverScreen
 import com.madteam.sunset.ui.screens.lostpassword.LostPasswordScreen
 import com.madteam.sunset.ui.screens.myprofile.MyProfileScreen
 import com.madteam.sunset.ui.screens.verifyaccount.VerifyAccountScreen
@@ -63,6 +65,10 @@ fun SunsetNavigation() {
             enterTransition = { slideInVertically(initialOffsetY = { it }, animationSpec = tween(500)) },
             exitTransition = { slideOutVertically(targetOffsetY = { it }, animationSpec = tween(500)) }) {
             LostPasswordScreen(navController)
+        }
+
+        composable(DiscoverScreen.route){
+            DiscoverScreen()
         }
     }
 }

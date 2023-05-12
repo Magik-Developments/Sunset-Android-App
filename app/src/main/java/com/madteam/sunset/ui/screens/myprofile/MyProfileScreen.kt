@@ -67,7 +67,7 @@ fun MyProfileScreen(
     sheetContent = { BottomSheetEditProfileScreen() }
   ) {
     Scaffold(
-      bottomBar = { SunsetBottomNavigation() },
+      bottomBar = { SunsetBottomNavigation(navController) },
       content = { paddingValues ->
         Box(
           modifier = Modifier.padding(paddingValues),

@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "178221002817",
+    "project_id": "sunset-app-maddevs",
+    "storage_bucket": "sunset-app-maddevs.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:178221002817:android:e427071528a332b31056c0",
+        "android_client_info": {
+          "package_name": "com.madteam.sunset"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "178221002817-t2m62tvep1g3ed192si30gtbeuo9lrgg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.madteam.sunset",
+            "certificate_hash": "a74396059be9b105189fcb879596e789e91a3972"
+          }
+        },
+        {
+          "client_id": "178221002817-gjuv15sdjqh178i32qrcvj9hlcio6p39.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA3vj4dIiym6KQyfJgE3rJfHAa8dHgCjno"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "178221002817-gjuv15sdjqh178i32qrcvj9hlcio6p39.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,4 +1,4 @@
-package com.madteam.sunset.ui.screens.discover
+package com.madteam.sunset.ui.screens.home
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
@@ -11,7 +11,7 @@ import androidx.navigation.NavController
 import com.madteam.sunset.ui.common.SunsetBottomNavigation
 
 @Composable
-fun DiscoverScreen(
+fun HomeScreen(
   navController: NavController
 ) {
 
@@ -22,18 +22,18 @@ fun DiscoverScreen(
         modifier = Modifier.padding(paddingValues),
         contentAlignment = Alignment.Center
       ) {
-        DiscoverContent()
+        HomeContent()
       }
     }
   )
 }
 
 @Composable
-fun DiscoverContent() {
+fun HomeContent() {
 }
 
 @Composable
 @Preview
 fun MyProfileScreenPreview() {
-  DiscoverContent()
+  HomeContent()
 }

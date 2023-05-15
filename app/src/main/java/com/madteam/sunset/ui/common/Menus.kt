@@ -28,11 +28,12 @@ fun SunsetBottomNavigation(navController: NavController) {
   val selectedContentColor = Color(0xFF000000)
 
   val items = listOf(
+    SunsetBottomNavItem.Home,
     SunsetBottomNavItem.Discover,
     SunsetBottomNavItem.Profile
   )
 
-  var selected by remember { mutableStateOf(4) }
+  var selected by remember { mutableStateOf(2) }
   BottomNavigation(
     modifier = Modifier
       .height(84.dp)
@@ -52,8 +53,7 @@ fun SunsetBottomNavigation(navController: NavController) {
       BottomNavigationItem(
         selected = currentRoute == item.route,
         onClick = {
-          selected = 2
-          navController.navigate(SunsetRoutes.DiscoverScreen.route) {
+          navController.navigate(item.route) {
             navController.graph.startDestinationRoute?.let { screen_route ->
               popUpTo(screen_route) {
                 saveState = true

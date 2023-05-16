@@ -1,7 +1,9 @@
 package com.madteam.sunset.ui.common
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
@@ -12,6 +14,7 @@ import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -80,6 +83,27 @@ fun CloseIconButton(
       imageVector = Icons.Outlined.Close,
       contentDescription = "",
       modifier = Modifier.size(24.dp)
+    )
+  }
+}
+
+@Composable
+fun RoundedCloseIconButton(
+  onClick: () -> Unit
+) {
+  IconButton(
+    onClick = onClick, modifier = Modifier
+      .size(24.dp)
+      .background(Color(0x80000000), RoundedCornerShape(50.dp))
+      .clip(
+        RoundedCornerShape(50.dp)
+      )
+  ) {
+    Icon(
+      imageVector = Icons.Outlined.Close,
+      contentDescription = "",
+      modifier = Modifier.size(24.dp),
+      tint = Color.White
     )
   }
 }

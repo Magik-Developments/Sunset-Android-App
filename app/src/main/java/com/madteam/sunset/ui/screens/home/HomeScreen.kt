@@ -40,51 +40,8 @@ fun HomeScreen(
 }
 
 @Composable
-fun HomeContent() {
-  LazyColumn(
-    modifier = Modifier.padding(top = 24.dp),
-    verticalArrangement = Arrangement.spacedBy(16.dp),
-    horizontalAlignment = Alignment.CenterHorizontally
-  ) {
-    items(getSpots()) { spot ->
-      ItemSpot(spot = spot)
-    }
-  }
-}
+fun HomeContent(){
 
-@OptIn(ExperimentalGlideComposeApi::class)
-@Composable
-fun ItemSpot(spot: Spot) {
-  Card(elevation = 4.dp) {
-    GlideImage(
-      model = spot.image,
-      contentDescription = "",
-      modifier = Modifier
-        .width(346.dp)
-        .height(378.dp),
-      contentScale = ContentScale.Crop
-    )
-  }
-}
-
-fun getSpots(): List<Spot> {
-  return listOf(
-    Spot(
-      "Sant Jeroni",
-      "Montserrat, Manresa.",
-      "https://live.staticflickr.com/65535/49373147057_7b1272acbf_b.jpg"
-    ),
-    Spot(
-      "Far de formentor",
-      "Formentor, Mallorca.",
-      "https://cs-static-pro.s3.amazonaws.com/cobi%2Fmedia%2Fpollensa.com%2Fcache%2F2c%2F60%2F2c60d1d8041179db4b033246554bd091.jpg"
-    ),
-    Spot(
-      "Miami Beach",
-      "Miami, FL. USA",
-      "https://www.sobeachtours.com/wp-content/uploads/2022/06/sunset-miami.jpg"
-    )
-  )
 }
 
 @Composable

@@ -188,15 +188,6 @@ fun DiscoverContent(
         },
         {
             "featureType": "poi",
-            "elementType": "geometry.fill",
-            "stylers": [
-                {
-                    "color": "#D8D8D8"
-                }
-            ]
-        },
-        {
-            "featureType": "poi",
             "elementType": "labels.icon",
             "stylers": [
                 {

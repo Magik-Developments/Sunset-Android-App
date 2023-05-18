@@ -15,7 +15,7 @@ class CustomClusterRenderer(
   DefaultClusterRenderer<ZoneClusterItem>(context, map, clusterManager) {
 
   override fun onBeforeClusterItemRendered(item: ZoneClusterItem, markerOptions: MarkerOptions) {
-    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
+    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN))
   }
 
 }

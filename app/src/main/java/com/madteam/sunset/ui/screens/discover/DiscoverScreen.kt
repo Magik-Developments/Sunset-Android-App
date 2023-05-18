@@ -1,6 +1,12 @@
 package com.madteam.sunset.ui.screens.discover
 
 import android.content.Context
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,6 +20,8 @@ import androidx.compose.material.Card
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,6 +36,7 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapEffect
 import com.google.maps.android.compose.MapProperties
@@ -53,6 +62,11 @@ fun DiscoverScreen(
 
   val mapState = viewModel.mapState.value
   val selectedCluster = viewModel.selectedCluster.value
+  val isVisibleState = remember { MutableTransitionState(false) }
+
+  SideEffect {
+    isVisibleState.targetState = selectedCluster != null
+  }
 
   Scaffold(
     bottomBar = { SunsetBottomNavigation(navController) },
@@ -76,7 +90,20 @@ fun DiscoverScreen(
               .align(Alignment.BottomCenter)
               .padding(24.dp)
           ) {
-            TestSelectedComposable(selectedCluster) { viewModel.selectedCluster.value = null }
+            AnimatedVisibility(
+              visibleState = isVisibleState,
+              enter = slideInVertically(initialOffsetY = { it }, animationSpec = tween(500)),
+              exit = slideOutVertically(
+                targetOffsetY = { it },
+                animationSpec = tween(500)
+              ) + fadeOut(
+                animationSpec = tween(
+                  durationMillis = 300
+                )
+              )
+            ) {
+              TestSelectedComposable(selectedCluster) { viewModel.selectedCluster.value = null }
+            }
           }
         }
 
@@ -130,8 +157,61 @@ fun DiscoverContent(
   onClusterClicked: (ZoneClusterItem) -> Unit
 ) {
 
+  val styleJson = """
+    [
+        {
+            "featureType": "poi",
+            "elementType": "labels",
+            "stylers": [
+                {
+                    "visibility": "off"
+                }
+            ]
+        },
+        {
+            "featureType": "road",
+            "elementType": "labels",
+            "stylers": [
+                {
+                    "visibility": "off"
+                }
+            ]
+        },
+        {
+            "featureType": "water",
+            "elementType": "geometry",
+            "stylers": [
+                {
+                    "color": "#CDE2F0"
+                }
+            ]
+        },
+        {
+            "featureType": "poi",
+            "elementType": "geometry.fill",
+            "stylers": [
+                {
+                    "color": "#D8D8D8"
+                }
+            ]
+        },
+        {
+            "featureType": "poi",
+            "elementType": "labels.icon",
+            "stylers": [
+                {
+                    "visibility": "off"
+                }
+            ]
+        }
+    ]
+""".trimIndent()
+
   val context = LocalContext.current
-  val mapProperties = MapProperties(isMyLocationEnabled = mapState.lastKnownLocation != null)
+  val mapProperties = MapProperties(
+    isMyLocationEnabled = mapState.lastKnownLocation != null,
+    mapStyleOptions = MapStyleOptions(styleJson)
+  )
   val cameraPositionState = rememberCameraPositionState()
 
   GoogleMap(

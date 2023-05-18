@@ -10,6 +10,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.madteam.sunset.utils.googlemaps.MapState
+import com.madteam.sunset.utils.googlemaps.clusters.CustomClusterRenderer
 import com.madteam.sunset.utils.googlemaps.clusters.ZoneClusterItem
 import com.madteam.sunset.utils.googlemaps.clusters.ZoneClusterManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -67,10 +68,12 @@ class DiscoverViewModel @Inject constructor() : ViewModel() {
     map: GoogleMap,
   ): ZoneClusterManager {
     val clusterManager = ZoneClusterManager(context, map)
+    val clusterRenderer = CustomClusterRenderer(context, map, clusterManager)
     clusterManager.addItems(mapState.value.clusterItems)
     clusterManager.setOnClusterClickedListener { clusterItem ->
       selectedCluster.value = clusterItem
     }
+    clusterManager.renderer = clusterRenderer
     return clusterManager
   }
 

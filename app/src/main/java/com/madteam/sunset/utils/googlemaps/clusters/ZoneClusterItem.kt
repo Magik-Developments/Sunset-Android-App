@@ -7,7 +7,7 @@ data class ZoneClusterItem(
   val id: String,
   private val title: String,
   private val snippet: String,
-  val markerPosition: LatLng
+  val markerPosition: LatLng,
 ) : ClusterItem {
 
   override fun getSnippet() = snippet

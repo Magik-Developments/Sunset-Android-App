@@ -36,134 +36,134 @@ import com.madteam.sunset.utils.googlemaps.clusters.ZoneClusterManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-const val MAP_PADDING = 20
+const val MAP_PADDING = 200
 
 @Composable
 fun DiscoverScreen(
-  navController: NavController,
-  viewModel: DiscoverViewModel = hiltViewModel()
+    navController: NavController,
+    viewModel: DiscoverViewModel = hiltViewModel()
 ) {
 
-  val mapState by viewModel.mapState.collectAsStateWithLifecycle()
-  val selectedCluster by viewModel.selectedCluster.collectAsStateWithLifecycle()
+    val mapState by viewModel.mapState.collectAsStateWithLifecycle()
+    val selectedCluster by viewModel.selectedCluster.collectAsStateWithLifecycle()
 
-  Scaffold(
-    bottomBar = { SunsetBottomNavigation(navController) },
-    content = { paddingValues ->
-      Box(
-        modifier = Modifier.padding(paddingValues),
-        contentAlignment = Alignment.Center
-      ) {
-        DiscoverContent(
-          mapState = mapState,
-          selectedCluster = { clusterItem ->
-            viewModel.selectedCluster.value = clusterItem
-          },
-          calculateZoneViewCenter = viewModel::calculateZoneLatLngBounds
-        )
+    Scaffold(
+        bottomBar = { SunsetBottomNavigation(navController) },
+        content = { paddingValues ->
+            Box(
+                modifier = Modifier.padding(paddingValues),
+                contentAlignment = Alignment.Center
+            ) {
+                DiscoverContent(
+                    mapState = mapState,
+                    selectedCluster = { clusterItem ->
+                        viewModel.selectedCluster.value = clusterItem
+                    },
+                    calculateZoneViewCenter = viewModel::calculateZoneLatLngBounds
+                )
 
-        if (selectedCluster != null) {
-          Box(
-            modifier = Modifier
-              .align(Alignment.BottomCenter)
-              .padding(24.dp)
-          ) {
-            SpotClusterInfo(selectedCluster!!) { viewModel.selectedCluster.value = null }
-          }
+                if (selectedCluster != null) {
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(24.dp)
+                    ) {
+                        SpotClusterInfo(selectedCluster!!) { viewModel.selectedCluster.value = null }
+                    }
+                }
+
+            }
         }
-
-      }
-    }
-  )
+    )
 }
 
 @Composable
 fun DiscoverContent(
-  mapState: MapState,
-  selectedCluster: (SpotClusterItem) -> Unit,
-  calculateZoneViewCenter: () -> LatLngBounds
+    mapState: MapState,
+    selectedCluster: (SpotClusterItem) -> Unit,
+    calculateZoneViewCenter: () -> LatLngBounds
 ) {
-  val context = LocalContext.current
-  val styleJson = remember {
-    val inputStream = context.resources.openRawResource(R.raw.map_style)
-    val json = inputStream.bufferedReader().use { it.readText() }
-    json
-  }
-  val mapProperties = MapProperties(
-    isMyLocationEnabled = mapState.lastKnownLocation != null,
-    mapStyleOptions = MapStyleOptions(styleJson)
-  )
-  val cameraPositionState = rememberCameraPositionState()
-
-  GoogleMap(
-    modifier = Modifier.fillMaxSize(),
-    properties = mapProperties,
-    cameraPositionState = cameraPositionState,
-    uiSettings = MapUiSettings()
-  ) {
-
-    SetupClusterManagerAndRenderers(
-      mapState = mapState,
-      selectedCluster = selectedCluster,
-      calculateZoneViewCenter = calculateZoneViewCenter,
-      cameraPositionState = cameraPositionState
+    val context = LocalContext.current
+    val styleJson = remember {
+        val inputStream = context.resources.openRawResource(R.raw.map_style)
+        val json = inputStream.bufferedReader().use { it.readText() }
+        json
+    }
+    val mapProperties = MapProperties(
+        isMyLocationEnabled = mapState.lastKnownLocation != null,
+        mapStyleOptions = MapStyleOptions(styleJson)
     )
+    val cameraPositionState = rememberCameraPositionState()
 
-  }
+    GoogleMap(
+        modifier = Modifier.fillMaxSize(),
+        properties = mapProperties,
+        cameraPositionState = cameraPositionState,
+        uiSettings = MapUiSettings()
+    ) {
+
+        SetupClusterManagerAndRenderers(
+            mapState = mapState,
+            selectedCluster = selectedCluster,
+            calculateZoneViewCenter = calculateZoneViewCenter,
+            cameraPositionState = cameraPositionState
+        )
+
+    }
 }
 
 @SuppressLint("PotentialBehaviorOverride")
 @OptIn(MapsComposeExperimentalApi::class)
 @Composable
 private fun SetupClusterManagerAndRenderers(
-  mapState: MapState,
-  selectedCluster: (SpotClusterItem) -> Unit,
-  calculateZoneViewCenter: () -> LatLngBounds,
-  cameraPositionState: CameraPositionState
+    mapState: MapState,
+    selectedCluster: (SpotClusterItem) -> Unit,
+    calculateZoneViewCenter: () -> LatLngBounds,
+    cameraPositionState: CameraPositionState
 ) {
 
-  val context = LocalContext.current
-  val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
-  MapEffect(mapState.clusterItems) { map ->
-    if (mapState.clusterItems.isNotEmpty()) {
-      val clusterManager = ZoneClusterManager(context, map)
-      val clusterRenderer = CustomClusterRenderer(context, map, clusterManager)
-      clusterManager.addItems(mapState.clusterItems)
+    MapEffect(mapState.clusterItems) { map ->
+        if (mapState.clusterItems.isNotEmpty()) {
+            val clusterManager = ZoneClusterManager(context, map)
+            val clusterRenderer = CustomClusterRenderer(context, map, clusterManager)
+            clusterManager.addItems(mapState.clusterItems)
 
-      clusterManager.setOnClusterClickedListener { clusterItem ->
-        selectedCluster(clusterItem)
-      }
+            clusterManager.setOnClusterClickedListener { clusterItem ->
+                selectedCluster(clusterItem)
+            }
 
-      clusterManager.renderer = clusterRenderer
-      map.setOnCameraIdleListener(clusterManager)
-      map.setOnMarkerClickListener(clusterManager)
-      clusterManager.setOnClusterClickListener { cluster ->
-        val clusterItem = cluster.items.firstOrNull()
-        clusterItem?.let { selectedCluster(it) }
-        true
-      }
+            clusterManager.renderer = clusterRenderer
+            map.setOnCameraIdleListener(clusterManager)
+            map.setOnMarkerClickListener(clusterManager)
+            clusterManager.setOnClusterClickListener { cluster ->
+                val clusterItem = cluster.items.firstOrNull()
+                clusterItem?.let { selectedCluster(it) }
+                true
+            }
+        }
+        map.setupMapInteractions(mapState, calculateZoneViewCenter, scope, cameraPositionState)
     }
-    map.setupMapInteractions(mapState, calculateZoneViewCenter, scope, cameraPositionState)
-  }
 }
 
 private fun GoogleMap.setupMapInteractions(
-  mapState: MapState,
-  calculateZoneViewCenter: () -> LatLngBounds,
-  scope: CoroutineScope,
-  cameraPositionState: CameraPositionState
+    mapState: MapState,
+    calculateZoneViewCenter: () -> LatLngBounds,
+    scope: CoroutineScope,
+    cameraPositionState: CameraPositionState
 ) {
-  setOnMapLoadedCallback {
-    if (mapState.clusterItems.isNotEmpty()) {
-      scope.launch {
-        cameraPositionState.animate(
-          update = CameraUpdateFactory.newLatLngBounds(
-            calculateZoneViewCenter(),
-            MAP_PADDING
-          )
-        )
-      }
+    setOnMapLoadedCallback {
+        if (mapState.clusterItems.isNotEmpty()) {
+            scope.launch {
+                cameraPositionState.animate(
+                    update = CameraUpdateFactory.newLatLngBounds(
+                        calculateZoneViewCenter(),
+                        MAP_PADDING
+                    )
+                )
+            }
+        }
     }
-  }
 }

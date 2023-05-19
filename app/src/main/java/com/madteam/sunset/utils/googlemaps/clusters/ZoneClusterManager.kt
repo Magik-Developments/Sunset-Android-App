@@ -8,7 +8,7 @@ import com.google.maps.android.collections.MarkerManager
 class ZoneClusterManager(
   context: Context,
   googleMap: GoogleMap,
-): ClusterManager<ZoneClusterItem>(context, googleMap, MarkerManager(googleMap)) {
+) : ClusterManager<SpotClusterItem>(context, googleMap, MarkerManager(googleMap)) {
   init {
     setOnClusterClickListener { cluster ->
       val clusterItem = cluster.items.firstOrNull()
@@ -22,10 +22,9 @@ class ZoneClusterManager(
     }
   }
 
-  private var onClusterClicked: (ZoneClusterItem) -> Unit = {}
+  private var onClusterClicked: (SpotClusterItem) -> Unit = {}
 
-  fun setOnClusterClickedListener(listener: (ZoneClusterItem) -> Unit) {
+  fun setOnClusterClickedListener(listener: (SpotClusterItem) -> Unit) {
     onClusterClicked = listener
   }
-
 }

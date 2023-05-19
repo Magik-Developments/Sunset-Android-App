@@ -21,6 +21,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -30,6 +31,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
@@ -48,7 +50,7 @@ import com.madteam.sunset.ui.common.SunsetBottomNavigation
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineS
 import com.madteam.sunset.ui.theme.secondaryRegularBodyL
 import com.madteam.sunset.utils.googlemaps.MapState
-import com.madteam.sunset.utils.googlemaps.clusters.ZoneClusterItem
+import com.madteam.sunset.utils.googlemaps.clusters.SpotClusterItem
 import com.madteam.sunset.utils.googlemaps.clusters.ZoneClusterManager
 import kotlinx.coroutines.launch
 
@@ -60,9 +62,9 @@ fun DiscoverScreen(
   viewModel: DiscoverViewModel = hiltViewModel()
 ) {
 
-  val mapState = viewModel.mapState.value
+  val mapState by viewModel.mapState.collectAsStateWithLifecycle()
   val selectedCluster = viewModel.selectedCluster.value
-  val isVisibleState = remember { MutableTransitionState(false) }
+  val isVisibleState = remember { MutableTransitionState(selectedCluster != null) }
 
   SideEffect {
     isVisibleState.targetState = selectedCluster != null
@@ -113,7 +115,7 @@ fun DiscoverScreen(
 }
 
 @OptIn(ExperimentalGlideComposeApi::class)
-@Composable fun TestSelectedComposable(selectedCluster: ZoneClusterItem, onClose: () -> Unit) {
+@Composable fun TestSelectedComposable(selectedCluster: SpotClusterItem, onClose: () -> Unit) {
   Card(
     modifier = Modifier
       .fillMaxWidth()
@@ -142,7 +144,7 @@ fun DiscoverScreen(
           .padding(8.dp)
       ) {
         Text(text = selectedCluster.title, style = primaryBoldHeadlineS)
-        Text(text = selectedCluster.snippet, style = secondaryRegularBodyL)
+        Text(text = "Lorem ipsum", style = secondaryRegularBodyL)
       }
     }
   }
@@ -154,7 +156,7 @@ fun DiscoverContent(
   mapState: MapState,
   setupClusterManager: (Context, GoogleMap) -> ZoneClusterManager,
   calculateZoneViewCenter: () -> LatLngBounds,
-  onClusterClicked: (ZoneClusterItem) -> Unit
+  onClusterClicked: (SpotClusterItem) -> Unit
 ) {
 
   val styleJson = """

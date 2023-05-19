@@ -21,30 +21,6 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    private val requestPermissionLauncher =
-        registerForActivityResult(
-            ActivityResultContracts.RequestPermission()
-        ) { isGranted: Boolean ->
-            if (isGranted) {
-                discoverViewModel.getDeviceLocation(fusedLocationProviderClient)
-            }
-        }
-
-    private fun askPermissions() = when (PackageManager.PERMISSION_GRANTED) {
-      ContextCompat.checkSelfPermission(
-          this,
-          ACCESS_FINE_LOCATION
-      ) -> {
-          discoverViewModel.getDeviceLocation(fusedLocationProviderClient)
-      }
-      else -> {
-          requestPermissionLauncher.launch(ACCESS_FINE_LOCATION)
-      }
-    }
-
-    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
-    private val discoverViewModel: DiscoverViewModel by viewModels()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {

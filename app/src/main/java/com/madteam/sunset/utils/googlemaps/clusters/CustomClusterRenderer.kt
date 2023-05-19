@@ -12,9 +12,9 @@ class CustomClusterRenderer(
   map: GoogleMap,
   clusterManager: ZoneClusterManager
 ) :
-  DefaultClusterRenderer<ZoneClusterItem>(context, map, clusterManager) {
+  DefaultClusterRenderer<SpotClusterItem>(context, map, clusterManager) {
 
-  override fun onBeforeClusterItemRendered(item: ZoneClusterItem, markerOptions: MarkerOptions) {
+  override fun onBeforeClusterItemRendered(item: SpotClusterItem, markerOptions: MarkerOptions) {
     markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN))
   }
 

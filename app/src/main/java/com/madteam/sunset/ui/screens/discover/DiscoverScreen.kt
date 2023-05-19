@@ -1,5 +1,6 @@
 package com.madteam.sunset.ui.screens.discover
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -16,8 +17,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MapStyleOptions
+import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapEffect
 import com.google.maps.android.compose.MapProperties
@@ -30,6 +33,7 @@ import com.madteam.sunset.ui.common.SunsetBottomNavigation
 import com.madteam.sunset.utils.googlemaps.MapState
 import com.madteam.sunset.utils.googlemaps.clusters.CustomClusterRenderer
 import com.madteam.sunset.utils.googlemaps.clusters.ZoneClusterManager
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 const val MAP_PADDING = 20
@@ -73,7 +77,6 @@ fun DiscoverScreen(
   )
 }
 
-@OptIn(MapsComposeExperimentalApi::class)
 @Composable
 fun DiscoverContent(
   mapState: MapState,
@@ -99,36 +102,67 @@ fun DiscoverContent(
     uiSettings = MapUiSettings()
   ) {
 
-    val scope = rememberCoroutineScope()
+    SetupClusterManagerAndRenderers(
+      mapState = mapState,
+      selectedCluster = selectedCluster,
+      calculateZoneViewCenter = calculateZoneViewCenter,
+      cameraPositionState = cameraPositionState
+    )
 
-    MapEffect(mapState.clusterItems) { map ->
-      if (mapState.clusterItems.isNotEmpty()) {
-        val clusterManager = ZoneClusterManager(context, map)
-        val clusterRenderer = CustomClusterRenderer(context, map, clusterManager)
-        clusterManager.addItems(mapState.clusterItems)
-        clusterManager.setOnClusterClickedListener { clusterItem ->
-          selectedCluster(clusterItem)
-        }
-        clusterManager.renderer = clusterRenderer
-        map.setOnCameraIdleListener(clusterManager)
-        map.setOnMarkerClickListener(clusterManager)
-        clusterManager.setOnClusterClickListener { cluster ->
-          val clusterItem = cluster.items.firstOrNull()
-          clusterItem?.let { selectedCluster(it) }
-          true
-        }
-        map.setOnMapLoadedCallback {
-          if (mapState.clusterItems.isNotEmpty()) {
-            scope.launch {
-              cameraPositionState.animate(
-                update = CameraUpdateFactory.newLatLngBounds(
-                  calculateZoneViewCenter(),
-                  MAP_PADDING
-                )
-              )
-            }
-          }
-        }
+  }
+}
+
+@SuppressLint("PotentialBehaviorOverride")
+@OptIn(MapsComposeExperimentalApi::class)
+@Composable
+private fun SetupClusterManagerAndRenderers(
+  mapState: MapState,
+  selectedCluster: (SpotClusterItem) -> Unit,
+  calculateZoneViewCenter: () -> LatLngBounds,
+  cameraPositionState: CameraPositionState
+) {
+
+  val context = LocalContext.current
+  val scope = rememberCoroutineScope()
+
+  MapEffect(mapState.clusterItems) { map ->
+    if (mapState.clusterItems.isNotEmpty()) {
+      val clusterManager = ZoneClusterManager(context, map)
+      val clusterRenderer = CustomClusterRenderer(context, map, clusterManager)
+      clusterManager.addItems(mapState.clusterItems)
+
+      clusterManager.setOnClusterClickedListener { clusterItem ->
+        selectedCluster(clusterItem)
+      }
+
+      clusterManager.renderer = clusterRenderer
+      map.setOnCameraIdleListener(clusterManager)
+      map.setOnMarkerClickListener(clusterManager)
+      clusterManager.setOnClusterClickListener { cluster ->
+        val clusterItem = cluster.items.firstOrNull()
+        clusterItem?.let { selectedCluster(it) }
+        true
+      }
+    }
+    map.setupMapInteractions(mapState, calculateZoneViewCenter, scope, cameraPositionState)
+  }
+}
+
+private fun GoogleMap.setupMapInteractions(
+  mapState: MapState,
+  calculateZoneViewCenter: () -> LatLngBounds,
+  scope: CoroutineScope,
+  cameraPositionState: CameraPositionState
+) {
+  setOnMapLoadedCallback {
+    if (mapState.clusterItems.isNotEmpty()) {
+      scope.launch {
+        cameraPositionState.animate(
+          update = CameraUpdateFactory.newLatLngBounds(
+            calculateZoneViewCenter(),
+            MAP_PADDING
+          )
+        )
       }
     }
   }

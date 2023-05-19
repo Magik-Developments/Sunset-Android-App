@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLngBounds
 import com.madteam.sunset.repositories.DatabaseRepository
 import com.madteam.sunset.utils.googlemaps.MapState
-import com.madteam.sunset.utils.googlemaps.clusters.SpotClusterItem
+import com.madteam.sunset.model.SpotClusterItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch

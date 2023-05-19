@@ -1,4 +1,4 @@
-package com.madteam.sunset.utils.googlemaps.clusters
+package com.madteam.sunset.model
 
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.firestore.GeoPoint

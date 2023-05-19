@@ -3,9 +3,9 @@ package com.madteam.sunset.utils.googlemaps.clusters
 import android.content.Context
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.maps.android.clustering.view.DefaultClusterRenderer
+import com.madteam.sunset.model.SpotClusterItem
 
 class CustomClusterRenderer(
   context: Context,

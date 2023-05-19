@@ -43,11 +43,11 @@ import com.madteam.sunset.ui.theme.primaryBoldHeadlineS
 import com.madteam.sunset.ui.theme.secondaryRegularBodyL
 import com.madteam.sunset.utils.googlemaps.MapState
 import com.madteam.sunset.utils.googlemaps.clusters.CustomClusterRenderer
-import com.madteam.sunset.utils.googlemaps.clusters.SpotClusterItem
+import com.madteam.sunset.model.SpotClusterItem
 import com.madteam.sunset.utils.googlemaps.clusters.ZoneClusterManager
 import kotlinx.coroutines.launch
 
-const val MAP_PADDING = 0
+const val MAP_PADDING = 20
 
 @Composable
 fun DiscoverScreen(

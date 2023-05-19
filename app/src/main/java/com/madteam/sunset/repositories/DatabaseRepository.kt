@@ -3,7 +3,7 @@ package com.madteam.sunset.repositories
 import com.google.firebase.firestore.FirebaseFirestore
 import com.madteam.sunset.model.UserProfile
 import com.madteam.sunset.utils.Resource
-import com.madteam.sunset.utils.googlemaps.clusters.SpotClusterItem
+import com.madteam.sunset.model.SpotClusterItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow

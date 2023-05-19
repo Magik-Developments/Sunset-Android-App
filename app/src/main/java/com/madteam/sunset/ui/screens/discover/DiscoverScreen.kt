@@ -1,12 +1,6 @@
 package com.madteam.sunset.ui.screens.discover
 
 import android.content.Context
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,9 +14,7 @@ import androidx.compose.material.Card
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,6 +42,7 @@ import com.madteam.sunset.ui.common.SunsetBottomNavigation
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineS
 import com.madteam.sunset.ui.theme.secondaryRegularBodyL
 import com.madteam.sunset.utils.googlemaps.MapState
+import com.madteam.sunset.utils.googlemaps.clusters.CustomClusterRenderer
 import com.madteam.sunset.utils.googlemaps.clusters.SpotClusterItem
 import com.madteam.sunset.utils.googlemaps.clusters.ZoneClusterManager
 import kotlinx.coroutines.launch
@@ -63,12 +56,7 @@ fun DiscoverScreen(
 ) {
 
   val mapState by viewModel.mapState.collectAsStateWithLifecycle()
-  val selectedCluster = viewModel.selectedCluster.value
-  val isVisibleState = remember { MutableTransitionState(selectedCluster != null) }
-
-  SideEffect {
-    isVisibleState.targetState = selectedCluster != null
-  }
+  val selectedCluster by viewModel.selectedCluster.collectAsStateWithLifecycle()
 
   Scaffold(
     bottomBar = { SunsetBottomNavigation(navController) },
@@ -79,7 +67,9 @@ fun DiscoverScreen(
       ) {
         DiscoverContent(
           mapState = mapState,
-          setupClusterManager = viewModel::setupClusterManager,
+          selectedCluster = { clusterItem ->
+            viewModel.selectedCluster.value = clusterItem
+          },
           calculateZoneViewCenter = viewModel::calculateZoneLatLngBounds,
           onClusterClicked = { clusterItem ->
             viewModel.selectedCluster.value = clusterItem
@@ -92,20 +82,7 @@ fun DiscoverScreen(
               .align(Alignment.BottomCenter)
               .padding(24.dp)
           ) {
-            AnimatedVisibility(
-              visibleState = isVisibleState,
-              enter = slideInVertically(initialOffsetY = { it }, animationSpec = tween(500)),
-              exit = slideOutVertically(
-                targetOffsetY = { it },
-                animationSpec = tween(500)
-              ) + fadeOut(
-                animationSpec = tween(
-                  durationMillis = 300
-                )
-              )
-            ) {
-              TestSelectedComposable(selectedCluster) { viewModel.selectedCluster.value = null }
-            }
+            TestSelectedComposable(selectedCluster!!) { viewModel.selectedCluster.value = null }
           }
         }
 
@@ -154,7 +131,7 @@ fun DiscoverScreen(
 @Composable
 fun DiscoverContent(
   mapState: MapState,
-  setupClusterManager: (Context, GoogleMap) -> ZoneClusterManager,
+  selectedCluster: (SpotClusterItem) -> Unit,
   calculateZoneViewCenter: () -> LatLngBounds,
   onClusterClicked: (SpotClusterItem) -> Unit
 ) {
@@ -215,9 +192,16 @@ fun DiscoverContent(
   ) {
 
     val scope = rememberCoroutineScope()
+
     MapEffect(mapState.clusterItems) { map ->
       if (mapState.clusterItems.isNotEmpty()) {
-        val clusterManager = setupClusterManager(context, map)
+        val clusterManager = ZoneClusterManager(context, map)
+        val clusterRenderer = CustomClusterRenderer(context, map, clusterManager)
+        clusterManager.addItems(mapState.clusterItems)
+        clusterManager.setOnClusterClickedListener { clusterItem ->
+          selectedCluster(clusterItem)
+        }
+        clusterManager.renderer = clusterRenderer
         map.setOnCameraIdleListener(clusterManager)
         map.setOnMarkerClickListener(clusterManager)
         clusterManager.setOnClusterClickListener { cluster ->
@@ -241,3 +225,7 @@ fun DiscoverContent(
     }
   }
 }
+
+@Composable
+fun getClusterManager(context: Context, map: GoogleMap): ZoneClusterManager =
+  ZoneClusterManager(context, map)

@@ -76,9 +76,9 @@ fun DiscoverScreen(
                             animationSpec = tween(durationMillis = ANIMATION_DURATION_IN_MILLIS)
                         )
                     ) {
-                            SpotClusterInfo(selectedCluster) {
-                                viewModel.setSelectedCluster(null)
-                            }
+                        SpotClusterInfo(selectedCluster) {
+                            viewModel.setSelectedCluster(null)
+                        }
                     }
                 }
             }

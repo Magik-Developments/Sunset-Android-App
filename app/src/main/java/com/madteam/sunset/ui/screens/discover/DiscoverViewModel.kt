@@ -2,7 +2,6 @@ package com.madteam.sunset.ui.screens.discover
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.android.gms.maps.model.LatLngBounds
 import com.madteam.sunset.model.SpotClusterItem
 import com.madteam.sunset.repositories.DatabaseRepository
 import com.madteam.sunset.utils.googlemaps.MapState
@@ -28,13 +27,5 @@ class DiscoverViewModel @Inject constructor(
                 _mapState.value = _mapState.value.copy(clusterItems = spots)
             }
         }
-    }
-
-    fun calculateZoneLatLngBounds(): LatLngBounds {
-        val builder = LatLngBounds.builder()
-        for (clusterItem in mapState.value.clusterItems) {
-            builder.include(clusterItem.position)
-        }
-        return builder.build()
     }
 }

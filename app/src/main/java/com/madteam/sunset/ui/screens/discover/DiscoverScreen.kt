@@ -18,7 +18,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
@@ -58,8 +57,7 @@ fun DiscoverScreen(
                     mapState = mapState,
                     selectedCluster = { clusterItem ->
                         viewModel.selectedCluster.value = clusterItem
-                    },
-                    calculateZoneViewCenter = viewModel::calculateZoneLatLngBounds
+                    }
                 )
 
                 if (selectedCluster != null) {
@@ -81,7 +79,6 @@ fun DiscoverScreen(
 fun DiscoverContent(
     mapState: MapState,
     selectedCluster: (SpotClusterItem) -> Unit,
-    calculateZoneViewCenter: () -> LatLngBounds
 ) {
     val cameraPositionState = rememberCameraPositionState()
 
@@ -94,7 +91,6 @@ fun DiscoverContent(
         SetupClusterManagerAndRenderers(
             mapState = mapState,
             selectedCluster = selectedCluster,
-            calculateZoneViewCenter = calculateZoneViewCenter,
             cameraPositionState = cameraPositionState
         )
     }
@@ -125,7 +121,6 @@ private fun setMapProperties(mapState: MapState): MapProperties {
 private fun SetupClusterManagerAndRenderers(
     mapState: MapState,
     selectedCluster: (SpotClusterItem) -> Unit,
-    calculateZoneViewCenter: () -> LatLngBounds,
     cameraPositionState: CameraPositionState
 ) {
 
@@ -151,13 +146,12 @@ private fun SetupClusterManagerAndRenderers(
                 true
             }
         }
-        map.setupMapInteractions(mapState, calculateZoneViewCenter, scope, cameraPositionState)
+        map.setupMapInteractions(mapState, scope, cameraPositionState)
     }
 }
 
 private fun GoogleMap.setupMapInteractions(
     mapState: MapState,
-    calculateZoneViewCenter: () -> LatLngBounds,
     scope: CoroutineScope,
     cameraPositionState: CameraPositionState
 ) {
@@ -166,7 +160,7 @@ private fun GoogleMap.setupMapInteractions(
             scope.launch {
                 cameraPositionState.animate(
                     update = CameraUpdateFactory.newLatLngBounds(
-                        calculateZoneViewCenter(),
+                        mapState.getBounds(),
                         MAP_PADDING
                     )
                 )

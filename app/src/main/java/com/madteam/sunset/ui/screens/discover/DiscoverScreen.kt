@@ -38,7 +38,6 @@ import kotlinx.coroutines.launch
 
 const val MAP_PADDING = 200
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun DiscoverScreen(
     navController: NavController,
@@ -58,7 +57,7 @@ fun DiscoverScreen(
                 DiscoverContent(
                     mapState = mapState,
                     selectedCluster = { clusterItem ->
-                        viewModel.selectedCluster.value = clusterItem
+                        viewModel.setSelectedCluster(clusterItem)
                     }
                 )
                 Box(
@@ -74,7 +73,7 @@ fun DiscoverScreen(
                     ) {
                         if (selectedCluster != null) {
                             SpotClusterInfo(selectedCluster!!) {
-                                viewModel.selectedCluster.value = null
+                                viewModel.setSelectedCluster(null)
                             }
                         }
                     }

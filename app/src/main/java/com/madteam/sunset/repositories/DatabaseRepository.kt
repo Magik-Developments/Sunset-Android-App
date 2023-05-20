@@ -3,6 +3,7 @@ package com.madteam.sunset.repositories
 import com.google.firebase.firestore.FirebaseFirestore
 import com.madteam.sunset.model.UserProfile
 import com.madteam.sunset.utils.Resource
+import com.madteam.sunset.model.SpotClusterItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
@@ -11,6 +12,8 @@ import java.util.Calendar
 import javax.inject.Inject
 
 private const val USERS_COLLECTION_PATH = "users"
+private const val SPOTS_LOCATIONS_COLLECTION_PATH = "spots_locations"
+private const val SPOTS_COLLECTION_PATH = "spots"
 
 class DatabaseRepository @Inject constructor(
   private val firebaseFirestore: FirebaseFirestore
@@ -70,6 +73,28 @@ class DatabaseRepository @Inject constructor(
   }.catch {
     emit(Resource.Error(it.message.toString()))
   }
+
+  override fun getSpotsLocations(): Flow<List<SpotClusterItem>> = flow {
+    try {
+      val spotCollection =
+        firebaseFirestore.collection(SPOTS_LOCATIONS_COLLECTION_PATH).get().await()
+      val spotList = spotCollection.documents.mapNotNull { document ->
+        val id = document.id
+        val name = document.getString("name")
+        val location = document.getGeoPoint("location")
+        val spot = document.getDocumentReference("spot")
+
+        if (name != null && location != null && spot != null) {
+          SpotClusterItem(id = id, name = name, spot = spot.toString(), location = location)
+        } else {
+          null
+        }
+      }
+      emit(spotList)
+    } catch (e: Exception) {
+      emit(emptyList())
+    }
+  }
 }
 
 interface DatabaseContract {
@@ -77,4 +102,5 @@ interface DatabaseContract {
   fun createUser(email: String, username: String, provider: String): Flow<Resource<String>>
   fun getUserByEmail(email: String, userProfileCallback: (UserProfile) -> Unit)
   fun updateUser(user: UserProfile): Flow<Resource<String>>
+  fun getSpotsLocations(): Flow<List<SpotClusterItem>>
 }

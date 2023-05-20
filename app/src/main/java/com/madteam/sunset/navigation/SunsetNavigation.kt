@@ -17,6 +17,7 @@ import com.madteam.sunset.navigation.SunsetRoutes.SignInCard
 import com.madteam.sunset.navigation.SunsetRoutes.SignUpCard
 import com.madteam.sunset.navigation.SunsetRoutes.WelcomeScreen
 import com.madteam.sunset.ui.screens.discover.DiscoverScreen
+import com.madteam.sunset.ui.screens.home.HomeScreen
 import com.madteam.sunset.ui.screens.lostpassword.LostPasswordScreen
 import com.madteam.sunset.ui.screens.myprofile.MyProfileScreen
 import com.madteam.sunset.ui.screens.verifyaccount.VerifyAccountScreen
@@ -25,50 +26,54 @@ import com.madteam.sunset.ui.screens.welcome.WelcomeScreen
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun SunsetNavigation() {
-    val navController = rememberAnimatedNavController()
+  val navController = rememberAnimatedNavController()
 
-    AnimatedNavHost(navController = navController, startDestination = WelcomeScreen.route) {
+  AnimatedNavHost(navController = navController, startDestination = WelcomeScreen.route) {
 
-        composable(WelcomeScreen.route) {
-            WelcomeScreen(navController)
-        }
-
-        composable(SignUpCard.route) {
-            WelcomeScreen(navController)
-        }
-
-        composable(SignInCard.route) {
-            WelcomeScreen(navController)
-        }
-
-        composable(MyProfileScreen.route) {
-            MyProfileScreen(navController)
-        }
-
-        composable(
-            route = "verify_account_screen/pass={pass}",
-            arguments = listOf(
-                navArgument("pass"){
-                    type = NavType.StringType
-                    defaultValue = ""
-                }
-            )
-        ) { backStackEntry ->
-            val pass = backStackEntry.arguments?.getString("pass")
-            pass?.let {
-                VerifyAccountScreen(navController = navController, pass = pass)
-            }
-        }
-
-        composable(
-            LostPasswordScreen.route,
-            enterTransition = { slideInVertically(initialOffsetY = { it }, animationSpec = tween(500)) },
-            exitTransition = { slideOutVertically(targetOffsetY = { it }, animationSpec = tween(500)) }) {
-            LostPasswordScreen(navController)
-        }
-
-        composable(DiscoverScreen.route){
-            DiscoverScreen()
-        }
+    composable(WelcomeScreen.route) {
+      WelcomeScreen(navController)
     }
+
+    composable(SignUpCard.route) {
+      WelcomeScreen(navController)
+    }
+
+    composable(SignInCard.route) {
+      WelcomeScreen(navController)
+    }
+
+    composable(MyProfileScreen.route) {
+      MyProfileScreen(navController)
+    }
+
+    composable(
+      route = "verify_account_screen/pass={pass}",
+      arguments = listOf(
+        navArgument("pass") {
+          type = NavType.StringType
+          defaultValue = ""
+        }
+      )
+    ) { backStackEntry ->
+      val pass = backStackEntry.arguments?.getString("pass")
+      pass?.let {
+        VerifyAccountScreen(navController = navController, pass = pass)
+      }
+    }
+
+    composable(
+      LostPasswordScreen.route,
+      enterTransition = { slideInVertically(initialOffsetY = { it }, animationSpec = tween(500)) },
+      exitTransition = { slideOutVertically(targetOffsetY = { it }, animationSpec = tween(500)) }) {
+      LostPasswordScreen(navController)
+    }
+
+    composable(DiscoverScreen.route) {
+      DiscoverScreen(navController)
+    }
+
+    composable(SunsetRoutes.HomeScreen.route) {
+      HomeScreen(navController)
+    }
+  }
 }

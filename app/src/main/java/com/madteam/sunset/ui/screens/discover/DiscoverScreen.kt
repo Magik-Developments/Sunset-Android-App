@@ -83,33 +83,40 @@ fun DiscoverContent(
     selectedCluster: (SpotClusterItem) -> Unit,
     calculateZoneViewCenter: () -> LatLngBounds
 ) {
-    val context = LocalContext.current
-    val styleJson = remember {
-        val inputStream = context.resources.openRawResource(R.raw.map_style)
-        val json = inputStream.bufferedReader().use { it.readText() }
-        json
-    }
-    val mapProperties = MapProperties(
-        isMyLocationEnabled = mapState.lastKnownLocation != null,
-        mapStyleOptions = MapStyleOptions(styleJson)
-    )
     val cameraPositionState = rememberCameraPositionState()
 
     GoogleMap(
         modifier = Modifier.fillMaxSize(),
-        properties = mapProperties,
+        properties = setMapProperties(mapState),
         cameraPositionState = cameraPositionState,
         uiSettings = MapUiSettings()
     ) {
-
         SetupClusterManagerAndRenderers(
             mapState = mapState,
             selectedCluster = selectedCluster,
             calculateZoneViewCenter = calculateZoneViewCenter,
             cameraPositionState = cameraPositionState
         )
-
     }
+}
+
+
+// TODO: This should be move to a class that handle the Map stuff.
+// DiscoverScreen shouldn't know anything about this, it is not its responsibility
+@Composable
+private fun setMapProperties(mapState: MapState): MapProperties {
+    val context = LocalContext.current
+
+    val styleJson = remember {
+        context.resources.openRawResource(R.raw.map_style).run {
+            bufferedReader().use { it.readText() }
+        }
+    }
+
+    return MapProperties(
+        isMyLocationEnabled = mapState.lastKnownLocation != null,
+        mapStyleOptions = MapStyleOptions(styleJson)
+    )
 }
 
 @SuppressLint("PotentialBehaviorOverride")

@@ -8,6 +8,7 @@ import com.madteam.sunset.repositories.DatabaseRepository
 import com.madteam.sunset.utils.googlemaps.MapState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -17,21 +18,14 @@ class DiscoverViewModel @Inject constructor(
 ) : ViewModel() {
 
     val selectedCluster: MutableStateFlow<SpotClusterItem?> = MutableStateFlow(null)
-    val mapState: MutableStateFlow<MapState> = MutableStateFlow(
-        MapState(
-            lastKnownLocation = null,
-            clusterItems = emptyList()
-        )
-    )
+
+    private val _mapState: MutableStateFlow<MapState> = MutableStateFlow(MapState())
+    val mapState: StateFlow<MapState> = _mapState
 
     init {
-        loadSpotsLocations()
-    }
-
-    private fun loadSpotsLocations() {
         viewModelScope.launch {
             databaseRepository.getSpotsLocations().collect { spots ->
-                mapState.value = mapState.value.copy(clusterItems = spots)
+                _mapState.value = _mapState.value.copy(clusterItems = spots)
             }
         }
     }

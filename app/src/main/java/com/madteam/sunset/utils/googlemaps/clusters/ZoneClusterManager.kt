@@ -7,25 +7,25 @@ import com.google.maps.android.collections.MarkerManager
 import com.madteam.sunset.model.SpotClusterItem
 
 class ZoneClusterManager(
-  context: Context,
-  googleMap: GoogleMap,
+    context: Context,
+    googleMap: GoogleMap,
 ) : ClusterManager<SpotClusterItem>(context, googleMap, MarkerManager(googleMap)) {
-  init {
-    setOnClusterClickListener { cluster ->
-      val clusterItem = cluster.items.firstOrNull()
-      clusterItem?.let { onClusterClicked(it) }
-      true
+    init {
+        setOnClusterClickListener { cluster ->
+            val clusterItem = cluster.items.firstOrNull()
+            clusterItem?.let { onClusterClicked(it) }
+            true
+        }
+
+        setOnClusterItemClickListener { clusterItem ->
+            onClusterClicked(clusterItem)
+            true
+        }
     }
 
-    setOnClusterItemClickListener { clusterItem ->
-      onClusterClicked(clusterItem)
-      true
+    private var onClusterClicked: (SpotClusterItem) -> Unit = {}
+
+    fun setOnClusterClickedListener(listener: (SpotClusterItem) -> Unit) {
+        onClusterClicked = listener
     }
-  }
-
-  private var onClusterClicked: (SpotClusterItem) -> Unit = {}
-
-  fun setOnClusterClickedListener(listener: (SpotClusterItem) -> Unit) {
-    onClusterClicked = listener
-  }
 }

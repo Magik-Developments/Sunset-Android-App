@@ -1,6 +1,10 @@
 package com.madteam.sunset.ui.screens.discover
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -34,6 +38,7 @@ import kotlinx.coroutines.launch
 
 const val MAP_PADDING = 200
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun DiscoverScreen(
     navController: NavController,
@@ -56,19 +61,24 @@ fun DiscoverScreen(
                         viewModel.selectedCluster.value = clusterItem
                     }
                 )
-
-                if (selectedCluster != null) {
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .padding(24.dp)
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(24.dp)
+                ) {
+                    AnimatedVisibility(
+                        visible = selectedCluster != null, enter = slideInVertically(
+                            initialOffsetY = { it },
+                            animationSpec = tween(durationMillis = 300)
+                        )
                     ) {
-                        SpotClusterInfo(selectedCluster!!) {
-                            viewModel.selectedCluster.value = null
+                        if (selectedCluster != null) {
+                            SpotClusterInfo(selectedCluster!!) {
+                                viewModel.selectedCluster.value = null
+                            }
                         }
                     }
                 }
-
             }
         }
     )

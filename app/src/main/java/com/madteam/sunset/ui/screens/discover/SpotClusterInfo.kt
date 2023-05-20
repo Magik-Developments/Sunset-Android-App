@@ -25,7 +25,7 @@ import com.madteam.sunset.ui.theme.secondaryRegularBodyL
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun SpotClusterInfo(selectedCluster: SpotClusterItem, onClose: () -> Unit) {
+fun SpotClusterInfo(selectedCluster: SpotClusterItem?, onClose: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -53,7 +53,9 @@ fun SpotClusterInfo(selectedCluster: SpotClusterItem, onClose: () -> Unit) {
                     .fillMaxSize()
                     .padding(8.dp)
             ) {
-                Text(text = selectedCluster.title, style = primaryBoldHeadlineS)
+                if (selectedCluster != null) {
+                    Text(text = selectedCluster.title, style = primaryBoldHeadlineS)
+                }
                 Text(text = "Lorem ipsum", style = secondaryRegularBodyL)
             }
         }

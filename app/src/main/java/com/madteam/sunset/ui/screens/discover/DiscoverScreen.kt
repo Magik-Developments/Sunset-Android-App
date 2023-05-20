@@ -37,6 +37,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 const val MAP_PADDING = 200
+const val ANIMATION_DURATION_IN_MILLIS = 300
 
 @Composable
 fun DiscoverScreen(
@@ -68,17 +69,16 @@ fun DiscoverScreen(
                     AnimatedVisibility(
                         visible = selectedCluster != null, enter = slideInVertically(
                             initialOffsetY = { it },
-                            animationSpec = tween(durationMillis = 300),
+                            animationSpec = tween(durationMillis = ANIMATION_DURATION_IN_MILLIS),
                         ),
                         exit = slideOutVertically(
-                            targetOffsetY = { it },
-                            animationSpec = tween(durationMillis = 300)
+                            targetOffsetY = { it + 200 },
+                            animationSpec = tween(durationMillis = ANIMATION_DURATION_IN_MILLIS)
                         )
                     ) {
                             SpotClusterInfo(selectedCluster) {
                                 viewModel.setSelectedCluster(null)
                             }
-
                     }
                 }
             }

@@ -46,12 +46,13 @@ fun DiscoverScreen(
 ) {
 
     val mapState by viewModel.mapState.collectAsStateWithLifecycle()
-    val selectedCluster by viewModel.selectedCluster.collectAsStateWithLifecycle()
+    val clusterInfo by viewModel.clusterInfo.collectAsStateWithLifecycle()
 
     val modifier = Modifier
 
     Scaffold(
         bottomBar = { SunsetBottomNavigation(navController) },
+
         content = { paddingValues ->
             Box(
                 modifier = modifier.padding(paddingValues),
@@ -59,7 +60,7 @@ fun DiscoverScreen(
                 DiscoverContent(
                     mapState = mapState,
                     selectedCluster = { clusterItem ->
-                        viewModel.toggleClusterVisibility(clusterItem)
+                        viewModel.clusterVisibility(clusterItem.copy(isVisible = true))
                     }
                 )
 
@@ -67,13 +68,13 @@ fun DiscoverScreen(
                     modifier = modifier
                         .align(Alignment.BottomCenter)
                         .padding(24.dp),
-                    visible = selectedCluster?.isVisible == true,
+                    visible = clusterInfo.isVisible,
                     // Other options: https://developer.android.com/jetpack/compose/animation?hl=es-419#enter-exit-transition
                     enter = scaleIn(),
                     exit = scaleOut()
                 ) {
-                    SpotClusterInfo(selectedCluster) {
-                        viewModel.toggleClusterVisibility(it)
+                    SpotClusterInfo(clusterInfo) { clusterItem ->
+                        viewModel.clusterVisibility(clusterItem.copy(isVisible = false))
                     }
                 }
             }
@@ -128,8 +129,9 @@ private fun SetupClusterManagerAndRenderers(
             map.setOnCameraIdleListener(clusterManager)
             map.setOnMarkerClickListener(clusterManager)
             clusterManager.setOnClusterClickListener { cluster ->
-                val clusterItem = cluster.items.firstOrNull()
-                clusterItem?.let { selectedCluster(it) }
+                cluster.items.firstOrNull()?.let {
+                    selectedCluster(it)
+                }
                 true
             }
         }

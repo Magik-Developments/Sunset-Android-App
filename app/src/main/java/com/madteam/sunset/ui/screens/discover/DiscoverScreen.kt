@@ -3,9 +3,8 @@ package com.madteam.sunset.ui.screens.discover
 import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -49,38 +48,32 @@ fun DiscoverScreen(
     val mapState by viewModel.mapState.collectAsStateWithLifecycle()
     val selectedCluster by viewModel.selectedCluster.collectAsStateWithLifecycle()
 
+    val modifier = Modifier
+
     Scaffold(
         bottomBar = { SunsetBottomNavigation(navController) },
         content = { paddingValues ->
             Box(
-                modifier = Modifier.padding(paddingValues),
-                contentAlignment = Alignment.Center
+                modifier = modifier.padding(paddingValues),
             ) {
                 DiscoverContent(
                     mapState = mapState,
                     selectedCluster = { clusterItem ->
-                        viewModel.selectedCluster.value = clusterItem
+                        viewModel.toggleClusterVisibility(clusterItem)
                     }
                 )
-                Box(
-                    modifier = Modifier
+
+                AnimatedVisibility(
+                    modifier = modifier
                         .align(Alignment.BottomCenter)
-                        .padding(24.dp)
+                        .padding(24.dp),
+                    visible = selectedCluster?.isVisible == true,
+                    // Other options: https://developer.android.com/jetpack/compose/animation?hl=es-419#enter-exit-transition
+                    enter = scaleIn(),
+                    exit = scaleOut()
                 ) {
-                    AnimatedVisibility(
-                        visible = selectedCluster != null,
-                        enter = slideInVertically(
-                            initialOffsetY = { it },
-                            animationSpec = tween(durationMillis = 300)
-                        ),
-                        exit = slideOutVertically(
-                            targetOffsetY = { it },
-                            animationSpec = tween(durationMillis = 300)
-                        )
-                    ) {
-                        SpotClusterInfo(selectedCluster) {
-                            viewModel.selectedCluster.value = null
-                        }
+                    SpotClusterInfo(selectedCluster) {
+                        viewModel.toggleClusterVisibility(it)
                     }
                 }
             }

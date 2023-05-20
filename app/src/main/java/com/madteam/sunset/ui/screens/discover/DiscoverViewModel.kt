@@ -16,7 +16,8 @@ class DiscoverViewModel @Inject constructor(
     private val databaseRepository: DatabaseRepository
 ) : ViewModel() {
 
-    val selectedCluster: MutableStateFlow<SpotClusterItem?> = MutableStateFlow(null)
+    val _selectedCluster: MutableStateFlow<SpotClusterItem?> = MutableStateFlow(null)
+    val selectedCluster: StateFlow<SpotClusterItem?> = _selectedCluster
 
     private val _mapState: MutableStateFlow<MapState> = MutableStateFlow(MapState())
     val mapState: StateFlow<MapState> = _mapState
@@ -27,5 +28,11 @@ class DiscoverViewModel @Inject constructor(
                 _mapState.value = _mapState.value.copy(clusterItems = spots)
             }
         }
+    }
+
+    fun toggleClusterVisibility(clusterItem: SpotClusterItem?) {
+        _selectedCluster.value = clusterItem?.copy(
+            isVisible = !clusterItem.isVisible
+        )
     }
 }

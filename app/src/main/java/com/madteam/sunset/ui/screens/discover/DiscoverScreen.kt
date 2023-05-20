@@ -5,6 +5,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -67,15 +68,18 @@ fun DiscoverScreen(
                         .padding(24.dp)
                 ) {
                     AnimatedVisibility(
-                        visible = selectedCluster != null, enter = slideInVertically(
+                        visible = selectedCluster != null,
+                        enter = slideInVertically(
                             initialOffsetY = { it },
+                            animationSpec = tween(durationMillis = 300)
+                        ),
+                        exit = slideOutVertically(
+                            targetOffsetY = { it },
                             animationSpec = tween(durationMillis = 300)
                         )
                     ) {
-                        if (selectedCluster != null) {
-                            SpotClusterInfo(selectedCluster!!) {
-                                viewModel.selectedCluster.value = null
-                            }
+                        SpotClusterInfo(selectedCluster) {
+                            viewModel.selectedCluster.value = null
                         }
                     }
                 }

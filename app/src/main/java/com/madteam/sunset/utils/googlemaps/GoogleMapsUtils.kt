@@ -4,8 +4,14 @@ package com.madteam.sunset.utils.googlemaps
 * A set of utility functions for centering the camera given some [LatLng] points.
 */
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.MapStyleOptions
+import com.google.maps.android.compose.MapProperties
+import com.madteam.sunset.R
 
 fun List<LatLng>.getCenterOfPolygon(): LatLngBounds {
   val centerBuilder: LatLngBounds.Builder = LatLngBounds.builder()
@@ -72,4 +78,20 @@ private fun List<LatLng>.findMaxMins(): CameraViewCoord {
     )
   }
   return viewCoord ?: throw IllegalStateException("viewCoord cannot be null.")
+}
+
+@Composable
+fun setMapProperties(mapState: MapState): MapProperties {
+  val context = LocalContext.current
+
+  val styleJson = remember {
+    context.resources.openRawResource(R.raw.map_style).run {
+      bufferedReader().use { it.readText() }
+    }
+  }
+
+  return MapProperties(
+    isMyLocationEnabled = mapState.lastKnownLocation != null,
+    mapStyleOptions = MapStyleOptions(styleJson)
+  )
 }

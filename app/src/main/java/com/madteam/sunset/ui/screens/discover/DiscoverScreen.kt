@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,20 +17,18 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapEffect
-import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.MapsComposeExperimentalApi
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.madteam.sunset.R
 import com.madteam.sunset.model.SpotClusterItem
 import com.madteam.sunset.ui.common.SunsetBottomNavigation
 import com.madteam.sunset.utils.googlemaps.MapState
 import com.madteam.sunset.utils.googlemaps.clusters.CustomClusterRenderer
 import com.madteam.sunset.utils.googlemaps.clusters.ZoneClusterManager
+import com.madteam.sunset.utils.googlemaps.setMapProperties
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -66,7 +63,9 @@ fun DiscoverScreen(
                             .align(Alignment.BottomCenter)
                             .padding(24.dp)
                     ) {
-                        SpotClusterInfo(selectedCluster!!) { viewModel.selectedCluster.value = null }
+                        SpotClusterInfo(selectedCluster!!) {
+                            viewModel.selectedCluster.value = null
+                        }
                     }
                 }
 
@@ -94,25 +93,6 @@ fun DiscoverContent(
             cameraPositionState = cameraPositionState
         )
     }
-}
-
-
-// TODO: This should be move to a class that handle the Map stuff.
-// DiscoverScreen shouldn't know anything about this, it is not its responsibility
-@Composable
-private fun setMapProperties(mapState: MapState): MapProperties {
-    val context = LocalContext.current
-
-    val styleJson = remember {
-        context.resources.openRawResource(R.raw.map_style).run {
-            bufferedReader().use { it.readText() }
-        }
-    }
-
-    return MapProperties(
-        isMyLocationEnabled = mapState.lastKnownLocation != null,
-        mapStyleOptions = MapStyleOptions(styleJson)
-    )
 }
 
 @SuppressLint("PotentialBehaviorOverride")

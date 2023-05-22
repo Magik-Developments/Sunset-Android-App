@@ -10,7 +10,16 @@ data class SpotClusterItem(
   val name: String,
   val spot: String,
   val location: GeoPoint,
+  val isSelected: Boolean
 ) : ClusterItem {
+
+  constructor(): this(
+    id = "",
+    name = "",
+    spot = "",
+    location = GeoPoint(0.0, 0.0),
+    isSelected = false
+  )
 
   override fun getTitle() = name
   override fun getSnippet(): String? = null

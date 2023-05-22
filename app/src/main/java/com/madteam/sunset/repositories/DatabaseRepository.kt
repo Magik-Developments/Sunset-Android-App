@@ -85,7 +85,7 @@ class DatabaseRepository @Inject constructor(
         val spot = document.getDocumentReference("spot")
 
         if (name != null && location != null && spot != null) {
-          SpotClusterItem(id = id, name = name, spot = spot.toString(), location = location)
+          SpotClusterItem(id = id, name = name, spot = spot.toString(), location = location, isSelected = false)
         } else {
           null
         }

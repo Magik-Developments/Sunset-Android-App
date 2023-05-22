@@ -2,9 +2,9 @@ package com.madteam.sunset.ui.screens.discover
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -39,6 +39,7 @@ import kotlinx.coroutines.launch
 const val MAP_PADDING = 200
 const val ANIMATION_DURATION_IN_MILLIS = 300
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun DiscoverScreen(
     navController: NavController,
@@ -46,7 +47,7 @@ fun DiscoverScreen(
 ) {
 
     val mapState by viewModel.mapState.collectAsStateWithLifecycle()
-    val selectedCluster by viewModel.selectedCluster.collectAsStateWithLifecycle()
+    val clusterInfo by viewModel.clusterInfo.collectAsStateWithLifecycle()
 
     Scaffold(
         bottomBar = { SunsetBottomNavigation(navController) },
@@ -58,27 +59,19 @@ fun DiscoverScreen(
                 DiscoverContent(
                     mapState = mapState,
                     selectedCluster = { clusterItem ->
-                        viewModel.setSelectedCluster(clusterItem)
+                        viewModel.clusterVisibility(clusterItem.copy(isSelected = true))
                     }
                 )
-                Box(
+                AnimatedVisibility(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
-                        .padding(24.dp)
+                        .padding(24.dp),
+                    visible = clusterInfo.isSelected,
+                    enter = scaleIn(),
+                    exit = scaleOut()
                 ) {
-                    AnimatedVisibility(
-                        visible = selectedCluster != null, enter = slideInVertically(
-                            initialOffsetY = { it },
-                            animationSpec = tween(durationMillis = ANIMATION_DURATION_IN_MILLIS),
-                        ),
-                        exit = slideOutVertically(
-                            targetOffsetY = { it + 200 },
-                            animationSpec = tween(durationMillis = ANIMATION_DURATION_IN_MILLIS)
-                        )
-                    ) {
-                        SpotClusterInfo(selectedCluster) {
-                            viewModel.setSelectedCluster(null)
-                        }
+                    SpotClusterInfo(clusterInfo) { clusterItem ->
+                        viewModel.clusterVisibility(clusterItem.copy(isSelected = false))
                     }
                 }
             }
@@ -133,8 +126,9 @@ private fun SetupClusterManagerAndRenderers(
             map.setOnCameraIdleListener(clusterManager)
             map.setOnMarkerClickListener(clusterManager)
             clusterManager.setOnClusterClickListener { cluster ->
-                val clusterItem = cluster.items.firstOrNull()
-                clusterItem?.let { selectedCluster(it) }
+                cluster.items.firstOrNull()?.let {
+                    selectedCluster(it)
+                }
                 true
             }
         }

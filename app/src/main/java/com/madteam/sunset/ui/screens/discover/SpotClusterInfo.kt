@@ -25,7 +25,7 @@ import com.madteam.sunset.ui.theme.secondaryRegularBodyL
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun SpotClusterInfo(selectedCluster: SpotClusterItem?, onClose: () -> Unit) {
+fun SpotClusterInfo(selectedCluster: SpotClusterItem, onClose: (SpotClusterItem) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -45,7 +45,7 @@ fun SpotClusterInfo(selectedCluster: SpotClusterItem?, onClose: () -> Unit) {
                     contentScale = ContentScale.Crop
                 )
                 Box(modifier = Modifier.padding(8.dp)) {
-                    RoundedCloseIconButton { onClose() }
+                    RoundedCloseIconButton { onClose(selectedCluster) }
                 }
             }
             Column(

@@ -3,8 +3,8 @@ package com.madteam.sunset.ui.screens.discover
 import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -67,8 +67,8 @@ fun DiscoverScreen(
                         .align(Alignment.BottomCenter)
                         .padding(24.dp),
                     visible = clusterInfo.isSelected,
-                    enter = scaleIn(),
-                    exit = scaleOut()
+                    enter = slideInVertically(initialOffsetY = { it }),
+                    exit = slideOutVertically(targetOffsetY = { it + 200 })
                 ) {
                     SpotClusterInfo(clusterInfo) { clusterItem ->
                         viewModel.clusterVisibility(clusterItem.copy(isSelected = false))

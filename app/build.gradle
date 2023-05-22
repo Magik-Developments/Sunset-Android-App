@@ -94,6 +94,7 @@ dependencies {
     implementation 'androidx.hilt:hilt-navigation-compose:1.0.0'
     implementation "androidx.lifecycle:lifecycle-runtime-compose:2.6.1"
     implementation 'androidx.activity:activity-compose:1.7.1'
+    implementation "androidx.constraintlayout:constraintlayout-compose:1.0.1"
 
     //Compose Previews
     implementation 'androidx.compose.ui:ui-tooling-preview'

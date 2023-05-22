@@ -37,9 +37,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 const val MAP_PADDING = 200
-const val ANIMATION_DURATION_IN_MILLIS = 300
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun DiscoverScreen(
     navController: NavController,

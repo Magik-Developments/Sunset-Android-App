@@ -1,5 +1,7 @@
 package com.madteam.sunset.ui.screens.discover
 
+import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
@@ -25,11 +28,11 @@ import com.madteam.sunset.ui.theme.secondaryRegularBodyL
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun SpotClusterInfo(selectedCluster: SpotClusterItem, onClose: (SpotClusterItem) -> Unit) {
+fun SpotClusterInfo(selectedCluster: SpotClusterItem, onClose: (SpotClusterItem) -> Unit, onItemClicked: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(140.dp),
+            .height(140.dp).clickable { onItemClicked() },
         backgroundColor = Color.White,
         shape = RoundedCornerShape(20.dp),
         elevation = 2.dp,

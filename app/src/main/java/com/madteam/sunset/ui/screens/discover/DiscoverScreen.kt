@@ -2,7 +2,6 @@ package com.madteam.sunset.ui.screens.discover
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
@@ -68,9 +67,9 @@ fun DiscoverScreen(
                     enter = slideInVertically(initialOffsetY = { it }),
                     exit = slideOutVertically(targetOffsetY = { it + 200 })
                 ) {
-                    SpotClusterInfo(clusterInfo) { clusterItem ->
+                    SpotClusterInfo(clusterInfo, onClose = { clusterItem ->
                         viewModel.clusterVisibility(clusterItem.copy(isSelected = false))
-                    }
+                    }, onItemClicked = {navController.navigate("spot_detail_screen/spotReference=${clusterInfo.spot}")})
                 }
             }
         }

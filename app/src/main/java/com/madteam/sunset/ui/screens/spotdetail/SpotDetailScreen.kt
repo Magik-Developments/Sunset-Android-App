@@ -30,6 +30,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.navigation.NavController
 import com.madteam.sunset.R
 import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.ImageSliderCounter
@@ -47,7 +48,10 @@ import com.madteam.sunset.ui.theme.secondarySemiBoldBodyM
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineM
 
 @Composable
-fun SpotDetailScreen() {
+fun SpotDetailScreen(
+    navController: NavController,
+    spotReference: String
+) {
     Scaffold(
         content = { paddingValues ->
             Box(

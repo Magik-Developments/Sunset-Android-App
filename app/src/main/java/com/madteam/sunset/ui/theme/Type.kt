@@ -31,6 +31,11 @@ val primaryBoldHeadlineS = TextStyle(
     fontSize = 19.sp
 )
 
+val primaryBoldHeadlineXS = TextStyle(
+    fontFamily = FontFamily(Font(R.font.montserrat_bold)),
+    fontSize = 16.sp
+)
+
 val primaryMediumDisplayM = TextStyle(
     fontFamily = FontFamily(Font(R.font.montserrat_medium)),
     fontSize = 39.sp

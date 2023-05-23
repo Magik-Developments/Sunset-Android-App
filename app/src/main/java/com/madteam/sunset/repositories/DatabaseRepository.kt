@@ -1,6 +1,7 @@
 package com.madteam.sunset.repositories
 
 import com.google.firebase.firestore.FirebaseFirestore
+import com.madteam.sunset.model.Spot
 import com.madteam.sunset.model.UserProfile
 import com.madteam.sunset.utils.Resource
 import com.madteam.sunset.model.SpotClusterItem
@@ -95,7 +96,21 @@ class DatabaseRepository @Inject constructor(
       emit(emptyList())
     }
   }
+
+  override fun getSpotByDocRef(docRef: String): Flow<Spot> = flow {
+    try {
+      val documentReference = firebaseFirestore.document(docRef)
+      val documentSnapshot = documentReference.get().await()
+
+      if (documentSnapshot.exists()) {
+
+      }
+    } catch (e: Exception) {
+
+    }
+  }
 }
+
 
 interface DatabaseContract {
 
@@ -103,4 +118,5 @@ interface DatabaseContract {
   fun getUserByEmail(email: String, userProfileCallback: (UserProfile) -> Unit)
   fun updateUser(user: UserProfile): Flow<Resource<String>>
   fun getSpotsLocations(): Flow<List<SpotClusterItem>>
+  fun getSpotByDocRef(docRef: String): Flow<Spot>
 }

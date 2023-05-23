@@ -30,6 +30,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.madteam.sunset.R
 import com.madteam.sunset.ui.common.CustomSpacer
@@ -50,6 +51,7 @@ import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineM
 @Composable
 fun SpotDetailScreen(
     navController: NavController,
+    viewModel: SpotDetailViewModel = hiltViewModel(),
     spotReference: String
 ) {
     Scaffold(

@@ -140,14 +140,14 @@ fun SpotDetailContent(
                     start.linkTo(spotterImage.end, 8.dp)
                 })
             Text(
-                text = "@SunsetApp",
+                text = "@${spotInfo.spottedBy.username}",
                 style = primaryBoldHeadlineXS,
                 modifier = Modifier.constrainAs(spottedByUsername) {
                     top.linkTo(spottedByTitle.bottom)
                     start.linkTo(spotterImage.end, 8.dp)
                 })
             Text(
-                text = "created 23/04/2023",
+                text = "created ${spotInfo.creationDate}",
                 style = secondaryRegularBodyS,
                 color = Color(0xFF333333),
                 modifier = Modifier.constrainAs(createdDate) {
@@ -164,14 +164,14 @@ fun SpotDetailContent(
                 style = primaryMediumDisplayS,
                 modifier = Modifier.constrainAs(spotTitle) {
                     start.linkTo(parent.start, 24.dp)
-                })
+                }.padding(end = 24.dp))
             Text(
                 text = spotInfo.description,
                 style = secondaryRegularBodyM,
                 modifier = Modifier.constrainAs(spotDescription) {
                     start.linkTo(parent.start, 24.dp)
                     top.linkTo(spotTitle.bottom, 8.dp)
-                }
+                }.padding(end = 36.dp)
             )
         }
         CustomSpacer(size = 16.dp)
@@ -183,16 +183,16 @@ fun SpotDetailContent(
         ) {
             Icon(imageVector = Icons.Outlined.Brightness5, contentDescription = "")
             CustomSpacer(size = 4.dp)
-            Text(text = "8.8", style = secondaryRegularBodyM)
+            Text(text = "${spotInfo.score}", style = secondaryRegularBodyM)
             CustomSpacer(size = 8.dp)
             Text(text = "·", style = secondarySemiBoldBodyM)
             CustomSpacer(size = 8.dp)
             Text(text = "Visited ", style = secondaryRegularBodyM)
-            Text(text = "1400 times", style = secondarySemiBoldBodyM)
+            Text(text = "${spotInfo.visitedTimes} times", style = secondarySemiBoldBodyM)
             CustomSpacer(size = 8.dp)
             Text(text = "·", style = secondarySemiBoldBodyM)
             CustomSpacer(size = 8.dp)
-            Text(text = "800 likes", style = secondarySemiBoldBodyM)
+            Text(text = "${spotInfo.likes} likes", style = secondarySemiBoldBodyM)
         }
         CustomSpacer(size = 8.dp)
         Text(text = spotInfo.location, style = secondaryRegularBodyL, modifier = Modifier.padding(horizontal = 24.dp))
@@ -216,5 +216,5 @@ fun SpotDetailContent(
 @Preview(showSystemUi = true)
 @Composable
 fun SpotDetailContentPreview() {
-  //  SpotDetailContent(Spo)
+    SpotDetailContent(Spot())
 }

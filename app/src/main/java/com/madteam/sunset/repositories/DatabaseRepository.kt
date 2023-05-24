@@ -123,9 +123,24 @@ class DatabaseRepository @Inject constructor(
                 val locationInLatLng = documentSnapshot.getGeoPoint("location_in_latlng")
                 val location = documentSnapshot.getString("location")
 
+                //User spotted by data
+                val userRef = documentSnapshot.getDocumentReference("spotted_by")
+                val userSnapshot = userRef!!.get().await()
+                val userId = userSnapshot.id
+                val username = userSnapshot.getString("username")
+                val usernameName = userSnapshot.getString("name")
+                val spottedBy = UserProfile(
+                    username = username ?: "",
+                    "",
+                    "",
+                    "",
+                    name = name ?: "",
+                    "",
+                )
+
                 val spotData = Spot(
                     id = id,
-                    spottedBy = UserProfile(),
+                    spottedBy = spottedBy,
                     creationDate = creationDate ?: "",
                     name = name ?: "",
                     description = description ?: "",
@@ -142,7 +157,6 @@ class DatabaseRepository @Inject constructor(
                 emit(Spot())
             }
         } catch (e: Exception) {
-            println("adri " + e.message.toString())
             emit(Spot())
         }
     }

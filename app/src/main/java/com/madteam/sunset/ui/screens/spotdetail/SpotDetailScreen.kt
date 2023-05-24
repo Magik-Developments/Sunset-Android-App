@@ -1,9 +1,12 @@
 package com.madteam.sunset.ui.screens.spotdetail
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -93,8 +96,13 @@ fun SpotDetailContent(
 ) {
 
     val scrollState = rememberScrollState()
+    val context = LocalContext.current
 
-    Column(modifier = Modifier.verticalScroll(scrollState)) {
+    Column(
+        modifier = Modifier
+            .verticalScroll(scrollState)
+            .padding(bottom = 40.dp)
+    ) {
         //Header image section
         ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
             val (spotImage, backIconButton, saveIconButton, sendIconButton, likeIconButton, imageSliderCounter) = createRefs()
@@ -261,7 +269,10 @@ fun SpotDetailContent(
                         bottom.linkTo(parent.bottom)
                         end.linkTo(parent.end, 36.dp)
                     }
-                    .size(48.dp),
+                    .size(48.dp)
+                    .clickable {
+                        openGoogleMaps(context, spotInfo.locationInLatLng)
+                    },
                 imageVector = Icons.Filled.Directions,
                 contentDescription = "",
                 tint = Color(0xFFFFB600)
@@ -300,7 +311,7 @@ fun SpotDetailContent(
                             painter = painterResource(
                                 id = getResourceId(
                                     attribute.icon,
-                                    context = LocalContext.current
+                                    context
                                 )
                             ),
                             contentDescription = "",
@@ -322,6 +333,13 @@ fun SpotDetailContent(
 @DrawableRes
 fun getResourceId(icon: String, context: Context): Int {
     return context.resources.getIdentifier(icon, "drawable", context.packageName)
+}
+
+fun openGoogleMaps(context: Context, location: GeoPoint) {
+    val uri = Uri.parse("google.navigation:q=${location.latitude},${location.longitude}")
+    val intent = Intent(Intent.ACTION_VIEW, uri)
+    intent.setPackage("com.google.android.apps.maps")
+    context.startActivity(intent)
 }
 
 @Preview(showSystemUi = true)

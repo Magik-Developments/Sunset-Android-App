@@ -1,10 +1,14 @@
 package com.madteam.sunset.ui.screens.spotdetail
 
+import android.content.Context
+import android.content.res.Resources
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,11 +16,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Brightness5
-import androidx.compose.material.icons.outlined.LocalParking
-import androidx.compose.material.icons.outlined.Park
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -26,15 +29,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.core.content.res.TypedArrayUtils.getResourceId
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.google.firebase.firestore.DocumentReference
 import com.madteam.sunset.R
 import com.madteam.sunset.model.Spot
 import com.madteam.sunset.ui.common.CustomSpacer
@@ -162,16 +166,20 @@ fun SpotDetailContent(
             Text(
                 text = spotInfo.name,
                 style = primaryMediumDisplayS,
-                modifier = Modifier.constrainAs(spotTitle) {
-                    start.linkTo(parent.start, 24.dp)
-                }.padding(end = 24.dp))
+                modifier = Modifier
+                    .constrainAs(spotTitle) {
+                        start.linkTo(parent.start, 24.dp)
+                    }
+                    .padding(end = 24.dp))
             Text(
                 text = spotInfo.description,
                 style = secondaryRegularBodyM,
-                modifier = Modifier.constrainAs(spotDescription) {
-                    start.linkTo(parent.start, 24.dp)
-                    top.linkTo(spotTitle.bottom, 8.dp)
-                }.padding(end = 36.dp)
+                modifier = Modifier
+                    .constrainAs(spotDescription) {
+                        start.linkTo(parent.start, 24.dp)
+                        top.linkTo(spotTitle.bottom, 8.dp)
+                    }
+                    .padding(end = 36.dp)
             )
         }
         CustomSpacer(size = 16.dp)
@@ -195,22 +203,58 @@ fun SpotDetailContent(
             Text(text = "${spotInfo.likes} likes", style = secondarySemiBoldBodyM)
         }
         CustomSpacer(size = 8.dp)
-        Text(text = spotInfo.location, style = secondaryRegularBodyL, modifier = Modifier.padding(horizontal = 24.dp))
+        Text(
+            text = spotInfo.location,
+            style = secondaryRegularBodyL,
+            modifier = Modifier.padding(horizontal = 24.dp)
+        )
         //Take me there section
         //todo: take me there section
         //About this spot section
         CustomSpacer(size = 16.dp)
-        Text(text = "About this spot", style = secondarySemiBoldHeadLineM, modifier = Modifier.padding(horizontal = 24.dp))
-        CustomSpacer(size = 8.dp)
-        Box(modifier = Modifier
-            .size(80.dp)
-            .border(1.dp, Color(0xFF999999), RoundedCornerShape(20.dp))){
-            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center, modifier = Modifier.fillMaxSize()) {
-                Icon(imageVector = Icons.Outlined.LocalParking, contentDescription = "")
-                Text(text = "Easy to park there", style = secondaryRegularBodyS, textAlign = TextAlign.Center)
+        Text(
+            text = "About this spot",
+            style = secondarySemiBoldHeadLineM,
+            modifier = Modifier.padding(horizontal = 24.dp)
+        )
+        CustomSpacer(size = 16.dp)
+        LazyRow(
+            modifier = Modifier,
+            contentPadding = PaddingValues(horizontal = 24.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            itemsIndexed(spotInfo.attributes) { _, attribute ->
+                Box(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .border(1.dp, Color(0xFF999999), RoundedCornerShape(20.dp))
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        Icon(
+                            painter = painterResource(id = getResourceId(attribute.icon, context = LocalContext.current)),
+                            contentDescription = "",
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Text(
+                            text = attribute.title,
+                            style = secondaryRegularBodyS,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
+                        )
+                    }
+                }
             }
         }
     }
+}
+
+@DrawableRes
+fun getResourceId(icon: String, context: Context): Int {
+ return context.resources.getIdentifier(icon, "drawable", context.packageName)
 }
 
 @Preview(showSystemUi = true)

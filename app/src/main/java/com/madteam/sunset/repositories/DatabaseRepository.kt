@@ -1,5 +1,6 @@
 package com.madteam.sunset.repositories
 
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
 import com.madteam.sunset.model.Spot
@@ -138,6 +139,23 @@ class DatabaseRepository @Inject constructor(
                     "",
                 )
 
+                //Spot attributes data
+                val attributesRefs = documentSnapshot.get("attributes") as List<DocumentReference>
+                val attributesList = mutableListOf<SpotAttributes>()
+                for (attributeRef in attributesRefs) {
+                    val attributeSnapshot = attributeRef.get().await()
+                    val attributeId = attributeSnapshot.id
+                    val attributeTitle = attributeSnapshot.getString("title")
+                    val attributeDescription = attributeSnapshot.getString("description")
+                    val attributeIcon = attributeSnapshot.getString("icon")
+                    val attributeFavorable = attributeSnapshot.getBoolean("favorable")
+                    if (attributeDescription != null && attributeTitle != null && attributeIcon != null && attributeFavorable != null) {
+                        val attributeData = SpotAttributes(attributeId, attributeDescription, attributeTitle, attributeIcon, attributeFavorable)
+                        attributesList.add(attributeData)
+                    }
+
+                }
+
                 val spotData = Spot(
                     id = id,
                     spottedBy = spottedBy,
@@ -149,7 +167,7 @@ class DatabaseRepository @Inject constructor(
                     likes = likes.toString().toInt(),
                     locationInLatLng = locationInLatLng ?: GeoPoint(0.0, 0.0),
                     location = location ?: "",
-                    attributes = SpotAttributes()
+                    attributes = attributesList
                 )
 
                 emit(spotData)

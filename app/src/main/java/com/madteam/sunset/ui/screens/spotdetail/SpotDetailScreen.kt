@@ -1,7 +1,6 @@
 package com.madteam.sunset.ui.screens.spotdetail
 
 import android.content.Context
-import android.content.res.Resources
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -17,9 +16,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Directions
 import androidx.compose.material.icons.outlined.Brightness5
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -33,14 +36,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.core.content.res.TypedArrayUtils.getResourceId
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.google.firebase.firestore.GeoPoint
 import com.madteam.sunset.R
 import com.madteam.sunset.model.Spot
+import com.madteam.sunset.model.SpotAttributes
+import com.madteam.sunset.model.UserProfile
 import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.ImageSliderCounter
 import com.madteam.sunset.ui.common.ProfileImage
@@ -53,6 +59,7 @@ import com.madteam.sunset.ui.theme.primaryMediumDisplayS
 import com.madteam.sunset.ui.theme.secondaryRegularBodyL
 import com.madteam.sunset.ui.theme.secondaryRegularBodyM
 import com.madteam.sunset.ui.theme.secondaryRegularBodyS
+import com.madteam.sunset.ui.theme.secondarySemiBoldBodyL
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyM
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineM
 
@@ -84,7 +91,10 @@ fun SpotDetailScreen(
 fun SpotDetailContent(
     spotInfo: Spot
 ) {
-    Column() {
+
+    val scrollState = rememberScrollState()
+
+    Column(modifier = Modifier.verticalScroll(scrollState)) {
         //Header image section
         ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
             val (spotImage, backIconButton, saveIconButton, sendIconButton, likeIconButton, imageSliderCounter) = createRefs()
@@ -208,8 +218,60 @@ fun SpotDetailContent(
             style = secondaryRegularBodyL,
             modifier = Modifier.padding(horizontal = 24.dp)
         )
+        CustomSpacer(size = 16.dp)
         //Take me there section
-        //todo: take me there section
+        Divider(
+            modifier = Modifier.padding(horizontal = 24.dp),
+            thickness = 1.dp,
+            color = Color(0xFF999999)
+        )
+        ConstraintLayout(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp)
+        ) {
+            val (distanceText, distance, time, directions) = createRefs()
+            Text(
+                text = "You are only ",
+                style = secondaryRegularBodyL,
+                modifier = Modifier.constrainAs(distanceText) {
+                    start.linkTo(parent.start)
+                    top.linkTo(parent.top, 8.dp)
+                })
+            Text(
+                text = "2 km away",
+                style = secondarySemiBoldBodyL,
+                modifier = Modifier.constrainAs(distance) {
+                    start.linkTo(distanceText.end)
+                    top.linkTo(parent.top, 8.dp)
+                })
+            Text(
+                text = "or 10 minutes walking",
+                style = secondaryRegularBodyM,
+                modifier = Modifier.constrainAs(time) {
+                    start.linkTo(distanceText.start)
+                    end.linkTo(distance.end)
+                    top.linkTo(distance.bottom, 8.dp)
+                    bottom.linkTo(parent.bottom, 8.dp)
+                })
+            Icon(
+                modifier = Modifier
+                    .constrainAs(directions) {
+                        top.linkTo(parent.top)
+                        bottom.linkTo(parent.bottom)
+                        end.linkTo(parent.end, 36.dp)
+                    }
+                    .size(48.dp),
+                imageVector = Icons.Filled.Directions,
+                contentDescription = "",
+                tint = Color(0xFFFFB600)
+            )
+        }
+        Divider(
+            modifier = Modifier.padding(horizontal = 24.dp),
+            thickness = 1.dp,
+            color = Color(0xFF999999)
+        )
         //About this spot section
         CustomSpacer(size = 16.dp)
         Text(
@@ -235,7 +297,12 @@ fun SpotDetailContent(
                         modifier = Modifier.fillMaxSize()
                     ) {
                         Icon(
-                            painter = painterResource(id = getResourceId(attribute.icon, context = LocalContext.current)),
+                            painter = painterResource(
+                                id = getResourceId(
+                                    attribute.icon,
+                                    context = LocalContext.current
+                                )
+                            ),
                             contentDescription = "",
                             modifier = Modifier.size(24.dp)
                         )
@@ -254,11 +321,47 @@ fun SpotDetailContent(
 
 @DrawableRes
 fun getResourceId(icon: String, context: Context): Int {
- return context.resources.getIdentifier(icon, "drawable", context.packageName)
+    return context.resources.getIdentifier(icon, "drawable", context.packageName)
 }
 
 @Preview(showSystemUi = true)
 @Composable
 fun SpotDetailContentPreview() {
-    SpotDetailContent(Spot())
+    SpotDetailContent(
+        Spot(
+            id = "test",
+            spottedBy = UserProfile(
+                "SunsetApp",
+                "",
+                "",
+                "",
+                "",
+                ""
+            ),
+            creationDate = "15/11/2023",
+            name = "La piscina de Vallparadís",
+            description = LoremIpsum(300).toString(),
+            score = 9.3f,
+            visitedTimes = 4524,
+            likes = 1511,
+            locationInLatLng = GeoPoint(0.0, 0.0),
+            location = "Terrassa, Miami, Cataluña",
+            attributes = listOf(
+                SpotAttributes(
+                    "",
+                    "",
+                    "There is parking",
+                    "ic_local_parking",
+                    true
+                ),
+                SpotAttributes(
+                    "",
+                    "",
+                    "There is parking",
+                    "ic_local_parking",
+                    true
+                )
+            )
+        )
+    )
 }

@@ -69,7 +69,7 @@ fun DiscoverScreen(
                 ) {
                     SpotClusterInfo(clusterInfo, onClose = { clusterItem ->
                         viewModel.clusterVisibility(clusterItem.copy(isSelected = false))
-                    }, onItemClicked = {navController.navigate("spot_detail_screen/spotReference=${clusterInfo.spot}")})
+                    }, onItemClicked = {navController.navigate("spot_detail_screen/spotReference=${clusterInfo.spot.id}")})
                 }
             }
         }

@@ -1,13 +1,15 @@
 package com.madteam.sunset.model
 
 import com.google.android.gms.maps.model.LatLng
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
 import com.google.maps.android.clustering.ClusterItem
 
 data class SpotClusterItem(
     val id: String,
     val name: String,
-    val spot: String,
+    val spot: DocumentReference,
     val location: GeoPoint,
     val isSelected: Boolean
 ) : ClusterItem {
@@ -15,7 +17,7 @@ data class SpotClusterItem(
     constructor() : this(
         id = "",
         name = "",
-        spot = "",
+        spot = FirebaseFirestore.getInstance().document(""),
         location = GeoPoint(0.0, 0.0),
         isSelected = false
     )

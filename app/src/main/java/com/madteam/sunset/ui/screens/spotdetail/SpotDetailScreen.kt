@@ -21,6 +21,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,8 +32,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.google.firebase.firestore.DocumentReference
 import com.madteam.sunset.R
+import com.madteam.sunset.model.Spot
 import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.ImageSliderCounter
 import com.madteam.sunset.ui.common.ProfileImage
@@ -54,20 +58,28 @@ fun SpotDetailScreen(
     viewModel: SpotDetailViewModel = hiltViewModel(),
     spotReference: String
 ) {
+
+    viewModel.setSpotReference("spots/$spotReference")
+    val spotInfo by viewModel.spotInfo.collectAsStateWithLifecycle()
+
     Scaffold(
         content = { paddingValues ->
             Box(
                 modifier = Modifier.padding(paddingValues),
                 contentAlignment = Alignment.Center
             ) {
-                SpotDetailContent()
+                SpotDetailContent(
+                    spotInfo = spotInfo
+                )
             }
         }
     )
 }
 
 @Composable
-fun SpotDetailContent() {
+fun SpotDetailContent(
+    spotInfo: Spot
+) {
     Column() {
         //Header image section
         ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
@@ -148,15 +160,13 @@ fun SpotDetailContent() {
         ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
             val (spotTitle, spotDescription) = createRefs()
             Text(
-                text = "Platja de Vallparadis",
+                text = spotInfo.name,
                 style = primaryMediumDisplayS,
                 modifier = Modifier.constrainAs(spotTitle) {
                     start.linkTo(parent.start, 24.dp)
                 })
             Text(
-                text = "This spot located on the amazing Vallparadis beach\n" +
-                        "is perfect to bla bla bla more spot description bla bla \n" +
-                        "lorem ipsum",
+                text = spotInfo.description,
                 style = secondaryRegularBodyM,
                 modifier = Modifier.constrainAs(spotDescription) {
                     start.linkTo(parent.start, 24.dp)
@@ -185,7 +195,7 @@ fun SpotDetailContent() {
             Text(text = "800 likes", style = secondarySemiBoldBodyM)
         }
         CustomSpacer(size = 8.dp)
-        Text(text = "Terrassa, Barcelona, Spain.", style = secondaryRegularBodyL, modifier = Modifier.padding(horizontal = 24.dp))
+        Text(text = spotInfo.location, style = secondaryRegularBodyL, modifier = Modifier.padding(horizontal = 24.dp))
         //Take me there section
         //todo: take me there section
         //About this spot section
@@ -206,5 +216,5 @@ fun SpotDetailContent() {
 @Preview(showSystemUi = true)
 @Composable
 fun SpotDetailContentPreview() {
-    SpotDetailContent()
+  //  SpotDetailContent(Spo)
 }

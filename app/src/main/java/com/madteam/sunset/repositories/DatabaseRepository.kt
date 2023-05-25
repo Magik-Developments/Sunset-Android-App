@@ -1,5 +1,6 @@
 package com.madteam.sunset.repositories
 
+import android.util.Log
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
@@ -109,74 +110,78 @@ class DatabaseRepository @Inject constructor(
     }
 
     override fun getSpotByDocRef(docRef: String): Flow<Spot> = flow {
-        try {
-            val documentReference = firebaseFirestore.document(docRef)
-            val documentSnapshot = documentReference.get().await()
+        val documentReference = firebaseFirestore.document(docRef)
+        val documentSnapshot = documentReference.get().await()
 
-            if (documentSnapshot.exists()) {
-                val id = documentSnapshot.id
-                val creationDate = documentSnapshot.getString("creation_date")
-                val name = documentSnapshot.getString("name")
-                val description = documentSnapshot.getString("description")
-                val score = documentSnapshot.getDouble("score")
-                val visitedTimes = documentSnapshot.get("visited_times")
-                val likes = documentSnapshot.get("likes")
-                val locationInLatLng = documentSnapshot.getGeoPoint("location_in_latlng")
-                val location = documentSnapshot.getString("location")
+        if (documentSnapshot.exists()) {
+            val id = documentSnapshot.id
+            val creationDate = documentSnapshot.getString("creation_date")
+            val name = documentSnapshot.getString("name")
+            val description = documentSnapshot.getString("description")
+            val score = documentSnapshot.getDouble("score")
+            val visitedTimes = documentSnapshot.get("visited_times")
+            val likes = documentSnapshot.get("likes")
+            val locationInLatLng = documentSnapshot.getGeoPoint("location_in_latlng")
+            val location = documentSnapshot.getString("location")
 
-                //User spotted by data
-                val userRef = documentSnapshot.getDocumentReference("spotted_by")
-                val userSnapshot = userRef!!.get().await()
-                val userId = userSnapshot.id
-                val username = userSnapshot.getString("username")
-                val usernameName = userSnapshot.getString("name")
-                val spottedBy = UserProfile(
-                    username = username ?: "",
-                    "",
-                    "",
-                    "",
-                    name = name ?: "",
-                    "",
-                )
+            //User spotted by data
+            val userRef = documentSnapshot.getDocumentReference("spotted_by")
+            val userSnapshot = userRef!!.get().await()
+            val userId = userSnapshot.id
+            val username = userSnapshot.getString("username")
+            val usernameName = userSnapshot.getString("name")
+            val spottedBy = UserProfile(
+                username = username ?: "",
+                "",
+                "",
+                "",
+                name = name ?: "",
+                "",
+            )
 
-                //Spot attributes data
-                val attributesRefs = documentSnapshot.get("attributes") as List<DocumentReference>
-                val attributesList = mutableListOf<SpotAttributes>()
-                for (attributeRef in attributesRefs) {
-                    val attributeSnapshot = attributeRef.get().await()
-                    val attributeId = attributeSnapshot.id
-                    val attributeTitle = attributeSnapshot.getString("title")
-                    val attributeDescription = attributeSnapshot.getString("description")
-                    val attributeIcon = attributeSnapshot.getString("icon")
-                    val attributeFavorable = attributeSnapshot.getBoolean("favorable")
-                    if (attributeDescription != null && attributeTitle != null && attributeIcon != null && attributeFavorable != null) {
-                        val attributeData = SpotAttributes(attributeId, attributeDescription, attributeTitle, attributeIcon, attributeFavorable)
-                        attributesList.add(attributeData)
-                    }
-
+            //Spot attributes data
+            val attributesRefs = documentSnapshot.get("attributes") as List<DocumentReference>
+            val attributesList = mutableListOf<SpotAttributes>()
+            for (attributeRef in attributesRefs) {
+                val attributeSnapshot = attributeRef.get().await()
+                val attributeId = attributeSnapshot.id
+                val attributeTitle = attributeSnapshot.getString("title")
+                val attributeDescription = attributeSnapshot.getString("description")
+                val attributeIcon = attributeSnapshot.getString("icon")
+                val attributeFavorable = attributeSnapshot.getBoolean("favorable")
+                if (attributeDescription != null && attributeTitle != null && attributeIcon != null && attributeFavorable != null) {
+                    val attributeData = SpotAttributes(
+                        attributeId,
+                        attributeDescription,
+                        attributeTitle,
+                        attributeIcon,
+                        attributeFavorable
+                    )
+                    attributesList.add(attributeData)
                 }
 
-                val spotData = Spot(
-                    id = id,
-                    spottedBy = spottedBy,
-                    creationDate = creationDate ?: "",
-                    name = name ?: "",
-                    description = description ?: "",
-                    score = score?.toFloat() ?: 0.0f,
-                    visitedTimes = visitedTimes.toString().toInt(),
-                    likes = likes.toString().toInt(),
-                    locationInLatLng = locationInLatLng ?: GeoPoint(0.0, 0.0),
-                    location = location ?: "",
-                    attributes = attributesList
-                )
-
-                emit(spotData)
-            } else {
-                emit(Spot())
             }
-        } catch (e: Exception) {
+
+            val spotData = Spot(
+                id = id,
+                spottedBy = spottedBy,
+                creationDate = creationDate ?: "",
+                name = name ?: "",
+                description = description ?: "",
+                score = score?.toFloat() ?: 0.0f,
+                visitedTimes = visitedTimes.toString().toIntOrNull() ?: 0,
+                likes = likes.toString().toIntOrNull() ?: 0,
+                locationInLatLng = locationInLatLng ?: GeoPoint(0.0, 0.0),
+                location = location ?: "",
+                attributes = attributesList
+            )
+            emit(spotData)
+        } else {
             emit(Spot())
         }
+    }.catch { exception ->
+        Log.e("DatabaseRepository::getSpotByDocRef", "Error: ${exception.message}")
+        emit(Spot())
     }
 }
 

@@ -5,7 +5,7 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
 import com.madteam.sunset.model.Spot
-import com.madteam.sunset.model.SpotAttributes
+import com.madteam.sunset.model.SpotAttribute
 import com.madteam.sunset.model.SpotClusterItem
 import com.madteam.sunset.model.UserProfile
 import com.madteam.sunset.utils.Resource
@@ -116,6 +116,7 @@ class DatabaseRepository @Inject constructor(
         if (documentSnapshot.exists()) {
             val id = documentSnapshot.id
             val creationDate = documentSnapshot.getString("creation_date")
+            val featuredImages = documentSnapshot.get("featured_images") as List<String>
             val name = documentSnapshot.getString("name")
             val description = documentSnapshot.getString("description")
             val score = documentSnapshot.getDouble("score")
@@ -141,7 +142,7 @@ class DatabaseRepository @Inject constructor(
 
             //Spot attributes data
             val attributesRefs = documentSnapshot.get("attributes") as List<DocumentReference>
-            val attributesList = mutableListOf<SpotAttributes>()
+            val attributesList = mutableListOf<SpotAttribute>()
             for (attributeRef in attributesRefs) {
                 val attributeSnapshot = attributeRef.get().await()
                 val attributeId = attributeSnapshot.id
@@ -150,7 +151,7 @@ class DatabaseRepository @Inject constructor(
                 val attributeIcon = attributeSnapshot.getString("icon")
                 val attributeFavorable = attributeSnapshot.getBoolean("favorable")
                 if (attributeDescription != null && attributeTitle != null && attributeIcon != null && attributeFavorable != null) {
-                    val attributeData = SpotAttributes(
+                    val attributeData = SpotAttribute(
                         attributeId,
                         attributeDescription,
                         attributeTitle,
@@ -165,6 +166,7 @@ class DatabaseRepository @Inject constructor(
             val spotData = Spot(
                 id = id,
                 spottedBy = spottedBy,
+                featuredImages = featuredImages,
                 creationDate = creationDate ?: "",
                 name = name ?: "",
                 description = description ?: "",
@@ -173,7 +175,8 @@ class DatabaseRepository @Inject constructor(
                 likes = likes.toString().toIntOrNull() ?: 0,
                 locationInLatLng = locationInLatLng ?: GeoPoint(0.0, 0.0),
                 location = location ?: "",
-                attributes = attributesList
+                attributes = attributesList,
+                spotReviews = listOf() //todo: obtain real reviews
             )
             emit(spotData)
         } else {

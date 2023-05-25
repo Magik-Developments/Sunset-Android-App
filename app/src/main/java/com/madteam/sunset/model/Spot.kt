@@ -4,6 +4,7 @@ import com.google.firebase.firestore.GeoPoint
 
 data class Spot(
     val id: String,
+    val featuredImages: List<String>,
     val spottedBy: UserProfile,
     val creationDate: String,
     val name: String,
@@ -13,11 +14,13 @@ data class Spot(
     val likes: Int,
     val locationInLatLng: GeoPoint,
     val location: String,
-    val attributes: List<SpotAttributes>
+    val attributes: List<SpotAttribute>,
+    val spotReviews: List<SpotReview>
 ) {
 
     constructor() : this(
         "",
+        listOf(),
         UserProfile(),
         "",
         "",
@@ -27,7 +30,8 @@ data class Spot(
         0,
         GeoPoint(0.0, 0.0),
         "",
-        listOf<SpotAttributes>()
+        listOf<SpotAttribute>(),
+        listOf()
     )
 
 }

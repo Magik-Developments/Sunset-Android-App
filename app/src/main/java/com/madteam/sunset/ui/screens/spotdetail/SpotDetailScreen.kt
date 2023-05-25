@@ -1,6 +1,5 @@
 package com.madteam.sunset.ui.screens.spotdetail
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +18,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Brightness7
 import androidx.compose.material.icons.filled.Directions
 import androidx.compose.material.icons.outlined.Brightness5
 import androidx.compose.material3.Divider
@@ -41,13 +42,19 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
+import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.firebase.firestore.GeoPoint
 import com.madteam.sunset.R
 import com.madteam.sunset.model.Spot
-import com.madteam.sunset.model.SpotAttributes
+import com.madteam.sunset.model.SpotAttribute
+import com.madteam.sunset.model.SpotReview
 import com.madteam.sunset.model.UserProfile
+import com.madteam.sunset.ui.common.AutoSlidingCarousel
 import com.madteam.sunset.ui.common.CustomSpacer
-import com.madteam.sunset.ui.common.ImageSliderCounter
+import com.madteam.sunset.ui.common.IconButtonDark
+import com.madteam.sunset.ui.common.LargeLightButton
 import com.madteam.sunset.ui.common.ProfileImage
 import com.madteam.sunset.ui.common.RoundedLightBackButton
 import com.madteam.sunset.ui.common.RoundedLightLikeButton
@@ -88,6 +95,7 @@ fun SpotDetailScreen(
     )
 }
 
+@OptIn(ExperimentalPagerApi::class, ExperimentalGlideComposeApi::class)
 @Composable
 fun SpotDetailContent(
     spotInfo: Spot
@@ -103,11 +111,16 @@ fun SpotDetailContent(
     ) {
         //Header image section
         ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
-            val (spotImage, backIconButton, saveIconButton, sendIconButton, likeIconButton, imageSliderCounter) = createRefs()
-            Image(
-                painter = painterResource(id = R.drawable.sunsetstockimage),
-                contentDescription = "Sunset Image",
-                contentScale = ContentScale.Crop,
+            val (spotImage, backIconButton, saveIconButton, sendIconButton, likeIconButton) = createRefs()
+            AutoSlidingCarousel(
+                itemsCount = spotInfo.featuredImages.size,
+                itemContent = { index ->
+                    GlideImage(
+                        model = spotInfo.featuredImages[index],
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop
+                    )
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(388.dp)
@@ -116,7 +129,8 @@ fun SpotDetailContent(
                         bottom.linkTo(parent.bottom)
                         start.linkTo(parent.start)
                         end.linkTo(parent.end)
-                    })
+                    }
+            )
             RoundedLightBackButton(modifier = Modifier.constrainAs(backIconButton) {
                 top.linkTo(parent.top, 16.dp)
                 start.linkTo(parent.start, 24.dp)
@@ -133,14 +147,6 @@ fun SpotDetailContent(
                 end.linkTo(parent.end, 24.dp)
                 bottom.linkTo(parent.bottom, 16.dp)
             }, isLiked = false)
-            ImageSliderCounter(
-                actualImage = 1,
-                totalImages = 5,
-                modifier = Modifier.constrainAs(imageSliderCounter) {
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    bottom.linkTo(parent.bottom, 16.dp)
-                })
         }
         //Spotter user information
         ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
@@ -288,7 +294,6 @@ fun SpotDetailContent(
             style = secondarySemiBoldHeadLineM,
             modifier = Modifier.padding(horizontal = 24.dp)
         )
-        //Boarding pass en color amarillo
         CustomSpacer(size = 16.dp)
         LazyRow(
             modifier = Modifier,
@@ -326,10 +331,163 @@ fun SpotDetailContent(
                 }
             }
         }
+        CustomSpacer(size = 24.dp)
+        Divider(
+            modifier = Modifier.padding(horizontal = 24.dp),
+            thickness = 1.dp,
+            color = Color(0xFF999999)
+        )
+        CustomSpacer(size = 24.dp)
+        Row(
+            modifier = Modifier.padding(horizontal = 24.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(imageVector = Icons.Filled.Brightness7, contentDescription = null)
+            CustomSpacer(size = 8.dp)
+            Text(text = spotInfo.score.toString(), style = secondarySemiBoldHeadLineM)
+            Text(text = " · ", style = secondarySemiBoldHeadLineM)
+            Text(text = "${spotInfo.spotReviews.size} reviews", style = secondarySemiBoldHeadLineM)
+        }
+        CustomSpacer(size = 16.dp)
+        LazyRow(
+            modifier = Modifier,
+            contentPadding = PaddingValues(horizontal = 24.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            itemsIndexed(spotInfo.spotReviews) { _, review ->
+                Box(
+                    modifier = Modifier
+                        .size(300.dp)
+                        .border(1.dp, Color(0xFF999999), RoundedCornerShape(20.dp))
+                ) {
+                    ConstraintLayout(
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .fillMaxSize()
+                    ) {
+                        val (title, description, attributesTitle, attributes, userImage, userUsername, reviewDate, scoreIcon, score) = createRefs()
+                        Text(
+                            text = review.title,
+                            style = secondarySemiBoldBodyL,
+                            modifier = Modifier.constrainAs(title) {
+                                top.linkTo(parent.top, 16.dp)
+                                start.linkTo(parent.start)
+                            })
+                        Text(
+                            text = review.description,
+                            style = secondaryRegularBodyM,
+                            modifier = Modifier.constrainAs(description) {
+                                top.linkTo(title.bottom, 8.dp)
+                                start.linkTo(parent.start)
+                            })
+                        ProfileImage(
+                            image = R.drawable.logo_degrade,
+                            size = 40.dp,
+                            modifier = Modifier.constrainAs(userImage) {
+                                bottom.linkTo(parent.bottom, 16.dp)
+                            })
+                        Text(
+                            text = "@${review.postedBy.username}",
+                            style = secondarySemiBoldBodyM,
+                            modifier = Modifier.constrainAs(userUsername) {
+                                top.linkTo(userImage.top, 4.dp)
+                                start.linkTo(userImage.end, 4.dp)
+                            })
+                        Text(
+                            text = review.creationDate,
+                            style = secondaryRegularBodyM,
+                            modifier = Modifier.constrainAs(reviewDate) {
+                                bottom.linkTo(userImage.bottom, 4.dp)
+                                start.linkTo(userImage.end, 4.dp)
+                            })
+                        Text(
+                            text = review.score.toString(),
+                            style = secondarySemiBoldHeadLineM,
+                            modifier = Modifier.constrainAs(score) {
+                                end.linkTo(parent.end)
+                                bottom.linkTo(userImage.bottom)
+                                top.linkTo(userImage.top)
+                            })
+                        Icon(
+                            imageVector = Icons.Filled.Brightness7,
+                            contentDescription = null,
+                            modifier = Modifier.constrainAs(scoreIcon) {
+                                end.linkTo(score.start, 4.dp)
+                                top.linkTo(score.top)
+                                bottom.linkTo(score.bottom)
+                            })
+                        Box(modifier = Modifier.constrainAs(attributesTitle) {
+                            top.linkTo(description.bottom)
+                            bottom.linkTo(userImage.top)
+                        }) {
+                            Column() {
+                                Text(
+                                    text = "How it was?",
+                                    style = secondarySemiBoldBodyM
+                                )
+                                LazyRow(
+                                    modifier = Modifier.padding(top = 16.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                                ) {
+                                    itemsIndexed(review.spotAttributes) { _, attribute ->
+                                        Box(
+                                            modifier = Modifier
+                                                .size(40.dp)
+                                                .border(
+                                                    1.dp,
+                                                    Color(0xFF999999),
+                                                    RoundedCornerShape(8.dp)
+                                                )
+                                        ) {
+                                            Column(
+                                                horizontalAlignment = Alignment.CenterHorizontally,
+                                                verticalArrangement = Arrangement.Center,
+                                                modifier = Modifier.fillMaxSize()
+                                            ) {
+                                                Icon(
+                                                    painter = painterResource(
+                                                        id = getResourceId(
+                                                            attribute.icon,
+                                                            context
+                                                        )
+                                                    ),
+                                                    contentDescription = "",
+                                                    modifier = Modifier.size(24.dp)
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
+        CustomSpacer(size = 16.dp)
+        Row(
+            Modifier
+                .padding(horizontal = 24.dp)
+                .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
+            LargeLightButton(
+                onClick = { /*TODO*/ },
+                text = R.string.show_all_reviews,
+                modifier = Modifier
+                    .fillMaxWidth(0.7f)
+            )
+            IconButtonDark(buttonIcon = Icons.Filled.Add, description = R.string.add, onClick = {}, iconTint = Color.White)
+        }
+        CustomSpacer(size = 24.dp)
+        Divider(
+            modifier = Modifier.padding(horizontal = 24.dp),
+            thickness = 1.dp,
+            color = Color(0xFF999999)
+        )
     }
 }
 
-@Preview(showSystemUi = true)
+@Preview(heightDp = 2000, showBackground = true)
 @Composable
 fun SpotDetailContentPreview() {
     SpotDetailContent(
@@ -343,6 +501,7 @@ fun SpotDetailContentPreview() {
                 "",
                 ""
             ),
+            featuredImages = listOf(),
             creationDate = "15/11/2023",
             name = "La piscina de Vallparadís",
             description = LoremIpsum(300).toString(),
@@ -352,19 +511,39 @@ fun SpotDetailContentPreview() {
             locationInLatLng = GeoPoint(0.0, 0.0),
             location = "Terrassa, Miami, Cataluña",
             attributes = listOf(
-                SpotAttributes(
+                SpotAttribute(
                     "",
                     "",
                     "There is parking",
                     "ic_local_parking",
                     true
                 ),
-                SpotAttributes(
+                SpotAttribute(
                     "",
                     "",
                     "There is parking",
                     "ic_local_parking",
                     true
+                )
+            ),
+            spotReviews = listOf(
+                SpotReview(
+                    "",
+                    "El mejor atardecer de mi vida, volveré 100%!! 😎",
+                    "Experiencia inolvidable ☀️🌅",
+                    postedBy = UserProfile("adriafa", "addd", "", "", "", ""),
+                    spotAttributes = listOf(
+                        SpotAttribute(
+                            "",
+                            "Site to park here",
+                            "d",
+                            "ic_local_parking",
+                            true
+                        ),
+                        SpotAttribute("", "Site to park here", "d", "ic_groups", true)
+                    ),
+                    creationDate = "23/05/2023",
+                    score = 9.8f
                 )
             )
         )

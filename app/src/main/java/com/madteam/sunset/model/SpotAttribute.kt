@@ -1,6 +1,6 @@
 package com.madteam.sunset.model
 
-data class SpotAttributes(
+data class SpotAttribute(
     val id: String,
     val description: String,
     val title: String,

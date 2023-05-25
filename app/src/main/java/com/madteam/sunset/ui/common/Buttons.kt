@@ -4,7 +4,6 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -14,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
@@ -34,7 +32,6 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.madteam.sunset.R
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyM
-import com.madteam.sunset.ui.theme.secondarySemiBoldBodyS
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
 
 @Composable
@@ -205,6 +202,31 @@ fun IconButtonLight(
 }
 
 @Composable
+fun IconButtonDark(
+    buttonIcon: ImageVector,
+    @StringRes description: Int,
+    iconTint: Color = Color.Unspecified,
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .height(50.dp)
+            .width(50.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(Color.Black)
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            modifier = Modifier.size(24.dp, 24.dp),
+            imageVector = buttonIcon,
+            contentDescription = stringResource(description),
+            tint = iconTint
+        )
+    }
+}
+
+@Composable
 fun ThinButtonLight(
     onClick: () -> Unit,
     @StringRes text: Int,
@@ -231,5 +253,36 @@ fun ThinButtonLight(
             style = secondarySemiBoldBodyM,
             color = Color(0xFF333333)
         )
+    }
+}
+
+@Composable
+fun LargeLightButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier.fillMaxWidth(),
+    @StringRes text: Int
+) {
+    Button(
+        onClick = onClick,
+        modifier = modifier
+            .height(48.dp),
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = Color(0xFFFFFFFF),
+        ),
+        shape = RoundedCornerShape(16.dp),
+        border = BorderStroke(1.dp, Color(0xFF000000))
+    ) {
+        Box(
+            Modifier
+                .fillMaxSize()
+                .align(Alignment.CenterVertically)
+        ) {
+            Text(
+                modifier = Modifier.align(Alignment.Center),
+                text = stringResource(text),
+                color = Color(0xFF000000),
+                style = secondarySemiBoldHeadLineS
+            )
+        }
     }
 }

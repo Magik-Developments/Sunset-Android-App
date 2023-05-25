@@ -15,7 +15,8 @@ data class Spot(
     val locationInLatLng: GeoPoint,
     val location: String,
     val attributes: List<SpotAttribute>,
-    val spotReviews: List<SpotReview>
+    val spotReviews: List<SpotReview>,
+    val spotPosts: List<SpotPost>
 ) {
 
     constructor() : this(
@@ -31,6 +32,7 @@ data class Spot(
         GeoPoint(0.0, 0.0),
         "",
         listOf<SpotAttribute>(),
+        listOf(),
         listOf()
     )
 

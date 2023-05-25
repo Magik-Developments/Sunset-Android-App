@@ -130,14 +130,16 @@ class DatabaseRepository @Inject constructor(
             val userSnapshot = userRef!!.get().await()
             val userId = userSnapshot.id
             val username = userSnapshot.getString("username")
+            val userImage = userSnapshot.getString("image")
             val usernameName = userSnapshot.getString("name")
             val spottedBy = UserProfile(
                 username = username ?: "",
                 "",
                 "",
                 "",
-                name = name ?: "",
+                name = usernameName ?: "",
                 "",
+                image = userImage  ?: ""
             )
 
             //Spot attributes data
@@ -176,7 +178,8 @@ class DatabaseRepository @Inject constructor(
                 locationInLatLng = locationInLatLng ?: GeoPoint(0.0, 0.0),
                 location = location ?: "",
                 attributes = attributesList,
-                spotReviews = listOf() //todo: obtain real reviews
+                spotReviews = listOf(),
+                spotPosts = listOf()
             )
             emit(spotData)
         } else {

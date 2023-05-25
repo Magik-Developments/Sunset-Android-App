@@ -48,13 +48,13 @@ fun MyProfileScreen(
   viewModel: MyProfileViewModel = hiltViewModel(),
 ) {
 
-  val context = LocalContext.current
   val coroutineScope = rememberCoroutineScope()
   val editProfileModalState =
     ModalBottomSheetState(initialValue = Hidden, isSkipHalfExpanded = true)
   val username by viewModel.username.collectAsStateWithLifecycle()
   val name by viewModel.name.collectAsStateWithLifecycle()
   val location by viewModel.location.collectAsStateWithLifecycle()
+  val userImage by viewModel.userImage.collectAsStateWithLifecycle()
   val navigateUp by viewModel.navigateWelcomeScreen.collectAsStateWithLifecycle()
 
   if (navigateUp)
@@ -77,6 +77,7 @@ fun MyProfileScreen(
             username = username,
             name = name,
             location = location,
+            userImage = userImage,
             onEditProfileClick = { coroutineScope.launch { editProfileModalState.show() } },
             logout = { viewModel.logOut() }
           )
@@ -91,6 +92,7 @@ fun MyProfileContent(
   username: String,
   name: String,
   location: String,
+  userImage: String,
   logout: () -> Unit,
   onEditProfileClick: () -> Unit
 ) {
@@ -111,7 +113,7 @@ fun MyProfileContent(
       MenuIconButton(onClick = { /*TODO*/ })
     }
     CustomSpacer(size = 8.dp)
-    ProfileImage(image = R.drawable.logo_degrade, size = 80.dp)
+    ProfileImage(imageUrl = userImage, size = 80.dp)
     if (name.isNotBlank()) {
       CustomSpacer(size = 16.dp)
       UserNameText(userName = name)
@@ -145,5 +147,5 @@ fun MyProfileContent(
 @Composable
 @Preview
 fun MyProfileScreenPreview() {
-  MyProfileContent("adriaa12", "Adrià Fernández", "🗺️ Terrassa, Bcn", {}) {}
+  MyProfileContent("adriaa12", "Adrià Fernández", "", "🗺️ Terrassa, Bcn", {}) {}
 }

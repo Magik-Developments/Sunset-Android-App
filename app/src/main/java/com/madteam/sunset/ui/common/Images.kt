@@ -32,6 +32,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
@@ -41,14 +43,15 @@ import kotlinx.coroutines.delay
 
 private const val AUTO_SLIDE_DURATION = 5000
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun ProfileImage(
-    @DrawableRes image: Int,
+    imageUrl: String,
     size: Dp,
     modifier: Modifier = Modifier
 ) {
-    Image(
-        painter = painterResource(id = image),
+    GlideImage(
+        model = imageUrl,
         contentDescription = stringResource(string.profile_user_image_description),
         contentScale = ContentScale.Crop,
         modifier = modifier
@@ -94,7 +97,7 @@ fun AutoSlidingCarousel(
 
     LaunchedEffect(pagerState.currentPage) {
         delay(autoSlideDuration.toLong())
-        pagerState.animateScrollToPage((pagerState.currentPage + 1) % itemsCount)
+        pagerState.animateScrollToPage((pagerState.currentPage + 1) % if (itemsCount == 0) { 1 } else { itemsCount })
     }
 
     Box(

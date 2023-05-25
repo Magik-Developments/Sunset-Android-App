@@ -44,6 +44,7 @@ fun BottomSheetEditProfileScreen(
   val username by viewModel.username.collectAsStateWithLifecycle()
   val email by viewModel.email.collectAsStateWithLifecycle()
   val name by viewModel.name.collectAsStateWithLifecycle()
+  val userImage by viewModel.userImage.collectAsStateWithLifecycle()
   val location by viewModel.location.collectAsStateWithLifecycle()
 
   Card(
@@ -58,6 +59,7 @@ fun BottomSheetEditProfileScreen(
       emailValue = email,
       nameValue = name,
       locationValue = location,
+      userImage = userImage,
       updateName = viewModel::updateName,
       updateLocation = viewModel::updateLocation,
       saveData = viewModel::updateData
@@ -71,6 +73,7 @@ fun BottomSheetEditProfileContent(
   emailValue: String,
   nameValue: String,
   locationValue: String,
+  userImage: String,
   updateName: (String) -> Unit,
   updateLocation: (String) -> Unit,
   saveData: () -> Unit
@@ -97,7 +100,7 @@ fun BottomSheetEditProfileContent(
         .fillMaxWidth(),
       horizontalAlignment = Alignment.CenterHorizontally
     ) {
-      ProfileImage(image = R.drawable.logo_degrade, size = 150.dp)
+      ProfileImage(imageUrl = userImage, size = 150.dp)
       CustomSpacer(size = 36.dp)
     }
     Column(

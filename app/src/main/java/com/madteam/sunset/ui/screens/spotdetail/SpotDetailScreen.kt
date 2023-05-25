@@ -49,6 +49,7 @@ import com.google.firebase.firestore.GeoPoint
 import com.madteam.sunset.R
 import com.madteam.sunset.model.Spot
 import com.madteam.sunset.model.SpotAttribute
+import com.madteam.sunset.model.SpotPost
 import com.madteam.sunset.model.SpotReview
 import com.madteam.sunset.model.UserProfile
 import com.madteam.sunset.ui.common.AutoSlidingCarousel
@@ -152,7 +153,7 @@ fun SpotDetailContent(
         ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
             val (spotterImage, spottedByTitle, spottedByUsername, createdDate) = createRefs()
             ProfileImage(
-                image = R.drawable.logo_degrade,
+                imageUrl = spotInfo.spottedBy.image,
                 size = 56.dp,
                 modifier = Modifier.constrainAs(spotterImage) {
                     start.linkTo(parent.start, 24.dp)
@@ -381,7 +382,7 @@ fun SpotDetailContent(
                                 start.linkTo(parent.start)
                             })
                         ProfileImage(
-                            image = R.drawable.logo_degrade,
+                            imageUrl = review.postedBy.image,
                             size = 40.dp,
                             modifier = Modifier.constrainAs(userImage) {
                                 bottom.linkTo(parent.bottom, 16.dp)
@@ -499,6 +500,7 @@ fun SpotDetailContentPreview() {
                 "",
                 "",
                 "",
+                "",
                 ""
             ),
             featuredImages = listOf(),
@@ -531,7 +533,7 @@ fun SpotDetailContentPreview() {
                     "",
                     "El mejor atardecer de mi vida, volveré 100%!! 😎",
                     "Experiencia inolvidable ☀️🌅",
-                    postedBy = UserProfile("adriafa", "addd", "", "", "", ""),
+                    postedBy = UserProfile("adriafa", "addd", "", "", "", "", ""),
                     spotAttributes = listOf(
                         SpotAttribute(
                             "",
@@ -545,6 +547,14 @@ fun SpotDetailContentPreview() {
                     creationDate = "23/05/2023",
                     score = 9.8f
                 )
+            ),
+            spotPosts = listOf(
+                SpotPost("","",Spot(), listOf(
+                    "https://cdn.vox-cdn.com/thumbor/Al48-pEnyIn2rlgKX7MIHNmlE68=/0x0:5563x3709/1200x800/filters:focal(2302x1311:3192x2201)/cdn.vox-cdn.com/uploads/chorus_image/image/65752607/1048232144.jpg.0.jpg",
+                    "https://images.pexels.com/photos/3651752/pexels-photo-3651752.jpeg?cs=srgb&dl=pexels-anas-hinde-3651752.jpg&fm=jpg"
+                ),
+                UserProfile("dgalaaa", "", "", "", "", "Barcelona, ES.", ""),
+                "")
             )
         )
     )

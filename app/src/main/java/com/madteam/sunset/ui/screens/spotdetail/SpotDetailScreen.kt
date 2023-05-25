@@ -288,6 +288,7 @@ fun SpotDetailContent(
             style = secondarySemiBoldHeadLineM,
             modifier = Modifier.padding(horizontal = 24.dp)
         )
+        //Boarding pass en color amarillo
         CustomSpacer(size = 16.dp)
         LazyRow(
             modifier = Modifier,

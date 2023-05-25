@@ -1,7 +1,5 @@
 package com.madteam.sunset.ui.common
 
-import androidx.annotation.DrawableRes
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -28,16 +26,18 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.ConstraintLayout
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 import com.madteam.sunset.R.string
+import com.madteam.sunset.model.SpotPost
+import com.madteam.sunset.ui.theme.secondaryRegularBodyS
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyS
 import kotlinx.coroutines.delay
 
@@ -97,7 +97,13 @@ fun AutoSlidingCarousel(
 
     LaunchedEffect(pagerState.currentPage) {
         delay(autoSlideDuration.toLong())
-        pagerState.animateScrollToPage((pagerState.currentPage + 1) % if (itemsCount == 0) { 1 } else { itemsCount })
+        pagerState.animateScrollToPage(
+            (pagerState.currentPage + 1) % if (itemsCount == 0) {
+                1
+            } else {
+                itemsCount
+            }
+        )
     }
 
     Box(
@@ -137,4 +143,57 @@ fun AutoSlidingCarousel(
             )
         }
     }
+}
+
+@OptIn(ExperimentalGlideComposeApi::class)
+@Composable
+fun ImagePostCard(
+    cardSize: Dp,
+    postInfo: SpotPost
+) {
+    ConstraintLayout(
+        modifier = Modifier
+            .size(cardSize)
+            .clip(
+                RoundedCornerShape(8.dp)
+            )
+    ) {
+        val (userBackground, userImage, userUsername, userLocation) = createRefs()
+        GlideImage(
+            model = postInfo.images.first(),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize()
+        )
+        Box(
+            modifier = Modifier
+                .background(color = Color.White, shape = RoundedCornerShape(50.dp))
+                .constrainAs(userBackground) {
+                    bottom.linkTo(parent.bottom, 16.dp)
+                    start.linkTo(parent.start, 16.dp)
+                })
+        Text(
+            text = postInfo.author.username,
+            style = secondarySemiBoldBodyS,
+            modifier = Modifier.constrainAs(userUsername) {
+                start.linkTo(userImage.end, 8.dp)
+                top.linkTo(userBackground.top, 8.dp)
+            })
+        ProfileImage(
+            imageUrl = postInfo.author.image,
+            size = 35.dp,
+            modifier = Modifier.constrainAs(userImage) {
+                start.linkTo(userBackground.start, 4.dp)
+                top.linkTo(userBackground.top)
+                bottom.linkTo(userBackground.bottom)
+            })
+        Text(
+            text = postInfo.author.location,
+            style = secondaryRegularBodyS,
+            modifier = Modifier.constrainAs(userLocation) {
+                start.linkTo(userUsername.start)
+                top.linkTo(userUsername.bottom, 4.dp)
+            })
+    }
+
+
 }

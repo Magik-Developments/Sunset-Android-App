@@ -55,6 +55,7 @@ import com.madteam.sunset.model.UserProfile
 import com.madteam.sunset.ui.common.AutoSlidingCarousel
 import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.IconButtonDark
+import com.madteam.sunset.ui.common.ImagePostCard
 import com.madteam.sunset.ui.common.LargeLightButton
 import com.madteam.sunset.ui.common.ProfileImage
 import com.madteam.sunset.ui.common.RoundedLightBackButton
@@ -470,14 +471,20 @@ fun SpotDetailContent(
         Row(
             Modifier
                 .padding(horizontal = 24.dp)
-                .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
+                .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround
+        ) {
             LargeLightButton(
                 onClick = { /*TODO*/ },
                 text = R.string.show_all_reviews,
                 modifier = Modifier
                     .fillMaxWidth(0.7f)
             )
-            IconButtonDark(buttonIcon = Icons.Filled.Add, description = R.string.add, onClick = {}, iconTint = Color.White)
+            IconButtonDark(
+                buttonIcon = Icons.Filled.Add,
+                description = R.string.add,
+                onClick = {},
+                iconTint = Color.White
+            )
         }
         CustomSpacer(size = 24.dp)
         Divider(
@@ -485,6 +492,22 @@ fun SpotDetailContent(
             thickness = 1.dp,
             color = Color(0xFF999999)
         )
+        CustomSpacer(size = 24.dp)
+        Text(
+            text = "User posts",
+            style = secondarySemiBoldHeadLineM,
+            modifier = Modifier.padding(horizontal = 24.dp)
+        )
+        CustomSpacer(size = 16.dp)
+        LazyRow(
+            modifier = Modifier.padding(horizontal = 24.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            itemsIndexed(spotInfo.spotPosts) { _, post ->
+                ImagePostCard(cardSize = 250.dp, postInfo = post)
+            }
+        }
+
     }
 }
 
@@ -549,12 +572,14 @@ fun SpotDetailContentPreview() {
                 )
             ),
             spotPosts = listOf(
-                SpotPost("","",Spot(), listOf(
-                    "https://cdn.vox-cdn.com/thumbor/Al48-pEnyIn2rlgKX7MIHNmlE68=/0x0:5563x3709/1200x800/filters:focal(2302x1311:3192x2201)/cdn.vox-cdn.com/uploads/chorus_image/image/65752607/1048232144.jpg.0.jpg",
-                    "https://images.pexels.com/photos/3651752/pexels-photo-3651752.jpeg?cs=srgb&dl=pexels-anas-hinde-3651752.jpg&fm=jpg"
-                ),
-                UserProfile("dgalaaa", "", "", "", "", "Barcelona, ES.", ""),
-                "")
+                SpotPost(
+                    "", "", Spot(), listOf(
+                        "https://cdn.vox-cdn.com/thumbor/Al48-pEnyIn2rlgKX7MIHNmlE68=/0x0:5563x3709/1200x800/filters:focal(2302x1311:3192x2201)/cdn.vox-cdn.com/uploads/chorus_image/image/65752607/1048232144.jpg.0.jpg",
+                        "https://images.pexels.com/photos/3651752/pexels-photo-3651752.jpeg?cs=srgb&dl=pexels-anas-hinde-3651752.jpg&fm=jpg"
+                    ),
+                    UserProfile("dgalaaa", "", "", "", "", "Barcelona, ES.", ""),
+                    ""
+                )
             )
         )
     )

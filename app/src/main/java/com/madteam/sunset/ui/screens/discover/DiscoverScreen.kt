@@ -67,9 +67,12 @@ fun DiscoverScreen(
                     enter = slideInVertically(initialOffsetY = { it }),
                     exit = slideOutVertically(targetOffsetY = { it + 200 })
                 ) {
-                    SpotClusterInfo(clusterInfo, onClose = { clusterItem ->
-                        viewModel.clusterVisibility(clusterItem.copy(isSelected = false))
-                    }, onItemClicked = {navController.navigate("spot_detail_screen/spotReference=${clusterInfo.spot.id}")})
+                    SpotClusterInfo(
+                        clusterInfo,
+                        onClose = { clusterItem ->
+                            viewModel.clusterVisibility(clusterItem.copy(isSelected = false))
+                        },
+                        onItemClicked = { navController.navigate("spot_detail_screen/spotReference=${clusterInfo.spot.id}") })
                 }
             }
         }

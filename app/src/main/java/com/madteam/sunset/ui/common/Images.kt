@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -155,17 +156,27 @@ fun ImagePostCard(
         modifier = Modifier
             .size(cardSize)
             .clip(
-                RoundedCornerShape(8.dp)
+                RoundedCornerShape(20.dp)
             )
     ) {
-        val (userBackground, userImage, userUsername, userLocation) = createRefs()
+        val (userBackground, userImage, userUsername, userLocation, image) = createRefs()
         GlideImage(
             model = postInfo.images.first(),
             contentDescription = null,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .constrainAs(image) {
+                    top.linkTo(parent.top)
+                    bottom.linkTo(parent.bottom)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                },
+            contentScale = ContentScale.Crop
         )
         Box(
             modifier = Modifier
+                .width(150.dp)
+                .height(40.dp)
                 .background(color = Color.White, shape = RoundedCornerShape(50.dp))
                 .constrainAs(userBackground) {
                     bottom.linkTo(parent.bottom, 16.dp)
@@ -191,7 +202,7 @@ fun ImagePostCard(
             style = secondaryRegularBodyS,
             modifier = Modifier.constrainAs(userLocation) {
                 start.linkTo(userUsername.start)
-                top.linkTo(userUsername.bottom, 4.dp)
+                top.linkTo(userUsername.bottom)
             })
     }
 

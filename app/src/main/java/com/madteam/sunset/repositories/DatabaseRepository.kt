@@ -2,12 +2,14 @@ package com.madteam.sunset.repositories
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
 import com.madteam.sunset.model.Spot
 import com.madteam.sunset.model.SpotAttribute
 import com.madteam.sunset.model.SpotClusterItem
+import com.madteam.sunset.model.SpotPost
 import com.madteam.sunset.model.SpotReview
 import com.madteam.sunset.model.UserProfile
 import com.madteam.sunset.utils.Resource
@@ -131,61 +133,26 @@ class DatabaseRepository @Inject constructor(
             val locationInLatLng = documentSnapshot.getGeoPoint("location_in_latlng")
             val location = documentSnapshot.getString("location")
             val spottedByDocRef = documentSnapshot.getDocumentReference("spotted_by")
+            val attributeDocRefs = documentSnapshot.get("attributes") as List<DocumentReference>
             var spottedBy = UserProfile()
+            var spotAttributes = listOf<SpotAttribute>()
+            val spotReviewsRef = documentReference.collection("spot_reviews")
+            var spotReviews = listOf<SpotReview>()
+            val spotPostsRefs = documentSnapshot.get("posts") as List<DocumentReference>
+            var spotPosts = listOf<SpotPost>()
             if (spottedByDocRef != null) {
-                getUserProfileByDocRef(spottedByDocRef.path).collectLatest { profile ->
+                getUserProfileByDocRef(spottedByDocRef).collectLatest { profile ->
                     spottedBy = profile
                 }
             }
-
-
-            //Spot attributes data
-            val attributesRefs = documentSnapshot.get("attributes") as List<DocumentReference>
-            val attributesList = mutableListOf<SpotAttribute>()
-            for (attributeRef in attributesRefs) {
-                val attributeSnapshot = attributeRef.get().await()
-                val attributeId = attributeSnapshot.id
-                val attributeTitle = attributeSnapshot.getString("title")
-                val attributeDescription = attributeSnapshot.getString("description")
-                val attributeIcon = attributeSnapshot.getString("icon")
-                val attributeFavorable = attributeSnapshot.getBoolean("favorable")
-                if (attributeDescription != null && attributeTitle != null && attributeIcon != null && attributeFavorable != null) {
-                    val attributeData = SpotAttribute(
-                        attributeId,
-                        attributeDescription,
-                        attributeTitle,
-                        attributeIcon,
-                        attributeFavorable
-                    )
-                    attributesList.add(attributeData)
-                }
-
+            getSpotAttributesByDocRefs(attributeDocRefs).collectLatest { attributes ->
+                spotAttributes = attributes
             }
-
-            //Spot reviews data
-            val spotReviewsRef = documentReference.collection("spot_reviews")
-            val spotReviewsList = mutableListOf<SpotReview>()
-            spotReviewsRef.get().await().forEach { spotReviewsSnapshow ->
-                val id= spotReviewsSnapshow.id
-                val description = spotReviewsSnapshow.getString("description")
-                val title = spotReviewsSnapshow.getString("title")
-                val postedBy = spotReviewsSnapshow.getDocumentReference("posted_by")
-                val spotAttributes = spotReviewsSnapshow.get("spot_attr") as List<SpotAttribute>
-                val creationDate = spotReviewsSnapshow.getString("creation_date")
-                val score = spotReviewsSnapshow.getDouble("score")
-                if (description != null && title != null && postedBy != null && creationDate != null && score != null) {
-                    spotReviewsList.add(
-                        SpotReview(
-                            id,
-                            description,
-                            title,
-                            UserProfile(),
-                            spotAttributes,
-                            creationDate,
-                            score.toFloat()
-                        )
-                    )
-                }
+            getSpotReviewsByCollectionRef(spotReviewsRef).collectLatest { reviews ->
+                spotReviews = reviews
+            }
+            getSpotPostsByDocRefs(spotPostsRefs).collectLatest { posts ->
+                spotPosts = posts
             }
 
             val spotData = Spot(
@@ -200,9 +167,9 @@ class DatabaseRepository @Inject constructor(
                 likes = likes.toString().toIntOrNull() ?: 0,
                 locationInLatLng = locationInLatLng ?: GeoPoint(0.0, 0.0),
                 location = location ?: "",
-                attributes = attributesList,
-                spotReviews = listOf(),
-                spotPosts = listOf()
+                attributes = spotAttributes,
+                spotReviews = spotReviews,
+                spotPosts = spotPosts
             )
             emit(spotData)
         } else {
@@ -213,21 +180,25 @@ class DatabaseRepository @Inject constructor(
         emit(Spot())
     }
 
-    override fun getUserProfileByDocRef(docRef: String): Flow<UserProfile> = flow {
-        val documentReference = firebaseFirestore.document(docRef)
+    override fun getUserProfileByDocRef(docRef: DocumentReference): Flow<UserProfile> = flow {
+        val documentReference = firebaseFirestore.document(docRef.path)
         val userSnapshot = documentReference.get().await()
 
         if (userSnapshot.exists()) {
             val username = userSnapshot.getString("username")
+            val email = userSnapshot.getString("email")
+            val provider = userSnapshot.getString("provider")
+            val location = userSnapshot.getString("location")
+            val creationDate = userSnapshot.getString("creation_date")
             val userImage = userSnapshot.getString("image")
             val usernameName = userSnapshot.getString("name")
             val userProfile = UserProfile(
                 username = username ?: "",
-                "",
-                "",
-                "",
+                email = email ?: "",
+                provider = provider ?: "",
+                creation_date = creationDate ?: "",
                 name = usernameName ?: "",
-                "",
+                location = location ?: "",
                 image = userImage  ?: ""
             )
             emit(userProfile)
@@ -235,6 +206,106 @@ class DatabaseRepository @Inject constructor(
     }.catch { exception ->
         Log.e("DatabaseRepository::getUserProfileByDocRef", "Error: ${exception.message}")
         emit(UserProfile())
+    }
+
+    override fun getSpotAttributesByDocRefs(docRefs: List<DocumentReference>): Flow<List<SpotAttribute>> = flow {
+        val attributesList = mutableListOf<SpotAttribute>()
+        for (attributeRef in docRefs) {
+            val attributeSnapshot = attributeRef.get().await()
+            val id = attributeSnapshot.id
+            val title = attributeSnapshot.getString("title")
+            val description = attributeSnapshot.getString("description")
+            val icon = attributeSnapshot.getString("icon")
+            val favorable = attributeSnapshot.getBoolean("favorable")
+            if (description != null && title != null && icon != null && favorable != null) {
+                val attributeData = SpotAttribute(
+                    id,
+                    description,
+                    title,
+                    icon,
+                    favorable
+                )
+                attributesList.add(attributeData)
+            }
+        }
+        emit(attributesList)
+    }.catch { exception ->
+        Log.e("DatabaseRepository::getSpotAttributesByDocRefs", "Error: ${exception.message}")
+        emit(mutableListOf())
+    }
+
+    override fun getSpotReviewsByCollectionRef(collectionRef: CollectionReference): Flow<List<SpotReview>> = flow<List<SpotReview>> {
+        val spotReviewsList = mutableListOf<SpotReview>()
+        collectionRef.get().await().forEach { spotReviewSnapshot ->
+            val id= spotReviewSnapshot.id
+            val description = spotReviewSnapshot.getString("description")
+            val title = spotReviewSnapshot.getString("title")
+            val postedByDocRef = spotReviewSnapshot.getDocumentReference("posted_by")
+            var postedBy = UserProfile()
+            if (postedByDocRef != null) {
+                getUserProfileByDocRef(postedByDocRef).collectLatest { profile ->
+                    postedBy = profile
+                }
+            }
+            val reviewAttributesRefs = spotReviewSnapshot.get("spot_attr") as List<DocumentReference>
+            var reviewAttributes = listOf<SpotAttribute>()
+            getSpotAttributesByDocRefs(reviewAttributesRefs).collectLatest { attributes ->
+                reviewAttributes = attributes
+            }
+            val creationDate = spotReviewSnapshot.getString("creation_date")
+            val score = spotReviewSnapshot.getDouble("score")
+            if (description != null && title != null && creationDate != null && score != null) {
+                spotReviewsList.add(
+                    SpotReview(
+                        id,
+                        description,
+                        title,
+                        postedBy,
+                        reviewAttributes,
+                        creationDate,
+                        score.toFloat()
+                    )
+                )
+            }
+        }
+        emit(spotReviewsList)
+    }.catch { exception ->
+        Log.e("DatabaseRepository::getSpotReviewsByDocRef", "Error: ${exception.message}")
+        emit(mutableListOf())
+    }
+
+    override fun getSpotPostsByDocRefs(docRefs: List<DocumentReference>): Flow<List<SpotPost>> = flow<List<SpotPost>> {
+        val postsList = mutableListOf<SpotPost>()
+        for (postRef in docRefs) {
+            val postSnapshot = postRef.get().await()
+            val id = postSnapshot.id
+            val authorRef = postSnapshot.getDocumentReference("author")
+            var author = UserProfile()
+            if (authorRef != null) {
+                getUserProfileByDocRef(authorRef).collectLatest { profile ->
+                    author = profile
+                }
+            }
+            val description = postSnapshot.getString("description")
+            val creationDate = postSnapshot.getString("creation_date")
+            val images = postSnapshot.get("images") as List<String>
+            val spotRef = postSnapshot.getDocumentReference("spot")?.path
+            if (description != null && creationDate != null && spotRef != null){
+                val spotPost = SpotPost(
+                    id,
+                    description,
+                    spotRef,
+                    images,
+                    author,
+                    creationDate
+                )
+                postsList.add(spotPost)
+            }
+        }
+        emit(postsList)
+    }.catch { exception ->
+        Log.e("DatabaseRepository::getSpotPostsByDocRefs", "Error: ${exception.message}")
+        emit(mutableListOf())
     }
 
 
@@ -252,5 +323,8 @@ interface DatabaseContract {
     fun updateUser(user: UserProfile): Flow<Resource<String>>
     fun getSpotsLocations(): Flow<List<SpotClusterItem>>
     fun getSpotByDocRef(docRef: String): Flow<Spot>
-    fun getUserProfileByDocRef(docRef: String): Flow<UserProfile>
+    fun getUserProfileByDocRef(docRef: DocumentReference): Flow<UserProfile>
+    fun getSpotAttributesByDocRefs(docRefs: List<DocumentReference>) : Flow<List<SpotAttribute>>
+    fun getSpotReviewsByCollectionRef(collectionRef: CollectionReference): Flow<List<SpotReview>>
+    fun getSpotPostsByDocRefs(docRefs: List<DocumentReference>) : Flow<List<SpotPost>>
 }

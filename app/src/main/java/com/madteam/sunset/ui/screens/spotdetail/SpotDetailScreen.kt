@@ -367,7 +367,7 @@ fun SpotDetailContent(
                             .padding(horizontal = 16.dp)
                             .fillMaxSize()
                     ) {
-                        val (title, description, attributesTitle, attributes, userImage, userUsername, reviewDate, scoreIcon, score) = createRefs()
+                        val (title, description, attributesTitle, userImage, userUsername, reviewDate, scoreIcon, score) = createRefs()
                         Text(
                             text = review.title,
                             style = secondarySemiBoldBodyL,
@@ -507,7 +507,25 @@ fun SpotDetailContent(
                 ImagePostCard(cardSize = 250.dp, postInfo = post)
             }
         }
-
+        CustomSpacer(size = 16.dp)
+        Row(
+            Modifier
+                .padding(horizontal = 24.dp)
+                .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround
+        ) {
+            LargeLightButton(
+                onClick = { /*TODO*/ },
+                text = R.string.show_all_posts,
+                modifier = Modifier
+                    .fillMaxWidth(0.7f)
+            )
+            IconButtonDark(
+                buttonIcon = Icons.Filled.Add,
+                description = R.string.add,
+                onClick = {},
+                iconTint = Color.White
+            )
+        }
     }
 }
 
@@ -573,7 +591,7 @@ fun SpotDetailContentPreview() {
             ),
             spotPosts = listOf(
                 SpotPost(
-                    "", "", Spot(), listOf(
+                    "", "", "", listOf(
                         "https://cdn.vox-cdn.com/thumbor/Al48-pEnyIn2rlgKX7MIHNmlE68=/0x0:5563x3709/1200x800/filters:focal(2302x1311:3192x2201)/cdn.vox-cdn.com/uploads/chorus_image/image/65752607/1048232144.jpg.0.jpg",
                         "https://images.pexels.com/photos/3651752/pexels-photo-3651752.jpeg?cs=srgb&dl=pexels-anas-hinde-3651752.jpg&fm=jpg"
                     ),

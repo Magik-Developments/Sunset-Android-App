@@ -184,7 +184,7 @@ fun ImagePostCard(
                         start.linkTo(parent.start, 16.dp)
                     })
             Text(
-                text = postInfo.author.username,
+                text = "@${postInfo.author.username}",
                 style = secondarySemiBoldBodyS,
                 modifier = Modifier.constrainAs(userUsername) {
                     start.linkTo(userImage.end, 8.dp)
@@ -199,11 +199,11 @@ fun ImagePostCard(
                     bottom.linkTo(userBackground.bottom)
                 })
             Text(
-                text = postInfo.author.location,
+                text = postInfo.creation_date,
                 style = secondaryRegularBodyS,
                 modifier = Modifier.constrainAs(userLocation) {
                     start.linkTo(userUsername.start)
-                    top.linkTo(userUsername.bottom)
+                    top.linkTo(userUsername.bottom, (-2).dp)
                 })
         }
     }

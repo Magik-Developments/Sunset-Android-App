@@ -35,6 +35,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.unit.dp
@@ -185,25 +186,28 @@ fun SpotDetailContent(
         }
         CustomSpacer(size = 24.dp)
         //Spot title and description
-        ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
+        ConstraintLayout(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp)) {
             val (spotTitle, spotDescription) = createRefs()
             Text(
                 text = spotInfo.name,
                 style = primaryMediumDisplayS,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
                     .constrainAs(spotTitle) {
-                        start.linkTo(parent.start, 24.dp)
+                        start.linkTo(parent.start)
                     }
-                    .padding(end = 24.dp))
+            )
             Text(
                 text = spotInfo.description,
+                maxLines = 10,
+                overflow = TextOverflow.Ellipsis,
                 style = secondaryRegularBodyM,
                 modifier = Modifier
                     .constrainAs(spotDescription) {
-                        start.linkTo(parent.start, 24.dp)
+                        start.linkTo(parent.start)
                         top.linkTo(spotTitle.bottom, 8.dp)
                     }
-                    .padding(end = 36.dp)
             )
         }
         CustomSpacer(size = 16.dp)
@@ -230,7 +234,9 @@ fun SpotDetailContent(
         Text(
             text = spotInfo.location,
             style = secondaryRegularBodyL,
-            modifier = Modifier.padding(horizontal = 24.dp)
+            modifier = Modifier.padding(horizontal = 24.dp),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
         CustomSpacer(size = 16.dp)
         //Take me there section
@@ -327,6 +333,8 @@ fun SpotDetailContent(
                             text = attribute.title,
                             style = secondaryRegularBodyS,
                             textAlign = TextAlign.Center,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
                         )
                     }
@@ -371,6 +379,8 @@ fun SpotDetailContent(
                         Text(
                             text = review.title,
                             style = secondarySemiBoldBodyL,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.constrainAs(title) {
                                 top.linkTo(parent.top, 16.dp)
                                 start.linkTo(parent.start)
@@ -378,6 +388,8 @@ fun SpotDetailContent(
                         Text(
                             text = review.description,
                             style = secondaryRegularBodyM,
+                            maxLines = 6,
+                            overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.constrainAs(description) {
                                 top.linkTo(title.bottom, 8.dp)
                                 start.linkTo(parent.start)

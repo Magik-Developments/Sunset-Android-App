@@ -14,6 +14,7 @@ import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
@@ -35,6 +36,7 @@ fun SpotClusterInfo(
         modifier = Modifier
             .fillMaxWidth()
             .height(140.dp)
+            .clip(RoundedCornerShape(20.dp))
             .clickable { onItemClicked() },
         backgroundColor = Color.White,
         shape = RoundedCornerShape(20.dp),

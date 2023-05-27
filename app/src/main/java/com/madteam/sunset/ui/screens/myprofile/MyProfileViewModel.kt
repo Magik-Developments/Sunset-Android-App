@@ -16,6 +16,7 @@ class MyProfileViewModel @Inject constructor(
     val username = MutableStateFlow("")
     val name = MutableStateFlow("")
     val location = MutableStateFlow("")
+    val userImage = MutableStateFlow("")
 
     val navigateWelcomeScreen = MutableStateFlow(false)
 
@@ -29,6 +30,7 @@ class MyProfileViewModel @Inject constructor(
                 username.value = it.username
                 name.value = it.name
                 location.value = it.location
+                userImage.value = it.image
             }
         }
     }

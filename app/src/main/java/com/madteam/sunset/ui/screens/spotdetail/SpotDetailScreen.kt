@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
@@ -245,7 +246,7 @@ fun SpotDetailContent(
                     .defaultMinSize(minWidth = 400.dp)
             )
         }
-        CustomSpacer(size = 16.dp)
+
         //Spot information and location
         Row(
             modifier = Modifier
@@ -256,6 +257,7 @@ fun SpotDetailContent(
 
         ) {
             if (!showShimmer.value) {
+                CustomSpacer(size = 16.dp)
                 Icon(imageVector = Icons.Outlined.Brightness5, contentDescription = "")
                 CustomSpacer(size = 4.dp)
                 Text(text = "${spotInfo.score}", style = secondaryRegularBodyM)
@@ -582,6 +584,23 @@ fun SpotDetailContent(
                     iconTint = Color.White
                 )
             }
+        } else {
+            //False shimmer effect when showshimmer is true
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .padding(horizontal = 24.dp)
+                    .background(shimmerBrush(showShimmer = showShimmer.value))
+            )
+            CustomSpacer(size = 16.dp)
+            Box(
+                modifier = Modifier
+                    .width(200.dp)
+                    .height(20.dp)
+                    .padding(horizontal = 24.dp)
+                    .background(shimmerBrush(showShimmer = showShimmer.value))
+            )
         }
     }
 }

@@ -280,303 +280,308 @@ fun SpotDetailContent(
         )
         CustomSpacer(size = 16.dp)
         //Take me there section
-        Divider(
-            modifier = Modifier.padding(horizontal = 24.dp),
-            thickness = 1.dp,
-            color = Color(0xFF999999)
-        )
-        ConstraintLayout(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp)
-        ) {
-            val (distanceText, distance, time, directions) = createRefs()
-            Text(
-                text = "You are only ",
-                style = secondaryRegularBodyL,
-                modifier = Modifier.constrainAs(distanceText) {
-                    start.linkTo(parent.start)
-                    top.linkTo(parent.top, 8.dp)
-                })
-            Text(
-                text = "2 km away",
-                style = secondarySemiBoldBodyL,
-                modifier = Modifier.constrainAs(distance) {
-                    start.linkTo(distanceText.end)
-                    top.linkTo(parent.top, 8.dp)
-                })
-            Text(
-                text = "or 10 minutes walking",
-                style = secondaryRegularBodyM,
-                modifier = Modifier.constrainAs(time) {
-                    start.linkTo(distanceText.start)
-                    end.linkTo(distance.end)
-                    top.linkTo(distance.bottom, 8.dp)
-                    bottom.linkTo(parent.bottom, 8.dp)
-                })
-            Icon(
-                modifier = Modifier
-                    .constrainAs(directions) {
-                        top.linkTo(parent.top)
-                        bottom.linkTo(parent.bottom)
-                        end.linkTo(parent.end, 36.dp)
-                    }
-                    .size(48.dp)
-                    .clickable {
-                        openDirectionsOnGoogleMaps(context, spotInfo.locationInLatLng)
-                    },
-                imageVector = Icons.Filled.Directions,
-                contentDescription = "",
-                tint = Color(0xFFFFB600)
+        if (!showShimmer.value) {
+            Divider(
+                modifier = Modifier.padding(horizontal = 24.dp),
+                thickness = 1.dp,
+                color = Color(0xFF999999)
             )
-        }
-        Divider(
-            modifier = Modifier.padding(horizontal = 24.dp),
-            thickness = 1.dp,
-            color = Color(0xFF999999)
-        )
-        //About this spot section
-        CustomSpacer(size = 16.dp)
-        Text(
-            text = "About this spot",
-            style = secondarySemiBoldHeadLineM,
-            modifier = Modifier.padding(horizontal = 24.dp)
-        )
-        CustomSpacer(size = 16.dp)
-        LazyRow(
-            modifier = Modifier,
-            contentPadding = PaddingValues(horizontal = 24.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            itemsIndexed(spotInfo.attributes) { _, attribute ->
-                Box(
+            ConstraintLayout(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp)
+            ) {
+                val (distanceText, distance, time, directions) = createRefs()
+                Text(
+                    text = "You are only ",
+                    style = secondaryRegularBodyL,
+                    modifier = Modifier.constrainAs(distanceText) {
+                        start.linkTo(parent.start)
+                        top.linkTo(parent.top, 8.dp)
+                    })
+                Text(
+                    text = "2 km away",
+                    style = secondarySemiBoldBodyL,
+                    modifier = Modifier.constrainAs(distance) {
+                        start.linkTo(distanceText.end)
+                        top.linkTo(parent.top, 8.dp)
+                    })
+                Text(
+                    text = "or 10 minutes walking",
+                    style = secondaryRegularBodyM,
+                    modifier = Modifier.constrainAs(time) {
+                        start.linkTo(distanceText.start)
+                        end.linkTo(distance.end)
+                        top.linkTo(distance.bottom, 8.dp)
+                        bottom.linkTo(parent.bottom, 8.dp)
+                    })
+                Icon(
                     modifier = Modifier
-                        .size(100.dp)
-                        .border(1.dp, Color(0xFF999999), RoundedCornerShape(20.dp))
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center,
-                        modifier = Modifier.fillMaxSize()
+                        .constrainAs(directions) {
+                            top.linkTo(parent.top)
+                            bottom.linkTo(parent.bottom)
+                            end.linkTo(parent.end, 36.dp)
+                        }
+                        .size(48.dp)
+                        .clickable {
+                            openDirectionsOnGoogleMaps(context, spotInfo.locationInLatLng)
+                        },
+                    imageVector = Icons.Filled.Directions,
+                    contentDescription = "",
+                    tint = Color(0xFFFFB600)
+                )
+            }
+            Divider(
+                modifier = Modifier.padding(horizontal = 24.dp),
+                thickness = 1.dp,
+                color = Color(0xFF999999)
+            )
+            //About this spot section
+            CustomSpacer(size = 16.dp)
+            Text(
+                text = "About this spot",
+                style = secondarySemiBoldHeadLineM,
+                modifier = Modifier.padding(horizontal = 24.dp)
+            )
+            CustomSpacer(size = 16.dp)
+            LazyRow(
+                modifier = Modifier,
+                contentPadding = PaddingValues(horizontal = 24.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                itemsIndexed(spotInfo.attributes) { _, attribute ->
+                    Box(
+                        modifier = Modifier
+                            .size(100.dp)
+                            .border(1.dp, Color(0xFF999999), RoundedCornerShape(20.dp))
                     ) {
-                        Icon(
-                            painter = painterResource(
-                                id = getResourceId(
-                                    attribute.icon,
-                                    context
-                                )
-                            ),
-                            contentDescription = "",
-                            modifier = Modifier.size(24.dp)
-                        )
-                        Text(
-                            text = attribute.title,
-                            style = secondaryRegularBodyS,
-                            textAlign = TextAlign.Center,
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
-                        )
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center,
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            Icon(
+                                painter = painterResource(
+                                    id = getResourceId(
+                                        attribute.icon,
+                                        context
+                                    )
+                                ),
+                                contentDescription = "",
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Text(
+                                text = attribute.title,
+                                style = secondaryRegularBodyS,
+                                textAlign = TextAlign.Center,
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
+                            )
+                        }
                     }
                 }
             }
-        }
-        CustomSpacer(size = 24.dp)
-        Divider(
-            modifier = Modifier.padding(horizontal = 24.dp),
-            thickness = 1.dp,
-            color = Color(0xFF999999)
-        )
-        CustomSpacer(size = 24.dp)
-        Row(
-            modifier = Modifier.padding(horizontal = 24.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(imageVector = Icons.Filled.Brightness7, contentDescription = null)
-            CustomSpacer(size = 8.dp)
-            Text(text = spotInfo.score.toString(), style = secondarySemiBoldHeadLineM)
-            Text(text = " · ", style = secondarySemiBoldHeadLineM)
-            Text(text = "${spotInfo.spotReviews.size} reviews", style = secondarySemiBoldHeadLineM)
-        }
-        CustomSpacer(size = 16.dp)
-        LazyRow(
-            modifier = Modifier,
-            contentPadding = PaddingValues(horizontal = 24.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            itemsIndexed(spotInfo.spotReviews) { _, review ->
-                Box(
-                    modifier = Modifier
-                        .size(300.dp)
-                        .border(1.dp, Color(0xFF999999), RoundedCornerShape(20.dp))
-                ) {
-                    ConstraintLayout(
+            CustomSpacer(size = 24.dp)
+            Divider(
+                modifier = Modifier.padding(horizontal = 24.dp),
+                thickness = 1.dp,
+                color = Color(0xFF999999)
+            )
+            CustomSpacer(size = 24.dp)
+            Row(
+                modifier = Modifier.padding(horizontal = 24.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(imageVector = Icons.Filled.Brightness7, contentDescription = null)
+                CustomSpacer(size = 8.dp)
+                Text(text = spotInfo.score.toString(), style = secondarySemiBoldHeadLineM)
+                Text(text = " · ", style = secondarySemiBoldHeadLineM)
+                Text(
+                    text = "${spotInfo.spotReviews.size} reviews",
+                    style = secondarySemiBoldHeadLineM
+                )
+            }
+            CustomSpacer(size = 16.dp)
+            LazyRow(
+                modifier = Modifier,
+                contentPadding = PaddingValues(horizontal = 24.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                itemsIndexed(spotInfo.spotReviews) { _, review ->
+                    Box(
                         modifier = Modifier
-                            .padding(horizontal = 16.dp)
-                            .fillMaxSize()
+                            .size(300.dp)
+                            .border(1.dp, Color(0xFF999999), RoundedCornerShape(20.dp))
                     ) {
-                        val (title, description, attributesTitle, userImage, userUsername, reviewDate, scoreIcon, score) = createRefs()
-                        Text(
-                            text = review.title,
-                            style = secondarySemiBoldBodyL,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.constrainAs(title) {
-                                top.linkTo(parent.top, 16.dp)
-                                start.linkTo(parent.start)
-                            })
-                        Text(
-                            text = review.description,
-                            style = secondaryRegularBodyM,
-                            maxLines = 6,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.constrainAs(description) {
-                                top.linkTo(title.bottom, 8.dp)
-                                start.linkTo(parent.start)
-                            })
-                        ProfileImage(
-                            imageUrl = review.postedBy.image,
-                            size = 40.dp,
-                            modifier = Modifier.constrainAs(userImage) {
-                                bottom.linkTo(parent.bottom, 16.dp)
-                            })
-                        Text(
-                            text = "@${review.postedBy.username}",
-                            style = secondarySemiBoldBodyM,
-                            modifier = Modifier.constrainAs(userUsername) {
-                                top.linkTo(userImage.top, 4.dp)
-                                start.linkTo(userImage.end, 4.dp)
-                            })
-                        Text(
-                            text = review.creationDate,
-                            style = secondaryRegularBodyM,
-                            modifier = Modifier.constrainAs(reviewDate) {
-                                bottom.linkTo(userImage.bottom, 4.dp)
-                                start.linkTo(userImage.end, 4.dp)
-                            })
-                        Text(
-                            text = review.score.toString(),
-                            style = secondarySemiBoldHeadLineM,
-                            modifier = Modifier.constrainAs(score) {
-                                end.linkTo(parent.end)
-                                bottom.linkTo(userImage.bottom)
-                                top.linkTo(userImage.top)
-                            })
-                        Icon(
-                            imageVector = Icons.Filled.Brightness7,
-                            contentDescription = null,
-                            modifier = Modifier.constrainAs(scoreIcon) {
-                                end.linkTo(score.start, 4.dp)
-                                top.linkTo(score.top)
-                                bottom.linkTo(score.bottom)
-                            })
-                        Box(modifier = Modifier.constrainAs(attributesTitle) {
-                            top.linkTo(description.bottom)
-                            bottom.linkTo(userImage.top)
-                        }) {
-                            Column() {
-                                Text(
-                                    text = "How it was?",
-                                    style = secondarySemiBoldBodyM
-                                )
-                                LazyRow(
-                                    modifier = Modifier.padding(top = 16.dp),
-                                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                                ) {
-                                    itemsIndexed(review.spotAttributes) { _, attribute ->
-                                        Box(
-                                            modifier = Modifier
-                                                .size(40.dp)
-                                                .border(
-                                                    1.dp,
-                                                    Color(0xFF999999),
-                                                    RoundedCornerShape(8.dp)
-                                                )
-                                        ) {
-                                            Column(
-                                                horizontalAlignment = Alignment.CenterHorizontally,
-                                                verticalArrangement = Arrangement.Center,
-                                                modifier = Modifier.fillMaxSize()
+                        ConstraintLayout(
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .fillMaxSize()
+                        ) {
+                            val (title, description, attributesTitle, userImage, userUsername, reviewDate, scoreIcon, score) = createRefs()
+                            Text(
+                                text = review.title,
+                                style = secondarySemiBoldBodyL,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.constrainAs(title) {
+                                    top.linkTo(parent.top, 16.dp)
+                                    start.linkTo(parent.start)
+                                })
+                            Text(
+                                text = review.description,
+                                style = secondaryRegularBodyM,
+                                maxLines = 6,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.constrainAs(description) {
+                                    top.linkTo(title.bottom, 8.dp)
+                                    start.linkTo(parent.start)
+                                })
+                            ProfileImage(
+                                imageUrl = review.postedBy.image,
+                                size = 40.dp,
+                                modifier = Modifier.constrainAs(userImage) {
+                                    bottom.linkTo(parent.bottom, 16.dp)
+                                })
+                            Text(
+                                text = "@${review.postedBy.username}",
+                                style = secondarySemiBoldBodyM,
+                                modifier = Modifier.constrainAs(userUsername) {
+                                    top.linkTo(userImage.top, 4.dp)
+                                    start.linkTo(userImage.end, 4.dp)
+                                })
+                            Text(
+                                text = review.creationDate,
+                                style = secondaryRegularBodyM,
+                                modifier = Modifier.constrainAs(reviewDate) {
+                                    bottom.linkTo(userImage.bottom, 4.dp)
+                                    start.linkTo(userImage.end, 4.dp)
+                                })
+                            Text(
+                                text = review.score.toString(),
+                                style = secondarySemiBoldHeadLineM,
+                                modifier = Modifier.constrainAs(score) {
+                                    end.linkTo(parent.end)
+                                    bottom.linkTo(userImage.bottom)
+                                    top.linkTo(userImage.top)
+                                })
+                            Icon(
+                                imageVector = Icons.Filled.Brightness7,
+                                contentDescription = null,
+                                modifier = Modifier.constrainAs(scoreIcon) {
+                                    end.linkTo(score.start, 4.dp)
+                                    top.linkTo(score.top)
+                                    bottom.linkTo(score.bottom)
+                                })
+                            Box(modifier = Modifier.constrainAs(attributesTitle) {
+                                top.linkTo(description.bottom)
+                                bottom.linkTo(userImage.top)
+                            }) {
+                                Column() {
+                                    Text(
+                                        text = "How it was?",
+                                        style = secondarySemiBoldBodyM
+                                    )
+                                    LazyRow(
+                                        modifier = Modifier.padding(top = 16.dp),
+                                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                                    ) {
+                                        itemsIndexed(review.spotAttributes) { _, attribute ->
+                                            Box(
+                                                modifier = Modifier
+                                                    .size(40.dp)
+                                                    .border(
+                                                        1.dp,
+                                                        Color(0xFF999999),
+                                                        RoundedCornerShape(8.dp)
+                                                    )
                                             ) {
-                                                Icon(
-                                                    painter = painterResource(
-                                                        id = getResourceId(
-                                                            attribute.icon,
-                                                            context
-                                                        )
-                                                    ),
-                                                    contentDescription = "",
-                                                    modifier = Modifier.size(24.dp)
-                                                )
+                                                Column(
+                                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                                    verticalArrangement = Arrangement.Center,
+                                                    modifier = Modifier.fillMaxSize()
+                                                ) {
+                                                    Icon(
+                                                        painter = painterResource(
+                                                            id = getResourceId(
+                                                                attribute.icon,
+                                                                context
+                                                            )
+                                                        ),
+                                                        contentDescription = "",
+                                                        modifier = Modifier.size(24.dp)
+                                                    )
+                                                }
                                             }
                                         }
                                     }
                                 }
                             }
-                        }
 
+                        }
                     }
                 }
             }
-        }
-        CustomSpacer(size = 16.dp)
-        Row(
-            Modifier
-                .padding(horizontal = 24.dp)
-                .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround
-        ) {
-            LargeLightButton(
-                onClick = { /*TODO*/ },
-                text = R.string.show_all_reviews,
-                modifier = Modifier
-                    .fillMaxWidth(0.7f)
-            )
-            IconButtonDark(
-                buttonIcon = Icons.Filled.Add,
-                description = R.string.add,
-                onClick = {},
-                iconTint = Color.White
-            )
-        }
-        CustomSpacer(size = 24.dp)
-        Divider(
-            modifier = Modifier.padding(horizontal = 24.dp),
-            thickness = 1.dp,
-            color = Color(0xFF999999)
-        )
-        CustomSpacer(size = 24.dp)
-        Text(
-            text = "User posts",
-            style = secondarySemiBoldHeadLineM,
-            modifier = Modifier.padding(horizontal = 24.dp)
-        )
-        CustomSpacer(size = 16.dp)
-        LazyRow(
-            modifier = Modifier.padding(horizontal = 24.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            itemsIndexed(spotInfo.spotPosts) { _, post ->
-                ImagePostCard(cardSize = 250.dp, postInfo = post)
+            CustomSpacer(size = 16.dp)
+            Row(
+                Modifier
+                    .padding(horizontal = 24.dp)
+                    .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround
+            ) {
+                LargeLightButton(
+                    onClick = { /*TODO*/ },
+                    text = R.string.show_all_reviews,
+                    modifier = Modifier
+                        .fillMaxWidth(0.7f)
+                )
+                IconButtonDark(
+                    buttonIcon = Icons.Filled.Add,
+                    description = R.string.add,
+                    onClick = {},
+                    iconTint = Color.White
+                )
             }
-        }
-        CustomSpacer(size = 16.dp)
-        Row(
-            Modifier
-                .padding(horizontal = 24.dp)
-                .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround
-        ) {
-            LargeLightButton(
-                onClick = { /*TODO*/ },
-                text = R.string.show_all_posts,
-                modifier = Modifier
-                    .fillMaxWidth(0.7f)
+            CustomSpacer(size = 24.dp)
+            Divider(
+                modifier = Modifier.padding(horizontal = 24.dp),
+                thickness = 1.dp,
+                color = Color(0xFF999999)
             )
-            IconButtonDark(
-                buttonIcon = Icons.Filled.Add,
-                description = R.string.add,
-                onClick = {},
-                iconTint = Color.White
+            CustomSpacer(size = 24.dp)
+            Text(
+                text = "User posts",
+                style = secondarySemiBoldHeadLineM,
+                modifier = Modifier.padding(horizontal = 24.dp)
             )
+            CustomSpacer(size = 16.dp)
+            LazyRow(
+                modifier = Modifier.padding(horizontal = 24.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                itemsIndexed(spotInfo.spotPosts) { _, post ->
+                    ImagePostCard(cardSize = 250.dp, postInfo = post)
+                }
+            }
+            CustomSpacer(size = 16.dp)
+            Row(
+                Modifier
+                    .padding(horizontal = 24.dp)
+                    .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround
+            ) {
+                LargeLightButton(
+                    onClick = { /*TODO*/ },
+                    text = R.string.show_all_posts,
+                    modifier = Modifier
+                        .fillMaxWidth(0.7f)
+                )
+                IconButtonDark(
+                    buttonIcon = Icons.Filled.Add,
+                    description = R.string.add,
+                    onClick = {},
+                    iconTint = Color.White
+                )
+            }
         }
     }
 }

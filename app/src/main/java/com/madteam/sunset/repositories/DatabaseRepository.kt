@@ -171,7 +171,7 @@ class DatabaseRepository @Inject constructor(
                 spotReviews = spotReviews,
                 spotPosts = spotPosts
             )
-            emit(spotData)
+            emit(Spot())
         } else {
             emit(Spot())
         }

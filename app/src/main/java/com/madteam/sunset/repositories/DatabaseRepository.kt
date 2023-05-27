@@ -1,7 +1,6 @@
 package com.madteam.sunset.repositories
 
 import android.util.Log
-import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
@@ -13,13 +12,12 @@ import com.madteam.sunset.model.SpotPost
 import com.madteam.sunset.model.SpotReview
 import com.madteam.sunset.model.UserProfile
 import com.madteam.sunset.utils.Resource
-import kotlinx.coroutines.CoroutineScope
+import com.madteam.sunset.utils.Result
+import com.madteam.sunset.utils.runCatchingException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.util.Calendar
 import javax.inject.Inject
@@ -32,38 +30,28 @@ class DatabaseRepository @Inject constructor(
     private val firebaseFirestore: FirebaseFirestore
 ) : DatabaseContract {
 
-    override fun createUser(
-        email: String,
-        username: String,
-        provider: String
-    ): Flow<Resource<String>> = flow {
-        emit(Resource.Loading())
+    override suspend fun createUser(email: String, username: String, provider: String): Result<String> =
+        runCatchingException {
+            val userDocument = firebaseFirestore.collection(USERS_COLLECTION_PATH).document(username)
+            val documentSnapshot = userDocument.get().await()
 
-        val userDocument = firebaseFirestore.collection(USERS_COLLECTION_PATH).document(username)
-        val documentSnapshot = userDocument.get().await()
-        if (documentSnapshot.exists()) {
-            emit(Resource.Error("e_user_already_exists"))
-            return@flow
+            if (documentSnapshot.exists()) {
+                "User already exists"
+            } else {
+                hashMapOf(
+                    "username" to username,
+                    "email" to email,
+                    "provider" to provider,
+                    "creation_date" to Calendar.getInstance().time.toString()
+                ).let { user ->
+                    firebaseFirestore.collection(USERS_COLLECTION_PATH).document(username).set(user).await()
+                }
+                "User database has been created"
+            }
         }
 
-        val currentDate = Calendar.getInstance().time.toString()
-        val user = hashMapOf(
-            "username" to username,
-            "email" to email,
-            "provider" to provider,
-            "creation_date" to currentDate
-        )
-
-        firebaseFirestore.collection(USERS_COLLECTION_PATH).document(username).set(user).await()
-        emit(Resource.Success("User database has been created"))
-    }.catch {
-        emit(Resource.Error(it.message.toString()))
-    }
-
     override fun getUserByEmail(email: String, userProfileCallback: (UserProfile) -> Unit) {
-        firebaseFirestore.collection(USERS_COLLECTION_PATH).whereEqualTo("email", email)
-            .limit(1)
-            .get()
+        firebaseFirestore.collection(USERS_COLLECTION_PATH).whereEqualTo("email", email).limit(1).get()
             .addOnSuccessListener { userDocument ->
                 userProfileCallback(userDocument.toObjects(UserProfile::class.java)[0])
             }
@@ -71,8 +59,7 @@ class DatabaseRepository @Inject constructor(
 
     override fun updateUser(user: UserProfile): Flow<Resource<String>> = flow {
         emit(Resource.Loading())
-        val userDocument =
-            firebaseFirestore.collection(USERS_COLLECTION_PATH).document(user.username)
+        val userDocument = firebaseFirestore.collection(USERS_COLLECTION_PATH).document(user.username)
         val documentSnapshot = userDocument.get().await()
         if (!documentSnapshot.exists()) {
             emit(Resource.Error("e_user_database_not_found"))
@@ -81,9 +68,7 @@ class DatabaseRepository @Inject constructor(
         val updateMap = HashMap<String, Any?>()
         updateMap["name"] = user.name
         updateMap["location"] = user.location
-        firebaseFirestore.collection(USERS_COLLECTION_PATH).document(user.username)
-            .update(updateMap)
-            .await()
+        firebaseFirestore.collection(USERS_COLLECTION_PATH).document(user.username).update(updateMap).await()
         emit(Resource.Success("User database has been updated"))
     }.catch {
         emit(Resource.Error(it.message.toString()))
@@ -91,8 +76,7 @@ class DatabaseRepository @Inject constructor(
 
     override fun getSpotsLocations(): Flow<List<SpotClusterItem>> = flow {
         try {
-            val spotCollection =
-                firebaseFirestore.collection(SPOTS_LOCATIONS_COLLECTION_PATH).get().await()
+            val spotCollection = firebaseFirestore.collection(SPOTS_LOCATIONS_COLLECTION_PATH).get().await()
             val spotList = spotCollection.documents.mapNotNull { document ->
                 val id = document.id
                 val name = document.getString("name")
@@ -101,11 +85,7 @@ class DatabaseRepository @Inject constructor(
 
                 if (name != null && location != null && spot != null) {
                     SpotClusterItem(
-                        id = id,
-                        name = name,
-                        spot = spot,
-                        location = location,
-                        isSelected = false
+                        id = id, name = name, spot = spot, location = location, isSelected = false
                     )
                 } else {
                     null
@@ -199,7 +179,7 @@ class DatabaseRepository @Inject constructor(
                 creation_date = creationDate ?: "",
                 name = usernameName ?: "",
                 location = location ?: "",
-                image = userImage  ?: ""
+                image = userImage ?: ""
             )
             emit(userProfile)
         }
@@ -219,11 +199,7 @@ class DatabaseRepository @Inject constructor(
             val favorable = attributeSnapshot.getBoolean("favorable")
             if (description != null && title != null && icon != null && favorable != null) {
                 val attributeData = SpotAttribute(
-                    id,
-                    description,
-                    title,
-                    icon,
-                    favorable
+                    id, description, title, icon, favorable
                 )
                 attributesList.add(attributeData)
             }
@@ -234,45 +210,40 @@ class DatabaseRepository @Inject constructor(
         emit(mutableListOf())
     }
 
-    override fun getSpotReviewsByCollectionRef(collectionRef: CollectionReference): Flow<List<SpotReview>> = flow<List<SpotReview>> {
-        val spotReviewsList = mutableListOf<SpotReview>()
-        collectionRef.get().await().forEach { spotReviewSnapshot ->
-            val id= spotReviewSnapshot.id
-            val description = spotReviewSnapshot.getString("description")
-            val title = spotReviewSnapshot.getString("title")
-            val postedByDocRef = spotReviewSnapshot.getDocumentReference("posted_by")
-            var postedBy = UserProfile()
-            if (postedByDocRef != null) {
-                getUserProfileByDocRef(postedByDocRef).collectLatest { profile ->
-                    postedBy = profile
+    override fun getSpotReviewsByCollectionRef(collectionRef: CollectionReference): Flow<List<SpotReview>> =
+        flow<List<SpotReview>> {
+            val spotReviewsList = mutableListOf<SpotReview>()
+            collectionRef.get().await().forEach { spotReviewSnapshot ->
+                val id = spotReviewSnapshot.id
+                val description = spotReviewSnapshot.getString("description")
+                val title = spotReviewSnapshot.getString("title")
+                val postedByDocRef = spotReviewSnapshot.getDocumentReference("posted_by")
+                var postedBy = UserProfile()
+                if (postedByDocRef != null) {
+                    getUserProfileByDocRef(postedByDocRef).collectLatest { profile ->
+                        postedBy = profile
+                    }
+                }
+                val reviewAttributesRefs = spotReviewSnapshot.get("spot_attr") as List<DocumentReference>
+                var reviewAttributes = listOf<SpotAttribute>()
+                getSpotAttributesByDocRefs(reviewAttributesRefs).collectLatest { attributes ->
+                    reviewAttributes = attributes
+                }
+                val creationDate = spotReviewSnapshot.getString("creation_date")
+                val score = spotReviewSnapshot.getDouble("score")
+                if (description != null && title != null && creationDate != null && score != null) {
+                    spotReviewsList.add(
+                        SpotReview(
+                            id, description, title, postedBy, reviewAttributes, creationDate, score.toFloat()
+                        )
+                    )
                 }
             }
-            val reviewAttributesRefs = spotReviewSnapshot.get("spot_attr") as List<DocumentReference>
-            var reviewAttributes = listOf<SpotAttribute>()
-            getSpotAttributesByDocRefs(reviewAttributesRefs).collectLatest { attributes ->
-                reviewAttributes = attributes
-            }
-            val creationDate = spotReviewSnapshot.getString("creation_date")
-            val score = spotReviewSnapshot.getDouble("score")
-            if (description != null && title != null && creationDate != null && score != null) {
-                spotReviewsList.add(
-                    SpotReview(
-                        id,
-                        description,
-                        title,
-                        postedBy,
-                        reviewAttributes,
-                        creationDate,
-                        score.toFloat()
-                    )
-                )
-            }
+            emit(spotReviewsList)
+        }.catch { exception ->
+            Log.e("DatabaseRepository::getSpotReviewsByDocRef", "Error: ${exception.message}")
+            emit(mutableListOf())
         }
-        emit(spotReviewsList)
-    }.catch { exception ->
-        Log.e("DatabaseRepository::getSpotReviewsByDocRef", "Error: ${exception.message}")
-        emit(mutableListOf())
-    }
 
     override fun getSpotPostsByDocRefs(docRefs: List<DocumentReference>): Flow<List<SpotPost>> = flow<List<SpotPost>> {
         val postsList = mutableListOf<SpotPost>()
@@ -290,14 +261,9 @@ class DatabaseRepository @Inject constructor(
             val creationDate = postSnapshot.getString("creation_date")
             val images = postSnapshot.get("images") as List<String>
             val spotRef = postSnapshot.getDocumentReference("spot")?.path
-            if (description != null && creationDate != null && spotRef != null){
+            if (description != null && creationDate != null && spotRef != null) {
                 val spotPost = SpotPost(
-                    id,
-                    description,
-                    spotRef,
-                    images,
-                    author,
-                    creationDate
+                    id, description, spotRef, images, author, creationDate
                 )
                 postsList.add(spotPost)
             }
@@ -312,19 +278,15 @@ class DatabaseRepository @Inject constructor(
 }
 
 
-
-
-
-
 interface DatabaseContract {
 
-    fun createUser(email: String, username: String, provider: String): Flow<Resource<String>>
+    suspend fun createUser(email: String, username: String, provider: String): Result<String>
     fun getUserByEmail(email: String, userProfileCallback: (UserProfile) -> Unit)
     fun updateUser(user: UserProfile): Flow<Resource<String>>
     fun getSpotsLocations(): Flow<List<SpotClusterItem>>
     fun getSpotByDocRef(docRef: String): Flow<Spot>
     fun getUserProfileByDocRef(docRef: DocumentReference): Flow<UserProfile>
-    fun getSpotAttributesByDocRefs(docRefs: List<DocumentReference>) : Flow<List<SpotAttribute>>
+    fun getSpotAttributesByDocRefs(docRefs: List<DocumentReference>): Flow<List<SpotAttribute>>
     fun getSpotReviewsByCollectionRef(collectionRef: CollectionReference): Flow<List<SpotReview>>
-    fun getSpotPostsByDocRefs(docRefs: List<DocumentReference>) : Flow<List<SpotPost>>
+    fun getSpotPostsByDocRefs(docRefs: List<DocumentReference>): Flow<List<SpotPost>>
 }

@@ -60,14 +60,15 @@ class VerifyAccountViewModel @Inject constructor(
   }
 
   fun checkIfUserIsVerified(credential: String) = viewModelScope.launch {
-    authRepository.reauthenticateUser(credential).collect()
+    authRepository.reAuthenticateUser(credential).collect()
     authRepository.checkIfUserEmailIsVerified(credential).collectLatest { result ->
       when (result) {
         is Success -> {
           userVerified.value = result.data!!
         }
 
-        else -> { /* Not necessary */ }
+        else -> { /* Not necessary */
+        }
       }
     }
     if (!userVerified.value) {

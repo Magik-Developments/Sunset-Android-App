@@ -15,7 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Surface
+import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -152,59 +152,59 @@ fun ImagePostCard(
     cardSize: Dp,
     postInfo: SpotPost
 ) {
-    ConstraintLayout(
-        modifier = Modifier
-            .size(cardSize)
-            .clip(
-                RoundedCornerShape(20.dp)
+    Card(elevation = 4.dp, shape = RoundedCornerShape(20.dp)) {
+        ConstraintLayout(
+            modifier = Modifier
+                .size(cardSize)
+                .clip(
+                    RoundedCornerShape(20.dp)
+                )
+        ) {
+            val (userBackground, userImage, userUsername, userLocation, image) = createRefs()
+            GlideImage(
+                model = postInfo.images.first(),
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .constrainAs(image) {
+                        top.linkTo(parent.top)
+                        bottom.linkTo(parent.bottom)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    },
+                contentScale = ContentScale.Crop
             )
-    ) {
-        val (userBackground, userImage, userUsername, userLocation, image) = createRefs()
-        GlideImage(
-            model = postInfo.images.first(),
-            contentDescription = null,
-            modifier = Modifier
-                .fillMaxSize()
-                .constrainAs(image) {
-                    top.linkTo(parent.top)
-                    bottom.linkTo(parent.bottom)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                },
-            contentScale = ContentScale.Crop
-        )
-        Box(
-            modifier = Modifier
-                .width(150.dp)
-                .height(40.dp)
-                .background(color = Color.White, shape = RoundedCornerShape(50.dp))
-                .constrainAs(userBackground) {
-                    bottom.linkTo(parent.bottom, 16.dp)
-                    start.linkTo(parent.start, 16.dp)
+            Box(
+                modifier = Modifier
+                    .width(150.dp)
+                    .height(40.dp)
+                    .background(color = Color.White, shape = RoundedCornerShape(50.dp))
+                    .constrainAs(userBackground) {
+                        bottom.linkTo(parent.bottom, 16.dp)
+                        start.linkTo(parent.start, 16.dp)
+                    })
+            Text(
+                text = postInfo.author.username,
+                style = secondarySemiBoldBodyS,
+                modifier = Modifier.constrainAs(userUsername) {
+                    start.linkTo(userImage.end, 8.dp)
+                    top.linkTo(userBackground.top, 8.dp)
                 })
-        Text(
-            text = postInfo.author.username,
-            style = secondarySemiBoldBodyS,
-            modifier = Modifier.constrainAs(userUsername) {
-                start.linkTo(userImage.end, 8.dp)
-                top.linkTo(userBackground.top, 8.dp)
-            })
-        ProfileImage(
-            imageUrl = postInfo.author.image,
-            size = 35.dp,
-            modifier = Modifier.constrainAs(userImage) {
-                start.linkTo(userBackground.start, 4.dp)
-                top.linkTo(userBackground.top)
-                bottom.linkTo(userBackground.bottom)
-            })
-        Text(
-            text = postInfo.author.location,
-            style = secondaryRegularBodyS,
-            modifier = Modifier.constrainAs(userLocation) {
-                start.linkTo(userUsername.start)
-                top.linkTo(userUsername.bottom)
-            })
+            ProfileImage(
+                imageUrl = postInfo.author.image,
+                size = 35.dp,
+                modifier = Modifier.constrainAs(userImage) {
+                    start.linkTo(userBackground.start, 4.dp)
+                    top.linkTo(userBackground.top)
+                    bottom.linkTo(userBackground.bottom)
+                })
+            Text(
+                text = postInfo.author.location,
+                style = secondaryRegularBodyS,
+                modifier = Modifier.constrainAs(userLocation) {
+                    start.linkTo(userUsername.start)
+                    top.linkTo(userUsername.bottom)
+                })
+        }
     }
-
-
 }

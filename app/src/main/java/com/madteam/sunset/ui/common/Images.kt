@@ -20,6 +20,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,6 +41,7 @@ import com.madteam.sunset.R.string
 import com.madteam.sunset.model.SpotPost
 import com.madteam.sunset.ui.theme.secondaryRegularBodyS
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyS
+import com.madteam.sunset.utils.shimmerBrush
 import kotlinx.coroutines.delay
 
 private const val AUTO_SLIDE_DURATION = 5000
@@ -51,12 +53,18 @@ fun ProfileImage(
     size: Dp,
     modifier: Modifier = Modifier
 ) {
+    val showShimmer = remember { mutableStateOf(true) }
+    if (imageUrl.isNotBlank()) {
+        showShimmer.value = false
+    }
+
     GlideImage(
         model = imageUrl,
         contentDescription = stringResource(string.profile_user_image_description),
         contentScale = ContentScale.Crop,
         modifier = modifier
             .size(size)
+            .background(shimmerBrush(showShimmer = showShimmer.value), shape = CircleShape)
             .clip(CircleShape)
     )
 }

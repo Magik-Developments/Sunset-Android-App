@@ -1,5 +1,6 @@
 package com.madteam.sunset.ui.screens.spotdetail
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -28,6 +30,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -73,6 +77,7 @@ import com.madteam.sunset.ui.theme.secondarySemiBoldBodyM
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineM
 import com.madteam.sunset.utils.getResourceId
 import com.madteam.sunset.utils.openDirectionsOnGoogleMaps
+import com.madteam.sunset.utils.shimmerBrush
 
 @Composable
 fun SpotDetailScreen(
@@ -105,7 +110,12 @@ fun SpotDetailContent(
 ) {
 
     val scrollState = rememberScrollState()
+    val showShimmer = remember { mutableStateOf(true) }
     val context = LocalContext.current
+
+    if (spotInfo != Spot()) {
+        showShimmer.value = false
+    }
 
     Column(
         modifier = Modifier
@@ -121,7 +131,8 @@ fun SpotDetailContent(
                     GlideImage(
                         model = spotInfo.featuredImages[index],
                         contentDescription = null,
-                        contentScale = ContentScale.Crop
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.background(shimmerBrush(targetValue = 2000f))
                     )
                 },
                 modifier = Modifier
@@ -133,6 +144,7 @@ fun SpotDetailContent(
                         start.linkTo(parent.start)
                         end.linkTo(parent.end)
                     }
+
             )
             RoundedLightBackButton(modifier = Modifier.constrainAs(backIconButton) {
                 top.linkTo(parent.top, 16.dp)
@@ -169,24 +181,43 @@ fun SpotDetailContent(
                     start.linkTo(spotterImage.end, 8.dp)
                 })
             Text(
-                text = "@${spotInfo.spottedBy.username}",
+                text = if (showShimmer.value) {
+                    ""
+                } else {
+                    "@${spotInfo.spottedBy.username}"
+                },
                 style = primaryBoldHeadlineXS,
-                modifier = Modifier.constrainAs(spottedByUsername) {
-                    top.linkTo(spottedByTitle.bottom)
-                    start.linkTo(spotterImage.end, 8.dp)
-                })
+                modifier = Modifier
+                    .constrainAs(spottedByUsername) {
+                        top.linkTo(spottedByTitle.bottom)
+                        start.linkTo(spotterImage.end, 8.dp)
+                    }
+                    .background(shimmerBrush(showShimmer = showShimmer.value))
+                    .defaultMinSize(minWidth = 100.dp))
             Text(
-                text = "created ${spotInfo.creationDate}",
+                text = if (showShimmer.value) {
+                    ""
+                } else {
+                    "created ${spotInfo.creationDate}"
+                },
                 style = secondaryRegularBodyS,
                 color = Color(0xFF333333),
-                modifier = Modifier.constrainAs(createdDate) {
-                    end.linkTo(parent.end, 16.dp)
-                    top.linkTo(parent.top, 4.dp)
-                })
+                modifier = Modifier
+                    .constrainAs(createdDate) {
+                        end.linkTo(parent.end, 16.dp)
+                        top.linkTo(parent.top, 4.dp)
+                    }
+                    .background(shimmerBrush(showShimmer = showShimmer.value))
+                    .defaultMinSize(minWidth = 100.dp)
+            )
         }
         CustomSpacer(size = 24.dp)
         //Spot title and description
-        ConstraintLayout(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp)) {
+        ConstraintLayout(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp)
+        ) {
             val (spotTitle, spotDescription) = createRefs()
             Text(
                 text = spotInfo.name,
@@ -197,6 +228,8 @@ fun SpotDetailContent(
                     .constrainAs(spotTitle) {
                         start.linkTo(parent.start)
                     }
+                    .background(shimmerBrush(showShimmer = showShimmer.value))
+                    .defaultMinSize(minWidth = 200.dp)
             )
             Text(
                 text = spotInfo.description,
@@ -208,6 +241,8 @@ fun SpotDetailContent(
                         start.linkTo(parent.start)
                         top.linkTo(spotTitle.bottom, 8.dp)
                     }
+                    .background(shimmerBrush(showShimmer = showShimmer.value))
+                    .defaultMinSize(minWidth = 400.dp)
             )
         }
         CustomSpacer(size = 16.dp)
@@ -215,20 +250,25 @@ fun SpotDetailContent(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp), verticalAlignment = Alignment.CenterVertically
+                .padding(horizontal = 24.dp)
+                .background(shimmerBrush(showShimmer = showShimmer.value))
+                .defaultMinSize(minWidth = 100.dp), verticalAlignment = Alignment.CenterVertically
+
         ) {
-            Icon(imageVector = Icons.Outlined.Brightness5, contentDescription = "")
-            CustomSpacer(size = 4.dp)
-            Text(text = "${spotInfo.score}", style = secondaryRegularBodyM)
-            CustomSpacer(size = 8.dp)
-            Text(text = "·", style = secondarySemiBoldBodyM)
-            CustomSpacer(size = 8.dp)
-            Text(text = "Visited ", style = secondaryRegularBodyM)
-            Text(text = "${spotInfo.visitedTimes} times", style = secondarySemiBoldBodyM)
-            CustomSpacer(size = 8.dp)
-            Text(text = "·", style = secondarySemiBoldBodyM)
-            CustomSpacer(size = 8.dp)
-            Text(text = "${spotInfo.likes} likes", style = secondarySemiBoldBodyM)
+            if (!showShimmer.value) {
+                Icon(imageVector = Icons.Outlined.Brightness5, contentDescription = "")
+                CustomSpacer(size = 4.dp)
+                Text(text = "${spotInfo.score}", style = secondaryRegularBodyM)
+                CustomSpacer(size = 8.dp)
+                Text(text = "·", style = secondarySemiBoldBodyM)
+                CustomSpacer(size = 8.dp)
+                Text(text = "Visited ", style = secondaryRegularBodyM)
+                Text(text = "${spotInfo.visitedTimes} times", style = secondarySemiBoldBodyM)
+                CustomSpacer(size = 8.dp)
+                Text(text = "·", style = secondarySemiBoldBodyM)
+                CustomSpacer(size = 8.dp)
+                Text(text = "${spotInfo.likes} likes", style = secondarySemiBoldBodyM)
+            }
         }
         CustomSpacer(size = 8.dp)
         Text(

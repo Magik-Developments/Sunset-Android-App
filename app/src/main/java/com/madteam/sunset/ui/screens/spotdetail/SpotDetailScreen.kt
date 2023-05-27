@@ -109,7 +109,6 @@ fun SpotDetailScreen(
 fun SpotDetailContent(
     spotInfo: Spot
 ) {
-
     val scrollState = rememberScrollState()
     val showShimmer = remember { mutableStateOf(true) }
     val context = LocalContext.current
@@ -603,78 +602,4 @@ fun SpotDetailContent(
             )
         }
     }
-}
-
-@Preview(heightDp = 2000, showBackground = true)
-@Composable
-fun SpotDetailContentPreview() {
-    SpotDetailContent(
-        Spot(
-            id = "test",
-            spottedBy = UserProfile(
-                "SunsetApp",
-                "",
-                "",
-                "",
-                "",
-                "",
-                ""
-            ),
-            featuredImages = listOf(),
-            creationDate = "15/11/2023",
-            name = "La piscina de Vallparadís",
-            description = LoremIpsum(300).toString(),
-            score = 9.3f,
-            visitedTimes = 4524,
-            likes = 1511,
-            locationInLatLng = GeoPoint(0.0, 0.0),
-            location = "Terrassa, Miami, Cataluña",
-            attributes = listOf(
-                SpotAttribute(
-                    "",
-                    "",
-                    "There is parking",
-                    "ic_local_parking",
-                    true
-                ),
-                SpotAttribute(
-                    "",
-                    "",
-                    "There is parking",
-                    "ic_local_parking",
-                    true
-                )
-            ),
-            spotReviews = listOf(
-                SpotReview(
-                    "",
-                    "El mejor atardecer de mi vida, volveré 100%!! 😎",
-                    "Experiencia inolvidable ☀️🌅",
-                    postedBy = UserProfile("adriafa", "addd", "", "", "", "", ""),
-                    spotAttributes = listOf(
-                        SpotAttribute(
-                            "",
-                            "Site to park here",
-                            "d",
-                            "ic_local_parking",
-                            true
-                        ),
-                        SpotAttribute("", "Site to park here", "d", "ic_groups", true)
-                    ),
-                    creationDate = "23/05/2023",
-                    score = 9.8f
-                )
-            ),
-            spotPosts = listOf(
-                SpotPost(
-                    "", "", "", listOf(
-                        "https://cdn.vox-cdn.com/thumbor/Al48-pEnyIn2rlgKX7MIHNmlE68=/0x0:5563x3709/1200x800/filters:focal(2302x1311:3192x2201)/cdn.vox-cdn.com/uploads/chorus_image/image/65752607/1048232144.jpg.0.jpg",
-                        "https://images.pexels.com/photos/3651752/pexels-photo-3651752.jpeg?cs=srgb&dl=pexels-anas-hinde-3651752.jpg&fm=jpg"
-                    ),
-                    UserProfile("dgalaaa", "", "", "", "", "Barcelona, ES.", ""),
-                    ""
-                )
-            )
-        )
-    )
 }

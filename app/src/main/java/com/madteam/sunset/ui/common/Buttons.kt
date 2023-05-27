@@ -180,8 +180,8 @@ fun OtherLoginIconButtons(
 fun IconButtonLight(
     buttonIcon: ImageVector,
     @StringRes description: Int,
-    iconTint: Color = Color.Unspecified,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    iconTint: Color = Color.Unspecified
 ) {
     Box(
         modifier = Modifier
@@ -205,8 +205,8 @@ fun IconButtonLight(
 fun IconButtonDark(
     buttonIcon: ImageVector,
     @StringRes description: Int,
+    onClick: () -> Unit,
     iconTint: Color = Color.Unspecified,
-    onClick: () -> Unit
 ) {
     Box(
         modifier = Modifier

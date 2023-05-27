@@ -286,3 +286,33 @@ fun LargeLightButton(
         }
     }
 }
+
+@Composable
+fun LargeDarkButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier.fillMaxWidth(),
+    @StringRes text: Int
+) {
+    Button(
+        onClick = onClick,
+        modifier = modifier
+            .height(48.dp),
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = Color(0xFF000000),
+        ),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Box(
+            Modifier
+                .fillMaxSize()
+                .align(Alignment.CenterVertically)
+        ) {
+            Text(
+                modifier = Modifier.align(Alignment.Center),
+                text = stringResource(text),
+                color = Color(0xFFFFFFFF),
+                style = secondarySemiBoldHeadLineS
+            )
+        }
+    }
+}

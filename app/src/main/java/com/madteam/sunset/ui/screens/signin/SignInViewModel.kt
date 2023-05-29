@@ -5,10 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.AuthResult
 import com.madteam.sunset.repositories.AuthContract
-import com.madteam.sunset.utils.Resource
+import com.madteam.sunset.utils.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -17,7 +17,9 @@ class SignInViewModel @Inject constructor(
     private val authRepository: AuthContract
 ) : ViewModel() {
 
-    val signInState = MutableStateFlow<Resource<AuthResult?>>(Resource.Success(null))
+    private var _signInState = MutableStateFlow<Result<AuthResult?>>(Result.Success(null))
+    var signInState: StateFlow<Result<AuthResult?>> = _signInState
+
     val isValidForm = MutableStateFlow(false)
 
     private fun isUserValid(email: String): Boolean {
@@ -33,13 +35,12 @@ class SignInViewModel @Inject constructor(
     }
 
     fun signInWithEmailAndPasswordIntent(email: String, password: String) = viewModelScope.launch {
-        authRepository.doSignInWithPasswordAndEmail(email, password).collectLatest {
-            signInState.value = it
-        }
+        _signInState.value = Result.Loading()
+        _signInState.value = authRepository.doSignInWithPasswordAndEmail(email, password)
     }
 
     fun clearSignInState() {
-        signInState.value = Resource.Success(null)
+        signInState = MutableStateFlow(Result.Success(null))
     }
 
     fun isValidEmail(email: String): Boolean {

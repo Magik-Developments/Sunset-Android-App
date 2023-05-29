@@ -4,14 +4,13 @@ import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.AuthResult
-import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.madteam.sunset.repositories.AuthContract
 import com.madteam.sunset.repositories.DatabaseContract
-import com.madteam.sunset.utils.Resource
-import com.madteam.sunset.utils.Resource.Error
-import com.madteam.sunset.utils.Resource.Success
+import com.madteam.sunset.utils.Result
+import com.madteam.sunset.utils.fold
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -20,90 +19,81 @@ private const val MIN_PASSWORD_LENGTH = 6
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
-  private val authRepository: AuthContract,
-  private val databaseRepository: DatabaseContract,
+    private val authRepository: AuthContract,
+    private val databaseRepository: DatabaseContract,
 ) : ViewModel() {
 
-  val isValidForm = MutableStateFlow(false)
+    val isValidForm = MutableStateFlow(false)
 
-  val signUpState = MutableStateFlow<Resource<AuthResult?>>(Success(null))
+    private val _signUpState = MutableStateFlow<Result<AuthResult?>>(Result.Success(null))
+    val signUpState: StateFlow<Result<AuthResult?>> = _signUpState
 
-  fun isEmailValid(email: String): Boolean {
-    return Patterns.EMAIL_ADDRESS.matcher(email).matches()
-  }
+    private val _notifyUser = MutableStateFlow<Result<String>>(Result.Success(""))
+    val notifyUser: StateFlow<Result<String>> = _notifyUser
 
-  fun isUsernameValid(username: String): Boolean {
-    return (username.length > 5)
-  }
+    fun isEmailValid(email: String): Boolean {
+        return Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    }
 
-  private fun isPasswordValid(password: String): Boolean {
-    return (password.length > MIN_PASSWORD_LENGTH)
-  }
+    fun isUsernameValid(username: String): Boolean {
+        return (username.length > 5)
+    }
 
-  fun isValidForm(email: String, password: String, username: String) {
-    isValidForm.value =
-      (isEmailValid(email) && isUsernameValid(username) && isPasswordValid(password))
-  }
+    private fun isPasswordValid(password: String): Boolean {
+        return (password.length > MIN_PASSWORD_LENGTH)
+    }
 
-  fun goToPoliciesScreen() {
-    //TODO: Go to policies Screen
-  }
+    fun isValidForm(email: String, password: String, username: String) {
+        isValidForm.value =
+            (isEmailValid(email) && isUsernameValid(username) && isPasswordValid(password))
+    }
 
-  fun signUpIntent(email: String, password: String, username: String) {
-    viewModelScope.launch {
-      authRepository.doSignUpWithPasswordAndEmail(email, password).collectLatest { result ->
-        when (result) {
-          is Success -> {
-            createUserDatabase(result, username)
-          }
+    fun goToPoliciesScreen() {
+        //TODO: Go to policies Screen
+    }
 
-          is Error -> {
-            signUpState.value = Error(result.message.toString())
-          }
+    fun signUpIntent(email: String, password: String, username: String) = viewModelScope.launch {
 
-          else -> {
-            signUpState.value = Error(result.message.toString())
-          }
+        _signUpState.value = authRepository.doSignUpWithPasswordAndEmail(email, password).also { result ->
+            result.fold(
+                onSuccess = { authResult ->
+                    _notifyUser.value = Result.Loading()
+
+                    val (userEmail, userProvider) = authResult?.user?.email to authResult?.user?.providerId
+                    if (userEmail != null && userProvider != null) {
+                        _notifyUser.value = databaseRepository.createUser(userEmail, username, userProvider)
+                    } else {
+                        _notifyUser.value = Result.Error(Throwable("Email or Provider invalid"))
+                    }
+                },
+                onError = {},
+                onLoading = {}
+            )
         }
-      }
     }
-    signUpState.value = Success(null)
-  }
 
-  private fun createUserDatabase(authResult: Resource<AuthResult?>, username: String) {
-    viewModelScope.launch {
-      val userEmail = authResult.data!!.user!!.email!!
-      val userProvider = authResult.data.user!!.providerId
-      databaseRepository.createUser(userEmail, username, userProvider).collectLatest { result ->
-        when (result) {
-          is Error -> {
-            if (result.message == "e_user_already_exists") {
-              signUpState.value = Error("e_user_already_exists")
-            } else {
-              signUpState.value = Error("Error signing up")
-            }
-            deleteCurrentUser()
-          }
+//        authRepository.doSignUpWithPasswordAndEmail(email, password).fold(
+//            onSuccess = { authResult ->
+//                if (authResult != null) {
+//                    createUserDatabase(authResult, username)
+//                } else {
+//
+//                }
+//            },
+//            onError = { error ->
+//                signUpState.value = Error(error)
+//            },
+//            onLoading = {
+//
+//            }
+//        )
+//        signUpState.value = Success(null)
 
-          is Success -> {
-            signUpState.value = authResult
-          }
-
-          else -> { /* Not necessary */
-          }
-        }
-
-      }
+    private fun deleteCurrentUser() = viewModelScope.launch {
+        authRepository.deleteCurrentUser().collectLatest { }
     }
-  }
 
-  private fun deleteCurrentUser() {
-    viewModelScope.launch {
-      authRepository.deleteCurrentUser().collectLatest { }
+    fun clearSignUpState() {
+        _signUpState.value = Result.Success(null)
     }
-  }
-
-  fun clearSignUpState() {
-    signUpState.value = Success(null)
-  }
 }

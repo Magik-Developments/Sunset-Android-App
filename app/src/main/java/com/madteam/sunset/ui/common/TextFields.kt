@@ -23,7 +23,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -205,16 +204,15 @@ fun UsernameTextField(
 
 @Composable
 fun ChatTextField(
-
+    textValue: String,
+    onValueChange: (String) -> Unit
 ) {
-
-    var value by remember { mutableStateOf("") }
 
     Column {
         TextField(
-            value = value,
+            value = textValue,
             maxLines = 3,
-            onValueChange = { value = it },
+            onValueChange = onValueChange,
             shape = RoundedCornerShape(50.dp),
             colors = TextFieldDefaults.textFieldColors(
                 backgroundColor = Color.White,
@@ -234,7 +232,7 @@ fun ChatTextField(
                 Icon(
                     imageVector = Icons.Default.Send,
                     contentDescription = "",
-                    tint = if (value.isNotEmpty()) {
+                    tint = if (textValue.isNotEmpty()) {
                         Color(0xFFFFB600)
                     } else {
                         Color(0xFF999999)
@@ -256,6 +254,6 @@ fun ChatTextField(
 @Preview(showSystemUi = true)
 @Composable
 fun PreviewTextFields() {
-    ChatTextField()
+
 }
 

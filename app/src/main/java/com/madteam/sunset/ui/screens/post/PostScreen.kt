@@ -1,6 +1,7 @@
 package com.madteam.sunset.ui.screens.post
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.defaultMinSize
@@ -67,7 +68,8 @@ fun PostScreen(
                 contentAlignment = Alignment.Center
             ) {
                 PostContent(
-                    postInfo = postInfo
+                    postInfo = postInfo,
+                    navigateTo = navController::navigate
                 )
             }
         }
@@ -77,7 +79,8 @@ fun PostScreen(
 @OptIn(ExperimentalPagerApi::class, ExperimentalGlideComposeApi::class)
 @Composable
 fun PostContent(
-    postInfo: SpotPost
+    postInfo: SpotPost,
+    navigateTo: (String) -> Unit
 ) {
     val scrollState = rememberScrollState()
     val showShimmer = remember { mutableStateOf(true) }
@@ -202,7 +205,11 @@ fun PostContent(
                 "View all ${postInfo.comments.size} comments"
             } else {
                 "Be the first to comment"
-            }, modifier = Modifier.padding(horizontal = 24.dp), color = Color(0xFF999999)
+            },
+            modifier = Modifier
+                .padding(horizontal = 24.dp)
+                .clickable { navigateTo("comments_screen/postReference=${postInfo.id}") },
+            color = Color(0xFF999999)
         )
 
     }
@@ -211,5 +218,4 @@ fun PostContent(
 @Preview(showSystemUi = true)
 @Composable
 fun PostContentPreview() {
-    PostContent(SpotPost())
 }

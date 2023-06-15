@@ -54,4 +54,5 @@
     <string name="enable_location">Enable location</string>
     <string name="spot_post_title">Spot post</string>
     <string name="comment_keyboard_placeholder">Comment</string>
+    <string name="comments_title">Comments</string>
 </resources>

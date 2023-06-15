@@ -288,7 +288,7 @@ class DatabaseRepository @Inject constructor(
                     }
                 }
                 var commentsList = listOf<PostComment>()
-                getCommentsFromPostRef(postRef).collectLatest { comments ->
+                getCommentsFromPostRef(postRef.path).collectLatest { comments ->
                     commentsList = comments
                 }
                 val description = postSnapshot.getString("description")
@@ -329,7 +329,7 @@ class DatabaseRepository @Inject constructor(
                 }
             }
             var commentsList = listOf<PostComment>()
-            getCommentsFromPostRef(documentReference).collectLatest { comments ->
+            getCommentsFromPostRef(documentReference.path).collectLatest { comments ->
                 commentsList = comments
             }
             val description = postSnapshot.getString("description")
@@ -356,10 +356,11 @@ class DatabaseRepository @Inject constructor(
             emit(SpotPost())
         }
 
-    override fun getCommentsFromPostRef(postRef: DocumentReference): Flow<List<PostComment>> =
+    override fun getCommentsFromPostRef(postRef: String): Flow<List<PostComment>> =
         flow {
             val commentsList = mutableListOf<PostComment>()
-            val commentsSnapshot = postRef.collection("comments").get().await()
+            val commentsSnapshot =
+                firebaseFirestore.document(postRef).collection("comments").get().await()
             for (commentDoc in commentsSnapshot.documents) {
                 val id = commentDoc.id
                 val commentText = commentDoc.getString("comment")
@@ -396,5 +397,5 @@ interface DatabaseContract {
     fun getSpotReviewsByCollectionRef(collectionRef: CollectionReference): Flow<List<SpotReview>>
     fun getSpotPostsByDocRefs(docRefs: List<DocumentReference>): Flow<List<SpotPost>>
     fun getSpotPostByDocRef(docRef: String): Flow<SpotPost>
-    fun getCommentsFromPostRef(postRef: DocumentReference): Flow<List<PostComment>>
+    fun getCommentsFromPostRef(postRef: String): Flow<List<PostComment>>
 }

@@ -52,4 +52,5 @@
     <string name="add">Add</string>
     <string name="show_all_posts">Show all posts</string>
     <string name="enable_location">Enable location</string>
+    <string name="spot_post_title">Spot post</string>
 </resources>

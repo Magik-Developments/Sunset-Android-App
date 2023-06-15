@@ -1,11 +1,17 @@
 package com.madteam.sunset.ui.common
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -14,11 +20,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.madteam.sunset.navigation.SunsetBottomNavItem
-import com.madteam.sunset.navigation.SunsetRoutes
 import com.madteam.sunset.utils.shadow
 
 @Composable
@@ -76,5 +82,21 @@ fun SunsetBottomNavigation(navController: NavController) {
       )
     }
   }
+}
+
+@Composable
+fun GoBackTopAppBar(
+  @StringRes title: Int,
+  onClick: () -> Unit
+) {
+  TopAppBar(
+    backgroundColor = Color.White,
+    navigationIcon = {
+      IconButton(onClick = { onClick() }) {
+        Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Go back")
+      }
+    },
+    title = { Text(text = stringResource(id = title)) }
+  )
 }
 

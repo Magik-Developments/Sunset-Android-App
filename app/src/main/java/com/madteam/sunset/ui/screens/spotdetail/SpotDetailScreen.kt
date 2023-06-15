@@ -41,8 +41,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -51,13 +49,8 @@ import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.firebase.firestore.GeoPoint
 import com.madteam.sunset.R
 import com.madteam.sunset.model.Spot
-import com.madteam.sunset.model.SpotAttribute
-import com.madteam.sunset.model.SpotPost
-import com.madteam.sunset.model.SpotReview
-import com.madteam.sunset.model.UserProfile
 import com.madteam.sunset.ui.common.AutoSlidingCarousel
 import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.IconButtonDark
@@ -97,7 +90,8 @@ fun SpotDetailScreen(
                 contentAlignment = Alignment.Center
             ) {
                 SpotDetailContent(
-                    spotInfo = spotInfo
+                    spotInfo = spotInfo,
+                    navigateTo = navController::navigate
                 )
             }
         }
@@ -107,7 +101,8 @@ fun SpotDetailScreen(
 @OptIn(ExperimentalPagerApi::class, ExperimentalGlideComposeApi::class)
 @Composable
 fun SpotDetailContent(
-    spotInfo: Spot
+    spotInfo: Spot,
+    navigateTo: (String) -> Unit
 ) {
     val scrollState = rememberScrollState()
     val showShimmer = remember { mutableStateOf(true) }
@@ -479,7 +474,7 @@ fun SpotDetailContent(
                                 top.linkTo(description.bottom)
                                 bottom.linkTo(userImage.top)
                             }) {
-                                Column() {
+                                Column {
                                     Text(
                                         text = "How it was?",
                                         style = secondarySemiBoldBodyM
@@ -561,7 +556,11 @@ fun SpotDetailContent(
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 itemsIndexed(spotInfo.spotPosts) { _, post ->
-                    ImagePostCard(cardSize = 250.dp, postInfo = post)
+                    ImagePostCard(
+                        cardSize = 250.dp,
+                        postInfo = post,
+                        onItemClicked = { navigateTo("post_screen/postReference=${post.id}") }
+                    )
                 }
             }
             CustomSpacer(size = 16.dp)

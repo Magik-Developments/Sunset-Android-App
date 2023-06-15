@@ -1,6 +1,7 @@
 package com.madteam.sunset.ui.common
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -158,7 +159,8 @@ fun AutoSlidingCarousel(
 @Composable
 fun ImagePostCard(
     cardSize: Dp,
-    postInfo: SpotPost
+    postInfo: SpotPost,
+    onItemClicked: () -> Unit
 ) {
     Card(elevation = 4.dp, shape = RoundedCornerShape(20.dp)) {
         ConstraintLayout(
@@ -167,6 +169,9 @@ fun ImagePostCard(
                 .clip(
                     RoundedCornerShape(20.dp)
                 )
+                .clickable {
+                    onItemClicked()
+                }
         ) {
             val (userBackground, userImage, userUsername, userLocation, image) = createRefs()
             GlideImage(

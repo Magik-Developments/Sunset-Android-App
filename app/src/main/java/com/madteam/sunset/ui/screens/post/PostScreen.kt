@@ -1,6 +1,7 @@
 package com.madteam.sunset.ui.screens.post
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -8,10 +9,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -20,12 +24,17 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.google.accompanist.pager.ExperimentalPagerApi
+import com.madteam.sunset.R
 import com.madteam.sunset.model.SpotPost
 import com.madteam.sunset.ui.common.AutoSlidingCarousel
 import com.madteam.sunset.ui.common.CustomSpacer
+import com.madteam.sunset.ui.common.GoBackTopAppBar
 import com.madteam.sunset.ui.common.ProfileImage
 import com.madteam.sunset.ui.common.RoundedLightLikeButton
 import com.madteam.sunset.ui.common.RoundedLightSaveButton
@@ -38,10 +47,30 @@ import com.madteam.sunset.utils.shimmerBrush
 
 @Composable
 fun PostScreen(
-
+    viewModel: PostViewModel = hiltViewModel(),
+    postReference: String,
+    navController: NavController
 ) {
-    PostContent(
-        SpotPost()
+
+    viewModel.setPostReference("posts/$postReference")
+    val postInfo by viewModel.postInfo.collectAsStateWithLifecycle()
+
+    Scaffold(
+        topBar = {
+            GoBackTopAppBar(title = R.string.spot_post_title) {
+                navController.popBackStack()
+            }
+        },
+        content = { paddingValues ->
+            Box(
+                modifier = Modifier.padding(paddingValues),
+                contentAlignment = Alignment.Center
+            ) {
+                PostContent(
+                    postInfo = postInfo
+                )
+            }
+        }
     )
 }
 
@@ -157,16 +186,25 @@ fun PostContent(
             overflow = TextOverflow.Ellipsis,
             style = secondaryRegularBodyM,
             modifier = Modifier
-
                 .background(shimmerBrush(showShimmer = showShimmer.value))
                 .defaultMinSize(minWidth = 400.dp)
+                .padding(horizontal = 24.dp)
         )
         CustomSpacer(size = 4.dp)
-        Text(text = "${postInfo.likes} likes", style = secondarySemiBoldBodyM)
+        Text(
+            text = "${postInfo.likes} likes",
+            style = secondarySemiBoldBodyM,
+            modifier = Modifier.padding(horizontal = 24.dp)
+        )
         CustomSpacer(size = 4.dp)
-        if (postInfo.comments.isNotEmpty()) {
-            Text(text = "View all ${postInfo.comments.size} comments")
-        }
+        Text(
+            text = if (postInfo.comments.isNotEmpty()) {
+                "View all ${postInfo.comments.size} comments"
+            } else {
+                "Be the first to comment"
+            }, modifier = Modifier.padding(horizontal = 24.dp), color = Color(0xFF999999)
+        )
+
     }
 }
 

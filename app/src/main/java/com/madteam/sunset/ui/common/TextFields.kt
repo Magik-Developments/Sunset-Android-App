@@ -205,7 +205,8 @@ fun UsernameTextField(
 @Composable
 fun ChatTextField(
     textValue: String,
-    onValueChange: (String) -> Unit
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier
 ) {
 
     Column {
@@ -225,7 +226,7 @@ fun ChatTextField(
                 disabledIndicatorColor = Color.Transparent
             ),
             textStyle = secondaryRegularBodyL,
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth()
                 .shadow(elevation = 4.dp, shape = RoundedCornerShape(50.dp)),
             trailingIcon = {

@@ -3,6 +3,7 @@ package com.madteam.sunset.ui.screens.comments
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -23,6 +24,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.madteam.sunset.R
 import com.madteam.sunset.model.PostComment
+import com.madteam.sunset.ui.common.ChatTextField
 import com.madteam.sunset.ui.common.CustomDivider
 import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.GoBackTopAppBar
@@ -71,9 +73,11 @@ fun CommentsContent(
     ) {
         LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp)) {
             itemsIndexed(comments) { _, comment ->
-                ConstraintLayout(modifier = Modifier
-                    .padding(horizontal = 24.dp)
-                    .fillMaxWidth()) {
+                ConstraintLayout(
+                    modifier = Modifier
+                        .padding(horizontal = 24.dp)
+                        .fillMaxWidth()
+                ) {
                     val (userImage, userUsername, creationDate, commentText) = createRefs()
                     ProfileImage(
                         imageUrl = comment.author.image,
@@ -101,7 +105,7 @@ fun CommentsContent(
                         text = comment.comment,
                         style = secondaryRegularBodyL,
                         modifier = Modifier
-                            .padding(end = 24.dp)
+                            .fillMaxWidth(0.8f)
                             .constrainAs(commentText) {
                                 top.linkTo(userUsername.bottom, 8.dp)
                                 start.linkTo(userImage.end, 8.dp)
@@ -111,6 +115,15 @@ fun CommentsContent(
                 CustomDivider(modifier = Modifier.fillMaxWidth(), color = Color(0xFF999999))
             }
         }
+    }
+    Column(
+        verticalArrangement = Arrangement.Bottom, modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+            .padding(horizontal = 8.dp)
+    ) {
+        ChatTextField(textValue = "", onValueChange = {})
+        CustomSpacer(size = 8.dp)
     }
 }
 

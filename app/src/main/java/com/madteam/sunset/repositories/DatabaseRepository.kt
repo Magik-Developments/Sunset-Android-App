@@ -1,7 +1,6 @@
 package com.madteam.sunset.repositories
 
 import android.util.Log
-import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
@@ -13,13 +12,10 @@ import com.madteam.sunset.model.SpotPost
 import com.madteam.sunset.model.SpotReview
 import com.madteam.sunset.model.UserProfile
 import com.madteam.sunset.utils.Resource
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.util.Calendar
 import javax.inject.Inject
@@ -297,7 +293,10 @@ class DatabaseRepository @Inject constructor(
                     spotRef,
                     images,
                     author,
-                    creationDate
+                    creationDate,
+                    listOf(),
+                    0
+                    //implement real comment data and likes
                 )
                 postsList.add(spotPost)
             }

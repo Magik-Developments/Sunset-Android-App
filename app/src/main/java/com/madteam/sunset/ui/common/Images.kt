@@ -84,7 +84,7 @@ fun ImageSliderCounter(
             .height(18.dp)
             .width(40.dp), contentAlignment = Alignment.Center
     ) {
-        Row() {
+        Row {
             Text(text = actualImage.toString(), style = secondarySemiBoldBodyS, color = Color.White)
             Text(text = " / ", style = secondarySemiBoldBodyS, color = Color.White)
             Text(text = totalImages.toString(), style = secondarySemiBoldBodyS, color = Color.White)
@@ -100,7 +100,7 @@ fun AutoSlidingCarousel(
     autoSlideDuration: Int = AUTO_SLIDE_DURATION,
     pagerState: PagerState = remember { PagerState() },
     itemsCount: Int,
-    itemContent: @Composable (index: Int) -> Unit,
+    itemContent: @Composable (index: Int) -> Unit
 ) {
     val isDragged by pagerState.interactionSource.collectIsDraggedAsState()
 

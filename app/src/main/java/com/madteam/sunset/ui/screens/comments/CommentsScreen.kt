@@ -34,6 +34,7 @@ import com.madteam.sunset.ui.common.CustomDivider
 import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.GoBackTopAppBar
 import com.madteam.sunset.ui.common.ProfileImage
+import com.madteam.sunset.ui.common.SelectedCommentTopAppBar
 import com.madteam.sunset.ui.theme.secondaryRegularBodyL
 import com.madteam.sunset.ui.theme.secondaryRegularBodyM
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyM
@@ -49,10 +50,19 @@ fun CommentsScreen(
     val comments by viewModel.comments.collectAsStateWithLifecycle()
     val selectedComment by viewModel.selectedComment.collectAsStateWithLifecycle()
 
+
+
     Scaffold(
         topBar = {
-            GoBackTopAppBar(title = R.string.comments_title) {
-                navController.popBackStack()
+            if (selectedComment == PostComment()) {
+                GoBackTopAppBar(title = R.string.comments_title) {
+                    navController.popBackStack()
+                }
+            } else {
+                SelectedCommentTopAppBar(title = R.string.selected_comment_title,
+                    onQuitClick = {
+                        viewModel.unSelectComment()
+                    })
             }
         },
         content = { paddingValues ->
@@ -86,7 +96,7 @@ fun CommentsContent(
     Column(
         Modifier
             .fillMaxSize()
-            .padding(top = 16.dp, bottom = 70.dp)
+            .padding(bottom = 70.dp)
     ) {
         LazyColumn {
             itemsIndexed(comments.sortedBy {

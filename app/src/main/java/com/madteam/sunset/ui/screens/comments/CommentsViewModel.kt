@@ -87,4 +87,8 @@ class CommentsViewModel @Inject constructor(
     fun onSelectedComment(selectedComment: PostComment) {
         _selectedComment.value = selectedComment
     }
+
+    fun unSelectComment() {
+        _selectedComment.value = PostComment()
+    }
 }

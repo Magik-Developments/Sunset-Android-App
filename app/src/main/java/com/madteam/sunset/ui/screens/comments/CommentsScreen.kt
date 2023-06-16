@@ -76,13 +76,16 @@ fun CommentsContent(
         mutableStateOf("")
     }
 
+
     Column(
         Modifier
             .fillMaxSize()
             .padding(top = 16.dp, bottom = 70.dp)
     ) {
         LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            itemsIndexed(comments) { _, comment ->
+            itemsIndexed(comments.sortedBy {
+                it.creation_date
+            }) { _, comment ->
                 ConstraintLayout(
                     modifier = Modifier
                         .padding(horizontal = 24.dp)

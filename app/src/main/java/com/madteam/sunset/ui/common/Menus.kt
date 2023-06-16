@@ -13,6 +13,7 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -104,13 +105,26 @@ fun GoBackTopAppBar(
 @Composable
 fun SelectedCommentTopAppBar(
   @StringRes title: Int,
-  onQuitClick: () -> Unit
+  onQuitClick: () -> Unit,
+  onDeleteClick: () -> Unit,
+  isCommentAuthor: Boolean
 ) {
   TopAppBar(
     backgroundColor = Color(0xFFFFB600),
     navigationIcon = {
       IconButton(onClick = { onQuitClick() }) {
         Icon(imageVector = Icons.Filled.Close, contentDescription = "Unselect", tint = Color.White)
+      }
+    },
+    actions = {
+      if (isCommentAuthor) {
+        IconButton(onClick = { onDeleteClick() }) {
+          Icon(
+            imageVector = Icons.Filled.Delete,
+            contentDescription = "Delete comment",
+            tint = Color.White
+          )
+        }
       }
     },
     title = { Text(text = stringResource(id = title), color = Color.White) }

@@ -74,18 +74,40 @@ class DatabaseRepository @Inject constructor(
             .document(comment.author.username)
 
         println("authorReference: " + authorReference.path)
+        val newCommentDocument = commentsReference.document()
+
         val newCommentData = hashMapOf(
+            "id" to newCommentDocument.id,
             "author" to authorReference,
             "comment" to comment.comment,
             "creation_date" to currentDate
         )
-        val newCommentDocument = commentsReference.document()
 
         newCommentDocument.set(newCommentData).await()
         emit(Resource.Success("Comment has been created"))
     }.catch { exception ->
         emit(Resource.Error(exception.message.toString()))
         Log.e("DatabaseRepository::createPostComment", "Error: ${exception.message}")
+    }
+
+    override fun deletePostComment(
+        comment: PostComment,
+        postDocument: String
+    ): Flow<Resource<String>> = flow {
+        emit(Resource.Loading())
+
+        val commentsReference =
+            firebaseFirestore.document(postDocument)
+                .collection(COMMENTS_POST_COLLECTION_PATH)
+
+        val commentDocument = commentsReference.document(comment.id)
+
+        commentDocument.delete().await()
+
+        emit(Resource.Success("Comment has been deleted"))
+    }.catch { exception ->
+        emit(Resource.Error(exception.message.toString()))
+        Log.e("DatabaseRepository::deletePostComment", "Error: ${exception.message}")
     }
 
     override fun getUserByEmail(email: String, userProfileCallback: (UserProfile) -> Unit) {
@@ -430,4 +452,5 @@ interface DatabaseContract {
     fun getSpotPostByDocRef(docRef: String): Flow<SpotPost>
     fun getCommentsFromPostRef(postRef: String): Flow<List<PostComment>>
     fun createPostComment(comment: PostComment, postDocument: String): Flow<Resource<String>>
+    fun deletePostComment(comment: PostComment, postDocument: String): Flow<Resource<String>>
 }

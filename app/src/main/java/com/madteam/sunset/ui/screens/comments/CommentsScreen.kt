@@ -59,10 +59,16 @@ fun CommentsScreen(
                     navController.popBackStack()
                 }
             } else {
-                SelectedCommentTopAppBar(title = R.string.selected_comment_title,
+                SelectedCommentTopAppBar(
+                    title = R.string.selected_comment_title,
                     onQuitClick = {
                         viewModel.unSelectComment()
-                    })
+                    },
+                    onDeleteClick = {
+                        viewModel.deleteSelectedComment()
+                    },
+                    isCommentAuthor = viewModel.checkIfUserIsCommentAuthor()
+                )
             }
         },
         content = { paddingValues ->

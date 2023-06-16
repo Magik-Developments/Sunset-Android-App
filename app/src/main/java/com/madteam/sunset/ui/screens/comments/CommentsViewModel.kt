@@ -73,9 +73,7 @@ class CommentsViewModel @Inject constructor(
                 .collectLatest { result ->
                     when (result) {
                         is Resource.Success -> {
-                            val currentComments = _comments.value.toMutableList()
-                            currentComments.add(newPostComment)
-                            _comments.value = currentComments
+                            getCommentsInfo()
                         }
 
                         else -> {}
@@ -90,5 +88,24 @@ class CommentsViewModel @Inject constructor(
 
     fun unSelectComment() {
         _selectedComment.value = PostComment()
+    }
+
+    fun checkIfUserIsCommentAuthor(): Boolean {
+        return _selectedComment.value.author.username == username
+    }
+
+    fun deleteSelectedComment() {
+        viewModelScope.launch {
+            databaseRepository.deletePostComment(_selectedComment.value, _postReference.value)
+                .collectLatest { result ->
+                    when (result) {
+                        is Resource.Success -> {
+                            getCommentsInfo()
+                        }
+
+                        else -> {}
+                    }
+                }
+        }
     }
 }

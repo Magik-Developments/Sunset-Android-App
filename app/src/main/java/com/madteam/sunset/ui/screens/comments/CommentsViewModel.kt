@@ -27,6 +27,10 @@ class CommentsViewModel @Inject constructor(
 
     private val _postReference: MutableStateFlow<String> = MutableStateFlow("")
 
+    private val _selectedComment: MutableStateFlow<PostComment> =
+        MutableStateFlow(PostComment())
+    val selectedComment: StateFlow<PostComment> = _selectedComment
+
     private lateinit var username: String
     private lateinit var userImage: String
 
@@ -78,5 +82,9 @@ class CommentsViewModel @Inject constructor(
                     }
                 }
         }
+    }
+
+    fun onSelectedComment(selectedComment: PostComment) {
+        _selectedComment.value = selectedComment
     }
 }

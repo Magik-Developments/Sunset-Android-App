@@ -1,5 +1,7 @@
 package com.madteam.sunset.ui.screens.comments
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -45,6 +47,7 @@ fun CommentsScreen(
 
     viewModel.setPostReference("posts/$commentsReference")
     val comments by viewModel.comments.collectAsStateWithLifecycle()
+    val selectedComment by viewModel.selectedComment.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
@@ -59,7 +62,9 @@ fun CommentsScreen(
             ) {
                 CommentsContent(
                     comments = comments,
-                    onCommentClick = viewModel::addNewComment
+                    onCommentClick = viewModel::addNewComment,
+                    selectedComment = selectedComment,
+                    onSelectedComment = viewModel::onSelectedComment
                 )
             }
         }
@@ -69,63 +74,71 @@ fun CommentsScreen(
 @Composable
 fun CommentsContent(
     comments: List<PostComment>,
-    onCommentClick: (String) -> Unit
+    onCommentClick: (String) -> Unit,
+    selectedComment: PostComment,
+    onSelectedComment: (PostComment) -> Unit
 ) {
 
     var newCommentText by remember {
         mutableStateOf("")
     }
 
-
     Column(
         Modifier
             .fillMaxSize()
             .padding(top = 16.dp, bottom = 70.dp)
     ) {
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        LazyColumn {
             itemsIndexed(comments.sortedBy {
                 it.creation_date
             }) { _, comment ->
+                val isSelected = comment == selectedComment
+                val backgroundColor = if (isSelected) Color(0xCDFFB600) else Color.White
                 ConstraintLayout(
                     modifier = Modifier
-                        .padding(horizontal = 24.dp)
                         .fillMaxWidth()
+                        .background(backgroundColor)
+                        .clickable {
+                            onSelectedComment(comment)
+                        }
                 ) {
                     val (userImage, userUsername, creationDate, commentText) = createRefs()
                     ProfileImage(
                         imageUrl = comment.author.image,
                         size = 60.dp,
-                        modifier = Modifier.constrainAs(userImage) {
-                            start.linkTo(parent.start)
-                            top.linkTo(parent.top)
-                        })
+                        modifier = Modifier
+                            .padding(bottom = 16.dp)
+                            .constrainAs(userImage) {
+                                start.linkTo(parent.start, 16.dp)
+                                top.linkTo(parent.top, 16.dp)
+                            })
                     Text(
                         text = "@" + comment.author.username,
                         style = secondarySemiBoldBodyM,
                         modifier = Modifier.constrainAs(userUsername) {
                             start.linkTo(userImage.end, 8.dp)
-                            top.linkTo(parent.top)
+                            top.linkTo(parent.top, 16.dp)
                         })
                     Text(
                         text = comment.creation_date,
                         style = secondaryRegularBodyM,
                         color = Color(0xFF999999),
                         modifier = Modifier.constrainAs(creationDate) {
-                            end.linkTo(parent.end)
-                            top.linkTo(parent.top)
+                            end.linkTo(parent.end, 24.dp)
+                            top.linkTo(parent.top, 16.dp)
                         })
                     Text(
                         text = comment.comment,
                         style = secondaryRegularBodyL,
                         modifier = Modifier
                             .fillMaxWidth(0.8f)
+                            .padding(end = 8.dp, bottom = 16.dp)
                             .constrainAs(commentText) {
                                 top.linkTo(userUsername.bottom, 8.dp)
                                 start.linkTo(userImage.end, 8.dp)
                             })
+                    CustomDivider(modifier = Modifier.fillMaxWidth(), color = Color(0xFF999999))
                 }
-                CustomSpacer(size = 8.dp)
-                CustomDivider(modifier = Modifier.fillMaxWidth(), color = Color(0xFF999999))
             }
         }
     }

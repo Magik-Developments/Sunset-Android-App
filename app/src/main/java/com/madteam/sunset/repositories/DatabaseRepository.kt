@@ -24,6 +24,8 @@ import javax.inject.Inject
 private const val USERS_COLLECTION_PATH = "users"
 private const val SPOTS_LOCATIONS_COLLECTION_PATH = "spots_locations"
 private const val SPOTS_COLLECTION_PATH = "spots"
+private const val POSTS_COLLECTION_PATH = "posts"
+private const val COMMENTS_POST_COLLECTION_PATH = "comments"
 
 class DatabaseRepository @Inject constructor(
     private val firebaseFirestore: FirebaseFirestore
@@ -53,8 +55,37 @@ class DatabaseRepository @Inject constructor(
 
         firebaseFirestore.collection(USERS_COLLECTION_PATH).document(username).set(user).await()
         emit(Resource.Success("User database has been created"))
-    }.catch {
-        emit(Resource.Error(it.message.toString()))
+    }.catch { exception ->
+        emit(Resource.Error(exception.message.toString()))
+    }
+
+    override fun createPostComment(
+        comment: PostComment,
+        postDocument: String
+    ): Flow<Resource<String>> = flow {
+        emit(Resource.Loading())
+        val currentDate = Calendar.getInstance().time.toString()
+        val commentsReference =
+            firebaseFirestore.document(postDocument).collection(
+                COMMENTS_POST_COLLECTION_PATH
+            )
+        val authorReference = firebaseFirestore
+            .collection(USERS_COLLECTION_PATH)
+            .document(comment.author.username)
+
+        println("authorReference: " + authorReference.path)
+        val newCommentData = hashMapOf(
+            "author" to authorReference,
+            "comment" to comment.comment,
+            "creation_date" to currentDate
+        )
+        val newCommentDocument = commentsReference.document()
+
+        newCommentDocument.set(newCommentData).await()
+        emit(Resource.Success("Comment has been created"))
+    }.catch { exception ->
+        emit(Resource.Error(exception.message.toString()))
+        Log.e("DatabaseRepository::createPostComment", "Error: ${exception.message}")
     }
 
     override fun getUserByEmail(email: String, userProfileCallback: (UserProfile) -> Unit) {
@@ -398,4 +429,5 @@ interface DatabaseContract {
     fun getSpotPostsByDocRefs(docRefs: List<DocumentReference>): Flow<List<SpotPost>>
     fun getSpotPostByDocRef(docRef: String): Flow<SpotPost>
     fun getCommentsFromPostRef(postRef: String): Flow<List<PostComment>>
+    fun createPostComment(comment: PostComment, postDocument: String): Flow<Resource<String>>
 }

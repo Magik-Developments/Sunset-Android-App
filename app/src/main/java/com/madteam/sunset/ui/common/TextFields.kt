@@ -2,6 +2,7 @@ package com.madteam.sunset.ui.common
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -206,6 +207,7 @@ fun UsernameTextField(
 fun ChatTextField(
     textValue: String,
     onValueChange: (String) -> Unit,
+    onSendClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -237,6 +239,9 @@ fun ChatTextField(
                         Color(0xFFFFB600)
                     } else {
                         Color(0xFF999999)
+                    },
+                    modifier = Modifier.clickable {
+                        onSendClick()
                     }
                 )
             },

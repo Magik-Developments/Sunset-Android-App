@@ -13,6 +13,9 @@ import androidx.compose.material.Text
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -55,7 +58,8 @@ fun CommentsScreen(
                 contentAlignment = Alignment.Center
             ) {
                 CommentsContent(
-                    comments = comments
+                    comments = comments,
+                    onCommentClick = viewModel::addNewComment
                 )
             }
         }
@@ -64,12 +68,18 @@ fun CommentsScreen(
 
 @Composable
 fun CommentsContent(
-    comments: List<PostComment>
+    comments: List<PostComment>,
+    onCommentClick: (String) -> Unit
 ) {
+
+    var newCommentText by remember {
+        mutableStateOf("")
+    }
+
     Column(
         Modifier
             .fillMaxSize()
-            .padding(top = 16.dp)
+            .padding(top = 16.dp, bottom = 70.dp)
     ) {
         LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp)) {
             itemsIndexed(comments) { _, comment ->
@@ -122,7 +132,13 @@ fun CommentsContent(
             .fillMaxHeight()
             .padding(horizontal = 8.dp)
     ) {
-        ChatTextField(textValue = "", onValueChange = {})
+        ChatTextField(
+            textValue = newCommentText,
+            onValueChange = { newCommentText = it },
+            onSendClick = {
+                onCommentClick(newCommentText)
+                newCommentText = ""
+            })
         CustomSpacer(size = 8.dp)
     }
 }

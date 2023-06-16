@@ -100,6 +100,7 @@ class CommentsViewModel @Inject constructor(
                 .collectLatest { result ->
                     when (result) {
                         is Resource.Success -> {
+                            unSelectComment()
                             getCommentsInfo()
                         }
 

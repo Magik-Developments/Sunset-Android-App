@@ -3,6 +3,7 @@ package com.madteam.sunset.repositories
 import android.util.Log
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
 import com.madteam.sunset.model.PostComment
@@ -26,6 +27,7 @@ private const val SPOTS_LOCATIONS_COLLECTION_PATH = "spots_locations"
 private const val SPOTS_COLLECTION_PATH = "spots"
 private const val POSTS_COLLECTION_PATH = "posts"
 private const val COMMENTS_POST_COLLECTION_PATH = "comments"
+private const val LIKED_BY_POST_COLLECTION_PATH = "liked_by"
 
 class DatabaseRepository @Inject constructor(
     private val firebaseFirestore: FirebaseFirestore
@@ -108,6 +110,35 @@ class DatabaseRepository @Inject constructor(
     }.catch { exception ->
         emit(Resource.Error(exception.message.toString()))
         Log.e("DatabaseRepository::deletePostComment", "Error: ${exception.message}")
+    }
+
+    override fun modifyUserPostLike(
+        postReference: String,
+        username: String
+    ): Flow<Resource<String>> = flow {
+
+        val likedByReference =
+            firebaseFirestore.document(postReference)
+                .collection(LIKED_BY_POST_COLLECTION_PATH)
+
+        val userLikeDocumentSnapshot =
+            likedByReference.document(username).get().await()
+
+        if (userLikeDocumentSnapshot.exists()) {
+            likedByReference.document(username).delete()
+            firebaseFirestore.document(postReference).update(
+                "likes", FieldValue.increment(-1)
+            ).await()
+        } else if (!userLikeDocumentSnapshot.exists()) {
+            likedByReference.document(username).set(
+                hashMapOf(
+                    "date" to Calendar.getInstance().time.toString()
+                )
+            ).await()
+            firebaseFirestore.document(postReference).update(
+                "likes", FieldValue.increment(-1)
+            ).await()
+        }
     }
 
     override fun getUserByEmail(email: String, userProfileCallback: (UserProfile) -> Unit) {
@@ -349,6 +380,8 @@ class DatabaseRepository @Inject constructor(
                 val images = postSnapshot.get("images") as List<String>
                 val spotRef = postSnapshot.getDocumentReference("spot")?.path
                 val likes = postSnapshot.get("likes")
+                val likedBySnapshot = postRef.collection("liked_by").get().await()
+                val likedByList = likedBySnapshot.documents.map { doc -> doc.id }
                 if (description != null && creationDate != null && spotRef != null) {
                     val spotPost = SpotPost(
                         id,
@@ -358,6 +391,7 @@ class DatabaseRepository @Inject constructor(
                         author,
                         creationDate,
                         commentsList,
+                        likedByList,
                         likes.toString().toInt()
                     )
                     postsList.add(spotPost)
@@ -390,6 +424,8 @@ class DatabaseRepository @Inject constructor(
             val images = postSnapshot.get("images") as List<String>
             val spotRef = postSnapshot.getDocumentReference("spot")?.path
             val likes = postSnapshot.get("likes")
+            val likedBySnapshot = documentReference.collection("liked_by").get().await()
+            val likedByList = likedBySnapshot.documents.map { doc -> doc.id }
             if (description != null && creationDate != null && spotRef != null) {
                 val spotPost = SpotPost(
                     id,
@@ -399,6 +435,7 @@ class DatabaseRepository @Inject constructor(
                     author,
                     creationDate,
                     commentsList,
+                    likedByList,
                     likes.toString().toInt()
                 )
                 emit(spotPost)
@@ -453,4 +490,6 @@ interface DatabaseContract {
     fun getCommentsFromPostRef(postRef: String): Flow<List<PostComment>>
     fun createPostComment(comment: PostComment, postDocument: String): Flow<Resource<String>>
     fun deletePostComment(comment: PostComment, postDocument: String): Flow<Resource<String>>
+    fun modifyUserPostLike(postReference: String, username: String): Flow<Resource<String>>
+
 }

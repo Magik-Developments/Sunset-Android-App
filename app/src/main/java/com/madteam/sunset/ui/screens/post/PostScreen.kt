@@ -13,6 +13,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,7 +27,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
@@ -54,7 +54,9 @@ fun PostScreen(
 ) {
 
     viewModel.setPostReference("posts/$postReference")
-    val postInfo by viewModel.postInfo.collectAsStateWithLifecycle()
+    val postInfo by viewModel.postInfo.collectAsState()
+    val isPostLikedByUser by viewModel.postIsLiked.collectAsState()
+    val postLikes by viewModel.postLikes.collectAsState()
 
     Scaffold(
         topBar = {
@@ -69,7 +71,11 @@ fun PostScreen(
             ) {
                 PostContent(
                     postInfo = postInfo,
-                    navigateTo = navController::navigate
+                    navigateTo = navController::navigate,
+                    postLikeClick = viewModel::modifyUserPostLike,
+                    postLikedByUser = isPostLikedByUser,
+                    updatePostInfo = viewModel::getPostInfo,
+                    postLikes = postLikes
                 )
             }
         }
@@ -80,7 +86,11 @@ fun PostScreen(
 @Composable
 fun PostContent(
     postInfo: SpotPost,
-    navigateTo: (String) -> Unit
+    postLikedByUser: Boolean,
+    navigateTo: (String) -> Unit,
+    postLikeClick: () -> Unit,
+    updatePostInfo: () -> Unit,
+    postLikes: Int
 ) {
     val scrollState = rememberScrollState()
     val showShimmer = remember { mutableStateOf(true) }
@@ -127,10 +137,13 @@ fun PostContent(
                 top.linkTo(parent.top, 16.dp)
                 end.linkTo(saveIconButton.start, 16.dp)
             }, onClick = {})
-            RoundedLightLikeButton(onClick = {}, modifier = Modifier.constrainAs(likeIconButton) {
+            RoundedLightLikeButton(onClick = {
+                postLikeClick()
+                updatePostInfo()
+            }, modifier = Modifier.constrainAs(likeIconButton) {
                 end.linkTo(parent.end, 24.dp)
                 bottom.linkTo(parent.bottom, 16.dp)
-            }, isLiked = false)
+            }, isLiked = postLikedByUser)
         }
 
         //Post author user information
@@ -195,7 +208,7 @@ fun PostContent(
         )
         CustomSpacer(size = 4.dp)
         Text(
-            text = "${postInfo.likes} likes",
+            text = "$postLikes likes",
             style = secondarySemiBoldBodyM,
             modifier = Modifier.padding(horizontal = 24.dp)
         )

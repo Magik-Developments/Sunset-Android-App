@@ -35,10 +35,10 @@ class CommentsViewModel @Inject constructor(
     private lateinit var userImage: String
 
     init {
-        getUserUsername()
+        getUserInfo()
     }
 
-    private fun getUserUsername() {
+    private fun getUserInfo() {
         authRepository.getCurrentUser()?.let { user ->
             databaseRepository.getUserByEmail(user.email!!) {
                 username = it.username

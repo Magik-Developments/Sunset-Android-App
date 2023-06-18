@@ -115,7 +115,7 @@ class DatabaseRepository @Inject constructor(
     override fun modifyUserPostLike(
         postReference: String,
         username: String
-    ): Flow<Resource<String>> = flow {
+    ): Flow<Resource<String>> = flow<Resource<String>> {
 
         val likedByReference =
             firebaseFirestore.document(postReference)
@@ -129,16 +129,38 @@ class DatabaseRepository @Inject constructor(
             firebaseFirestore.document(postReference).update(
                 "likes", FieldValue.increment(-1)
             ).await()
-        } else if (!userLikeDocumentSnapshot.exists()) {
+        } else {
             likedByReference.document(username).set(
                 hashMapOf(
                     "date" to Calendar.getInstance().time.toString()
                 )
             ).await()
             firebaseFirestore.document(postReference).update(
-                "likes", FieldValue.increment(-1)
+                "likes", FieldValue.increment(1)
             ).await()
         }
+    }.catch { exception ->
+        emit(Resource.Error(exception.message.toString()))
+        Log.e("DatabaseRepository::modifyUserPostLike", "Error: ${exception.message}")
+    }
+
+    override fun checkIfPostIsLikedByUser(
+        postReference: String,
+        username: String
+    ): Flow<Resource<Boolean>> = flow {
+
+        val likedByReference =
+            firebaseFirestore.document(postReference)
+                .collection(LIKED_BY_POST_COLLECTION_PATH)
+
+        val userLikeDocumentSnapshot =
+            likedByReference.document(username).get().await()
+
+        val postIsLikedByUser = userLikeDocumentSnapshot.exists()
+        emit(Resource.Success(postIsLikedByUser))
+
+    }.catch { exception ->
+        Log.e("DatabaseRepository::modifyUserPostLike", "Error: ${exception.message}")
     }
 
     override fun getUserByEmail(email: String, userProfileCallback: (UserProfile) -> Unit) {
@@ -491,5 +513,6 @@ interface DatabaseContract {
     fun createPostComment(comment: PostComment, postDocument: String): Flow<Resource<String>>
     fun deletePostComment(comment: PostComment, postDocument: String): Flow<Resource<String>>
     fun modifyUserPostLike(postReference: String, username: String): Flow<Resource<String>>
+    fun checkIfPostIsLikedByUser(postReference: String, username: String): Flow<Resource<Boolean>>
 
 }

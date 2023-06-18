@@ -242,10 +242,11 @@ fun SpotDetailContent(
         }
 
         //Spot information and location
+        CustomSpacer(size = 8.dp)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp)
+                .padding(start = 8.dp)
                 .background(shimmerBrush(showShimmer = showShimmer.value))
                 .defaultMinSize(minWidth = 100.dp), verticalAlignment = Alignment.CenterVertically
 

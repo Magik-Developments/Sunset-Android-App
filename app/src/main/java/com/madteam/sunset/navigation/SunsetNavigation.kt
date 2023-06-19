@@ -16,10 +16,12 @@ import com.madteam.sunset.navigation.SunsetRoutes.MyProfileScreen
 import com.madteam.sunset.navigation.SunsetRoutes.SignInCard
 import com.madteam.sunset.navigation.SunsetRoutes.SignUpCard
 import com.madteam.sunset.navigation.SunsetRoutes.WelcomeScreen
+import com.madteam.sunset.ui.screens.comments.CommentsScreen
 import com.madteam.sunset.ui.screens.discover.DiscoverScreen
 import com.madteam.sunset.ui.screens.home.HomeScreen
 import com.madteam.sunset.ui.screens.lostpassword.LostPasswordScreen
 import com.madteam.sunset.ui.screens.myprofile.MyProfileScreen
+import com.madteam.sunset.ui.screens.post.PostScreen
 import com.madteam.sunset.ui.screens.spotdetail.SpotDetailScreen
 import com.madteam.sunset.ui.screens.verifyaccount.VerifyAccountScreen
 import com.madteam.sunset.ui.screens.welcome.WelcomeScreen
@@ -89,6 +91,36 @@ fun SunsetNavigation() {
       val spotReference = backStackEntry.arguments?.getString("spotReference")
       spotReference?.let {
         SpotDetailScreen(navController = navController, spotReference = spotReference)
+      }
+    }
+
+    composable(
+      route = "post_screen/postReference={postReference}",
+      arguments = listOf(
+        navArgument("postReference") {
+          type = NavType.StringType
+          defaultValue = ""
+        }
+      )
+    ) { backStackEntry ->
+      val postReference = backStackEntry.arguments?.getString("postReference")
+      postReference?.let {
+        PostScreen(postReference = postReference, navController = navController)
+      }
+    }
+
+    composable(
+      route = "comments_screen/postReference={postReference}",
+      arguments = listOf(
+        navArgument("postReference") {
+          type = NavType.StringType
+          defaultValue = ""
+        }
+      )
+    ) { backStackEntry ->
+      val postReference = backStackEntry.arguments?.getString("postReference")
+      postReference?.let {
+        CommentsScreen(commentsReference = postReference, navController = navController)
       }
     }
   }

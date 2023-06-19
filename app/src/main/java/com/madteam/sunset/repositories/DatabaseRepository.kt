@@ -1,11 +1,12 @@
 package com.madteam.sunset.repositories
 
 import android.util.Log
-import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
+import com.madteam.sunset.model.PostComment
 import com.madteam.sunset.model.Spot
 import com.madteam.sunset.model.SpotAttribute
 import com.madteam.sunset.model.SpotClusterItem
@@ -13,13 +14,10 @@ import com.madteam.sunset.model.SpotPost
 import com.madteam.sunset.model.SpotReview
 import com.madteam.sunset.model.UserProfile
 import com.madteam.sunset.utils.Resource
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.util.Calendar
 import javax.inject.Inject
@@ -27,6 +25,9 @@ import javax.inject.Inject
 private const val USERS_COLLECTION_PATH = "users"
 private const val SPOTS_LOCATIONS_COLLECTION_PATH = "spots_locations"
 private const val SPOTS_COLLECTION_PATH = "spots"
+private const val POSTS_COLLECTION_PATH = "posts"
+private const val COMMENTS_POST_COLLECTION_PATH = "comments"
+private const val LIKED_BY_POST_COLLECTION_PATH = "liked_by"
 
 class DatabaseRepository @Inject constructor(
     private val firebaseFirestore: FirebaseFirestore
@@ -56,8 +57,110 @@ class DatabaseRepository @Inject constructor(
 
         firebaseFirestore.collection(USERS_COLLECTION_PATH).document(username).set(user).await()
         emit(Resource.Success("User database has been created"))
-    }.catch {
-        emit(Resource.Error(it.message.toString()))
+    }.catch { exception ->
+        emit(Resource.Error(exception.message.toString()))
+    }
+
+    override fun createPostComment(
+        comment: PostComment,
+        postDocument: String
+    ): Flow<Resource<String>> = flow {
+        emit(Resource.Loading())
+        val currentDate = Calendar.getInstance().time.toString()
+        val commentsReference =
+            firebaseFirestore.document(postDocument).collection(
+                COMMENTS_POST_COLLECTION_PATH
+            )
+        val authorReference = firebaseFirestore
+            .collection(USERS_COLLECTION_PATH)
+            .document(comment.author.username)
+
+        println("authorReference: " + authorReference.path)
+        val newCommentDocument = commentsReference.document()
+
+        val newCommentData = hashMapOf(
+            "id" to newCommentDocument.id,
+            "author" to authorReference,
+            "comment" to comment.comment,
+            "creation_date" to currentDate
+        )
+
+        newCommentDocument.set(newCommentData).await()
+        emit(Resource.Success("Comment has been created"))
+    }.catch { exception ->
+        emit(Resource.Error(exception.message.toString()))
+        Log.e("DatabaseRepository::createPostComment", "Error: ${exception.message}")
+    }
+
+    override fun deletePostComment(
+        comment: PostComment,
+        postDocument: String
+    ): Flow<Resource<String>> = flow {
+        emit(Resource.Loading())
+
+        val commentsReference =
+            firebaseFirestore.document(postDocument)
+                .collection(COMMENTS_POST_COLLECTION_PATH)
+
+        val commentDocument = commentsReference.document(comment.id)
+
+        commentDocument.delete().await()
+
+        emit(Resource.Success("Comment has been deleted"))
+    }.catch { exception ->
+        emit(Resource.Error(exception.message.toString()))
+        Log.e("DatabaseRepository::deletePostComment", "Error: ${exception.message}")
+    }
+
+    override fun modifyUserPostLike(
+        postReference: String,
+        username: String
+    ): Flow<Resource<String>> = flow<Resource<String>> {
+
+        val likedByReference =
+            firebaseFirestore.document(postReference)
+                .collection(LIKED_BY_POST_COLLECTION_PATH)
+
+        val userLikeDocumentSnapshot =
+            likedByReference.document(username).get().await()
+
+        if (userLikeDocumentSnapshot.exists()) {
+            likedByReference.document(username).delete()
+            firebaseFirestore.document(postReference).update(
+                "likes", FieldValue.increment(-1)
+            ).await()
+        } else {
+            likedByReference.document(username).set(
+                hashMapOf(
+                    "date" to Calendar.getInstance().time.toString()
+                )
+            ).await()
+            firebaseFirestore.document(postReference).update(
+                "likes", FieldValue.increment(1)
+            ).await()
+        }
+    }.catch { exception ->
+        emit(Resource.Error(exception.message.toString()))
+        Log.e("DatabaseRepository::modifyUserPostLike", "Error: ${exception.message}")
+    }
+
+    override fun checkIfPostIsLikedByUser(
+        postReference: String,
+        username: String
+    ): Flow<Resource<Boolean>> = flow {
+
+        val likedByReference =
+            firebaseFirestore.document(postReference)
+                .collection(LIKED_BY_POST_COLLECTION_PATH)
+
+        val userLikeDocumentSnapshot =
+            likedByReference.document(username).get().await()
+
+        val postIsLikedByUser = userLikeDocumentSnapshot.exists()
+        emit(Resource.Success(postIsLikedByUser))
+
+    }.catch { exception ->
+        Log.e("DatabaseRepository::modifyUserPostLike", "Error: ${exception.message}")
     }
 
     override fun getUserByEmail(email: String, userProfileCallback: (UserProfile) -> Unit) {
@@ -199,7 +302,7 @@ class DatabaseRepository @Inject constructor(
                 creation_date = creationDate ?: "",
                 name = usernameName ?: "",
                 location = location ?: "",
-                image = userImage  ?: ""
+                image = userImage ?: ""
             )
             emit(userProfile)
         }
@@ -208,76 +311,124 @@ class DatabaseRepository @Inject constructor(
         emit(UserProfile())
     }
 
-    override fun getSpotAttributesByDocRefs(docRefs: List<DocumentReference>): Flow<List<SpotAttribute>> = flow {
-        val attributesList = mutableListOf<SpotAttribute>()
-        for (attributeRef in docRefs) {
-            val attributeSnapshot = attributeRef.get().await()
-            val id = attributeSnapshot.id
-            val title = attributeSnapshot.getString("title")
-            val description = attributeSnapshot.getString("description")
-            val icon = attributeSnapshot.getString("icon")
-            val favorable = attributeSnapshot.getBoolean("favorable")
-            if (description != null && title != null && icon != null && favorable != null) {
-                val attributeData = SpotAttribute(
-                    id,
-                    description,
-                    title,
-                    icon,
-                    favorable
-                )
-                attributesList.add(attributeData)
-            }
-        }
-        emit(attributesList)
-    }.catch { exception ->
-        Log.e("DatabaseRepository::getSpotAttributesByDocRefs", "Error: ${exception.message}")
-        emit(mutableListOf())
-    }
-
-    override fun getSpotReviewsByCollectionRef(collectionRef: CollectionReference): Flow<List<SpotReview>> = flow<List<SpotReview>> {
-        val spotReviewsList = mutableListOf<SpotReview>()
-        collectionRef.get().await().forEach { spotReviewSnapshot ->
-            val id= spotReviewSnapshot.id
-            val description = spotReviewSnapshot.getString("description")
-            val title = spotReviewSnapshot.getString("title")
-            val postedByDocRef = spotReviewSnapshot.getDocumentReference("posted_by")
-            var postedBy = UserProfile()
-            if (postedByDocRef != null) {
-                getUserProfileByDocRef(postedByDocRef).collectLatest { profile ->
-                    postedBy = profile
-                }
-            }
-            val reviewAttributesRefs = spotReviewSnapshot.get("spot_attr") as List<DocumentReference>
-            var reviewAttributes = listOf<SpotAttribute>()
-            getSpotAttributesByDocRefs(reviewAttributesRefs).collectLatest { attributes ->
-                reviewAttributes = attributes
-            }
-            val creationDate = spotReviewSnapshot.getString("creation_date")
-            val score = spotReviewSnapshot.getDouble("score")
-            if (description != null && title != null && creationDate != null && score != null) {
-                spotReviewsList.add(
-                    SpotReview(
+    override fun getSpotAttributesByDocRefs(docRefs: List<DocumentReference>): Flow<List<SpotAttribute>> =
+        flow {
+            val attributesList = mutableListOf<SpotAttribute>()
+            for (attributeRef in docRefs) {
+                val attributeSnapshot = attributeRef.get().await()
+                val id = attributeSnapshot.id
+                val title = attributeSnapshot.getString("title")
+                val description = attributeSnapshot.getString("description")
+                val icon = attributeSnapshot.getString("icon")
+                val favorable = attributeSnapshot.getBoolean("favorable")
+                if (description != null && title != null && icon != null && favorable != null) {
+                    val attributeData = SpotAttribute(
                         id,
                         description,
                         title,
-                        postedBy,
-                        reviewAttributes,
-                        creationDate,
-                        score.toFloat()
+                        icon,
+                        favorable
                     )
-                )
+                    attributesList.add(attributeData)
+                }
             }
+            emit(attributesList)
+        }.catch { exception ->
+            Log.e("DatabaseRepository::getSpotAttributesByDocRefs", "Error: ${exception.message}")
+            emit(mutableListOf())
         }
-        emit(spotReviewsList)
-    }.catch { exception ->
-        Log.e("DatabaseRepository::getSpotReviewsByDocRef", "Error: ${exception.message}")
-        emit(mutableListOf())
-    }
 
-    override fun getSpotPostsByDocRefs(docRefs: List<DocumentReference>): Flow<List<SpotPost>> = flow<List<SpotPost>> {
-        val postsList = mutableListOf<SpotPost>()
-        for (postRef in docRefs) {
-            val postSnapshot = postRef.get().await()
+    override fun getSpotReviewsByCollectionRef(collectionRef: CollectionReference): Flow<List<SpotReview>> =
+        flow<List<SpotReview>> {
+            val spotReviewsList = mutableListOf<SpotReview>()
+            collectionRef.get().await().forEach { spotReviewSnapshot ->
+                val id = spotReviewSnapshot.id
+                val description = spotReviewSnapshot.getString("description")
+                val title = spotReviewSnapshot.getString("title")
+                val postedByDocRef = spotReviewSnapshot.getDocumentReference("posted_by")
+                var postedBy = UserProfile()
+                if (postedByDocRef != null) {
+                    getUserProfileByDocRef(postedByDocRef).collectLatest { profile ->
+                        postedBy = profile
+                    }
+                }
+                val reviewAttributesRefs =
+                    spotReviewSnapshot.get("spot_attr") as List<DocumentReference>
+                var reviewAttributes = listOf<SpotAttribute>()
+                getSpotAttributesByDocRefs(reviewAttributesRefs).collectLatest { attributes ->
+                    reviewAttributes = attributes
+                }
+                val creationDate = spotReviewSnapshot.getString("creation_date")
+                val score = spotReviewSnapshot.getDouble("score")
+                if (description != null && title != null && creationDate != null && score != null) {
+                    spotReviewsList.add(
+                        SpotReview(
+                            id,
+                            description,
+                            title,
+                            postedBy,
+                            reviewAttributes,
+                            creationDate,
+                            score.toFloat()
+                        )
+                    )
+                }
+            }
+            emit(spotReviewsList)
+        }.catch { exception ->
+            Log.e("DatabaseRepository::getSpotReviewsByDocRef", "Error: ${exception.message}")
+            emit(mutableListOf())
+        }
+
+    override fun getSpotPostsByDocRefs(docRefs: List<DocumentReference>): Flow<List<SpotPost>> =
+        flow<List<SpotPost>> {
+            val postsList = mutableListOf<SpotPost>()
+            for (postRef in docRefs) {
+                val postSnapshot = postRef.get().await()
+                val id = postSnapshot.id
+                val authorRef = postSnapshot.getDocumentReference("author")
+                var author = UserProfile()
+                if (authorRef != null) {
+                    getUserProfileByDocRef(authorRef).collectLatest { profile ->
+                        author = profile
+                    }
+                }
+                var commentsList = listOf<PostComment>()
+                getCommentsFromPostRef(postRef.path).collectLatest { comments ->
+                    commentsList = comments
+                }
+                val description = postSnapshot.getString("description")
+                val creationDate = postSnapshot.getString("creation_date")
+                val images = postSnapshot.get("images") as List<String>
+                val spotRef = postSnapshot.getDocumentReference("spot")?.path
+                val likes = postSnapshot.get("likes")
+                val likedBySnapshot = postRef.collection("liked_by").get().await()
+                val likedByList = likedBySnapshot.documents.map { doc -> doc.id }
+                if (description != null && creationDate != null && spotRef != null) {
+                    val spotPost = SpotPost(
+                        id,
+                        description,
+                        spotRef,
+                        images,
+                        author,
+                        creationDate,
+                        commentsList,
+                        likedByList,
+                        likes.toString().toInt()
+                    )
+                    postsList.add(spotPost)
+                }
+            }
+            emit(postsList)
+        }.catch { exception ->
+            Log.e("DatabaseRepository::getSpotPostsByDocRefs", "Error: ${exception.message}")
+            emit(mutableListOf())
+        }
+
+    override fun getSpotPostByDocRef(docRef: String): Flow<SpotPost> =
+        flow {
+            val documentReference = firebaseFirestore.document(docRef)
+            val postSnapshot = documentReference.get().await()
             val id = postSnapshot.id
             val authorRef = postSnapshot.getDocumentReference("author")
             var author = UserProfile()
@@ -286,35 +437,65 @@ class DatabaseRepository @Inject constructor(
                     author = profile
                 }
             }
+            var commentsList = listOf<PostComment>()
+            getCommentsFromPostRef(documentReference.path).collectLatest { comments ->
+                commentsList = comments
+            }
             val description = postSnapshot.getString("description")
             val creationDate = postSnapshot.getString("creation_date")
             val images = postSnapshot.get("images") as List<String>
             val spotRef = postSnapshot.getDocumentReference("spot")?.path
-            if (description != null && creationDate != null && spotRef != null){
+            val likes = postSnapshot.get("likes")
+            val likedBySnapshot = documentReference.collection("liked_by").get().await()
+            val likedByList = likedBySnapshot.documents.map { doc -> doc.id }
+            if (description != null && creationDate != null && spotRef != null) {
                 val spotPost = SpotPost(
                     id,
                     description,
                     spotRef,
                     images,
                     author,
-                    creationDate
+                    creationDate,
+                    commentsList,
+                    likedByList,
+                    likes.toString().toInt()
                 )
-                postsList.add(spotPost)
+                emit(spotPost)
             }
-        }
-        emit(postsList)
-    }.catch { exception ->
-        Log.e("DatabaseRepository::getSpotPostsByDocRefs", "Error: ${exception.message}")
-        emit(mutableListOf())
-    }
 
+        }.catch { exception ->
+            Log.e("DatabaseRepository::getSpotPostByDocRef", "Error: ${exception.message}")
+            emit(SpotPost())
+        }
+
+    override fun getCommentsFromPostRef(postRef: String): Flow<List<PostComment>> =
+        flow {
+            val commentsList = mutableListOf<PostComment>()
+            val commentsSnapshot =
+                firebaseFirestore.document(postRef).collection("comments").get().await()
+            for (commentDoc in commentsSnapshot.documents) {
+                val id = commentDoc.id
+                val commentText = commentDoc.getString("comment")
+                val creationDate = commentDoc.getString("creation_date")
+                val authorRef = commentDoc.getDocumentReference("author")
+                var author = UserProfile()
+                if (authorRef != null) {
+                    getUserProfileByDocRef(authorRef).collectLatest { profile ->
+                        author = profile
+                    }
+                }
+                if (commentText != null && creationDate != null) {
+                    val comment = PostComment(id, commentText, author, creationDate)
+                    commentsList.add(comment)
+                }
+            }
+            emit(commentsList)
+        }.catch { exception ->
+            Log.e("DatabaseRepository::getCommentsFromPostRef", "Error: ${exception.message}")
+            emit(mutableListOf())
+        }
 
 }
-
-
-
-
-
 
 interface DatabaseContract {
 
@@ -324,7 +505,14 @@ interface DatabaseContract {
     fun getSpotsLocations(): Flow<List<SpotClusterItem>>
     fun getSpotByDocRef(docRef: String): Flow<Spot>
     fun getUserProfileByDocRef(docRef: DocumentReference): Flow<UserProfile>
-    fun getSpotAttributesByDocRefs(docRefs: List<DocumentReference>) : Flow<List<SpotAttribute>>
+    fun getSpotAttributesByDocRefs(docRefs: List<DocumentReference>): Flow<List<SpotAttribute>>
     fun getSpotReviewsByCollectionRef(collectionRef: CollectionReference): Flow<List<SpotReview>>
-    fun getSpotPostsByDocRefs(docRefs: List<DocumentReference>) : Flow<List<SpotPost>>
+    fun getSpotPostsByDocRefs(docRefs: List<DocumentReference>): Flow<List<SpotPost>>
+    fun getSpotPostByDocRef(docRef: String): Flow<SpotPost>
+    fun getCommentsFromPostRef(postRef: String): Flow<List<PostComment>>
+    fun createPostComment(comment: PostComment, postDocument: String): Flow<Resource<String>>
+    fun deletePostComment(comment: PostComment, postDocument: String): Flow<Resource<String>>
+    fun modifyUserPostLike(postReference: String, username: String): Flow<Resource<String>>
+    fun checkIfPostIsLikedByUser(postReference: String, username: String): Flow<Resource<Boolean>>
+
 }

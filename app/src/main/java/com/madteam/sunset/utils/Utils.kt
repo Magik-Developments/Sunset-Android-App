@@ -14,6 +14,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import com.google.firebase.firestore.GeoPoint
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @DrawableRes
 fun getResourceId(icon: String, context: Context): Int {
@@ -52,9 +55,17 @@ fun shimmerBrush(showShimmer: Boolean = true,targetValue:Float = 1000f): Brush {
         )
     } else {
         Brush.linearGradient(
-            colors = listOf(Color.Transparent,Color.Transparent),
+            colors = listOf(Color.Transparent, Color.Transparent),
             start = Offset.Zero,
             end = Offset.Zero
         )
     }
+}
+
+fun formatDate(originalDate: String): String {
+    val originalFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH)
+    val formattedDate = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+
+    val date: Date = originalFormat.parse(originalDate) as Date
+    return formattedDate.format(date)
 }

@@ -38,6 +38,7 @@ import com.madteam.sunset.ui.common.SelectedCommentTopAppBar
 import com.madteam.sunset.ui.theme.secondaryRegularBodyL
 import com.madteam.sunset.ui.theme.secondaryRegularBodyM
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyM
+import com.madteam.sunset.utils.formatDate
 
 @Composable
 fun CommentsScreen(
@@ -136,7 +137,7 @@ fun CommentsContent(
                             top.linkTo(parent.top, 16.dp)
                         })
                     Text(
-                        text = comment.creation_date,
+                        text = formatDate(comment.creation_date),
                         style = secondaryRegularBodyM,
                         color = Color(0xFF999999),
                         modifier = Modifier.constrainAs(creationDate) {

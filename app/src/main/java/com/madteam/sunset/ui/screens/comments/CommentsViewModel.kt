@@ -67,7 +67,7 @@ class CommentsViewModel @Inject constructor(
                 id = "",
                 comment = commentText,
                 author = UserProfile(username, "", "", "", "", "", userImage),
-                creation_date = Calendar.getInstance().time.toString()
+                creationDate = Calendar.getInstance().time.toString()
             )
             databaseRepository.createPostComment(newPostComment, _postReference.value)
                 .collectLatest { result ->

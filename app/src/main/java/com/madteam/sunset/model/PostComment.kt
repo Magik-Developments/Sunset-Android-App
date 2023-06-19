@@ -4,7 +4,7 @@ data class PostComment(
     val id: String,
     val comment: String,
     val author: UserProfile,
-    val creation_date: String
+    val creationDate: String
 ) {
     constructor() : this("", "", UserProfile(), "")
 }

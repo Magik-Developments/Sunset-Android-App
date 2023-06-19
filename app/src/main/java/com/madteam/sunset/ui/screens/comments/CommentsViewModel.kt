@@ -22,7 +22,7 @@ class CommentsViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _comments: MutableStateFlow<List<PostComment>> =
-        MutableStateFlow(listOf<PostComment>())
+        MutableStateFlow(listOf())
     val comments: StateFlow<List<PostComment>> = _comments
 
     private val _postReference: MutableStateFlow<String> = MutableStateFlow("")
@@ -67,7 +67,7 @@ class CommentsViewModel @Inject constructor(
                 id = "",
                 comment = commentText,
                 author = UserProfile(username, "", "", "", "", "", userImage),
-                creation_date = Calendar.getInstance().time.toString()
+                creationDate = Calendar.getInstance().time.toString()
             )
             databaseRepository.createPostComment(newPostComment, _postReference.value)
                 .collectLatest { result ->

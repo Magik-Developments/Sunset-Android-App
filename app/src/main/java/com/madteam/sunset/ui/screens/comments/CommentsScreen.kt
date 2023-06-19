@@ -107,7 +107,7 @@ fun CommentsContent(
     ) {
         LazyColumn {
             itemsIndexed(comments.sortedBy {
-                it.creation_date
+                it.creationDate
             }) { _, comment ->
                 val isSelected = comment == selectedComment
                 val backgroundColor = if (isSelected) Color(0xCDFFB600) else Color.White
@@ -137,7 +137,7 @@ fun CommentsContent(
                             top.linkTo(parent.top, 16.dp)
                         })
                     Text(
-                        text = formatDate(comment.creation_date),
+                        text = formatDate(comment.creationDate),
                         style = secondaryRegularBodyM,
                         color = Color(0xFF999999),
                         modifier = Modifier.constrainAs(creationDate) {

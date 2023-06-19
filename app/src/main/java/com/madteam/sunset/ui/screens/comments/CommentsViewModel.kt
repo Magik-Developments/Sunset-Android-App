@@ -22,7 +22,7 @@ class CommentsViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _comments: MutableStateFlow<List<PostComment>> =
-        MutableStateFlow(listOf<PostComment>())
+        MutableStateFlow(listOf())
     val comments: StateFlow<List<PostComment>> = _comments
 
     private val _postReference: MutableStateFlow<String> = MutableStateFlow("")

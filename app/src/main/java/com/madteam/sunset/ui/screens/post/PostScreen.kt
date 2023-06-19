@@ -74,7 +74,6 @@ fun PostScreen(
                     navigateTo = navController::navigate,
                     postLikeClick = viewModel::modifyUserPostLike,
                     postLikedByUser = isPostLikedByUser,
-                    updatePostInfo = viewModel::getPostInfo,
                     postLikes = postLikes
                 )
             }
@@ -89,7 +88,6 @@ fun PostContent(
     postLikedByUser: Boolean,
     navigateTo: (String) -> Unit,
     postLikeClick: () -> Unit,
-    updatePostInfo: () -> Unit,
     postLikes: Int
 ) {
     val scrollState = rememberScrollState()
@@ -139,7 +137,6 @@ fun PostContent(
             }, onClick = {})
             RoundedLightLikeButton(onClick = {
                 postLikeClick()
-                updatePostInfo()
             }, modifier = Modifier.constrainAs(likeIconButton) {
                 end.linkTo(parent.end, 24.dp)
                 bottom.linkTo(parent.bottom, 16.dp)

@@ -52,7 +52,7 @@ class PostViewModel @Inject constructor(
         getPostInfo()
     }
 
-    fun getPostInfo() {
+    private fun getPostInfo() {
         viewModelScope.launch {
             databaseRepository.getSpotPostByDocRef(_postReference.value).collectLatest { post ->
                 _postInfo.value = post
@@ -65,8 +65,14 @@ class PostViewModel @Inject constructor(
     fun modifyUserPostLike() {
         viewModelScope.launch {
             databaseRepository.modifyUserPostLike(_postReference.value, username)
-                .collectLatest {
-                }
+                .collectLatest {}
+            if (_postIsLiked.value) {
+                _postLikes.value--
+                _postIsLiked.value = false
+            } else {
+                _postLikes.value++
+                _postIsLiked.value = true
+            }
         }
     }
 }

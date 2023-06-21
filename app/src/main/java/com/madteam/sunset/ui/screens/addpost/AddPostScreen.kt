@@ -38,6 +38,8 @@ import com.madteam.sunset.ui.common.GoForwardTopAppBar
 import com.madteam.sunset.ui.common.IconButtonDark
 import com.madteam.sunset.utils.shimmerBrush
 
+private const val MAX_IMAGES_SELECTED = 8
+
 @Composable
 fun AddPostScreen(
     viewModel: AddPostViewModel = hiltViewModel(),
@@ -48,7 +50,7 @@ fun AddPostScreen(
     val selectedImageUris by viewModel.selectedImageUris.collectAsStateWithLifecycle()
 
     val multiplePhotoPickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickMultipleVisualMedia(),
+        contract = ActivityResultContracts.PickMultipleVisualMedia(maxItems = MAX_IMAGES_SELECTED),
         onResult = { uris -> viewModel.updateSelectedImages(uris) })
 
     Scaffold(

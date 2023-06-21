@@ -51,8 +51,6 @@ fun CommentsScreen(
     val comments by viewModel.comments.collectAsStateWithLifecycle()
     val selectedComment by viewModel.selectedComment.collectAsStateWithLifecycle()
 
-
-
     Scaffold(
         topBar = {
             if (selectedComment == PostComment()) {

@@ -12,11 +12,22 @@ class AddPostViewModel @Inject constructor(
 
 ) : ViewModel() {
 
-    private val _selectedImageUris: MutableStateFlow<List<Uri>> = MutableStateFlow(listOf())
-    val selectedImageUris: StateFlow<List<Uri>> = _selectedImageUris
+    private val _selectedImageUri: MutableStateFlow<Uri> = MutableStateFlow(Uri.EMPTY)
+    val selectedImageUri: StateFlow<Uri> = _selectedImageUri
+
+    private val _imageUris: MutableStateFlow<List<Uri>> = MutableStateFlow(listOf())
+    val imageUris: StateFlow<List<Uri>> = _imageUris
 
     fun updateSelectedImages(uris: List<Uri>) {
-        _selectedImageUris.value = uris
+        _imageUris.value = _imageUris.value + uris
+    }
+
+    fun removeSelectedImageFromList(uri: Uri) {
+        _imageUris.value = imageUris.value.filterNot { it == uri }
+    }
+
+    fun addSelectedImage(uri: Uri) {
+        _selectedImageUri.value = uri
     }
 
 }

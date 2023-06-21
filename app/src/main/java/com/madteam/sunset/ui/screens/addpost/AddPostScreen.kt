@@ -5,6 +5,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,11 +18,14 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
@@ -33,9 +37,7 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.madteam.sunset.R
 import com.madteam.sunset.ui.common.AutoSlidingCarousel
-import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.GoForwardTopAppBar
-import com.madteam.sunset.ui.common.IconButtonDark
 import com.madteam.sunset.utils.shimmerBrush
 
 private const val MAX_IMAGES_SELECTED = 8
@@ -47,7 +49,8 @@ fun AddPostScreen(
     navController: NavController
 ) {
 
-    val selectedImageUris by viewModel.selectedImageUris.collectAsStateWithLifecycle()
+    val imageUris by viewModel.imageUris.collectAsStateWithLifecycle()
+    val selectedImageUri by viewModel.selectedImageUri.collectAsStateWithLifecycle()
 
     val multiplePhotoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickMultipleVisualMedia(maxItems = MAX_IMAGES_SELECTED),
@@ -67,7 +70,9 @@ fun AddPostScreen(
                 modifier = Modifier.padding(paddingValues),
                 contentAlignment = Alignment.Center
             ) {
-                AddPostContent(selectedImages = selectedImageUris,
+                AddPostContent(images = imageUris,
+                    selectedImage = selectedImageUri,
+                    onImageSelected = viewModel::addSelectedImage,
                     onAddImagesClick = {
                         multiplePhotoPickerLauncher.launch(
                             PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
@@ -83,16 +88,18 @@ fun AddPostScreen(
 @OptIn(ExperimentalPagerApi::class, ExperimentalGlideComposeApi::class)
 @Composable
 fun AddPostContent(
-    selectedImages: List<Uri>,
+    images: List<Uri>,
+    selectedImage: Uri,
+    onImageSelected: (Uri) -> Unit,
     onAddImagesClick: () -> Unit
 ) {
     Column(verticalArrangement = Arrangement.Top, modifier = Modifier.fillMaxSize()) {
         AutoSlidingCarousel(
-            itemsCount = selectedImages.size,
+            itemsCount = images.size,
             autoSlideDuration = 0,
             itemContent = { index ->
                 GlideImage(
-                    model = selectedImages[index],
+                    model = images[index],
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.background(shimmerBrush(targetValue = 2000f))
@@ -103,21 +110,47 @@ fun AddPostContent(
                 .height(388.dp)
         )
         LazyRow {
-            itemsIndexed(selectedImages) { _, image ->
+
+
+            itemsIndexed(images) { _, image ->
+                val nonSelectedImageModifier = Modifier
+                    .size(150.dp)
+                    .clickable {
+                        onImageSelected(image)
+                    }
+
+                val selectedImageModifier = Modifier
+                    .size(150.dp)
+                    .clickable {
+                        onImageSelected(image)
+                    }
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(Color.Transparent, Color(0xFFFFB600))
+                        )
+                    )
+
                 GlideImage(
                     model = image,
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier.size(100.dp)
+                    modifier = if (image == selectedImage) selectedImageModifier else nonSelectedImageModifier
                 )
             }
+            item {
+                IconButton(
+                    onClick = { onAddImagesClick() },
+                    modifier = Modifier
+                        .size(150.dp)
+                        .background(Color(0xFFFFB600))
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Add image",
+                        tint = Color.White
+                    )
+                }
+            }
         }
-        CustomSpacer(size = 24.dp)
-        IconButtonDark(
-            buttonIcon = Icons.Default.Add,
-            description = R.string.add,
-            onClick = { onAddImagesClick() },
-            iconTint = Color.White
-        )
     }
 }

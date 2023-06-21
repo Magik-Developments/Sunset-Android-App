@@ -165,7 +165,7 @@ fun GoForwardTopAppBar(
                 }
             }
         },
-        title = { Text(text = stringResource(id = title), color = Color.White) }
+        title = { Text(text = stringResource(id = title), color = Color.Black) }
     )
 }
 

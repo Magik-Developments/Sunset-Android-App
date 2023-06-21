@@ -16,6 +16,7 @@ import com.madteam.sunset.navigation.SunsetRoutes.MyProfileScreen
 import com.madteam.sunset.navigation.SunsetRoutes.SignInCard
 import com.madteam.sunset.navigation.SunsetRoutes.SignUpCard
 import com.madteam.sunset.navigation.SunsetRoutes.WelcomeScreen
+import com.madteam.sunset.ui.screens.addpost.AddPostScreen
 import com.madteam.sunset.ui.screens.comments.CommentsScreen
 import com.madteam.sunset.ui.screens.discover.DiscoverScreen
 import com.madteam.sunset.ui.screens.home.HomeScreen
@@ -121,6 +122,21 @@ fun SunsetNavigation() {
       val postReference = backStackEntry.arguments?.getString("postReference")
       postReference?.let {
         CommentsScreen(commentsReference = postReference, navController = navController)
+      }
+    }
+
+    composable(
+      route = "add_post_screen/spotReference={spotReference}",
+      arguments = listOf(
+        navArgument("spotReference") {
+          type = NavType.StringType
+          defaultValue = ""
+        }
+      )
+    ) { backStackEntry ->
+      val spotReference = backStackEntry.arguments?.getString("spotReference")
+      spotReference?.let {
+        AddPostScreen(spotReference = spotReference, navController = navController)
       }
     }
   }

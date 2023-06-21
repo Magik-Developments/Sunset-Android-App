@@ -15,7 +15,6 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Forward
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -149,9 +148,9 @@ fun GoForwardTopAppBar(
         navigationIcon = {
             IconButton(onClick = { onQuitClick() }) {
                 Icon(
-                    imageVector = Icons.Filled.ArrowForward,
+                    imageVector = Icons.Filled.Close,
                     contentDescription = "Unselect",
-                    tint = Color.White
+                    tint = Color.Black
                 )
             }
         },
@@ -159,7 +158,7 @@ fun GoForwardTopAppBar(
             if (canContinue) {
                 IconButton(onClick = { onContinueClick() }) {
                     Icon(
-                        imageVector = Icons.Filled.Forward,
+                        imageVector = Icons.Filled.ArrowForward,
                         contentDescription = "Continue",
                         tint = Color(0xFFFFB600)
                     )

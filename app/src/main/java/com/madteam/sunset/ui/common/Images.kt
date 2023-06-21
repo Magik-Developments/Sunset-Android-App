@@ -105,15 +105,17 @@ fun AutoSlidingCarousel(
 ) {
     val isDragged by pagerState.interactionSource.collectIsDraggedAsState()
 
-    LaunchedEffect(pagerState.currentPage) {
-        delay(autoSlideDuration.toLong())
-        pagerState.animateScrollToPage(
-            (pagerState.currentPage + 1) % if (itemsCount == 0) {
-                1
-            } else {
-                itemsCount
-            }
-        )
+    if (autoSlideDuration != 0) {
+        LaunchedEffect(pagerState.currentPage) {
+            delay(autoSlideDuration.toLong())
+            pagerState.animateScrollToPage(
+                (pagerState.currentPage + 1) % if (itemsCount == 0) {
+                    1
+                } else {
+                    itemsCount
+                }
+            )
+        }
     }
 
     Box(
@@ -146,11 +148,13 @@ fun AutoSlidingCarousel(
                 .fillMaxSize()
                 .padding(bottom = 16.dp)
         ) {
-            ImageSliderCounter(
-                actualImage = (if (isDragged) pagerState.currentPage else pagerState.targetPage) + 1,
-                totalImages = itemsCount,
-                modifier = Modifier
-            )
+            if (itemsCount != 0) {
+                ImageSliderCounter(
+                    actualImage = (if (isDragged) pagerState.currentPage else pagerState.targetPage) + 1,
+                    totalImages = itemsCount,
+                    modifier = Modifier
+                )
+            }
         }
     }
 }

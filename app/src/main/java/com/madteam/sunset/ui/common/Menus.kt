@@ -12,8 +12,10 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Forward
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,102 +34,139 @@ import com.madteam.sunset.utils.shadow
 @Composable
 fun SunsetBottomNavigation(navController: NavController) {
 
-  val unselectedContentColor = Color(0xB3FFB600)
-  val selectedContentColor = Color(0xFF000000)
+    val unselectedContentColor = Color(0xB3FFB600)
+    val selectedContentColor = Color(0xFF000000)
 
-  val items = listOf(
-    SunsetBottomNavItem.Home,
-    SunsetBottomNavItem.Discover,
-    SunsetBottomNavItem.Profile
-  )
+    val items = listOf(
+        SunsetBottomNavItem.Home,
+        SunsetBottomNavItem.Discover,
+        SunsetBottomNavItem.Profile
+    )
 
-  var selected by remember { mutableStateOf(2) }
-  BottomNavigation(
-    modifier = Modifier
-      .height(84.dp)
-      .shadow(
-        color = Color(0x33000000),
-        blurRadius = 2.dp,
-        offsetY = (-2).dp
-      )
-      .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)),
-    backgroundColor = Color.White
-  ) {
+    var selected by remember { mutableStateOf(2) }
+    BottomNavigation(
+        modifier = Modifier
+            .height(84.dp)
+            .shadow(
+                color = Color(0x33000000),
+                blurRadius = 2.dp,
+                offsetY = (-2).dp
+            )
+            .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)),
+        backgroundColor = Color.White
+    ) {
 
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
+        val navBackStackEntry by navController.currentBackStackEntryAsState()
+        val currentRoute = navBackStackEntry?.destination?.route
 
-    items.forEach { item ->
-      BottomNavigationItem(
-        selected = currentRoute == item.route,
-        onClick = {
-          navController.navigate(item.route) {
-            navController.graph.startDestinationRoute?.let { screen_route ->
-              popUpTo(screen_route) {
-                saveState = true
-              }
-            }
-            launchSingleTop = true
-            restoreState = true
-          }
-        },
-        icon = {
-          Icon(
-            imageVector = item.icon, contentDescription = item.title,
-            modifier = Modifier
-              .height(32.dp)
-              .width(32.dp)
-          )
-        },
-        unselectedContentColor = unselectedContentColor,
-        selectedContentColor = selectedContentColor
-      )
+        items.forEach { item ->
+            BottomNavigationItem(
+                selected = currentRoute == item.route,
+                onClick = {
+                    navController.navigate(item.route) {
+                        navController.graph.startDestinationRoute?.let { screen_route ->
+                            popUpTo(screen_route) {
+                                saveState = true
+                            }
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                icon = {
+                    Icon(
+                        imageVector = item.icon, contentDescription = item.title,
+                        modifier = Modifier
+                            .height(32.dp)
+                            .width(32.dp)
+                    )
+                },
+                unselectedContentColor = unselectedContentColor,
+                selectedContentColor = selectedContentColor
+            )
+        }
     }
-  }
 }
 
 @Composable
 fun GoBackTopAppBar(
-  @StringRes title: Int,
-  onClick: () -> Unit
+    @StringRes title: Int,
+    onClick: () -> Unit
 ) {
-  TopAppBar(
-    backgroundColor = Color.White,
-    navigationIcon = {
-      IconButton(onClick = { onClick() }) {
-        Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Go back")
-      }
-    },
-    title = { Text(text = stringResource(id = title)) }
-  )
+    TopAppBar(
+        backgroundColor = Color.White,
+        navigationIcon = {
+            IconButton(onClick = { onClick() }) {
+                Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Go back")
+            }
+        },
+        title = { Text(text = stringResource(id = title)) }
+    )
 }
 
 @Composable
 fun SelectedCommentTopAppBar(
-  @StringRes title: Int,
-  onQuitClick: () -> Unit,
-  onDeleteClick: () -> Unit,
-  isCommentAuthor: Boolean
+    @StringRes title: Int,
+    onQuitClick: () -> Unit,
+    onDeleteClick: () -> Unit,
+    isCommentAuthor: Boolean
 ) {
-  TopAppBar(
-    backgroundColor = Color(0xFFFFB600),
-    navigationIcon = {
-      IconButton(onClick = { onQuitClick() }) {
-        Icon(imageVector = Icons.Filled.Close, contentDescription = "Unselect", tint = Color.White)
-      }
-    },
-    actions = {
-      if (isCommentAuthor) {
-        IconButton(onClick = { onDeleteClick() }) {
-          Icon(
-            imageVector = Icons.Filled.Delete,
-            contentDescription = "Delete comment",
-            tint = Color.White
-          )
-        }
-      }
-    },
-    title = { Text(text = stringResource(id = title), color = Color.White) }
-  )
+    TopAppBar(
+        backgroundColor = Color(0xFFFFB600),
+        navigationIcon = {
+            IconButton(onClick = { onQuitClick() }) {
+                Icon(
+                    imageVector = Icons.Filled.Close,
+                    contentDescription = "Unselect",
+                    tint = Color.White
+                )
+            }
+        },
+        actions = {
+            if (isCommentAuthor) {
+                IconButton(onClick = { onDeleteClick() }) {
+                    Icon(
+                        imageVector = Icons.Filled.Delete,
+                        contentDescription = "Delete comment",
+                        tint = Color.White
+                    )
+                }
+            }
+        },
+        title = { Text(text = stringResource(id = title), color = Color.White) }
+    )
+}
+
+@Composable
+fun GoForwardTopAppBar(
+    @StringRes title: Int,
+    onQuitClick: () -> Unit,
+    onContinueClick: () -> Unit,
+    canContinue: Boolean
+) {
+    TopAppBar(
+        backgroundColor = Color.White,
+        navigationIcon = {
+            IconButton(onClick = { onQuitClick() }) {
+                Icon(
+                    imageVector = Icons.Filled.ArrowForward,
+                    contentDescription = "Unselect",
+                    tint = Color.White
+                )
+            }
+        },
+        actions = {
+            if (canContinue) {
+                IconButton(onClick = { onContinueClick() }) {
+                    Icon(
+                        imageVector = Icons.Filled.Forward,
+                        contentDescription = "Continue",
+                        tint = Color(0xFFFFB600)
+                    )
+                }
+            }
+        },
+        title = { Text(text = stringResource(id = title), color = Color.White) }
+    )
 }
 

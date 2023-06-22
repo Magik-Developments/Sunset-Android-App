@@ -21,6 +21,9 @@ class AddPostViewModel @Inject constructor(
     private val _descriptionText: MutableStateFlow<String> = MutableStateFlow("")
     val descriptionText: StateFlow<String> = _descriptionText
 
+    private val _showExitDialog: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val showExitDialog: StateFlow<Boolean> = _showExitDialog
+
     fun updateSelectedImages(uris: List<Uri>) {
         _imageUris.value = _imageUris.value + uris
     }
@@ -40,6 +43,10 @@ class AddPostViewModel @Inject constructor(
 
     fun updateDescriptionText(text: String) {
         _descriptionText.value = text
+    }
+
+    fun setShowExitDialog(state: Boolean) {
+        _showExitDialog.value = state
     }
 
 }

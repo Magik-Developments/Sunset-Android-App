@@ -41,6 +41,7 @@ import com.madteam.sunset.R
 import com.madteam.sunset.ui.common.AddDescriptionTextField
 import com.madteam.sunset.ui.common.AutoSlidingCarousel
 import com.madteam.sunset.ui.common.CustomSpacer
+import com.madteam.sunset.ui.common.DismissAndPositiveDialog
 import com.madteam.sunset.ui.common.GoForwardTopAppBar
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineL
 import com.madteam.sunset.utils.shimmerBrush
@@ -57,6 +58,7 @@ fun AddPostScreen(
     val imageUris by viewModel.imageUris.collectAsStateWithLifecycle()
     val selectedImageUri by viewModel.selectedImageUri.collectAsStateWithLifecycle()
     val descriptionText by viewModel.descriptionText.collectAsStateWithLifecycle()
+    val showExitDialog by viewModel.showExitDialog.collectAsStateWithLifecycle()
 
     val multiplePhotoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickMultipleVisualMedia(maxItems = MAX_IMAGES_SELECTED),
@@ -68,7 +70,13 @@ fun AddPostScreen(
         topBar = {
             GoForwardTopAppBar(
                 title = R.string.add_post,
-                onQuitClick = { navController.popBackStack() },
+                onQuitClick = {
+                    if (isReadyToPost) {
+                        viewModel.setShowExitDialog(true)
+                    } else {
+                        navController.popBackStack()
+                    }
+                },
                 onContinueClick = { /*TODO*/ },
                 canContinue = isReadyToPost
             )
@@ -89,7 +97,10 @@ fun AddPostScreen(
                         )
                     },
                     onDeleteImagesClick = viewModel::removeSelectedImageFromList,
-                    onUpdateDescriptionText = viewModel::updateDescriptionText
+                    onUpdateDescriptionText = viewModel::updateDescriptionText,
+                    showExitDialog = showExitDialog,
+                    setShowExitDialog = viewModel::setShowExitDialog,
+                    exitAddPost = navController::popBackStack
                 )
             }
         }
@@ -105,9 +116,27 @@ fun AddPostContent(
     descriptionText: String,
     onImageSelected: (Uri) -> Unit,
     onAddImagesClick: () -> Unit,
+    showExitDialog: Boolean,
     onDeleteImagesClick: () -> Unit,
-    onUpdateDescriptionText: (String) -> Unit
+    onUpdateDescriptionText: (String) -> Unit,
+    setShowExitDialog: (Boolean) -> Unit,
+    exitAddPost: () -> Unit
 ) {
+
+    if (showExitDialog) {
+        DismissAndPositiveDialog(
+            setShowDialog = { setShowExitDialog(it) },
+            dialogTitle = R.string.are_you_sure,
+            dialogDescription = R.string.exit_post_dialog,
+            positiveButtonText = R.string.discard_changes,
+            dismissButtonText = R.string.cancel,
+            dismissClickedAction = { setShowExitDialog(false) },
+            positiveClickedAction = {
+                setShowExitDialog(false)
+                exitAddPost()
+            }
+        )
+    }
 
     Column(verticalArrangement = Arrangement.Top, modifier = Modifier.fillMaxSize()) {
         Box {

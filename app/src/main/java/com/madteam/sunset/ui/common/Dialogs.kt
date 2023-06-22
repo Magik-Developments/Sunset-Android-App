@@ -2,6 +2,7 @@ package com.madteam.sunset.ui.common
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -55,13 +56,21 @@ fun DismissAndPositiveDialog(
                         contentDescription = "Dialog image",
                         alignment = Alignment.Center
                     )
+                } else {
+                    CustomSpacer(size = 16.dp)
                 }
-                Text(
-                    modifier = Modifier.padding(horizontal = 24.dp),
-                    text = stringResource(dialogTitle),
-                    style = primaryBoldHeadlineS,
-                    textAlign = TextAlign.Center
-                )
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .padding(horizontal = 24.dp),
+                        text = stringResource(dialogTitle),
+                        style = primaryBoldHeadlineS,
+                        textAlign = TextAlign.Center
+                    )
+                }
                 CustomSpacer(size = 24.dp)
                 Text(
                     modifier = Modifier.padding(horizontal = 24.dp),

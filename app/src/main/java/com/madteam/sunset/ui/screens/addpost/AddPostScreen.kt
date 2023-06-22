@@ -56,13 +56,15 @@ fun AddPostScreen(
         contract = ActivityResultContracts.PickMultipleVisualMedia(maxItems = MAX_IMAGES_SELECTED),
         onResult = { uris -> viewModel.updateSelectedImages(uris) })
 
+    val isReadyToPost = imageUris.isNotEmpty()
+
     Scaffold(
         topBar = {
             GoForwardTopAppBar(
                 title = R.string.add_post,
                 onQuitClick = { navController.popBackStack() },
                 onContinueClick = { /*TODO*/ },
-                canContinue = true
+                canContinue = isReadyToPost
             )
         },
         content = { paddingValues ->

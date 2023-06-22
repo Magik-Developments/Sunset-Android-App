@@ -24,10 +24,15 @@ class AddPostViewModel @Inject constructor(
 
     fun removeSelectedImageFromList() {
         _imageUris.value = imageUris.value.filterNot { it == _selectedImageUri.value }
+        _selectedImageUri.value = Uri.EMPTY
     }
 
     fun addSelectedImage(uri: Uri) {
-        _selectedImageUri.value = uri
+        if (_selectedImageUri.value == uri) {
+            _selectedImageUri.value = Uri.EMPTY
+        } else {
+            _selectedImageUri.value = uri
+        }
     }
 
 }

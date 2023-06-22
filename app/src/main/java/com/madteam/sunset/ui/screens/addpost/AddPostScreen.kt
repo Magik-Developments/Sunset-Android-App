@@ -22,12 +22,14 @@ import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -38,6 +40,7 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.madteam.sunset.R
 import com.madteam.sunset.ui.common.AutoSlidingCarousel
 import com.madteam.sunset.ui.common.GoForwardTopAppBar
+import com.madteam.sunset.ui.theme.primaryBoldHeadlineL
 import com.madteam.sunset.utils.shimmerBrush
 
 private const val MAX_IMAGES_SELECTED = 8
@@ -99,24 +102,35 @@ fun AddPostContent(
     onDeleteImagesClick: () -> Unit
 ) {
     Column(verticalArrangement = Arrangement.Top, modifier = Modifier.fillMaxSize()) {
-        AutoSlidingCarousel(
-            itemsCount = images.size,
-            autoSlideDuration = 0,
-            itemContent = { index ->
-                GlideImage(
-                    model = images[index],
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.background(shimmerBrush(targetValue = 2000f))
+        Box {
+            AutoSlidingCarousel(
+                itemsCount = images.size,
+                autoSlideDuration = 0,
+                itemContent = { index ->
+                    GlideImage(
+                        model = images[index],
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.background(shimmerBrush(targetValue = 2000f))
+                    )
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(388.dp)
+            )
+            if (images.isEmpty()) {
+                Text(
+                    text = "Add the best photos of this Spot",
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .padding(24.dp),
+                    style = primaryBoldHeadlineL,
+                    textAlign = TextAlign.Center,
+                    color = Color.White
                 )
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(388.dp)
-        )
+            }
+        }
         LazyRow {
-
-
             itemsIndexed(images) { _, image ->
                 Box(Modifier.size(150.dp)) {
 

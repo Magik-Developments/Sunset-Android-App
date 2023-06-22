@@ -24,8 +24,15 @@ class AddPostViewModel @Inject constructor(
     private val _showExitDialog: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val showExitDialog: StateFlow<Boolean> = _showExitDialog
 
+    private val _errorToastText: MutableStateFlow<String> = MutableStateFlow("")
+    val errorToastText: StateFlow<String> = _errorToastText
+
     fun updateSelectedImages(uris: List<Uri>) {
-        _imageUris.value = _imageUris.value + uris
+        if (uris.size <= MAX_IMAGES_SELECTED && _imageUris.value.size <= MAX_IMAGES_SELECTED && _imageUris.value.size + uris.size <= MAX_IMAGES_SELECTED) {
+            _imageUris.value = _imageUris.value + uris
+        } else {
+            _errorToastText.value = "Maximum 8 images"
+        }
     }
 
     fun removeSelectedImageFromList() {

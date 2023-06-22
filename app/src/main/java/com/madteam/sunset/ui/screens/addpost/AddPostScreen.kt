@@ -48,7 +48,7 @@ import com.madteam.sunset.ui.common.GoForwardTopAppBar
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineL
 import com.madteam.sunset.utils.shimmerBrush
 
-private const val MAX_IMAGES_SELECTED = 8
+const val MAX_IMAGES_SELECTED = 8
 private const val MAX_CHAR_LENGTH_DESCRIPTION = 2500
 
 @Composable
@@ -62,6 +62,7 @@ fun AddPostScreen(
     val selectedImageUri by viewModel.selectedImageUri.collectAsStateWithLifecycle()
     val descriptionText by viewModel.descriptionText.collectAsStateWithLifecycle()
     val showExitDialog by viewModel.showExitDialog.collectAsStateWithLifecycle()
+    val errorToastText by viewModel.errorToastText.collectAsStateWithLifecycle()
 
     val multiplePhotoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickMultipleVisualMedia(maxItems = MAX_IMAGES_SELECTED),
@@ -103,7 +104,8 @@ fun AddPostScreen(
                     onUpdateDescriptionText = viewModel::updateDescriptionText,
                     showExitDialog = showExitDialog,
                     setShowExitDialog = viewModel::setShowExitDialog,
-                    exitAddPost = navController::popBackStack
+                    exitAddPost = navController::popBackStack,
+                    errorToast = errorToastText
                 )
             }
         }
@@ -117,6 +119,7 @@ fun AddPostContent(
     images: List<Uri>,
     selectedImage: Uri,
     descriptionText: String,
+    errorToast: String,
     onImageSelected: (Uri) -> Unit,
     onAddImagesClick: () -> Unit,
     showExitDialog: Boolean,
@@ -127,6 +130,10 @@ fun AddPostContent(
 ) {
 
     val context = LocalContext.current
+
+    if (errorToast.isNotBlank()) {
+        Toast.makeText(context, errorToast, Toast.LENGTH_SHORT).show()
+    }
 
     if (showExitDialog) {
         DismissAndPositiveDialog(

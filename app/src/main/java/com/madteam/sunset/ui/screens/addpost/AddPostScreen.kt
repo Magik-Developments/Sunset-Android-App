@@ -1,6 +1,7 @@
 package com.madteam.sunset.ui.screens.addpost
 
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -29,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -47,6 +49,7 @@ import com.madteam.sunset.ui.theme.primaryBoldHeadlineL
 import com.madteam.sunset.utils.shimmerBrush
 
 private const val MAX_IMAGES_SELECTED = 8
+private const val MAX_CHAR_LENGTH_DESCRIPTION = 2500
 
 @Composable
 fun AddPostScreen(
@@ -122,6 +125,8 @@ fun AddPostContent(
     setShowExitDialog: (Boolean) -> Unit,
     exitAddPost: () -> Unit
 ) {
+
+    val context = LocalContext.current
 
     if (showExitDialog) {
         DismissAndPositiveDialog(
@@ -219,7 +224,14 @@ fun AddPostContent(
         CustomSpacer(size = 8.dp)
         AddDescriptionTextField(
             value = descriptionText,
-            onValueChange = { onUpdateDescriptionText(it) },
+            onValueChange = {
+                if (it.length <= MAX_CHAR_LENGTH_DESCRIPTION) {
+                    onUpdateDescriptionText(it)
+                } else {
+                    Toast.makeText(context, R.string.max_characters_reached, Toast.LENGTH_SHORT)
+                        .show()
+                }
+            },
             hint = R.string.add_post_description
         )
     }

@@ -105,7 +105,8 @@ fun AddPostScreen(
                     showExitDialog = showExitDialog,
                     setShowExitDialog = viewModel::setShowExitDialog,
                     exitAddPost = navController::popBackStack,
-                    errorToast = errorToastText
+                    errorToast = errorToastText,
+                    clearErrorToast = viewModel::clearErrorToastText
                 )
             }
         }
@@ -126,13 +127,15 @@ fun AddPostContent(
     onDeleteImagesClick: () -> Unit,
     onUpdateDescriptionText: (String) -> Unit,
     setShowExitDialog: (Boolean) -> Unit,
-    exitAddPost: () -> Unit
+    exitAddPost: () -> Unit,
+    clearErrorToast: () -> Unit
 ) {
 
     val context = LocalContext.current
 
     if (errorToast.isNotBlank()) {
         Toast.makeText(context, errorToast, Toast.LENGTH_SHORT).show()
+        clearErrorToast()
     }
 
     if (showExitDialog) {

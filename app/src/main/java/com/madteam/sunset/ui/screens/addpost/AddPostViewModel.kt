@@ -56,4 +56,8 @@ class AddPostViewModel @Inject constructor(
         _showExitDialog.value = state
     }
 
+    fun clearErrorToastText() {
+        _errorToastText.value = ""
+    }
+
 }

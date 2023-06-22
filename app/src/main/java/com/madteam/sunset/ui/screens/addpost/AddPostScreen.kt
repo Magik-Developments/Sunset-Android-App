@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -25,7 +26,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
@@ -70,14 +70,16 @@ fun AddPostScreen(
                 modifier = Modifier.padding(paddingValues),
                 contentAlignment = Alignment.Center
             ) {
-                AddPostContent(images = imageUris,
+                AddPostContent(
+                    images = imageUris,
                     selectedImage = selectedImageUri,
                     onImageSelected = viewModel::addSelectedImage,
                     onAddImagesClick = {
                         multiplePhotoPickerLauncher.launch(
                             PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                         )
-                    }
+                    },
+                    onDeleteImagesClick = viewModel::removeSelectedImageFromList
                 )
             }
         }
@@ -91,7 +93,8 @@ fun AddPostContent(
     images: List<Uri>,
     selectedImage: Uri,
     onImageSelected: (Uri) -> Unit,
-    onAddImagesClick: () -> Unit
+    onAddImagesClick: () -> Unit,
+    onDeleteImagesClick: () -> Unit
 ) {
     Column(verticalArrangement = Arrangement.Top, modifier = Modifier.fillMaxSize()) {
         AutoSlidingCarousel(
@@ -113,30 +116,38 @@ fun AddPostContent(
 
 
             itemsIndexed(images) { _, image ->
-                val nonSelectedImageModifier = Modifier
-                    .size(150.dp)
-                    .clickable {
-                        onImageSelected(image)
-                    }
+                Box(Modifier.size(150.dp)) {
 
-                val selectedImageModifier = Modifier
-                    .size(150.dp)
-                    .clickable {
-                        onImageSelected(image)
-                    }
-                    .background(
-                        Brush.verticalGradient(
-                            colors = listOf(Color.Transparent, Color(0xFFFFB600))
-                        )
+                    GlideImage(
+                        model = image,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(150.dp)
+                            .clickable {
+                                onImageSelected(image)
+                            }
                     )
-
-                GlideImage(
-                    model = image,
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = if (image == selectedImage) selectedImageModifier else nonSelectedImageModifier
-                )
+                    if (image == selectedImage) {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .background(Color(0xCCFFB600)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            IconButton(onClick = { onDeleteImagesClick() }) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Delete,
+                                    contentDescription = "Delete image",
+                                    tint = Color.White,
+                                    modifier = Modifier.size(36.dp)
+                                )
+                            }
+                        }
+                    }
+                }
             }
+
             item {
                 IconButton(
                     onClick = { onAddImagesClick() },

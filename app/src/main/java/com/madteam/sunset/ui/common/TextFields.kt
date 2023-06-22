@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -248,6 +249,47 @@ fun ChatTextField(
             placeholder = {
                 Text(
                     text = stringResource(id = R.string.comment_keyboard_placeholder),
+                    style = secondaryRegularBodyL,
+                    textAlign = TextAlign.Start,
+                    color = Color(0xFF999999)
+                )
+            }
+        )
+    }
+}
+
+@Composable
+fun AddDescriptionTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    @StringRes hint: Int,
+    enabled: Boolean = true,
+    visualTransformation: VisualTransformation = VisualTransformation.None
+) {
+    Column {
+        TextField(
+            value = value,
+            onValueChange = onValueChange,
+            modifier = Modifier
+                .fillMaxHeight()
+                .fillMaxWidth(),
+            colors = TextFieldDefaults.textFieldColors(
+                backgroundColor = Color.Transparent,
+                textColor = Color(0xFF333333),
+                cursorColor = Color.Black,
+                focusedLabelColor = Color(0xFF999999),
+                unfocusedLabelColor = Color(0xFF999999),
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent
+            ),
+            singleLine = false,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+            enabled = enabled,
+            visualTransformation = visualTransformation,
+            placeholder = {
+                Text(
+                    text = stringResource(id = hint),
                     style = secondaryRegularBodyL,
                     textAlign = TextAlign.Start,
                     color = Color(0xFF999999)

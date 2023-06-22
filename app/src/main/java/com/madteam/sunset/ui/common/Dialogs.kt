@@ -1,5 +1,6 @@
 package com.madteam.sunset.ui.common
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,17 +23,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextAlign.Companion
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.madteam.sunset.R
-import com.madteam.sunset.R.string
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineS
 import com.madteam.sunset.ui.theme.secondaryRegularBodyL
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyL
 
 @Composable
-fun GDPRDialog(
+fun DismissAndPositiveDialog(
     setShowDialog: (Boolean) -> Unit,
-    readPoliciesClicked: () -> Unit,
-    acceptPoliciesClicked: () -> Unit
+    @StringRes dialogTitle: Int,
+    @StringRes dialogDescription: Int,
+    @StringRes positiveButtonText: Int,
+    @StringRes dismissButtonText: Int,
+    image: Int? = null,
+    dismissClickedAction: () -> Unit,
+    positiveClickedAction: () -> Unit
 ) {
     Dialog(onDismissRequest = { setShowDialog(false) }) {
         Card(
@@ -40,33 +44,35 @@ fun GDPRDialog(
             elevation = 2.dp,
             modifier = Modifier.padding(horizontal = 24.dp)
         ) {
-            Column() {
-                Image(
-                    modifier = Modifier
-                        .width(140.dp)
-                        .height(140.dp)
-                        .align(alignment = Alignment.CenterHorizontally),
-                    painter = painterResource(id = R.drawable.sunset_vectorial_art_01),
-                    contentDescription = stringResource(string.sunset_art_image_description),
-                    alignment = Alignment.Center
-                )
+            Column {
+                if (image != null) {
+                    Image(
+                        modifier = Modifier
+                            .width(140.dp)
+                            .height(140.dp)
+                            .align(alignment = Alignment.CenterHorizontally),
+                        painter = painterResource(id = image),
+                        contentDescription = "Dialog image",
+                        alignment = Alignment.Center
+                    )
+                }
                 Text(
                     modifier = Modifier.padding(horizontal = 24.dp),
-                    text = stringResource(string.privacy_dialog_title),
+                    text = stringResource(dialogTitle),
                     style = primaryBoldHeadlineS,
                     textAlign = TextAlign.Center
                 )
                 CustomSpacer(size = 24.dp)
                 Text(
                     modifier = Modifier.padding(horizontal = 24.dp),
-                    text = stringResource(string.privacy_dialog_description),
+                    text = stringResource(dialogDescription),
                     style = secondaryRegularBodyL,
                     textAlign = TextAlign.Center
                 )
                 CustomSpacer(size = 24.dp)
                 Row(Modifier.fillMaxWidth()) {
                     Button(
-                        onClick = readPoliciesClicked,
+                        onClick = dismissClickedAction,
                         modifier = Modifier
                             .weight(1f)
                             .height(60.dp),
@@ -74,14 +80,14 @@ fun GDPRDialog(
                         shape = RoundedCornerShape(0.dp)
                     ) {
                         Text(
-                            text = stringResource(string.read_policies),
+                            text = stringResource(dismissButtonText),
                             style = secondarySemiBoldBodyL,
                             color = Color.Black,
                             textAlign = TextAlign.Center
                         )
                     }
                     Button(
-                        onClick = acceptPoliciesClicked,
+                        onClick = positiveClickedAction,
                         modifier = Modifier
                             .weight(1f)
                             .height(60.dp),
@@ -89,7 +95,7 @@ fun GDPRDialog(
                         shape = RoundedCornerShape(0.dp)
                     ) {
                         Text(
-                            text = stringResource(string.sign_up),
+                            text = stringResource(positiveButtonText),
                             style = secondarySemiBoldBodyL,
                             color = Color.White,
                             textAlign = Companion.Center

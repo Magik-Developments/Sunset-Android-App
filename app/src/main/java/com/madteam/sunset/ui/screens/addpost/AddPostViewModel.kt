@@ -18,6 +18,9 @@ class AddPostViewModel @Inject constructor(
     private val _imageUris: MutableStateFlow<List<Uri>> = MutableStateFlow(listOf())
     val imageUris: StateFlow<List<Uri>> = _imageUris
 
+    private val _descriptionText: MutableStateFlow<String> = MutableStateFlow("")
+    val descriptionText: StateFlow<String> = _descriptionText
+
     fun updateSelectedImages(uris: List<Uri>) {
         _imageUris.value = _imageUris.value + uris
     }
@@ -33,6 +36,10 @@ class AddPostViewModel @Inject constructor(
         } else {
             _selectedImageUri.value = uri
         }
+    }
+
+    fun updateDescriptionText(text: String) {
+        _descriptionText.value = text
     }
 
 }

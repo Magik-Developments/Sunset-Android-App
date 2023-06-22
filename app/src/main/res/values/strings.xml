@@ -57,4 +57,5 @@
     <string name="comments_title">Comments</string>
     <string name="selected_comment_title">Comment selected</string>
     <string name="add_post">Add post</string>
+    <string name="add_post_description">Add a description to your post</string>
 </resources>

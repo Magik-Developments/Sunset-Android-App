@@ -38,7 +38,9 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.madteam.sunset.R
+import com.madteam.sunset.ui.common.AddDescriptionTextField
 import com.madteam.sunset.ui.common.AutoSlidingCarousel
+import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.GoForwardTopAppBar
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineL
 import com.madteam.sunset.utils.shimmerBrush
@@ -54,6 +56,7 @@ fun AddPostScreen(
 
     val imageUris by viewModel.imageUris.collectAsStateWithLifecycle()
     val selectedImageUri by viewModel.selectedImageUri.collectAsStateWithLifecycle()
+    val descriptionText by viewModel.descriptionText.collectAsStateWithLifecycle()
 
     val multiplePhotoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickMultipleVisualMedia(maxItems = MAX_IMAGES_SELECTED),
@@ -78,13 +81,15 @@ fun AddPostScreen(
                 AddPostContent(
                     images = imageUris,
                     selectedImage = selectedImageUri,
+                    descriptionText = descriptionText,
                     onImageSelected = viewModel::addSelectedImage,
                     onAddImagesClick = {
                         multiplePhotoPickerLauncher.launch(
                             PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                         )
                     },
-                    onDeleteImagesClick = viewModel::removeSelectedImageFromList
+                    onDeleteImagesClick = viewModel::removeSelectedImageFromList,
+                    onUpdateDescriptionText = viewModel::updateDescriptionText
                 )
             }
         }
@@ -97,10 +102,13 @@ fun AddPostScreen(
 fun AddPostContent(
     images: List<Uri>,
     selectedImage: Uri,
+    descriptionText: String,
     onImageSelected: (Uri) -> Unit,
     onAddImagesClick: () -> Unit,
-    onDeleteImagesClick: () -> Unit
+    onDeleteImagesClick: () -> Unit,
+    onUpdateDescriptionText: (String) -> Unit
 ) {
+
     Column(verticalArrangement = Arrangement.Top, modifier = Modifier.fillMaxSize()) {
         Box {
             AutoSlidingCarousel(
@@ -179,5 +187,11 @@ fun AddPostContent(
                 }
             }
         }
+        CustomSpacer(size = 8.dp)
+        AddDescriptionTextField(
+            value = descriptionText,
+            onValueChange = { onUpdateDescriptionText(it) },
+            hint = R.string.add_post_description
+        )
     }
 }

@@ -81,7 +81,7 @@ fun AddPostScreen(
                         navController.popBackStack()
                     }
                 },
-                onContinueClick = { /*TODO*/ },
+                onContinueClick = { viewModel.createNewPost(spotReference) },
                 canContinue = isReadyToPost
             )
         },

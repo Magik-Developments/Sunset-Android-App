@@ -1,11 +1,13 @@
 package com.madteam.sunset.repositories
 
+import android.net.Uri
 import android.util.Log
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
+import com.google.firebase.storage.FirebaseStorage
 import com.madteam.sunset.model.PostComment
 import com.madteam.sunset.model.Spot
 import com.madteam.sunset.model.SpotAttribute
@@ -20,6 +22,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 import java.util.Calendar
+import java.util.UUID
 import javax.inject.Inject
 
 private const val USERS_COLLECTION_PATH = "users"
@@ -28,9 +31,11 @@ private const val SPOTS_COLLECTION_PATH = "spots"
 private const val POSTS_COLLECTION_PATH = "posts"
 private const val COMMENTS_POST_COLLECTION_PATH = "comments"
 private const val LIKED_BY_POST_COLLECTION_PATH = "liked_by"
+private const val IMAGES_STORAGE_POSTS_PATH = "posts_images/"
 
 class DatabaseRepository @Inject constructor(
-    private val firebaseFirestore: FirebaseFirestore
+    private val firebaseFirestore: FirebaseFirestore,
+    private val firebaseStorage: FirebaseStorage
 ) : DatabaseContract {
 
     override fun createUser(
@@ -495,6 +500,63 @@ class DatabaseRepository @Inject constructor(
             emit(mutableListOf())
         }
 
+    override fun createSpotPost(
+        spotRef: String,
+        description: String?,
+        imagesUriList: List<Uri>,
+        authorUsername: String
+    ): Flow<Resource<String>> = flow {
+        val newPostDocument = firebaseFirestore.collection(POSTS_COLLECTION_PATH).document()
+        val spotDocumentRef = firebaseFirestore.collection(SPOTS_COLLECTION_PATH).document(spotRef)
+        val authorRef = firebaseFirestore.collection(USERS_COLLECTION_PATH).document(authorUsername)
+        var imagesList = listOf<String>()
+        uploadImages(
+            imagesUriList,
+            "$IMAGES_STORAGE_POSTS_PATH${newPostDocument.id}/"
+        ).collectLatest { urlImagesList ->
+            imagesList = urlImagesList
+        }
+        val newPost = hashMapOf(
+            "id" to newPostDocument.id,
+            "description" to description,
+            "spot" to spotDocumentRef,
+            "images" to imagesList,
+            "author" to authorRef,
+            "creation_date" to Calendar.getInstance().time.toString(),
+            "likes" to 0
+        )
+
+        newPostDocument.set(newPost).await()
+        spotDocumentRef.update("posts", FieldValue.arrayUnion(newPostDocument))
+        emit(Resource.Success(newPostDocument.id))
+    }.catch { exception ->
+        Log.e("DatabaseRepository::createSpotPost", "Error: ${exception.message}")
+        emit(Resource.Success(exception.message.toString()))
+    }
+
+    override fun uploadImages(
+        uriImagesList: List<Uri>,
+        storagePath: String
+    ): Flow<List<String>> = flow {
+
+        val downloadUrls = mutableListOf<String>()
+
+        val storageReference = firebaseStorage.getReference(storagePath)
+
+        uriImagesList.forEach { uri ->
+            val imageFileName = UUID.randomUUID().toString()
+            val imageRef = storageReference.child(imageFileName)
+            val uploadTask = imageRef.putFile(uri)
+            val taskSnapshot = uploadTask.await()
+            val downloadUrl = taskSnapshot.storage.downloadUrl.await()
+            downloadUrls.add(downloadUrl.toString())
+        }
+
+        emit(downloadUrls)
+    }.catch { exception ->
+        Log.e("DatabaseRepository::uploadImages", "Error: ${exception.message}")
+        emit(mutableListOf())
+    }
 }
 
 interface DatabaseContract {
@@ -510,6 +572,14 @@ interface DatabaseContract {
     fun getSpotPostsByDocRefs(docRefs: List<DocumentReference>): Flow<List<SpotPost>>
     fun getSpotPostByDocRef(docRef: String): Flow<SpotPost>
     fun getCommentsFromPostRef(postRef: String): Flow<List<PostComment>>
+    fun createSpotPost(
+        spotRef: String,
+        description: String?,
+        imagesUriList: List<Uri>,
+        authorUsername: String
+    ): Flow<Resource<String>>
+
+    fun uploadImages(uriImagesList: List<Uri>, storagePath: String): Flow<List<String>>
     fun createPostComment(comment: PostComment, postDocument: String): Flow<Resource<String>>
     fun deletePostComment(comment: PostComment, postDocument: String): Flow<Resource<String>>
     fun modifyUserPostLike(postReference: String, username: String): Flow<Resource<String>>

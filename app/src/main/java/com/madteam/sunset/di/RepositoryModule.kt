@@ -2,6 +2,7 @@ package com.madteam.sunset.di
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import com.madteam.sunset.repositories.AuthContract
 import com.madteam.sunset.repositories.AuthRepository
 import com.madteam.sunset.repositories.DatabaseContract
@@ -21,6 +22,9 @@ object RepositoryModule {
     ): AuthContract = AuthRepository(firebaseAuth)
 
     @Provides
-    fun provideDatabaseRepository(firestore: FirebaseFirestore): DatabaseContract =
-        DatabaseRepository(firestore)
+    fun provideDatabaseRepository(
+        firestore: FirebaseFirestore,
+        storage: FirebaseStorage
+    ): DatabaseContract =
+        DatabaseRepository(firestore, storage)
 }

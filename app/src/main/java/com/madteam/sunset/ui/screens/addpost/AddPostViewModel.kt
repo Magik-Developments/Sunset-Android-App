@@ -2,15 +2,24 @@ package com.madteam.sunset.ui.screens.addpost
 
 import android.net.Uri
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.madteam.sunset.repositories.AuthRepository
+import com.madteam.sunset.repositories.DatabaseRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class AddPostViewModel @Inject constructor(
-
+    private val databaseRepository: DatabaseRepository,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
+
+    private lateinit var username: String
+    private lateinit var newPostRef: String
 
     private val _selectedImageUri: MutableStateFlow<Uri> = MutableStateFlow(Uri.EMPTY)
     val selectedImageUri: StateFlow<Uri> = _selectedImageUri
@@ -26,6 +35,10 @@ class AddPostViewModel @Inject constructor(
 
     private val _errorToastText: MutableStateFlow<String> = MutableStateFlow("")
     val errorToastText: StateFlow<String> = _errorToastText
+
+    init {
+        getUserInfo()
+    }
 
     fun updateSelectedImages(uris: List<Uri>) {
         if (uris.size <= MAX_IMAGES_SELECTED && _imageUris.value.size <= MAX_IMAGES_SELECTED && _imageUris.value.size + uris.size <= MAX_IMAGES_SELECTED) {
@@ -58,6 +71,27 @@ class AddPostViewModel @Inject constructor(
 
     fun clearErrorToastText() {
         _errorToastText.value = ""
+    }
+
+    private fun getUserInfo() {
+        authRepository.getCurrentUser()?.let { user ->
+            databaseRepository.getUserByEmail(user.email!!) {
+                username = it.username
+            }
+        }
+    }
+
+    fun createNewPost(spotRef: String) {
+        viewModelScope.launch {
+            databaseRepository.createSpotPost(
+                spotRef,
+                _descriptionText.value,
+                _imageUris.value,
+                username
+            ).collectLatest {
+
+            }
+        }
     }
 
 }

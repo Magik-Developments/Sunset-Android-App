@@ -32,131 +32,148 @@ import com.madteam.sunset.ui.common.GenericTextField
 import com.madteam.sunset.ui.common.ProfileImage
 import com.madteam.sunset.ui.common.SmallButtonDark
 import com.madteam.sunset.ui.common.UsernameTextField
+import com.madteam.sunset.ui.theme.SunsetTheme
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyL
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
 
-@Preview
 @Composable
 fun BottomSheetEditProfileScreen(
-  viewModel: EditProfileViewModel = hiltViewModel()
+    viewModel: EditProfileViewModel = hiltViewModel()
 ) {
 
-  val username by viewModel.username.collectAsStateWithLifecycle()
-  val email by viewModel.email.collectAsStateWithLifecycle()
-  val name by viewModel.name.collectAsStateWithLifecycle()
-  val userImage by viewModel.userImage.collectAsStateWithLifecycle()
-  val location by viewModel.location.collectAsStateWithLifecycle()
+    val username by viewModel.username.collectAsStateWithLifecycle()
+    val email by viewModel.email.collectAsStateWithLifecycle()
+    val name by viewModel.name.collectAsStateWithLifecycle()
+    val userImage by viewModel.userImage.collectAsStateWithLifecycle()
+    val location by viewModel.location.collectAsStateWithLifecycle()
 
-  Card(
-    modifier = Modifier
-      .fillMaxWidth()
-      .height((LocalConfiguration.current.screenHeightDp * 0.98).dp),
-    backgroundColor = Color.White,
-    shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
-  ) {
-    BottomSheetEditProfileContent(
-      usernameValue = username,
-      emailValue = email,
-      nameValue = name,
-      locationValue = location,
-      userImage = userImage,
-      updateName = viewModel::updateName,
-      updateLocation = viewModel::updateLocation,
-      saveData = viewModel::updateData
-    )
-  }
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height((LocalConfiguration.current.screenHeightDp * 0.98).dp),
+        backgroundColor = Color.White,
+        shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
+    ) {
+        BottomSheetEditProfileContent(
+            usernameValue = username,
+            emailValue = email,
+            nameValue = name,
+            locationValue = location,
+            userImage = userImage,
+            updateName = viewModel::updateName,
+            updateLocation = viewModel::updateLocation,
+            saveData = viewModel::updateData
+        )
+    }
 }
 
 @Composable
 fun BottomSheetEditProfileContent(
-  usernameValue: String,
-  emailValue: String,
-  nameValue: String,
-  locationValue: String,
-  userImage: String,
-  updateName: (String) -> Unit,
-  updateLocation: (String) -> Unit,
-  saveData: () -> Unit
+    usernameValue: String,
+    emailValue: String,
+    nameValue: String,
+    locationValue: String,
+    userImage: String,
+    updateName: (String) -> Unit,
+    updateLocation: (String) -> Unit,
+    saveData: () -> Unit
 ) {
 
-  var dataHasChanged by remember { mutableStateOf(false) }
+    var dataHasChanged by remember { mutableStateOf(false) }
 
-  Column(
-    modifier = Modifier
-      .fillMaxSize()
-      .fillMaxWidth()
-      .padding(horizontal = 24.dp)
-  ) {
-    CustomSpacer(size = 16.dp)
-    Row(horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
-      CloseIconButton { /* to do */ }
-      CustomSpacer(size = 16.dp)
-      Text(text = "Edit profile", style = secondarySemiBoldHeadLineS)
-    }
-    CustomSpacer(size = 36.dp)
     Column(
-      modifier = Modifier
-        .padding(horizontal = 24.dp)
-        .fillMaxWidth(),
-      horizontalAlignment = Alignment.CenterHorizontally
+        modifier = Modifier
+            .fillMaxSize()
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp)
     ) {
-      ProfileImage(imageUrl = userImage, size = 150.dp)
-      CustomSpacer(size = 36.dp)
+        CustomSpacer(size = 16.dp)
+        Row(horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
+            CloseIconButton { /* to do */ }
+            CustomSpacer(size = 16.dp)
+            Text(text = "Edit profile", style = secondarySemiBoldHeadLineS)
+        }
+        CustomSpacer(size = 36.dp)
+        Column(
+            modifier = Modifier
+                .padding(horizontal = 24.dp)
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            ProfileImage(imageUrl = userImage, size = 150.dp)
+            CustomSpacer(size = 36.dp)
+        }
+        Column(
+            modifier = Modifier
+                .padding(horizontal = 24.dp)
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.Start
+        ) {
+            Text(text = "Username", style = secondarySemiBoldBodyL, color = Color(0xFF333333))
+            CustomSpacer(size = 8.dp)
+            UsernameTextField(
+                usernameValue = usernameValue,
+                onValueChange = {/* to do */ },
+                enabled = false
+            )
+            CustomSpacer(size = 16.dp)
+            Text(text = "Email address", style = secondarySemiBoldBodyL, color = Color(0xFF333333))
+            CustomSpacer(size = 8.dp)
+            EmailTextField(emailValue = emailValue, onValueChange = {/* to do */ }, enabled = false)
+            CustomSpacer(size = 16.dp)
+            Text(text = "Name", style = secondarySemiBoldBodyL, color = Color(0xFF333333))
+            CustomSpacer(size = 8.dp)
+            GenericTextField(
+                value = nameValue,
+                onValueChange = {
+                    updateName(it)
+                    dataHasChanged = true
+                },
+                hint = R.string.name
+            )
+            CustomSpacer(size = 16.dp)
+            Text(text = "Location", style = secondarySemiBoldBodyL, color = Color(0xFF333333))
+            CustomSpacer(size = 8.dp)
+            GenericTextField(
+                value = locationValue,
+                onValueChange = {
+                    updateLocation(it)
+                    dataHasChanged = true
+                },
+                hint = R.string.location
+            )
+            CustomSpacer(size = 16.dp)
+        }
+        Column(
+            modifier = Modifier
+                .padding(horizontal = 24.dp)
+                .fillMaxWidth()
+                .fillMaxHeight(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Bottom
+        ) {
+            SmallButtonDark(onClick = {
+                saveData()
+                dataHasChanged = false
+            }, text = R.string.save, enabled = dataHasChanged)
+            CustomSpacer(size = 24.dp)
+        }
     }
-    Column(
-      modifier = Modifier
-        .padding(horizontal = 24.dp)
-        .fillMaxWidth(),
-      horizontalAlignment = Alignment.Start
-    ) {
-      Text(text = "Username", style = secondarySemiBoldBodyL, color = Color(0xFF333333))
-      CustomSpacer(size = 8.dp)
-      UsernameTextField(
-        usernameValue = usernameValue,
-        onValueChange = {/* to do */ },
-        enabled = false
-      )
-      CustomSpacer(size = 16.dp)
-      Text(text = "Email address", style = secondarySemiBoldBodyL, color = Color(0xFF333333))
-      CustomSpacer(size = 8.dp)
-      EmailTextField(emailValue = emailValue, onValueChange = {/* to do */ }, enabled = false)
-      CustomSpacer(size = 16.dp)
-      Text(text = "Name", style = secondarySemiBoldBodyL, color = Color(0xFF333333))
-      CustomSpacer(size = 8.dp)
-      GenericTextField(
-        value = nameValue,
-        onValueChange = {
-          updateName(it)
-          dataHasChanged = true
-        },
-        hint = R.string.name
-      )
-      CustomSpacer(size = 16.dp)
-      Text(text = "Location", style = secondarySemiBoldBodyL, color = Color(0xFF333333))
-      CustomSpacer(size = 8.dp)
-      GenericTextField(
-        value = locationValue,
-        onValueChange = {
-          updateLocation(it)
-          dataHasChanged = true
-        },
-        hint = R.string.location
-      )
-      CustomSpacer(size = 16.dp)
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun PreviewBottomSheetEditProfileContent() {
+    SunsetTheme {
+        BottomSheetEditProfileContent(
+            usernameValue = "usernameValue",
+            emailValue = "emailValue",
+            nameValue = "nameValue",
+            locationValue = "locationValue",
+            userImage = "userImage",
+            updateName = { _ -> },
+            updateLocation = { _ -> },
+            saveData = {}
+        )
     }
-    Column(
-      modifier = Modifier
-        .padding(horizontal = 24.dp)
-        .fillMaxWidth()
-        .fillMaxHeight(),
-      horizontalAlignment = Alignment.CenterHorizontally,
-      verticalArrangement = Arrangement.Bottom
-    ) {
-      SmallButtonDark(onClick = {
-        saveData()
-        dataHasChanged = false
-      }, text = R.string.save, enabled = dataHasChanged)
-      CustomSpacer(size = 24.dp)
-    }
-  }
 }

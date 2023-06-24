@@ -26,9 +26,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.madteam.sunset.R
 import com.madteam.sunset.R.string
+import com.madteam.sunset.ui.theme.SunsetTheme
 
 @Composable
 fun PasswordVisibilityOffIcon() {
@@ -37,6 +39,14 @@ fun PasswordVisibilityOffIcon() {
         description = string.visibility_password_icon_description,
         iconTint = Color(0xFF333333)
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewPasswordVisibilityOffIcon() {
+    SunsetTheme {
+        PasswordVisibilityOffIcon()
+    }
 }
 
 @Composable
@@ -48,6 +58,14 @@ fun SuccessIcon() {
     )
 }
 
+@Preview(showBackground = true)
+@Composable
+fun PreviewSuccessIcon() {
+    SunsetTheme {
+        SuccessIcon()
+    }
+}
+
 @Composable
 fun ErrorIcon() {
     TextFieldIcon(
@@ -55,6 +73,14 @@ fun ErrorIcon() {
         description = string.invalid_form_icon_description,
         iconTint = Color.Red
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewErrorIcon() {
+    SunsetTheme {
+        ErrorIcon()
+    }
 }
 
 @Composable

@@ -409,6 +409,7 @@ fun SpotDetailContent(
                     Box(
                         modifier = Modifier
                             .size(300.dp)
+                            .clickable { navigateTo("spot_review_screen/spotReference=${spotInfo.id}reviewReference=${review.id}") }
                             .border(1.dp, Color(0xFF999999), RoundedCornerShape(20.dp))
                     ) {
                         ConstraintLayout(

@@ -27,6 +27,7 @@ import javax.inject.Inject
 
 private const val USERS_COLLECTION_PATH = "users"
 private const val SPOTS_LOCATIONS_COLLECTION_PATH = "spots_locations"
+private const val SPOT_REVIEWS_COLLECTION = "spot_reviews"
 private const val SPOTS_COLLECTION_PATH = "spots"
 private const val POSTS_COLLECTION_PATH = "posts"
 private const val COMMENTS_POST_COLLECTION_PATH = "comments"
@@ -558,6 +559,46 @@ class DatabaseRepository @Inject constructor(
         Log.e("DatabaseRepository::uploadImages", "Error: ${exception.message}")
         emit(mutableListOf())
     }
+
+    override fun getSpotReviewByDocRef(
+        spotReference: String,
+        docReference: String
+    ): Flow<SpotReview> = flow {
+        var review: SpotReview = SpotReview()
+        val reviewSnapshot =
+            firebaseFirestore.collection(SPOTS_COLLECTION_PATH).document(spotReference)
+                .collection(SPOT_REVIEWS_COLLECTION).document(docReference).get().await()
+        val description = reviewSnapshot.getString("description")
+        val title = reviewSnapshot.getString("title")
+        val postedByDocRef = reviewSnapshot.getDocumentReference("posted_by")
+        var postedBy = UserProfile()
+        if (postedByDocRef != null) {
+            getUserProfileByDocRef(postedByDocRef).collectLatest { profile ->
+                postedBy = profile
+            }
+        }
+        val reviewAttributesRefs =
+            reviewSnapshot.get("spot_attr") as List<DocumentReference>
+        var reviewAttributes = listOf<SpotAttribute>()
+        getSpotAttributesByDocRefs(reviewAttributesRefs).collectLatest { attributes ->
+            reviewAttributes = attributes
+        }
+        val creationDate = reviewSnapshot.getString("creation_date")
+        val score = reviewSnapshot.getDouble("score")
+
+        if (description != null && title != null && creationDate != null && score != null) {
+            review = SpotReview(
+                id = reviewSnapshot.id,
+                description = description,
+                title = title,
+                postedBy = postedBy,
+                spotAttributes = reviewAttributes,
+                creationDate = creationDate,
+                score = score.toFloat()
+            )
+        }
+        emit(review)
+    }
 }
 
 interface DatabaseContract {
@@ -585,5 +626,6 @@ interface DatabaseContract {
     fun deletePostComment(comment: PostComment, postDocument: String): Flow<Resource<String>>
     fun modifyUserPostLike(postReference: String, username: String): Flow<Resource<String>>
     fun checkIfPostIsLikedByUser(postReference: String, username: String): Flow<Resource<Boolean>>
+    fun getSpotReviewByDocRef(spotReference: String, docReference: String): Flow<SpotReview>
 
 }

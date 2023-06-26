@@ -205,8 +205,9 @@ fun PostContent(
                     .defaultMinSize(minWidth = 400.dp)
                     .padding(horizontal = 24.dp)
             )
+            CustomSpacer(size = 4.dp)
         }
-        CustomSpacer(size = 4.dp)
+
         Text(
             text = "$postLikes likes",
             style = secondarySemiBoldBodyM,

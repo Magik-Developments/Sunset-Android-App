@@ -20,10 +20,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextAlign.Companion
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.madteam.sunset.R
 import com.madteam.sunset.R.string
+import com.madteam.sunset.ui.theme.SunsetTheme
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineS
 import com.madteam.sunset.ui.theme.secondaryRegularBodyL
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyL
@@ -40,7 +42,7 @@ fun GDPRDialog(
             elevation = 2.dp,
             modifier = Modifier.padding(horizontal = 24.dp)
         ) {
-            Column() {
+            Column {
                 Image(
                     modifier = Modifier
                         .width(140.dp)
@@ -98,5 +100,13 @@ fun GDPRDialog(
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewGDPRDialog() {
+    SunsetTheme {
+        GDPRDialog({}, {}, {})
     }
 }

@@ -42,6 +42,7 @@ import com.madteam.sunset.R.string
 import com.madteam.sunset.model.SpotPost
 import com.madteam.sunset.ui.theme.secondaryRegularBodyS
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyS
+import com.madteam.sunset.utils.formatDate
 import com.madteam.sunset.utils.shimmerBrush
 import kotlinx.coroutines.delay
 
@@ -216,7 +217,7 @@ fun ImagePostCard(
                     bottom.linkTo(userBackground.bottom)
                 })
             Text(
-                text = postInfo.creation_date,
+                text = formatDate(postInfo.creation_date),
                 style = secondaryRegularBodyS,
                 modifier = Modifier.constrainAs(userLocation) {
                     start.linkTo(userUsername.start)

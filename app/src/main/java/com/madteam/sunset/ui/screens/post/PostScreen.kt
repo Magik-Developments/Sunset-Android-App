@@ -44,6 +44,7 @@ import com.madteam.sunset.ui.theme.primaryBoldHeadlineXS
 import com.madteam.sunset.ui.theme.secondaryRegularBodyM
 import com.madteam.sunset.ui.theme.secondaryRegularBodyS
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyM
+import com.madteam.sunset.utils.formatDate
 import com.madteam.sunset.utils.shimmerBrush
 
 @Composable
@@ -178,7 +179,7 @@ fun PostContent(
                 text = if (showShimmer.value) {
                     ""
                 } else {
-                    postInfo.creation_date
+                    "created " + formatDate(postInfo.creation_date)
                 },
                 style = secondaryRegularBodyS,
                 color = Color(0xFF333333),
@@ -193,16 +194,18 @@ fun PostContent(
         }
         CustomSpacer(size = 24.dp)
         //Post description
-        Text(
-            text = postInfo.description,
-            maxLines = 10,
-            overflow = TextOverflow.Ellipsis,
-            style = secondaryRegularBodyM,
-            modifier = Modifier
-                .background(shimmerBrush(showShimmer = showShimmer.value))
-                .defaultMinSize(minWidth = 400.dp)
-                .padding(horizontal = 24.dp)
-        )
+        if (postInfo.description.isNotBlank()) {
+            Text(
+                text = postInfo.description,
+                maxLines = 10,
+                overflow = TextOverflow.Ellipsis,
+                style = secondaryRegularBodyM,
+                modifier = Modifier
+                    .background(shimmerBrush(showShimmer = showShimmer.value))
+                    .defaultMinSize(minWidth = 400.dp)
+                    .padding(horizontal = 24.dp)
+            )
+        }
         CustomSpacer(size = 4.dp)
         Text(
             text = "$postLikes likes",

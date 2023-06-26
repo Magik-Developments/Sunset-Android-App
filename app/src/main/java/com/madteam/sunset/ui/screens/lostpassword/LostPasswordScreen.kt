@@ -22,13 +22,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
@@ -71,8 +68,6 @@ fun LostPasswordContent(
     val animComposition by rememberLottieComposition(spec = LottieCompositionSpec.RawRes(R.raw.sunsetlighthouse))
     var emailValueText by remember { mutableStateOf("") }
     var emailSent by remember { mutableStateOf(false) }
-
-
 
     Column(
         modifier = Modifier

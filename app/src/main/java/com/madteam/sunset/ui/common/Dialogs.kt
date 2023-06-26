@@ -26,8 +26,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextAlign.Companion
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.madteam.sunset.R
+import com.madteam.sunset.R.string
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineS
 import com.madteam.sunset.ui.theme.secondaryRegularBodyL
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyL
@@ -132,3 +135,4 @@ fun CircularLoadingDialog(
         CircularProgressIndicator(color = Color(0xFFFFB600))
     }
 }
+

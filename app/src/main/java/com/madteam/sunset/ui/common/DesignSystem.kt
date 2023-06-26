@@ -20,9 +20,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.madteam.sunset.R
+import com.madteam.sunset.ui.theme.SunsetTheme
 import com.madteam.sunset.ui.theme.primaryBoldDisplayS
 import com.madteam.sunset.ui.theme.secondaryRegularBodyL
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyM
@@ -66,6 +68,14 @@ fun MainTitle() {
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+fun PreviewMainTitle() {
+    SunsetTheme {
+        MainTitle()
+    }
+}
+
 @Composable
 fun SubTitle(modifier: Modifier) {
     Text(
@@ -73,6 +83,14 @@ fun SubTitle(modifier: Modifier) {
         style = secondaryRegularBodyL,
         modifier = modifier
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewSubTitle() {
+    SunsetTheme {
+        SubTitle(Modifier)
+    }
 }
 
 //Sign In / Sign Up Card
@@ -96,6 +114,14 @@ fun CardTitle(@StringRes text: Int) {
     )
 }
 
+@Preview(showBackground = true)
+@Composable
+fun PreviewCardTitle() {
+    SunsetTheme {
+        CardTitle(R.string.save)
+    }
+}
+
 @Composable
 fun CardSubtitle(text: Int) {
     Text(
@@ -115,6 +141,14 @@ fun ForgotPasswordText(onClick: () -> Unit) {
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+fun PreviewForgotPasswordText() {
+    SunsetTheme {
+        ForgotPasswordText {}
+    }
+}
+
 @Composable
 fun OtherLoginMethodsText(modifier: Modifier, @StringRes text: Int) {
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier) {
@@ -126,6 +160,14 @@ fun OtherLoginMethodsText(modifier: Modifier, @StringRes text: Int) {
             maxLines = 2,
             textAlign = TextAlign.Center
         )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewOtherLoginMethodsText() {
+    SunsetTheme {
+        OtherLoginMethodsText(Modifier, R.string.continue_text)
     }
 }
 
@@ -143,3 +185,10 @@ fun OtherLoginMethodsSection(@StringRes text: Int) {
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+fun PreviewOtherLoginMethodsSection() {
+    SunsetTheme {
+        OtherLoginMethodsSection(R.string.continue_text)
+    }
+}

@@ -29,8 +29,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.madteam.sunset.R
+import com.madteam.sunset.ui.theme.SunsetTheme
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyM
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
 
@@ -54,6 +56,12 @@ fun EmailButton(onClick: () -> Unit) {
             style = secondarySemiBoldHeadLineS
         )
     }
+}
+
+@Preview
+@Composable
+fun PreviewEmailButton() {
+    SunsetTheme { EmailButton {} }
 }
 
 @Composable
@@ -92,6 +100,12 @@ fun GoogleButton(onClick: () -> Unit) {
     }
 }
 
+@Preview
+@Composable
+fun PreviewGoogleButton() {
+    SunsetTheme { GoogleButton {} }
+}
+
 @Composable
 fun FacebookButton(onClick: () -> Unit) {
     Button(
@@ -128,11 +142,15 @@ fun FacebookButton(onClick: () -> Unit) {
     }
 }
 
+@Preview
+@Composable
+fun PreviewFacebookButton() {
+    SunsetTheme { FacebookButton {} }
+}
+
 @Composable
 fun SmallButtonDark(
-    onClick: () -> Unit,
-    @StringRes text: Int,
-    enabled: Boolean
+    onClick: () -> Unit, @StringRes text: Int, enabled: Boolean
 ) {
     Button(
         onClick = onClick,
@@ -149,17 +167,24 @@ fun SmallButtonDark(
 
     ) {
         Text(
-            text = stringResource(id = text),
-            style = secondarySemiBoldHeadLineS,
-            color = Color.White
+            text = stringResource(id = text), style = secondarySemiBoldHeadLineS, color = Color.White
+        )
+    }
+}
+
+@Preview
+@Composable
+fun PreviewSmallButtonDark() {
+    SunsetTheme {
+        SmallButtonDark(
+            onClick = { }, text = R.string.save, true
         )
     }
 }
 
 @Composable
 fun OtherLoginIconButtons(
-    firstMethod: () -> Unit,
-    secondMethod: () -> Unit
+    firstMethod: () -> Unit, secondMethod: () -> Unit
 ) {
     Row {
         IconButtonLight(
@@ -176,12 +201,17 @@ fun OtherLoginIconButtons(
     }
 }
 
+@Preview
+@Composable
+fun PreviewOtherLoginIconButtons() {
+    SunsetTheme {
+        OtherLoginIconButtons(firstMethod = { }, secondMethod = {})
+    }
+}
+
 @Composable
 fun IconButtonLight(
-    buttonIcon: ImageVector,
-    @StringRes description: Int,
-    onClick: () -> Unit,
-    iconTint: Color = Color.Unspecified
+    buttonIcon: ImageVector, @StringRes description: Int, onClick: () -> Unit, iconTint: Color = Color.Unspecified
 ) {
     Box(
         modifier = Modifier
@@ -189,14 +219,25 @@ fun IconButtonLight(
             .width(50.dp)
             .clip(RoundedCornerShape(16.dp))
             .background(Color.White)
-            .clickable(onClick = onClick),
-        contentAlignment = Alignment.Center
+            .clickable(onClick = onClick), contentAlignment = Alignment.Center
     ) {
         Icon(
             modifier = Modifier.size(24.dp, 24.dp),
             imageVector = buttonIcon,
             contentDescription = stringResource(description),
             tint = iconTint
+        )
+    }
+}
+
+@Preview
+@Composable
+fun PreviewIconButtonLight() {
+    SunsetTheme {
+        IconButtonLight(
+            buttonIcon = ImageVector.vectorResource(id = R.drawable.logo_google),
+            description = R.string.google_icon_description,
+            onClick = {}
         )
     }
 }
@@ -214,8 +255,7 @@ fun IconButtonDark(
             .width(50.dp)
             .clip(RoundedCornerShape(16.dp))
             .background(Color.Black)
-            .clickable(onClick = onClick),
-        contentAlignment = Alignment.Center
+            .clickable(onClick = onClick), contentAlignment = Alignment.Center
     ) {
         Icon(
             modifier = Modifier.size(24.dp, 24.dp),
@@ -226,11 +266,21 @@ fun IconButtonDark(
     }
 }
 
+@Preview
+@Composable
+fun PreviewIconButtonDark() {
+    SunsetTheme {
+        IconButtonDark(
+            buttonIcon = ImageVector.vectorResource(id = R.drawable.logo_google),
+            description = R.string.google_icon_description,
+            onClick = {}
+        )
+    }
+}
+
 @Composable
 fun ThinButtonLight(
-    onClick: () -> Unit,
-    @StringRes text: Int,
-    enabled: Boolean = true
+    onClick: () -> Unit, @StringRes text: Int, enabled: Boolean = true
 ) {
     Button(
         onClick = onClick,
@@ -249,28 +299,30 @@ fun ThinButtonLight(
 
     ) {
         Text(
-            text = stringResource(id = text),
-            style = secondarySemiBoldBodyM,
-            color = Color(0xFF333333)
+            text = stringResource(id = text), style = secondarySemiBoldBodyM, color = Color(0xFF333333)
+        )
+    }
+}
+
+@Preview
+@Composable
+fun PreviewThinButtonLight() {
+    SunsetTheme {
+        ThinButtonLight(
+            onClick = {},
+            R.string.edit_profile
         )
     }
 }
 
 @Composable
 fun LargeLightButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier.fillMaxWidth(),
-    @StringRes text: Int
+    onClick: () -> Unit, @StringRes text: Int, modifier: Modifier = Modifier.fillMaxWidth()
 ) {
     Button(
-        onClick = onClick,
-        modifier = modifier
-            .height(48.dp),
-        colors = ButtonDefaults.buttonColors(
+        onClick = onClick, modifier = modifier.height(48.dp), colors = ButtonDefaults.buttonColors(
             backgroundColor = Color(0xFFFFFFFF),
-        ),
-        shape = RoundedCornerShape(16.dp),
-        border = BorderStroke(1.dp, Color(0xFF000000))
+        ), shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, Color(0xFF000000))
     ) {
         Box(
             Modifier
@@ -287,20 +339,25 @@ fun LargeLightButton(
     }
 }
 
+@Preview
+@Composable
+fun PreviewLargeLightButton() {
+    SunsetTheme {
+        LargeLightButton(
+            onClick = {},
+            R.string.show_all_reviews
+        )
+    }
+}
+
 @Composable
 fun LargeDarkButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier.fillMaxWidth(),
-    @StringRes text: Int
+    onClick: () -> Unit, @StringRes text: Int, modifier: Modifier = Modifier.fillMaxWidth()
 ) {
     Button(
-        onClick = onClick,
-        modifier = modifier
-            .height(48.dp),
-        colors = ButtonDefaults.buttonColors(
+        onClick = onClick, modifier = modifier.height(48.dp), colors = ButtonDefaults.buttonColors(
             backgroundColor = Color(0xFF000000),
-        ),
-        shape = RoundedCornerShape(16.dp)
+        ), shape = RoundedCornerShape(16.dp)
     ) {
         Box(
             Modifier
@@ -314,5 +371,16 @@ fun LargeDarkButton(
                 style = secondarySemiBoldHeadLineS
             )
         }
+    }
+}
+
+@Preview
+@Composable
+fun PreviewLargeDarkButton() {
+    SunsetTheme {
+        LargeDarkButton(
+            onClick = {},
+            R.string.show_all_reviews
+        )
     }
 }

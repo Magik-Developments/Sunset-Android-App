@@ -22,13 +22,12 @@ class SpotReviewViewModel @Inject constructor(
     private val _reviewReference: MutableStateFlow<String> = MutableStateFlow("")
     private val _spotReference: MutableStateFlow<String> = MutableStateFlow("")
 
-    fun setReviewReference(docReference: String) {
-        _reviewReference.value = docReference
-    }
-
-    fun setSpotReference(docReference: String) {
-        _spotReference.value = docReference
-        getReviewInfo()
+    fun setReferences(reviewReference: String, spotReference: String) {
+        _reviewReference.value = reviewReference
+        _spotReference.value = spotReference
+        viewModelScope.launch {
+            getReviewInfo()
+        }
     }
 
     private fun getReviewInfo() {

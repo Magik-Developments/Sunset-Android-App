@@ -35,6 +35,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -69,6 +70,7 @@ import com.madteam.sunset.ui.theme.secondaryRegularBodyS
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyL
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyM
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineM
+import com.madteam.sunset.utils.formatDate
 import com.madteam.sunset.utils.getResourceId
 import com.madteam.sunset.utils.openDirectionsOnGoogleMaps
 import com.madteam.sunset.utils.shimmerBrush
@@ -410,6 +412,8 @@ fun SpotDetailContent(
                         modifier = Modifier
                             .size(300.dp)
                             .border(1.dp, Color(0xFF999999), RoundedCornerShape(20.dp))
+                            .clip(RoundedCornerShape(20.dp))
+                            .clickable { navigateTo("spot_review_screen/spotReference=${spotInfo.id}reviewReference=${review.id}") }
                     ) {
                         ConstraintLayout(
                             modifier = Modifier
@@ -449,7 +453,7 @@ fun SpotDetailContent(
                                     start.linkTo(userImage.end, 4.dp)
                                 })
                             Text(
-                                text = review.creationDate,
+                                text = formatDate(review.creationDate),
                                 style = secondaryRegularBodyM,
                                 modifier = Modifier.constrainAs(reviewDate) {
                                     bottom.linkTo(userImage.bottom, 4.dp)

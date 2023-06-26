@@ -104,6 +104,22 @@ fun GoBackTopAppBar(
 }
 
 @Composable
+fun GoBackVariantTitleTopAppBar(
+    title: String,
+    onClick: () -> Unit
+) {
+    TopAppBar(
+        backgroundColor = Color.White,
+        navigationIcon = {
+            IconButton(onClick = { onClick() }) {
+                Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Go back")
+            }
+        },
+        title = { Text(text = title) }
+    )
+}
+
+@Composable
 fun SelectedCommentTopAppBar(
     @StringRes title: Int,
     onQuitClick: () -> Unit,

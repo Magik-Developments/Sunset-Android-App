@@ -539,7 +539,7 @@ fun SpotDetailContent(
                 IconButtonDark(
                     buttonIcon = Icons.Filled.Add,
                     description = R.string.add,
-                    onClick = { },
+                    onClick = { navigateTo("add_spot_review_screen/spotReference=${spotInfo.id}") },
                     iconTint = Color.White
                 )
             }

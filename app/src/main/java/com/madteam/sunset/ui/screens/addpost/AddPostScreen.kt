@@ -41,13 +41,14 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.madteam.sunset.R
-import com.madteam.sunset.ui.common.AddDescriptionTextField
 import com.madteam.sunset.ui.common.AutoSlidingCarousel
 import com.madteam.sunset.ui.common.CircularLoadingDialog
 import com.madteam.sunset.ui.common.CustomSpacer
+import com.madteam.sunset.ui.common.CustomTextField
 import com.madteam.sunset.ui.common.DismissAndPositiveDialog
 import com.madteam.sunset.ui.common.GoForwardTopAppBar
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineL
+import com.madteam.sunset.ui.theme.secondaryRegularBodyL
 import com.madteam.sunset.utils.Resource
 import com.madteam.sunset.utils.shimmerBrush
 
@@ -242,7 +243,7 @@ fun AddPostContent(
             }
         }
         CustomSpacer(size = 8.dp)
-        AddDescriptionTextField(
+        CustomTextField(
             value = descriptionText,
             onValueChange = {
                 if (it.length <= MAX_CHAR_LENGTH_DESCRIPTION) {
@@ -252,7 +253,9 @@ fun AddPostContent(
                         .show()
                 }
             },
-            hint = R.string.add_post_description
+            hint = R.string.add_post_description,
+            textStyle = secondaryRegularBodyL,
+            textColor = Color(0xFF999999)
         )
     }
 
@@ -285,6 +288,7 @@ fun AddPostContent(
                 clearUploadProgress()
             }
         }
+
         else -> {}
     }
 }

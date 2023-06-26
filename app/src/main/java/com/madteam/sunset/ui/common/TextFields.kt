@@ -1,5 +1,6 @@
 package com.madteam.sunset.ui.common
 
+import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -31,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -259,18 +261,22 @@ fun ChatTextField(
 }
 
 @Composable
-fun AddDescriptionTextField(
+fun CustomTextField(
+    modifier: Modifier = Modifier,
     value: String,
     onValueChange: (String) -> Unit,
     @StringRes hint: Int,
+    textStyle: TextStyle,
+    @ColorRes textColor: Color,
     enabled: Boolean = true,
-    visualTransformation: VisualTransformation = VisualTransformation.None
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    maxLines: Int = 10
 ) {
     Column {
         TextField(
             value = value,
             onValueChange = onValueChange,
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxHeight()
                 .fillMaxWidth(),
             colors = TextFieldDefaults.textFieldColors(
@@ -290,11 +296,13 @@ fun AddDescriptionTextField(
             placeholder = {
                 Text(
                     text = stringResource(id = hint),
-                    style = secondaryRegularBodyL,
+                    style = textStyle,
                     textAlign = TextAlign.Start,
-                    color = Color(0xFF999999)
+                    color = textColor
                 )
-            }
+            },
+            textStyle = textStyle,
+            maxLines = maxLines
         )
     }
 }

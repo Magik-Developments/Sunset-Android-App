@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.madteam.sunset.repositories.AuthRepository
 import com.madteam.sunset.repositories.DatabaseRepository
+import com.madteam.sunset.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -35,6 +36,11 @@ class AddPostViewModel @Inject constructor(
 
     private val _errorToastText: MutableStateFlow<String> = MutableStateFlow("")
     val errorToastText: StateFlow<String> = _errorToastText
+
+    private val _uploadProgress: MutableStateFlow<Resource<String>> =
+        MutableStateFlow(Resource.Success(""))
+    val uploadProgress: StateFlow<Resource<String>> = _uploadProgress
+
 
     init {
         getUserInfo()
@@ -89,9 +95,13 @@ class AddPostViewModel @Inject constructor(
                 _imageUris.value,
                 username
             ).collectLatest {
-
+                _uploadProgress.value = it
             }
         }
+    }
+
+    fun clearUpdateProgressState() {
+        _uploadProgress.value = Resource.Success("")
     }
 
 }

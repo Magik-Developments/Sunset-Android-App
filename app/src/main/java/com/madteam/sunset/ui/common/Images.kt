@@ -42,6 +42,7 @@ import com.madteam.sunset.R.string
 import com.madteam.sunset.model.SpotPost
 import com.madteam.sunset.ui.theme.secondaryRegularBodyS
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyS
+import com.madteam.sunset.utils.formatDate
 import com.madteam.sunset.utils.shimmerBrush
 import kotlinx.coroutines.delay
 
@@ -105,15 +106,17 @@ fun AutoSlidingCarousel(
 ) {
     val isDragged by pagerState.interactionSource.collectIsDraggedAsState()
 
-    LaunchedEffect(pagerState.currentPage) {
-        delay(autoSlideDuration.toLong())
-        pagerState.animateScrollToPage(
-            (pagerState.currentPage + 1) % if (itemsCount == 0) {
-                1
-            } else {
-                itemsCount
-            }
-        )
+    if (autoSlideDuration != 0) {
+        LaunchedEffect(pagerState.currentPage) {
+            delay(autoSlideDuration.toLong())
+            pagerState.animateScrollToPage(
+                (pagerState.currentPage + 1) % if (itemsCount == 0) {
+                    1
+                } else {
+                    itemsCount
+                }
+            )
+        }
     }
 
     Box(
@@ -146,11 +149,13 @@ fun AutoSlidingCarousel(
                 .fillMaxSize()
                 .padding(bottom = 16.dp)
         ) {
-            ImageSliderCounter(
-                actualImage = (if (isDragged) pagerState.currentPage else pagerState.targetPage) + 1,
-                totalImages = itemsCount,
-                modifier = Modifier
-            )
+            if (itemsCount != 0) {
+                ImageSliderCounter(
+                    actualImage = (if (isDragged) pagerState.currentPage else pagerState.targetPage) + 1,
+                    totalImages = itemsCount,
+                    modifier = Modifier
+                )
+            }
         }
     }
 }
@@ -212,7 +217,7 @@ fun ImagePostCard(
                     bottom.linkTo(userBackground.bottom)
                 })
             Text(
-                text = postInfo.creation_date,
+                text = formatDate(postInfo.creation_date),
                 style = secondaryRegularBodyS,
                 modifier = Modifier.constrainAs(userLocation) {
                     start.linkTo(userUsername.start)

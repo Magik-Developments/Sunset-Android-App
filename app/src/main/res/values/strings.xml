@@ -56,4 +56,11 @@
     <string name="comment_keyboard_placeholder">Comment</string>
     <string name="comments_title">Comments</string>
     <string name="selected_comment_title">Comment selected</string>
+    <string name="add_post">Add post</string>
+    <string name="add_post_description">Add a description to your post</string>
+    <string name="are_you_sure">Are you sure?</string>
+    <string name="exit_post_dialog">If you exit now you will discard all the changes.</string>
+    <string name="cancel">Cancel</string>
+    <string name="discard_changes">Discard changes</string>
+    <string name="max_characters_reached">You have reached the maximum characters.</string>
 </resources>

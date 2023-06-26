@@ -1,16 +1,22 @@
 package com.madteam.sunset.ui.common
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -25,16 +31,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.madteam.sunset.R
 import com.madteam.sunset.R.string
-import com.madteam.sunset.ui.theme.SunsetTheme
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineS
 import com.madteam.sunset.ui.theme.secondaryRegularBodyL
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyL
 
 @Composable
-fun GDPRDialog(
+fun DismissAndPositiveDialog(
     setShowDialog: (Boolean) -> Unit,
-    readPoliciesClicked: () -> Unit,
-    acceptPoliciesClicked: () -> Unit
+    @StringRes dialogTitle: Int,
+    @StringRes dialogDescription: Int,
+    @StringRes positiveButtonText: Int,
+    @StringRes dismissButtonText: Int,
+    image: Int? = null,
+    dismissClickedAction: () -> Unit,
+    positiveClickedAction: () -> Unit
 ) {
     Dialog(onDismissRequest = { setShowDialog(false) }) {
         Card(
@@ -43,32 +53,42 @@ fun GDPRDialog(
             modifier = Modifier.padding(horizontal = 24.dp)
         ) {
             Column {
-                Image(
-                    modifier = Modifier
-                        .width(140.dp)
-                        .height(140.dp)
-                        .align(alignment = Alignment.CenterHorizontally),
-                    painter = painterResource(id = R.drawable.sunset_vectorial_art_01),
-                    contentDescription = stringResource(string.sunset_art_image_description),
-                    alignment = Alignment.Center
-                )
-                Text(
-                    modifier = Modifier.padding(horizontal = 24.dp),
-                    text = stringResource(string.privacy_dialog_title),
-                    style = primaryBoldHeadlineS,
-                    textAlign = TextAlign.Center
-                )
+                if (image != null) {
+                    Image(
+                        modifier = Modifier
+                            .width(140.dp)
+                            .height(140.dp)
+                            .align(alignment = Alignment.CenterHorizontally),
+                        painter = painterResource(id = image),
+                        contentDescription = "Dialog image",
+                        alignment = Alignment.Center
+                    )
+                } else {
+                    CustomSpacer(size = 16.dp)
+                }
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .padding(horizontal = 24.dp),
+                        text = stringResource(dialogTitle),
+                        style = primaryBoldHeadlineS,
+                        textAlign = TextAlign.Center
+                    )
+                }
                 CustomSpacer(size = 24.dp)
                 Text(
                     modifier = Modifier.padding(horizontal = 24.dp),
-                    text = stringResource(string.privacy_dialog_description),
+                    text = stringResource(dialogDescription),
                     style = secondaryRegularBodyL,
                     textAlign = TextAlign.Center
                 )
                 CustomSpacer(size = 24.dp)
                 Row(Modifier.fillMaxWidth()) {
                     Button(
-                        onClick = readPoliciesClicked,
+                        onClick = dismissClickedAction,
                         modifier = Modifier
                             .weight(1f)
                             .height(60.dp),
@@ -76,14 +96,14 @@ fun GDPRDialog(
                         shape = RoundedCornerShape(0.dp)
                     ) {
                         Text(
-                            text = stringResource(string.read_policies),
+                            text = stringResource(dismissButtonText),
                             style = secondarySemiBoldBodyL,
                             color = Color.Black,
                             textAlign = TextAlign.Center
                         )
                     }
                     Button(
-                        onClick = acceptPoliciesClicked,
+                        onClick = positiveClickedAction,
                         modifier = Modifier
                             .weight(1f)
                             .height(60.dp),
@@ -91,7 +111,7 @@ fun GDPRDialog(
                         shape = RoundedCornerShape(0.dp)
                     ) {
                         Text(
-                            text = stringResource(string.sign_up),
+                            text = stringResource(positiveButtonText),
                             style = secondarySemiBoldBodyL,
                             color = Color.White,
                             textAlign = Companion.Center
@@ -103,10 +123,16 @@ fun GDPRDialog(
     }
 }
 
-@Preview(showBackground = true)
 @Composable
-fun PreviewGDPRDialog() {
-    SunsetTheme {
-        GDPRDialog({}, {}, {})
+fun CircularLoadingDialog(
+) {
+    Box(
+        Modifier
+            .size(100.dp)
+            .background(color = Color.White, RoundedCornerShape(20.dp)),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator(color = Color(0xFFFFB600))
     }
 }
+

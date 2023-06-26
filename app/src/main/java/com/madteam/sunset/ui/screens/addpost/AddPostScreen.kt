@@ -25,7 +25,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -276,16 +275,13 @@ fun AddPostContent(
 
         is Resource.Success -> {
             if (uploadProgress.data != "") {
-                LaunchedEffect(key1 = uploadProgress.data) {
-                    navigateTo("post_screen/postReference=${uploadProgress.data}")
-                }
+                navigateTo("post_screen/postReference=${uploadProgress.data}")
                 clearUploadProgress()
             } else if (uploadProgress.data.contains("Error")) {
                 Toast.makeText(context, "Error, try again later.", Toast.LENGTH_SHORT).show()
                 clearUploadProgress()
             }
         }
-
         else -> {}
     }
 }

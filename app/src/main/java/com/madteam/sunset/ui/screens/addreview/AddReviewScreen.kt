@@ -39,7 +39,7 @@ fun AddReviewScreen(
     navController: NavController
 ) {
 
-    val isReadyToPost = true
+    val isReadyToPost = false
 
     Scaffold(
         topBar = {

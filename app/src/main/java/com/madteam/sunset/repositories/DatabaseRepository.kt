@@ -506,6 +506,7 @@ class DatabaseRepository @Inject constructor(
         imagesUriList: List<Uri>,
         authorUsername: String
     ): Flow<Resource<String>> = flow {
+        emit(Resource.Loading())
         val newPostDocument = firebaseFirestore.collection(POSTS_COLLECTION_PATH).document()
         val spotDocumentRef = firebaseFirestore.collection(SPOTS_COLLECTION_PATH).document(spotRef)
         val authorRef = firebaseFirestore.collection(USERS_COLLECTION_PATH).document(authorUsername)
@@ -531,7 +532,7 @@ class DatabaseRepository @Inject constructor(
         emit(Resource.Success(newPostDocument.id))
     }.catch { exception ->
         Log.e("DatabaseRepository::createSpotPost", "Error: ${exception.message}")
-        emit(Resource.Success(exception.message.toString()))
+        emit(Resource.Success("Error: " + exception.message.toString()))
     }
 
     override fun uploadImages(

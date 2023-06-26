@@ -25,6 +25,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,10 +43,12 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.madteam.sunset.R
 import com.madteam.sunset.ui.common.AddDescriptionTextField
 import com.madteam.sunset.ui.common.AutoSlidingCarousel
+import com.madteam.sunset.ui.common.CircularLoadingDialog
 import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.DismissAndPositiveDialog
 import com.madteam.sunset.ui.common.GoForwardTopAppBar
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineL
+import com.madteam.sunset.utils.Resource
 import com.madteam.sunset.utils.shimmerBrush
 
 const val MAX_IMAGES_SELECTED = 8
@@ -58,6 +61,7 @@ fun AddPostScreen(
     navController: NavController
 ) {
 
+    val uploadProgress by viewModel.uploadProgress.collectAsStateWithLifecycle()
     val imageUris by viewModel.imageUris.collectAsStateWithLifecycle()
     val selectedImageUri by viewModel.selectedImageUri.collectAsStateWithLifecycle()
     val descriptionText by viewModel.descriptionText.collectAsStateWithLifecycle()
@@ -106,7 +110,10 @@ fun AddPostScreen(
                     setShowExitDialog = viewModel::setShowExitDialog,
                     exitAddPost = navController::popBackStack,
                     errorToast = errorToastText,
-                    clearErrorToast = viewModel::clearErrorToastText
+                    clearErrorToast = viewModel::clearErrorToastText,
+                    uploadProgress = uploadProgress,
+                    navigateTo = navController::navigate,
+                    clearUploadProgress = viewModel::clearUpdateProgressState
                 )
             }
         }
@@ -128,7 +135,10 @@ fun AddPostContent(
     onUpdateDescriptionText: (String) -> Unit,
     setShowExitDialog: (Boolean) -> Unit,
     exitAddPost: () -> Unit,
-    clearErrorToast: () -> Unit
+    clearErrorToast: () -> Unit,
+    uploadProgress: Resource<String>,
+    navigateTo: (String) -> Unit,
+    clearUploadProgress: () -> Unit
 ) {
 
     val context = LocalContext.current
@@ -244,5 +254,38 @@ fun AddPostContent(
             },
             hint = R.string.add_post_description
         )
+    }
+
+    when (uploadProgress) {
+        is Resource.Loading -> {
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .background(Color.Transparent),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.background(Color.Transparent)
+                ) {
+                    CircularLoadingDialog()
+                }
+            }
+        }
+
+        is Resource.Success -> {
+            if (uploadProgress.data != "") {
+                LaunchedEffect(key1 = uploadProgress.data) {
+                    navigateTo("post_screen/postReference=${uploadProgress.data}")
+                }
+                clearUploadProgress()
+            } else if (uploadProgress.data.contains("Error")) {
+                Toast.makeText(context, "Error, try again later.", Toast.LENGTH_SHORT).show()
+                clearUploadProgress()
+            }
+        }
+
+        else -> {}
     }
 }

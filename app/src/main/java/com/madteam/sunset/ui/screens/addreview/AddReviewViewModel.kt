@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.roundToInt
 
 @HiltViewModel
 class AddReviewViewModel @Inject constructor(
@@ -23,6 +24,18 @@ class AddReviewViewModel @Inject constructor(
     private val _selectedAttributes: MutableStateFlow<List<SpotAttribute>> =
         MutableStateFlow(mutableListOf())
     val selectedAttributes: StateFlow<List<SpotAttribute>> = _selectedAttributes
+
+    private val _reviewTitle: MutableStateFlow<String> =
+        MutableStateFlow("")
+    val reviewTitle: StateFlow<String> = _reviewTitle
+
+    private val _reviewDescription: MutableStateFlow<String> =
+        MutableStateFlow("")
+    val reviewDescription: StateFlow<String> = _reviewDescription
+
+    private val _reviewScore: MutableStateFlow<Int> =
+        MutableStateFlow(0)
+    val reviewScore: StateFlow<Int> = _reviewScore
 
     init {
         getSpotAttributesList()
@@ -42,5 +55,17 @@ class AddReviewViewModel @Inject constructor(
         } else {
             _selectedAttributes.value = _selectedAttributes.value - attribute
         }
+    }
+
+    fun modifyReviewDescription(description: String) {
+        _reviewDescription.value = description
+    }
+
+    fun modifyReviewTitle(title: String) {
+        _reviewTitle.value = title
+    }
+
+    fun modifyReviewScore(score: Float) {
+        _reviewScore.value = score.roundToInt()
     }
 }

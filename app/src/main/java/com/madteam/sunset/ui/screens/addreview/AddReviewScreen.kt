@@ -28,9 +28,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -58,7 +55,6 @@ import com.madteam.sunset.ui.theme.secondaryRegularHeadlineS
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyM
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
 import com.madteam.sunset.utils.getResourceId
-import kotlin.math.roundToInt
 
 private const val MAX_CHAR_LENGTH_REVIEW_TITLE = 50
 private const val MAX_CHAR_LENGTH_REVIEW_DESCRIPTION = 2500
@@ -76,6 +72,9 @@ fun AddReviewScreen(
     val isReadyToPost = false
     val attributesList by viewModel.attributesList.collectAsStateWithLifecycle()
     val selectedAttributes by viewModel.selectedAttributes.collectAsStateWithLifecycle()
+    val reviewTitle by viewModel.reviewTitle.collectAsStateWithLifecycle()
+    val reviewDescription by viewModel.reviewDescription.collectAsStateWithLifecycle()
+    val reviewScore by viewModel.reviewScore.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
@@ -102,7 +101,13 @@ fun AddReviewScreen(
                 AddReviewContent(
                     attributesList = attributesList,
                     onAttributeClicked = viewModel::modifySelectedAttributes,
-                    selectedAttributes = selectedAttributes
+                    selectedAttributes = selectedAttributes,
+                    reviewTitle = reviewTitle,
+                    reviewDescription = reviewDescription,
+                    onReviewDescriptionChanged = viewModel::modifyReviewDescription,
+                    onReviewTitleChanged = viewModel::modifyReviewTitle,
+                    onReviewScoreChanged = viewModel::modifyReviewScore,
+                    reviewScore = reviewScore
                 )
             }
         }
@@ -113,20 +118,17 @@ fun AddReviewScreen(
 fun AddReviewContent(
     attributesList: List<SpotAttribute>,
     selectedAttributes: List<SpotAttribute>,
-    onAttributeClicked: (SpotAttribute) -> Unit
+    reviewTitle: String,
+    reviewDescription: String,
+    reviewScore: Int,
+    onReviewTitleChanged: (String) -> Unit,
+    onReviewDescriptionChanged: (String) -> Unit,
+    onAttributeClicked: (SpotAttribute) -> Unit,
+    onReviewScoreChanged: (Float) -> Unit
 ) {
 
     val context = LocalContext.current
     val scrollState = rememberScrollState()
-    var temporalTitle by remember {
-        mutableStateOf("")
-    }
-    var temporalDescription by remember {
-        mutableStateOf("")
-    }
-    var temporalScore by remember {
-        mutableStateOf(0.0f)
-    }
 
     Column(
         Modifier
@@ -135,11 +137,10 @@ fun AddReviewContent(
             .verticalScroll(scrollState)
     ) {
         CustomTextField(
-            value = temporalTitle,
+            value = reviewTitle,
             onValueChange = {
                 if (it.length <= MAX_CHAR_LENGTH_REVIEW_TITLE) {
-                    // update value changed
-                    temporalTitle = it
+                    onReviewTitleChanged(it)
                 } else {
                     Toast.makeText(context, R.string.max_characters_reached, Toast.LENGTH_SHORT)
                         .show()
@@ -151,11 +152,10 @@ fun AddReviewContent(
             maxLines = 2
         )
         CustomTextField(
-            value = temporalDescription,
+            value = reviewDescription,
             onValueChange = {
                 if (it.length <= MAX_CHAR_LENGTH_REVIEW_DESCRIPTION) {
-                    // update value changed
-                    temporalDescription = it
+                    onReviewDescriptionChanged(it)
                 } else {
                     Toast.makeText(context, R.string.max_characters_reached, Toast.LENGTH_SHORT)
                         .show()
@@ -356,8 +356,8 @@ fun AddReviewContent(
             modifier = Modifier.padding(start = 16.dp)
         )
         ScoreSlider(
-            value = temporalScore,
-            onValueChange = { temporalScore = it },
+            value = reviewScore.toFloat(),
+            onValueChange = { onReviewScoreChanged(it) },
             modifier = Modifier.padding(horizontal = 12.dp)
         )
         Row(
@@ -366,15 +366,15 @@ fun AddReviewContent(
             horizontalArrangement = Arrangement.Center
         ) {
             Icon(
-                imageVector = if (temporalScore < 3.0f) {
+                imageVector = if (reviewScore < 3) {
                     Icons.Outlined.BrightnessLow
-                } else if (temporalScore < 5) {
+                } else if (reviewScore < 5) {
                     Icons.Outlined.Brightness4
-                } else if (temporalScore < 7) {
+                } else if (reviewScore < 7) {
                     Icons.Outlined.Brightness5
-                } else if (temporalScore < 9) {
+                } else if (reviewScore < 9) {
                     Icons.Outlined.Brightness6
-                } else if (temporalScore > 9) {
+                } else if (reviewScore > 9) {
                     Icons.Outlined.Brightness7
                 } else {
                     Icons.Outlined.BrightnessLow
@@ -385,7 +385,7 @@ fun AddReviewContent(
                     .size(36.dp)
             )
             CustomSpacer(size = 8.dp)
-            Text(text = temporalScore.roundToInt().toString(), style = primaryBoldDisplayS)
+            Text(text = reviewScore.toString(), style = primaryBoldDisplayS)
         }
         CustomSpacer(size = 24.dp)
     }

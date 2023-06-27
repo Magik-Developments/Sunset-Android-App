@@ -16,10 +16,13 @@ class AddReviewViewModel @Inject constructor(
     private val databaseRepository: DatabaseRepository
 ) : ViewModel() {
 
-    private val _attributesList: MutableStateFlow<List<SpotAttribute>> = MutableStateFlow(
-        mutableListOf()
-    )
+    private val _attributesList: MutableStateFlow<List<SpotAttribute>> =
+        MutableStateFlow(mutableListOf())
     val attributesList: StateFlow<List<SpotAttribute>> = _attributesList
+
+    private val _selectedAttributes: MutableStateFlow<List<SpotAttribute>> =
+        MutableStateFlow(mutableListOf())
+    val selectedAttributes: StateFlow<List<SpotAttribute>> = _selectedAttributes
 
     init {
         getSpotAttributesList()
@@ -30,6 +33,14 @@ class AddReviewViewModel @Inject constructor(
             databaseRepository.getAllSpotAttributes().collectLatest { attributesList ->
                 _attributesList.value = attributesList
             }
+        }
+    }
+
+    fun modifySelectedAttributes(attribute: SpotAttribute) {
+        if (!_selectedAttributes.value.contains(attribute)) {
+            _selectedAttributes.value = _selectedAttributes.value + attribute
+        } else {
+            _selectedAttributes.value = _selectedAttributes.value - attribute
         }
     }
 }

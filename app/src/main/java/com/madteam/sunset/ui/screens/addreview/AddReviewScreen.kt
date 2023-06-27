@@ -15,6 +15,12 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Brightness4
+import androidx.compose.material.icons.outlined.Brightness5
+import androidx.compose.material.icons.outlined.Brightness6
+import androidx.compose.material.icons.outlined.Brightness7
+import androidx.compose.material.icons.outlined.BrightnessLow
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -330,15 +336,34 @@ fun AddReviewContent(
             onValueChange = { temporalScore = it },
             modifier = Modifier.padding(horizontal = 12.dp)
         )
-        CustomSpacer(size = 8.dp)
         Row(
             Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
+            Icon(
+                imageVector = if (temporalScore < 3.0f) {
+                    Icons.Outlined.BrightnessLow
+                } else if (temporalScore < 5) {
+                    Icons.Outlined.Brightness4
+                } else if (temporalScore < 7) {
+                    Icons.Outlined.Brightness5
+                } else if (temporalScore < 9) {
+                    Icons.Outlined.Brightness6
+                } else if (temporalScore > 9) {
+                    Icons.Outlined.Brightness7
+                } else {
+                    Icons.Outlined.BrightnessLow
+                },
+                contentDescription = "Score icon",
+                modifier = Modifier
+                    .align(Alignment.CenterVertically)
+                    .size(36.dp)
+            )
+            CustomSpacer(size = 8.dp)
             Text(text = temporalScore.roundToInt().toString(), style = primaryBoldDisplayS)
         }
-        CustomSpacer(size = 16.dp)
+        CustomSpacer(size = 24.dp)
     }
 
 }

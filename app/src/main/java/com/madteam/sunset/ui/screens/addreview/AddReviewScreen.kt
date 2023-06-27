@@ -1,11 +1,20 @@
 package com.madteam.sunset.ui.screens.addreview
 
 import android.widget.Toast
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,22 +26,32 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.madteam.sunset.R
+import com.madteam.sunset.model.SpotAttribute
 import com.madteam.sunset.ui.common.CustomDivider
 import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.CustomTextField
 import com.madteam.sunset.ui.common.GoForwardTopAppBar
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineL
+import com.madteam.sunset.ui.theme.secondaryRegularBodyS
 import com.madteam.sunset.ui.theme.secondaryRegularHeadlineS
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyM
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
+import com.madteam.sunset.utils.getResourceId
 
 private const val MAX_CHAR_LENGTH_REVIEW_TITLE = 50
 private const val MAX_CHAR_LENGTH_REVIEW_DESCRIPTION = 2500
+private const val FAVORABLE_ATTRIBUTES = "favorable"
+private const val NON_FAVORABLE_ATTRIBUTES = "non-favorable"
+private const val SUNSET_ATTRIBUTES = "sunset"
 
 @Composable
 fun AddReviewScreen(
@@ -42,6 +61,7 @@ fun AddReviewScreen(
 ) {
 
     val isReadyToPost = false
+    val attributesList by viewModel.attributesList.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
@@ -65,16 +85,21 @@ fun AddReviewScreen(
                 modifier = Modifier.padding(paddingValues),
                 contentAlignment = Alignment.Center
             ) {
-                AddReviewContent()
+                AddReviewContent(
+                    attributesList = attributesList
+                )
             }
         }
     )
 }
 
 @Composable
-fun AddReviewContent() {
+fun AddReviewContent(
+    attributesList: List<SpotAttribute>
+) {
 
     val context = LocalContext.current
+    val scrollState = rememberScrollState()
     var temporalTitle by remember {
         mutableStateOf("")
     }
@@ -86,6 +111,7 @@ fun AddReviewContent() {
         Modifier
             .fillMaxSize()
             .padding(start = 8.dp, end = 24.dp, top = 24.dp, bottom = 24.dp)
+            .verticalScroll(scrollState)
     ) {
         CustomTextField(
             value = temporalTitle,
@@ -126,7 +152,7 @@ fun AddReviewContent() {
                 .padding(start = 16.dp),
             color = Color(0xFF999999)
         )
-        CustomSpacer(size = 16.dp)
+        CustomSpacer(size = 24.dp)
         Text(
             text = stringResource(id = R.string.how_it_was),
             style = primaryBoldHeadlineL,
@@ -139,6 +165,160 @@ fun AddReviewContent() {
             modifier = Modifier.padding(start = 16.dp)
         )
         CustomSpacer(size = 16.dp)
+        Text(
+            text = stringResource(id = R.string.good_attributes),
+            style = secondaryRegularHeadlineS,
+            modifier = Modifier.padding(start = 16.dp),
+            color = Color(0xFF666666)
+        )
+        CustomSpacer(size = 8.dp)
+        LazyRow(
+            modifier = Modifier.padding(start = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            itemsIndexed(attributesList.filter { it.type == FAVORABLE_ATTRIBUTES }) { _, attribute ->
+                Box(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .border(1.dp, Color(0xFF999999), RoundedCornerShape(20.dp))
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        Icon(
+                            painter = painterResource(
+                                id = getResourceId(
+                                    attribute.icon,
+                                    context
+                                )
+                            ),
+                            contentDescription = "",
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Text(
+                            text = attribute.title,
+                            style = secondaryRegularBodyS,
+                            textAlign = TextAlign.Center,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
+                        )
+                    }
+                }
+            }
+        }
+        CustomSpacer(size = 16.dp)
+        Text(
+            text = stringResource(id = R.string.bad_attributes),
+            style = secondaryRegularHeadlineS,
+            modifier = Modifier.padding(start = 16.dp),
+            color = Color(0xFF666666)
+        )
+        CustomSpacer(size = 8.dp)
+        LazyRow(
+            modifier = Modifier.padding(start = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            itemsIndexed(attributesList.filter { it.type == NON_FAVORABLE_ATTRIBUTES }) { _, attribute ->
+                Box(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .border(1.dp, Color(0xFF999999), RoundedCornerShape(20.dp))
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        Icon(
+                            painter = painterResource(
+                                id = getResourceId(
+                                    attribute.icon,
+                                    context
+                                )
+                            ),
+                            contentDescription = "",
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Text(
+                            text = attribute.title,
+                            style = secondaryRegularBodyS,
+                            textAlign = TextAlign.Center,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
+                        )
+                    }
+                }
+            }
+        }
+        CustomSpacer(size = 16.dp)
+        Text(
+            text = stringResource(id = R.string.sunset_attributes),
+            style = secondaryRegularHeadlineS,
+            modifier = Modifier.padding(start = 16.dp),
+            color = Color(0xFF666666)
+        )
+        CustomSpacer(size = 8.dp)
+        LazyRow(
+            modifier = Modifier.padding(start = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            itemsIndexed(attributesList.filter { it.type == SUNSET_ATTRIBUTES }) { _, attribute ->
+                Box(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .border(1.dp, Color(0xFF999999), RoundedCornerShape(20.dp))
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        Icon(
+                            painter = painterResource(
+                                id = getResourceId(
+                                    attribute.icon,
+                                    context
+                                )
+                            ),
+                            contentDescription = "",
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Text(
+                            text = attribute.title,
+                            style = secondaryRegularBodyS,
+                            textAlign = TextAlign.Center,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
+                        )
+                    }
+                }
+            }
+        }
+        CustomSpacer(size = 32.dp)
+        CustomDivider(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp),
+            color = Color(0xFF999999)
+        )
+        CustomSpacer(size = 24.dp)
+        Text(
+            text = stringResource(id = R.string.review_score),
+            style = primaryBoldHeadlineL,
+            modifier = Modifier.padding(start = 16.dp)
+        )
+        CustomSpacer(size = 4.dp)
+        Text(
+            text = stringResource(id = R.string.add_review_score),
+            style = secondarySemiBoldBodyM,
+            modifier = Modifier.padding(start = 16.dp)
+        )
+
     }
 
 }

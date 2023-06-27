@@ -69,4 +69,9 @@
     <string name="add_description_review">Add a description...</string>
     <string name="how_it_was">How it was?</string>
     <string name="add_attributes_review">Add some attributes</string>
+    <string name="good_attributes">Good attributes</string>
+    <string name="bad_attributes">Bad attributes</string>
+    <string name="sunset_attributes">Sunset attributes</string>
+    <string name="review_score">Review score</string>
+    <string name="add_review_score">Add a score</string>
 </resources>

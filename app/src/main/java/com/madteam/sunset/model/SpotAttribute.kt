@@ -5,7 +5,7 @@ data class SpotAttribute(
     val description: String,
     val title: String,
     val icon: String,
-    val favorable: Boolean
+    val type: String
 ) {
-    constructor() : this("", "", "", "", false)
+    constructor() : this("", "", "", "", "")
 }

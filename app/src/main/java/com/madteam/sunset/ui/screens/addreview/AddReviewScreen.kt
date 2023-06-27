@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -40,12 +41,15 @@ import com.madteam.sunset.ui.common.CustomDivider
 import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.CustomTextField
 import com.madteam.sunset.ui.common.GoForwardTopAppBar
+import com.madteam.sunset.ui.common.ScoreSlider
+import com.madteam.sunset.ui.theme.primaryBoldDisplayS
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineL
 import com.madteam.sunset.ui.theme.secondaryRegularBodyS
 import com.madteam.sunset.ui.theme.secondaryRegularHeadlineS
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyM
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
 import com.madteam.sunset.utils.getResourceId
+import kotlin.math.roundToInt
 
 private const val MAX_CHAR_LENGTH_REVIEW_TITLE = 50
 private const val MAX_CHAR_LENGTH_REVIEW_DESCRIPTION = 2500
@@ -105,6 +109,9 @@ fun AddReviewContent(
     }
     var temporalDescription by remember {
         mutableStateOf("")
+    }
+    var temporalScore by remember {
+        mutableStateOf(0.0f)
     }
 
     Column(
@@ -318,7 +325,20 @@ fun AddReviewContent(
             style = secondarySemiBoldBodyM,
             modifier = Modifier.padding(start = 16.dp)
         )
-
+        ScoreSlider(
+            value = temporalScore,
+            onValueChange = { temporalScore = it },
+            modifier = Modifier.padding(horizontal = 12.dp)
+        )
+        CustomSpacer(size = 8.dp)
+        Row(
+            Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(text = temporalScore.roundToInt().toString(), style = primaryBoldDisplayS)
+        }
+        CustomSpacer(size = 16.dp)
     }
 
 }

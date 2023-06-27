@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -21,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.madteam.sunset.R
+import com.madteam.sunset.ui.common.CustomDivider
 import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.CustomTextField
 import com.madteam.sunset.ui.common.GoForwardTopAppBar
@@ -83,7 +85,7 @@ fun AddReviewContent() {
     Column(
         Modifier
             .fillMaxSize()
-            .padding(24.dp)
+            .padding(start = 8.dp, end = 24.dp, top = 24.dp, bottom = 24.dp)
     ) {
         CustomTextField(
             value = temporalTitle,
@@ -101,7 +103,6 @@ fun AddReviewContent() {
             textColor = Color(0xFF666666),
             maxLines = 2
         )
-        CustomSpacer(size = 24.dp)
         CustomTextField(
             value = temporalDescription,
             onValueChange = {
@@ -118,12 +119,24 @@ fun AddReviewContent() {
             textColor = Color(0xFF666666),
             maxLines = 6
         )
-        CustomSpacer(size = 24.dp)
-        Text(text = stringResource(id = R.string.how_it_was), style = primaryBoldHeadlineL)
+        CustomSpacer(size = 16.dp)
+        CustomDivider(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp),
+            color = Color(0xFF999999)
+        )
+        CustomSpacer(size = 16.dp)
+        Text(
+            text = stringResource(id = R.string.how_it_was),
+            style = primaryBoldHeadlineL,
+            modifier = Modifier.padding(start = 16.dp)
+        )
         CustomSpacer(size = 4.dp)
         Text(
             text = stringResource(id = R.string.add_attributes_review),
-            style = secondarySemiBoldBodyM
+            style = secondarySemiBoldBodyM,
+            modifier = Modifier.padding(start = 16.dp)
         )
         CustomSpacer(size = 16.dp)
     }

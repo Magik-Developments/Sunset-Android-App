@@ -630,6 +630,36 @@ class DatabaseRepository @Inject constructor(
         Log.e("DatabaseRepository::getAllSpotAttributes", "Error: ${exception.message}")
         emit(mutableListOf())
     }
+
+    override fun createSpotReview(
+        spotReference: String,
+        title: String,
+        description: String,
+        attributeList: List<SpotAttribute>,
+        score: Int,
+        author: UserProfile
+    ): Flow<Resource<String>> = flow {
+        val newReviewDocument = firebaseFirestore.collection(SPOTS_COLLECTION_PATH)
+            .document(spotReference)
+            .collection(SPOT_REVIEWS_COLLECTION)
+            .document()
+
+        val newReview = SpotReview(
+            id = newReviewDocument.id,
+            description = description,
+            title = title,
+            postedBy = author,
+            spotAttributes = attributeList,
+            creationDate = Calendar.getInstance().time.toString(),
+            score = score.toFloat()
+        )
+
+        newReviewDocument.set(newReview).await()
+        emit(Resource.Success(newReviewDocument.id))
+    }.catch { exception ->
+        Log.e("DatabaseRepository::createSpotReview", "Error: ${exception.message}")
+        emit(Resource.Success("Error: " + exception.message))
+    }
 }
 
 interface DatabaseContract {
@@ -651,6 +681,7 @@ interface DatabaseContract {
         imagesUriList: List<Uri>,
         authorUsername: String
     ): Flow<Resource<String>>
+
     fun uploadImages(uriImagesList: List<Uri>, storagePath: String): Flow<List<String>>
     fun createPostComment(comment: PostComment, postDocument: String): Flow<Resource<String>>
     fun deletePostComment(comment: PostComment, postDocument: String): Flow<Resource<String>>
@@ -658,5 +689,13 @@ interface DatabaseContract {
     fun checkIfPostIsLikedByUser(postReference: String, username: String): Flow<Resource<Boolean>>
     fun getSpotReviewByDocRef(spotReference: String, docReference: String): Flow<SpotReview>
     fun getAllSpotAttributes(): Flow<List<SpotAttribute>>
+    fun createSpotReview(
+        spotReference: String,
+        title: String,
+        description: String,
+        attributeList: List<SpotAttribute>,
+        score: Int,
+        author: UserProfile
+    ): Flow<Resource<String>>
 
 }

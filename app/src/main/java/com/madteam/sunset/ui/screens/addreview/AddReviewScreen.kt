@@ -27,6 +27,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,9 +44,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.madteam.sunset.R
 import com.madteam.sunset.model.SpotAttribute
+import com.madteam.sunset.ui.common.CircularLoadingDialog
 import com.madteam.sunset.ui.common.CustomDivider
 import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.CustomTextField
+import com.madteam.sunset.ui.common.DismissAndPositiveDialog
 import com.madteam.sunset.ui.common.GoForwardTopAppBar
 import com.madteam.sunset.ui.common.ScoreSlider
 import com.madteam.sunset.ui.theme.primaryBoldDisplayS
@@ -54,6 +57,7 @@ import com.madteam.sunset.ui.theme.secondaryRegularBodyS
 import com.madteam.sunset.ui.theme.secondaryRegularHeadlineS
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyM
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
+import com.madteam.sunset.utils.Resource
 import com.madteam.sunset.utils.getResourceId
 
 private const val MAX_CHAR_LENGTH_REVIEW_TITLE = 50
@@ -74,9 +78,11 @@ fun AddReviewScreen(
     val reviewTitle by viewModel.reviewTitle.collectAsStateWithLifecycle()
     val reviewDescription by viewModel.reviewDescription.collectAsStateWithLifecycle()
     val reviewScore by viewModel.reviewScore.collectAsStateWithLifecycle()
-
+    val showExitDialog by viewModel.showExitDialog.collectAsStateWithLifecycle()
     val isReadyToPost =
         selectedAttributes.isNotEmpty() && reviewTitle.isNotEmpty() && reviewDescription.isNotEmpty()
+    val uploadProgress by viewModel.uploadProgress.collectAsStateWithLifecycle()
+    val errorToastText by viewModel.errorToastText.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
@@ -84,13 +90,13 @@ fun AddReviewScreen(
                 title = R.string.add_review,
                 onQuitClick = {
                     if (isReadyToPost) {
-                        // show dialog before quitting
+                        viewModel.setShowExitDialog(true)
                     } else {
                         navController.popBackStack()
                     }
                 },
                 onContinueClick = {
-                    // post review
+                    viewModel.createNewReview(spotReference)
                 },
                 canContinue = isReadyToPost
             )
@@ -109,7 +115,16 @@ fun AddReviewScreen(
                     onReviewDescriptionChanged = viewModel::modifyReviewDescription,
                     onReviewTitleChanged = viewModel::modifyReviewTitle,
                     onReviewScoreChanged = viewModel::modifyReviewScore,
-                    reviewScore = reviewScore
+                    reviewScore = reviewScore,
+                    showExitDialog = showExitDialog,
+                    spotReference = spotReference,
+                    setShowExitDialog = viewModel::setShowExitDialog,
+                    exitAddReview = navController::popBackStack,
+                    uploadProgress = uploadProgress,
+                    errorToast = errorToastText,
+                    navigateTo = navController::navigate,
+                    clearUploadProgress = viewModel::clearUpdateProgressState,
+                    clearErrorToast = viewModel::clearErrorToastText
                 )
             }
         }
@@ -123,14 +138,43 @@ fun AddReviewContent(
     reviewTitle: String,
     reviewDescription: String,
     reviewScore: Int,
+    showExitDialog: Boolean,
+    uploadProgress: Resource<String>,
+    errorToast: String,
+    spotReference: String,
+    clearUploadProgress: () -> Unit,
+    clearErrorToast: () -> Unit,
     onReviewTitleChanged: (String) -> Unit,
     onReviewDescriptionChanged: (String) -> Unit,
     onAttributeClicked: (SpotAttribute) -> Unit,
-    onReviewScoreChanged: (Float) -> Unit
+    onReviewScoreChanged: (Float) -> Unit,
+    setShowExitDialog: (Boolean) -> Unit,
+    navigateTo: (String) -> Unit,
+    exitAddReview: () -> Unit
 ) {
 
     val context = LocalContext.current
     val scrollState = rememberScrollState()
+
+    if (errorToast.isNotBlank()) {
+        Toast.makeText(context, errorToast, Toast.LENGTH_SHORT).show()
+        clearErrorToast()
+    }
+
+    if (showExitDialog) {
+        DismissAndPositiveDialog(
+            setShowDialog = { setShowExitDialog(it) },
+            dialogTitle = R.string.are_you_sure,
+            dialogDescription = R.string.exit_post_dialog,
+            positiveButtonText = R.string.discard_changes,
+            dismissButtonText = R.string.cancel,
+            dismissClickedAction = { setShowExitDialog(false) },
+            positiveClickedAction = {
+                setShowExitDialog(false)
+                exitAddReview()
+            }
+        )
+    }
 
     Column(
         Modifier
@@ -390,6 +434,39 @@ fun AddReviewContent(
             Text(text = reviewScore.toString(), style = primaryBoldDisplayS)
         }
         CustomSpacer(size = 24.dp)
+    }
+
+    when (uploadProgress) {
+        is Resource.Loading -> {
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .background(Color.Transparent),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.background(Color.Transparent)
+                ) {
+                    CircularLoadingDialog()
+                }
+            }
+        }
+
+        is Resource.Success -> {
+            if (uploadProgress.data != "") {
+                LaunchedEffect(key1 = uploadProgress.data) {
+                    navigateTo("spot_review_screen/spotReference={$spotReference}reviewReference={${uploadProgress.data}}")
+                    clearUploadProgress()
+                }
+            } else if (uploadProgress.data.contains("Error")) {
+                Toast.makeText(context, "Error, try again later.", Toast.LENGTH_SHORT).show()
+                clearUploadProgress()
+            }
+        }
+
+        else -> {}
     }
 
 }

@@ -69,12 +69,14 @@ fun AddReviewScreen(
     navController: NavController
 ) {
 
-    val isReadyToPost = false
     val attributesList by viewModel.attributesList.collectAsStateWithLifecycle()
     val selectedAttributes by viewModel.selectedAttributes.collectAsStateWithLifecycle()
     val reviewTitle by viewModel.reviewTitle.collectAsStateWithLifecycle()
     val reviewDescription by viewModel.reviewDescription.collectAsStateWithLifecycle()
     val reviewScore by viewModel.reviewScore.collectAsStateWithLifecycle()
+
+    val isReadyToPost =
+        selectedAttributes.isNotEmpty() && reviewTitle.isNotEmpty() && reviewDescription.isNotEmpty()
 
     Scaffold(
         topBar = {

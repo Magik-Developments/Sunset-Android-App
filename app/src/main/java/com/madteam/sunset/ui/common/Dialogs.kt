@@ -26,11 +26,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextAlign.Companion
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.madteam.sunset.R
-import com.madteam.sunset.R.string
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineS
 import com.madteam.sunset.ui.theme.secondaryRegularBodyL
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyL
@@ -40,11 +37,11 @@ fun DismissAndPositiveDialog(
     setShowDialog: (Boolean) -> Unit,
     @StringRes dialogTitle: Int,
     @StringRes dialogDescription: Int,
-    @StringRes positiveButtonText: Int,
+    @StringRes positiveButtonText: Int? = null,
     @StringRes dismissButtonText: Int,
     image: Int? = null,
     dismissClickedAction: () -> Unit,
-    positiveClickedAction: () -> Unit
+    positiveClickedAction: () -> Unit = {}
 ) {
     Dialog(onDismissRequest = { setShowDialog(false) }) {
         Card(
@@ -102,20 +99,22 @@ fun DismissAndPositiveDialog(
                             textAlign = TextAlign.Center
                         )
                     }
-                    Button(
-                        onClick = positiveClickedAction,
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(60.dp),
-                        colors = ButtonDefaults.buttonColors(backgroundColor = Color.Black),
-                        shape = RoundedCornerShape(0.dp)
-                    ) {
-                        Text(
-                            text = stringResource(positiveButtonText),
-                            style = secondarySemiBoldBodyL,
-                            color = Color.White,
-                            textAlign = Companion.Center
-                        )
+                    if (positiveButtonText != null) {
+                        Button(
+                            onClick = positiveClickedAction,
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(60.dp),
+                            colors = ButtonDefaults.buttonColors(backgroundColor = Color.Black),
+                            shape = RoundedCornerShape(0.dp)
+                        ) {
+                            Text(
+                                text = stringResource(positiveButtonText),
+                                style = secondarySemiBoldBodyL,
+                                color = Color.White,
+                                textAlign = Companion.Center
+                            )
+                        }
                     }
                 }
             }

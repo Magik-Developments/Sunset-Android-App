@@ -28,6 +28,7 @@ import javax.inject.Inject
 private const val USERS_COLLECTION_PATH = "users"
 private const val SPOTS_LOCATIONS_COLLECTION_PATH = "spots_locations"
 private const val SPOT_REVIEWS_COLLECTION = "spot_reviews"
+private const val SPOT_ATTRIBUTES_COLLECTION = "spot_attributes"
 private const val SPOTS_COLLECTION_PATH = "spots"
 private const val POSTS_COLLECTION_PATH = "posts"
 private const val COMMENTS_POST_COLLECTION_PATH = "comments"
@@ -326,14 +327,14 @@ class DatabaseRepository @Inject constructor(
                 val title = attributeSnapshot.getString("title")
                 val description = attributeSnapshot.getString("description")
                 val icon = attributeSnapshot.getString("icon")
-                val favorable = attributeSnapshot.getBoolean("favorable")
-                if (description != null && title != null && icon != null && favorable != null) {
+                val type = attributeSnapshot.getString("type")
+                if (description != null && title != null && icon != null && type != null) {
                     val attributeData = SpotAttribute(
                         id,
                         description,
                         title,
                         icon,
-                        favorable
+                        type
                     )
                     attributesList.add(attributeData)
                 }
@@ -564,7 +565,7 @@ class DatabaseRepository @Inject constructor(
         spotReference: String,
         docReference: String
     ): Flow<SpotReview> = flow {
-        var review: SpotReview = SpotReview()
+        var review = SpotReview()
         val reviewSnapshot =
             firebaseFirestore.collection(SPOTS_COLLECTION_PATH).document(spotReference)
                 .collection(SPOT_REVIEWS_COLLECTION).document(docReference).get().await()
@@ -599,6 +600,73 @@ class DatabaseRepository @Inject constructor(
         }
         emit(review)
     }
+
+    override fun getAllSpotAttributes(): Flow<List<SpotAttribute>> = flow {
+        val spotAttributesList = mutableListOf<SpotAttribute>()
+
+        val spotAttributesSnapshot =
+            firebaseFirestore.collection(SPOT_ATTRIBUTES_COLLECTION).get().await()
+
+        for (spotAttributeDoc in spotAttributesSnapshot.documents) {
+            val id = spotAttributeDoc.id
+            val title = spotAttributeDoc.getString("title")
+            val description = spotAttributeDoc.getString("description")
+            val icon = spotAttributeDoc.getString("icon")
+            val type = spotAttributeDoc.getString("type")
+
+            if (description != null && title != null && icon != null && type != null) {
+                val spotAttribute = SpotAttribute(
+                    id,
+                    description,
+                    title,
+                    icon,
+                    type
+                )
+                spotAttributesList.add(spotAttribute)
+            }
+        }
+        emit(spotAttributesList)
+    }.catch { exception ->
+        Log.e("DatabaseRepository::getAllSpotAttributes", "Error: ${exception.message}")
+        emit(mutableListOf())
+    }
+
+    override fun createSpotReview(
+        spotReference: String,
+        title: String,
+        description: String,
+        attributeList: List<SpotAttribute>,
+        score: Int,
+        author: UserProfile
+    ): Flow<Resource<String>> = flow {
+        val newReviewDocument = firebaseFirestore.collection(SPOTS_COLLECTION_PATH)
+            .document(spotReference)
+            .collection(SPOT_REVIEWS_COLLECTION)
+            .document()
+
+        val attributeRefs = attributeList.map {
+            firebaseFirestore.collection(
+                SPOT_ATTRIBUTES_COLLECTION
+            ).document(it.id)
+        }
+
+        val userRef = firebaseFirestore.collection(USERS_COLLECTION_PATH).document(author.username)
+
+        val newReviewData = hashMapOf(
+            "description" to description,
+            "title" to title,
+            "posted_by" to userRef,
+            "spot_attr" to attributeRefs,
+            "creation_date" to Calendar.getInstance().time.toString(),
+            "score" to score.toFloat()
+        )
+
+        newReviewDocument.set(newReviewData).await()
+        emit(Resource.Success(newReviewDocument.id))
+    }.catch { exception ->
+        Log.e("DatabaseRepository::createSpotReview", "Error: ${exception.message}")
+        emit(Resource.Success("Error: " + exception.message))
+    }
 }
 
 interface DatabaseContract {
@@ -627,5 +695,14 @@ interface DatabaseContract {
     fun modifyUserPostLike(postReference: String, username: String): Flow<Resource<String>>
     fun checkIfPostIsLikedByUser(postReference: String, username: String): Flow<Resource<Boolean>>
     fun getSpotReviewByDocRef(spotReference: String, docReference: String): Flow<SpotReview>
+    fun getAllSpotAttributes(): Flow<List<SpotAttribute>>
+    fun createSpotReview(
+        spotReference: String,
+        title: String,
+        description: String,
+        attributeList: List<SpotAttribute>,
+        score: Int,
+        author: UserProfile
+    ): Flow<Resource<String>>
 
 }

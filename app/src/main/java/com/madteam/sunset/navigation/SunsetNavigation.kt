@@ -17,6 +17,7 @@ import com.madteam.sunset.navigation.SunsetRoutes.SignInCard
 import com.madteam.sunset.navigation.SunsetRoutes.SignUpCard
 import com.madteam.sunset.navigation.SunsetRoutes.WelcomeScreen
 import com.madteam.sunset.ui.screens.addpost.AddPostScreen
+import com.madteam.sunset.ui.screens.addreview.AddReviewScreen
 import com.madteam.sunset.ui.screens.comments.CommentsScreen
 import com.madteam.sunset.ui.screens.discover.DiscoverScreen
 import com.madteam.sunset.ui.screens.home.HomeScreen
@@ -31,136 +32,160 @@ import com.madteam.sunset.ui.screens.welcome.WelcomeScreen
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun SunsetNavigation() {
-  val navController = rememberAnimatedNavController()
+    val navController = rememberAnimatedNavController()
 
-  AnimatedNavHost(navController = navController, startDestination = WelcomeScreen.route) {
+    AnimatedNavHost(navController = navController, startDestination = WelcomeScreen.route) {
 
-    composable(WelcomeScreen.route) {
-      WelcomeScreen(navController)
-    }
-
-    composable(SignUpCard.route) {
-      WelcomeScreen(navController)
-    }
-
-    composable(SignInCard.route) {
-      WelcomeScreen(navController)
-    }
-
-    composable(MyProfileScreen.route) {
-      MyProfileScreen(navController)
-    }
-
-    composable(
-      route = "verify_account_screen/pass={pass}",
-      arguments = listOf(
-        navArgument("pass") {
-          type = NavType.StringType
-          defaultValue = ""
+        composable(WelcomeScreen.route) {
+            WelcomeScreen(navController)
         }
-      )
-    ) { backStackEntry ->
-      val pass = backStackEntry.arguments?.getString("pass")
-      pass?.let {
-        VerifyAccountScreen(navController = navController, pass = pass)
-      }
-    }
 
-    composable(
-      LostPasswordScreen.route,
-      enterTransition = { slideInVertically(initialOffsetY = { it }, animationSpec = tween(500)) },
-      exitTransition = { slideOutVertically(targetOffsetY = { it }, animationSpec = tween(500)) }) {
-      LostPasswordScreen(navController)
-    }
-
-    composable(DiscoverScreen.route) {
-      DiscoverScreen(navController)
-    }
-
-    composable(SunsetRoutes.HomeScreen.route) {
-      HomeScreen(navController)
-    }
-
-    composable(
-      route = "spot_detail_screen/spotReference={spotReference}",
-      arguments = listOf(
-        navArgument("spotReference") {
-          type = NavType.StringType
-          defaultValue = ""
+        composable(SignUpCard.route) {
+            WelcomeScreen(navController)
         }
-      )
-    ) { backStackEntry ->
-      val spotReference = backStackEntry.arguments?.getString("spotReference")
-      spotReference?.let {
-        SpotDetailScreen(navController = navController, spotReference = spotReference)
-      }
-    }
 
-    composable(
-      route = "post_screen/postReference={postReference}",
-      arguments = listOf(
-        navArgument("postReference") {
-          type = NavType.StringType
-          defaultValue = ""
+        composable(SignInCard.route) {
+            WelcomeScreen(navController)
         }
-      )
-    ) { backStackEntry ->
-      val postReference = backStackEntry.arguments?.getString("postReference")
-      postReference?.let {
-        PostScreen(postReference = postReference, navController = navController)
-      }
-    }
 
-    composable(
-      route = "comments_screen/postReference={postReference}",
-      arguments = listOf(
-        navArgument("postReference") {
-          type = NavType.StringType
-          defaultValue = ""
+        composable(MyProfileScreen.route) {
+            MyProfileScreen(navController)
         }
-      )
-    ) { backStackEntry ->
-      val postReference = backStackEntry.arguments?.getString("postReference")
-      postReference?.let {
-        CommentsScreen(commentsReference = postReference, navController = navController)
-      }
-    }
 
-    composable(
-      route = "add_post_screen/spotReference={spotReference}",
-      arguments = listOf(
-        navArgument("spotReference") {
-          type = NavType.StringType
-          defaultValue = ""
+        composable(
+            route = "verify_account_screen/pass={pass}",
+            arguments = listOf(
+                navArgument("pass") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                }
+            )
+        ) { backStackEntry ->
+            val pass = backStackEntry.arguments?.getString("pass")
+            pass?.let {
+                VerifyAccountScreen(navController = navController, pass = pass)
+            }
         }
-      )
-    ) { backStackEntry ->
-      val spotReference = backStackEntry.arguments?.getString("spotReference")
-      spotReference?.let {
-        AddPostScreen(spotReference = spotReference, navController = navController)
-      }
-    }
 
-    composable(
-      route = "spot_review_screen/spotReference={spotReference}reviewReference={reviewReference}",
-      arguments = listOf(
-        navArgument("spotReference") {
-          type = NavType.StringType
-          defaultValue = ""
-        },
-        navArgument("reviewReference") {
-          type = NavType.StringType
-          defaultValue = ""
+        composable(
+            LostPasswordScreen.route,
+            enterTransition = {
+                slideInVertically(
+                    initialOffsetY = { it },
+                    animationSpec = tween(500)
+                )
+            },
+            exitTransition = {
+                slideOutVertically(
+                    targetOffsetY = { it },
+                    animationSpec = tween(500)
+                )
+            }) {
+            LostPasswordScreen(navController)
         }
-      )
-    ) { backStackEntry ->
-      val spotReference = backStackEntry.arguments?.getString("spotReference")
-      val reviewReference = backStackEntry.arguments?.getString("reviewReference")
-      PostReviewScreen(
-        spotReference = spotReference!!,
-        reviewReference = reviewReference!!,
-        navController = navController
-      )
+
+        composable(DiscoverScreen.route) {
+            DiscoverScreen(navController)
+        }
+
+        composable(SunsetRoutes.HomeScreen.route) {
+            HomeScreen(navController)
+        }
+
+        composable(
+            route = "spot_detail_screen/spotReference={spotReference}",
+            arguments = listOf(
+                navArgument("spotReference") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                }
+            )
+        ) { backStackEntry ->
+            val spotReference = backStackEntry.arguments?.getString("spotReference")
+            spotReference?.let {
+                SpotDetailScreen(navController = navController, spotReference = spotReference)
+            }
+        }
+
+        composable(
+            route = "post_screen/postReference={postReference}",
+            arguments = listOf(
+                navArgument("postReference") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                }
+            )
+        ) { backStackEntry ->
+            val postReference = backStackEntry.arguments?.getString("postReference")
+            postReference?.let {
+                PostScreen(postReference = postReference, navController = navController)
+            }
+        }
+
+        composable(
+            route = "comments_screen/postReference={postReference}",
+            arguments = listOf(
+                navArgument("postReference") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                }
+            )
+        ) { backStackEntry ->
+            val postReference = backStackEntry.arguments?.getString("postReference")
+            postReference?.let {
+                CommentsScreen(commentsReference = postReference, navController = navController)
+            }
+        }
+
+        composable(
+            route = "add_post_screen/spotReference={spotReference}",
+            arguments = listOf(
+                navArgument("spotReference") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                }
+            )
+        ) { backStackEntry ->
+            val spotReference = backStackEntry.arguments?.getString("spotReference")
+            spotReference?.let {
+                AddPostScreen(spotReference = spotReference, navController = navController)
+            }
+        }
+
+        composable(
+            route = "spot_review_screen/spotReference={spotReference}reviewReference={reviewReference}",
+            arguments = listOf(
+                navArgument("spotReference") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                },
+                navArgument("reviewReference") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                }
+            )
+        ) { backStackEntry ->
+            val spotReference = backStackEntry.arguments?.getString("spotReference")
+            val reviewReference = backStackEntry.arguments?.getString("reviewReference")
+            PostReviewScreen(
+                spotReference = spotReference!!,
+                reviewReference = reviewReference!!,
+                navController = navController
+            )
+        }
+
+        composable(
+            route = "add_spot_review_screen/spotReference={spotReference}",
+            arguments = listOf(
+                navArgument("spotReference") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                }
+            )
+        ) { backStackEntry ->
+            val spotReference = backStackEntry.arguments?.getString("spotReference")
+            AddReviewScreen(spotReference = spotReference!!, navController = navController)
+        }
+
     }
-  }
 }

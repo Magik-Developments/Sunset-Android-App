@@ -644,17 +644,24 @@ class DatabaseRepository @Inject constructor(
             .collection(SPOT_REVIEWS_COLLECTION)
             .document()
 
-        val newReview = SpotReview(
-            id = newReviewDocument.id,
-            description = description,
-            title = title,
-            postedBy = author,
-            spotAttributes = attributeList,
-            creationDate = Calendar.getInstance().time.toString(),
-            score = score.toFloat()
+        val attributeRefs = attributeList.map {
+            firebaseFirestore.collection(
+                SPOT_ATTRIBUTES_COLLECTION
+            ).document(it.id)
+        }
+
+        val userRef = firebaseFirestore.collection(USERS_COLLECTION_PATH).document(author.username)
+
+        val newReviewData = hashMapOf(
+            "description" to description,
+            "title" to title,
+            "posted_by" to userRef,
+            "spot_attr" to attributeRefs,
+            "creation_date" to Calendar.getInstance().time.toString(),
+            "score" to score.toFloat()
         )
 
-        newReviewDocument.set(newReview).await()
+        newReviewDocument.set(newReviewData).await()
         emit(Resource.Success(newReviewDocument.id))
     }.catch { exception ->
         Log.e("DatabaseRepository::createSpotReview", "Error: ${exception.message}")

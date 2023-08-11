@@ -565,7 +565,7 @@ class DatabaseRepository @Inject constructor(
         spotReference: String,
         docReference: String
     ): Flow<SpotReview> = flow {
-        var review: SpotReview = SpotReview()
+        var review = SpotReview()
         val reviewSnapshot =
             firebaseFirestore.collection(SPOTS_COLLECTION_PATH).document(spotReference)
                 .collection(SPOT_REVIEWS_COLLECTION).document(docReference).get().await()

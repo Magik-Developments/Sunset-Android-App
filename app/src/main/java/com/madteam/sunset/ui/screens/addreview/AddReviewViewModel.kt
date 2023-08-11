@@ -44,6 +44,9 @@ class AddReviewViewModel @Inject constructor(
     private val _showExitDialog: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val showExitDialog: StateFlow<Boolean> = _showExitDialog
 
+    private val _showFinishedDialog: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val showFinishedDialog: StateFlow<Boolean> = _showFinishedDialog
+
     private val _userInfo: MutableStateFlow<UserProfile> = MutableStateFlow(UserProfile())
 
     private val _uploadProgress: MutableStateFlow<Resource<String>> =
@@ -96,6 +99,10 @@ class AddReviewViewModel @Inject constructor(
 
     fun setShowExitDialog(state: Boolean) {
         _showExitDialog.value = state
+    }
+
+    fun setShowFinishedDialog(state: Boolean) {
+        _showFinishedDialog.value = state
     }
 
     fun createNewReview(spotRef: String) {

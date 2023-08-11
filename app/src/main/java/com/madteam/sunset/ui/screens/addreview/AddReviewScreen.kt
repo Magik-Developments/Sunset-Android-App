@@ -44,6 +44,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.madteam.sunset.R
 import com.madteam.sunset.model.SpotAttribute
+import com.madteam.sunset.navigation.SunsetRoutes
 import com.madteam.sunset.ui.common.CircularLoadingDialog
 import com.madteam.sunset.ui.common.CustomDivider
 import com.madteam.sunset.ui.common.CustomSpacer
@@ -79,6 +80,7 @@ fun AddReviewScreen(
     val reviewDescription by viewModel.reviewDescription.collectAsStateWithLifecycle()
     val reviewScore by viewModel.reviewScore.collectAsStateWithLifecycle()
     val showExitDialog by viewModel.showExitDialog.collectAsStateWithLifecycle()
+    val showFinishedDialog by viewModel.showFinishedDialog.collectAsStateWithLifecycle()
     val isReadyToPost =
         selectedAttributes.isNotEmpty() && reviewTitle.isNotEmpty() && reviewDescription.isNotEmpty()
     val uploadProgress by viewModel.uploadProgress.collectAsStateWithLifecycle()
@@ -124,7 +126,9 @@ fun AddReviewScreen(
                     errorToast = errorToastText,
                     navigateTo = navController::navigate,
                     clearUploadProgress = viewModel::clearUpdateProgressState,
-                    clearErrorToast = viewModel::clearErrorToastText
+                    clearErrorToast = viewModel::clearErrorToastText,
+                    showFinishedDialog = showFinishedDialog,
+                    setShowFinishedDialog = viewModel::setShowFinishedDialog
                 )
             }
         }
@@ -150,7 +154,9 @@ fun AddReviewContent(
     onReviewScoreChanged: (Float) -> Unit,
     setShowExitDialog: (Boolean) -> Unit,
     navigateTo: (String) -> Unit,
-    exitAddReview: () -> Unit
+    exitAddReview: () -> Unit,
+    showFinishedDialog: Boolean,
+    setShowFinishedDialog: (Boolean) -> Unit
 ) {
 
     val context = LocalContext.current
@@ -436,6 +442,16 @@ fun AddReviewContent(
         CustomSpacer(size = 24.dp)
     }
 
+    if (showFinishedDialog) {
+        DismissAndPositiveDialog(
+            setShowDialog = { setShowFinishedDialog(it) },
+            dialogTitle = R.string.post_review_finished,
+            dialogDescription = R.string.post_review_finished_description,
+            dismissButtonText = R.string.continue_text,
+            dismissClickedAction = { navigateTo(SunsetRoutes.DiscoverScreen.route) }
+        )
+    }
+
     when (uploadProgress) {
         is Resource.Loading -> {
             Column(
@@ -457,7 +473,7 @@ fun AddReviewContent(
         is Resource.Success -> {
             if (uploadProgress.data != "") {
                 LaunchedEffect(key1 = uploadProgress.data) {
-                    navigateTo("spot_review_screen/spotReference={$spotReference}reviewReference={${uploadProgress.data}}")
+                    setShowFinishedDialog(true)
                     clearUploadProgress()
                 }
             } else if (uploadProgress.data.contains("Error")) {

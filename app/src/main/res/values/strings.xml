@@ -74,4 +74,6 @@
     <string name="sunset_attributes">Sunset attributes</string>
     <string name="review_score">Review score</string>
     <string name="add_review_score">Add a score</string>
+    <string name="post_review_finished">Review posted!</string>
+    <string name="post_review_finished_description">Your review has been posted, thank you for contributing!</string>
 </resources>

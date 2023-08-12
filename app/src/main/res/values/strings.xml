@@ -77,4 +77,5 @@
     <string name="post_review_finished">Review posted!</string>
     <string name="post_review_finished_description">Your review has been posted, thank you for contributing!</string>
     <string name="add_spot">Add Spot</string>
+    <string name="add_location">Add location</string>
 </resources>

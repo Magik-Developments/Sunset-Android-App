@@ -1,6 +1,7 @@
 package com.madteam.sunset.ui.screens.addspot
 
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -16,6 +17,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.Delete
@@ -29,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -39,10 +43,17 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.madteam.sunset.R
 import com.madteam.sunset.ui.common.AutoSlidingCarousel
+import com.madteam.sunset.ui.common.CustomSpacer
+import com.madteam.sunset.ui.common.CustomTextField
 import com.madteam.sunset.ui.common.GoForwardTopAppBar
 import com.madteam.sunset.ui.screens.addpost.MAX_IMAGES_SELECTED
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineL
+import com.madteam.sunset.ui.theme.secondaryRegularHeadlineS
+import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
 import com.madteam.sunset.utils.shimmerBrush
+
+private const val MAX_CHAR_LENGTH_SPOT_TITLE = 24
+private const val MAX_CHAR_LENGTH_SPOT_DESCRIPTION = 580
 
 @Composable
 fun AddSpotScreen(
@@ -52,6 +63,8 @@ fun AddSpotScreen(
 
     val imageUris by viewModel.imageUris.collectAsStateWithLifecycle()
     val selectedImageUri by viewModel.selectedImageUri.collectAsStateWithLifecycle()
+    val spotTitle by viewModel.spotTitle.collectAsStateWithLifecycle()
+    val spotDescription by viewModel.spotDescription.collectAsStateWithLifecycle()
 
     val multiplePhotoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickMultipleVisualMedia(maxItems = MAX_IMAGES_SELECTED),
@@ -80,7 +93,11 @@ fun AddSpotScreen(
                             PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                         )
                     },
-                    onDeleteImagesClick = viewModel::removeSelectedImageFromList
+                    onDeleteImagesClick = viewModel::removeSelectedImageFromList,
+                    spotTitle = spotTitle,
+                    spotDescription = spotDescription,
+                    onSpotTitleChanged = viewModel::modifySpotTitle,
+                    onSpotDescriptionChanged = viewModel::modifySpotDescription
                 )
             }
         }
@@ -94,10 +111,25 @@ fun AddSpotContent(
     selectedImage: Uri,
     onImageSelected: (Uri) -> Unit,
     onAddImagesClick: () -> Unit,
-    onDeleteImagesClick: () -> Unit
+    onDeleteImagesClick: () -> Unit,
+    spotTitle: String,
+    onSpotTitleChanged: (String) -> Unit,
+    spotDescription: String,
+    onSpotDescriptionChanged: (String) -> Unit
 ) {
-    //Add featured images section
-    Column(verticalArrangement = Arrangement.Top, modifier = Modifier.fillMaxSize()) {
+
+    val context = LocalContext.current
+    val scrollState = rememberScrollState()
+
+    Column(
+        verticalArrangement = Arrangement.Top,
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(scrollState)
+    ) {
+
+        //Add featured images section
+
         Box {
             AutoSlidingCarousel(
                 itemsCount = images.size,
@@ -175,6 +207,44 @@ fun AddSpotContent(
                 }
             }
         }
+
+        //Add title and description section
+
+        CustomSpacer(size = 16.dp)
+        CustomTextField(
+            value = spotTitle,
+            onValueChange = {
+                if (it.length <= MAX_CHAR_LENGTH_SPOT_TITLE) {
+                    onSpotTitleChanged(it)
+                } else {
+                    Toast.makeText(context, R.string.max_characters_reached, Toast.LENGTH_SHORT)
+                        .show()
+                }
+            },
+            hint = R.string.add_title_review,
+            textStyle = secondarySemiBoldHeadLineS,
+            textColor = Color(0xFF666666),
+            maxLines = 2
+        )
+        CustomTextField(
+            value = spotDescription,
+            onValueChange = {
+                if (it.length <= MAX_CHAR_LENGTH_SPOT_DESCRIPTION) {
+                    onSpotDescriptionChanged(it)
+                } else {
+                    Toast.makeText(context, R.string.max_characters_reached, Toast.LENGTH_SHORT)
+                        .show()
+                }
+            },
+            hint = R.string.add_description_review,
+            textStyle = secondaryRegularHeadlineS,
+            textColor = Color(0xFF666666),
+            maxLines = 6
+        )
+        CustomSpacer(size = 16.dp)
+
+        //Add location section
+
 
     }
 }

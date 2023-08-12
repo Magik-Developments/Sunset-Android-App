@@ -20,6 +20,12 @@ class AddSpotViewModel @Inject constructor(
     private val _selectedImageUri: MutableStateFlow<Uri> = MutableStateFlow(Uri.EMPTY)
     val selectedImageUri: StateFlow<Uri> = _selectedImageUri
 
+    private val _spotTitle: MutableStateFlow<String> = MutableStateFlow("")
+    val spotTitle: StateFlow<String> = _spotTitle
+
+    private val _spotDescription: MutableStateFlow<String> = MutableStateFlow("")
+    val spotDescription: StateFlow<String> = _spotDescription
+
     fun updateSelectedImages(uris: List<Uri>) {
         if (uris.size <= MAX_IMAGES_SELECTED && _imageUris.value.size <= MAX_IMAGES_SELECTED && _imageUris.value.size + uris.size <= MAX_IMAGES_SELECTED) {
             _imageUris.value = _imageUris.value + uris
@@ -39,6 +45,14 @@ class AddSpotViewModel @Inject constructor(
         } else {
             _selectedImageUri.value = uri
         }
+    }
+
+    fun modifySpotTitle(title: String) {
+        _spotTitle.value = title
+    }
+
+    fun modifySpotDescription(description: String) {
+        _spotDescription.value = description
     }
 
 }

@@ -52,8 +52,10 @@ fun DiscoverScreen(
     Scaffold(
         bottomBar = { SunsetBottomNavigation(navController) },
         floatingActionButton = {
-            AddSpotFAB {
-                //TODO: Navigate to new add spot screen
+            if (!clusterInfo.isSelected) {
+                AddSpotFAB {
+                    //TODO: Navigate to new add spot screen
+                }
             }
         },
         content = { paddingValues ->
@@ -98,7 +100,9 @@ fun DiscoverContent(
         modifier = Modifier.fillMaxSize(),
         properties = setMapProperties(mapState),
         cameraPositionState = cameraPositionState,
-        uiSettings = MapUiSettings()
+        uiSettings = MapUiSettings(
+            zoomControlsEnabled = false
+        )
     ) {
         SetupClusterManagerAndRenderers(
             mapState = mapState,

@@ -45,6 +45,7 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.madteam.sunset.R
+import com.madteam.sunset.navigation.SunsetRoutes
 import com.madteam.sunset.ui.common.AutoSlidingCarousel
 import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.CustomTextField
@@ -100,7 +101,8 @@ fun AddSpotScreen(
                     spotTitle = spotTitle,
                     spotDescription = spotDescription,
                     onSpotTitleChanged = viewModel::modifySpotTitle,
-                    onSpotDescriptionChanged = viewModel::modifySpotDescription
+                    onSpotDescriptionChanged = viewModel::modifySpotDescription,
+                    navigateTo = navController::navigate
                 )
             }
         }
@@ -118,7 +120,8 @@ fun AddSpotContent(
     spotTitle: String,
     onSpotTitleChanged: (String) -> Unit,
     spotDescription: String,
-    onSpotDescriptionChanged: (String) -> Unit
+    onSpotDescriptionChanged: (String) -> Unit,
+    navigateTo: (String) -> Unit
 ) {
 
     val context = LocalContext.current
@@ -252,7 +255,10 @@ fun AddSpotContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(200.dp)
-                .background(Color(0xFFD9D9D9)),
+                .background(Color(0xFFD9D9D9))
+                .clickable {
+                    navigateTo(SunsetRoutes.SelectLocationScreen.route)
+                },
             contentAlignment = Alignment.Center
         ) {
             Column(

@@ -16,4 +16,5 @@ sealed class SunsetRoutes(val route: String) {
     object SpotReviewScreen : SunsetRoutes(route = "spot_review_screen")
     object AddSpotReviewScreen : SunsetRoutes(route = "add_spot_review_screen")
     object AddSpotScreen : SunsetRoutes(route = "add_spot_screen")
+    object SelectLocationScreen : SunsetRoutes(route = "select_location_screen")
 }

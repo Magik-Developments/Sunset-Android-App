@@ -10,9 +10,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,6 +24,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
@@ -83,7 +87,6 @@ fun SelectLocationContent(
 
     val context = LocalContext.current
     var location by remember { mutableStateOf(LatLng(0.0, 0.0)) }
-    val scope = rememberCoroutineScope()
 
     val cameraPositionState = rememberCameraPositionState()
 
@@ -99,57 +102,60 @@ fun SelectLocationContent(
             }
         )
 
-    if (location.latitude != 0.0 && location.longitude != 0.0) {
-        GoogleMap(
-            modifier = Modifier.fillMaxSize(),
-            properties = setMapProperties(mapState = mapState),
-            cameraPositionState = cameraPositionState,
-            uiSettings = MapUiSettings(
-                zoomControlsEnabled = false
-            )
-        ) {
-            SetupClusterManagerAndRenderers(
-                mapState = mapState,
-                cameraPositionState = cameraPositionState,
-                userLocation = location
-            )
 
-        }
+    GoogleMap(
+        modifier = Modifier.fillMaxSize(),
+        properties = setMapProperties(mapState = mapState),
+        cameraPositionState = cameraPositionState,
+        uiSettings = MapUiSettings(
+            zoomControlsEnabled = false
+        )
+    ) {
+        SetupClusterManagerAndRenderers(
+            mapState = mapState,
+            cameraPositionState = cameraPositionState,
+            userLocation = location
+        )
     }
 
     Column(
         Modifier
             .fillMaxSize()
-            .padding(20.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.End
     ) {
-        Button(onClick = {
-            if (hasLocationPermission(context)) {
-                getCurrentLocation(context) { lat, long ->
-                    location = LatLng(lat, long)
+        IconButton(
+            colors = IconButtonDefaults.iconButtonColors(containerColor = Color(0xFFFFB600)),
+            onClick = {
+                if (hasLocationPermission(context)) {
+                    getCurrentLocation(context) { lat, long ->
+                        location = LatLng(lat, long)
+                    }
+                } else {
+                    requestPermissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
                 }
-            } else {
-                requestPermissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
-            }
-        }) {
-            Text(text = "test")
+            }) {
+            Icon(
+                imageVector = Icons.Default.MyLocation,
+                contentDescription = "",
+                tint = Color.White
+            )
         }
     }
 
 }
 
 private fun GoogleMap.setupUserLocation(
-    mapState: MapState,
     scope: CoroutineScope,
     cameraPositionState: CameraPositionState,
-    latLngBounds: LatLng
+    latLng: LatLng
 ) {
     setOnMapLoadedCallback {
         scope.launch {
             cameraPositionState.animate(
                 update = CameraUpdateFactory.newLatLngZoom(
-                    latLngBounds,
+                    latLng,
                     18f
                 )
             )
@@ -178,7 +184,7 @@ fun SetupClusterManagerAndRenderers(
             clusterManager.renderer = clusterRenderer
             map.setOnCameraIdleListener(clusterManager)
         }
-        map.setupUserLocation(mapState, scope, cameraPositionState, userLocation)
+        map.setupUserLocation(scope, cameraPositionState, userLocation)
     }
 }
 

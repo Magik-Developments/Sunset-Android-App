@@ -22,8 +22,8 @@ class SelectLocationViewModel @Inject constructor(
     private val _userLocation: MutableStateFlow<LatLng> = MutableStateFlow(LatLng(0.0, 0.0))
     val userLocation: StateFlow<LatLng> = _userLocation
 
-    private val _setUserLocation: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    val setUserLocation: StateFlow<Boolean> = _setUserLocation
+    private val _goToUserLocation: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val goToUserLocation: StateFlow<Boolean> = _goToUserLocation
 
     fun updateSelectedLocation(location: LatLng) {
         _selectedLocation.value = location
@@ -33,12 +33,8 @@ class SelectLocationViewModel @Inject constructor(
         _userLocation.value = location
     }
 
-    fun enableSetUserLocation() {
-        _setUserLocation.value = true
-    }
-
-    fun disableSetUserLocation() {
-        _setUserLocation.value = false
+    fun setGoToUserLocation(state: Boolean) {
+        _goToUserLocation.value = state
     }
 
 }

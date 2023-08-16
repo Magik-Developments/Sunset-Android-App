@@ -55,6 +55,7 @@ fun SelectLocationScreen(
     val mapState by viewModel.mapState.collectAsStateWithLifecycle()
     val selectedLocation by viewModel.selectedLocation.collectAsStateWithLifecycle()
     val userLocation by viewModel.userLocation.collectAsStateWithLifecycle()
+    val goToUserLocation by viewModel.goToUserLocation.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
@@ -74,8 +75,10 @@ fun SelectLocationScreen(
                     mapState = mapState,
                     selectedLocation = selectedLocation,
                     userLocation = userLocation,
+                    goToUserLocation = goToUserLocation,
                     updateSelectedLocation = viewModel::updateSelectedLocation,
-                    updateUserLocation = viewModel::updateUserLocation
+                    updateUserLocation = viewModel::updateUserLocation,
+                    setGoToUserLocation = viewModel::setGoToUserLocation
                 )
             }
         }
@@ -87,8 +90,10 @@ fun SelectLocationContent(
     mapState: MapState,
     selectedLocation: LatLng,
     userLocation: LatLng,
+    goToUserLocation: Boolean,
     updateSelectedLocation: (LatLng) -> Unit,
-    updateUserLocation: (LatLng) -> Unit
+    updateUserLocation: (LatLng) -> Unit,
+    setGoToUserLocation: (Boolean) -> Unit
 ) {
 
     val context = LocalContext.current
@@ -117,7 +122,9 @@ fun SelectLocationContent(
             cameraPositionState = cameraPositionState,
             userLocation = userLocation,
             selectedLocation = selectedLocation,
-            updateSelectedLocation = updateSelectedLocation
+            updateSelectedLocation = updateSelectedLocation,
+            goToUserLocation = goToUserLocation,
+            setGoToUserLocation = setGoToUserLocation
         )
     }
 
@@ -134,6 +141,7 @@ fun SelectLocationContent(
                 if (hasLocationPermission(context)) {
                     getCurrentLocation(context) { lat, long ->
                         updateUserLocation(LatLng(lat, long))
+                        setGoToUserLocation(true)
                     }
                 } else {
                     requestPermissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
@@ -172,12 +180,14 @@ fun SetupClusterManagerAndRenderers(
     cameraPositionState: CameraPositionState,
     userLocation: LatLng,
     updateSelectedLocation: (LatLng) -> Unit,
-    selectedLocation: LatLng
+    selectedLocation: LatLng,
+    goToUserLocation: Boolean,
+    setGoToUserLocation: (Boolean) -> Unit
 ) {
 
     val scope = rememberCoroutineScope()
 
-    MapEffect(key1 = selectedLocation) { map ->
+    MapEffect(key1 = selectedLocation, key2 = goToUserLocation) { map ->
         map.setOnMapClickListener { clickedLatLng ->
             updateSelectedLocation(clickedLatLng)
         }
@@ -187,9 +197,10 @@ fun SetupClusterManagerAndRenderers(
                 MarkerOptions().position(selectedLocation)
             )
         }
-        if (userLocation.longitude != 0.0 && userLocation.latitude != 0.0) {
+        if (userLocation.longitude != 0.0 && userLocation.latitude != 0.0 && goToUserLocation) {
             map.setupUserLocation(scope, cameraPositionState, userLocation)
         }
+        setGoToUserLocation(false)
     }
 }
 

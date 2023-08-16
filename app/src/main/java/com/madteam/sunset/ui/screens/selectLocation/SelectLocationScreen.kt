@@ -18,10 +18,7 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,6 +32,7 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapEffect
@@ -44,8 +42,6 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import com.madteam.sunset.R
 import com.madteam.sunset.ui.common.GoForwardTopAppBar
 import com.madteam.sunset.utils.googlemaps.MapState
-import com.madteam.sunset.utils.googlemaps.clusters.CustomClusterRenderer
-import com.madteam.sunset.utils.googlemaps.clusters.ZoneClusterManager
 import com.madteam.sunset.utils.googlemaps.setMapProperties
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -57,6 +53,8 @@ fun SelectLocationScreen(
 ) {
 
     val mapState by viewModel.mapState.collectAsStateWithLifecycle()
+    val selectedLocation by viewModel.selectedLocation.collectAsStateWithLifecycle()
+    val userLocation by viewModel.userLocation.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
@@ -73,7 +71,11 @@ fun SelectLocationScreen(
                 contentAlignment = Alignment.Center
             ) {
                 SelectLocationContent(
-                    mapState = mapState
+                    mapState = mapState,
+                    selectedLocation = selectedLocation,
+                    userLocation = userLocation,
+                    updateSelectedLocation = viewModel::updateSelectedLocation,
+                    updateUserLocation = viewModel::updateUserLocation
                 )
             }
         }
@@ -82,26 +84,26 @@ fun SelectLocationScreen(
 
 @Composable
 fun SelectLocationContent(
-    mapState: MapState
+    mapState: MapState,
+    selectedLocation: LatLng,
+    userLocation: LatLng,
+    updateSelectedLocation: (LatLng) -> Unit,
+    updateUserLocation: (LatLng) -> Unit
 ) {
 
     val context = LocalContext.current
-    var location by remember { mutableStateOf(LatLng(0.0, 0.0)) }
-
     val cameraPositionState = rememberCameraPositionState()
-
     val requestPermissionLauncher =
         rememberLauncherForActivityResult(
             contract = ActivityResultContracts.RequestPermission(),
             onResult = { isGranted ->
                 if (isGranted) {
                     getCurrentLocation(context) { lat, long ->
-                        location = LatLng(lat, long)
+                        updateUserLocation(LatLng(lat, long))
                     }
                 }
             }
         )
-
 
     GoogleMap(
         modifier = Modifier.fillMaxSize(),
@@ -112,9 +114,10 @@ fun SelectLocationContent(
         )
     ) {
         SetupClusterManagerAndRenderers(
-            mapState = mapState,
             cameraPositionState = cameraPositionState,
-            userLocation = location
+            userLocation = userLocation,
+            selectedLocation = selectedLocation,
+            updateSelectedLocation = updateSelectedLocation
         )
     }
 
@@ -130,7 +133,7 @@ fun SelectLocationContent(
             onClick = {
                 if (hasLocationPermission(context)) {
                     getCurrentLocation(context) { lat, long ->
-                        location = LatLng(lat, long)
+                        updateUserLocation(LatLng(lat, long))
                     }
                 } else {
                     requestPermissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
@@ -143,7 +146,6 @@ fun SelectLocationContent(
             )
         }
     }
-
 }
 
 private fun GoogleMap.setupUserLocation(
@@ -167,24 +169,27 @@ private fun GoogleMap.setupUserLocation(
 @OptIn(MapsComposeExperimentalApi::class)
 @Composable
 fun SetupClusterManagerAndRenderers(
-    mapState: MapState,
     cameraPositionState: CameraPositionState,
-    userLocation: LatLng
+    userLocation: LatLng,
+    updateSelectedLocation: (LatLng) -> Unit,
+    selectedLocation: LatLng
 ) {
 
-    val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    MapEffect(mapState.clusterItems) { map ->
-        if (mapState.clusterItems.isNotEmpty()) {
-            val clusterManager = ZoneClusterManager(context, map)
-            val clusterRenderer = CustomClusterRenderer(context, map, clusterManager)
-            clusterManager.addItems(mapState.clusterItems)
-
-            clusterManager.renderer = clusterRenderer
-            map.setOnCameraIdleListener(clusterManager)
+    MapEffect(key1 = selectedLocation) { map ->
+        map.setOnMapClickListener { clickedLatLng ->
+            updateSelectedLocation(clickedLatLng)
         }
-        map.setupUserLocation(scope, cameraPositionState, userLocation)
+        if (selectedLocation.latitude != 0.0 && selectedLocation.longitude != 0.0) {
+            map.clear()
+            map.addMarker(
+                MarkerOptions().position(selectedLocation)
+            )
+        }
+        if (userLocation.longitude != 0.0 && userLocation.latitude != 0.0) {
+            map.setupUserLocation(scope, cameraPositionState, userLocation)
+        }
     }
 }
 

@@ -1,8 +1,6 @@
 package com.madteam.sunset.ui.screens.selectLocation
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -24,13 +22,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.maps.android.compose.CameraPositionState
@@ -41,10 +35,11 @@ import com.google.maps.android.compose.MapsComposeExperimentalApi
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.madteam.sunset.R
 import com.madteam.sunset.ui.common.GoForwardTopAppBar
+import com.madteam.sunset.utils.getCurrentLocation
 import com.madteam.sunset.utils.googlemaps.MapState
 import com.madteam.sunset.utils.googlemaps.setMapProperties
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+import com.madteam.sunset.utils.googlemaps.updateCameraLocation
+import com.madteam.sunset.utils.hasLocationPermission
 
 @Composable
 fun SelectLocationScreen(
@@ -118,7 +113,7 @@ fun SelectLocationContent(
             zoomControlsEnabled = false
         )
     ) {
-        SetupClusterManagerAndRenderers(
+        SetupListenersAndMapView(
             cameraPositionState = cameraPositionState,
             userLocation = userLocation,
             selectedLocation = selectedLocation,
@@ -156,27 +151,10 @@ fun SelectLocationContent(
     }
 }
 
-private fun GoogleMap.setupUserLocation(
-    scope: CoroutineScope,
-    cameraPositionState: CameraPositionState,
-    latLng: LatLng
-) {
-    setOnMapLoadedCallback {
-        scope.launch {
-            cameraPositionState.animate(
-                update = CameraUpdateFactory.newLatLngZoom(
-                    latLng,
-                    18f
-                )
-            )
-        }
-    }
-}
-
 @SuppressLint("PotentialBehaviorOverride")
 @OptIn(MapsComposeExperimentalApi::class)
 @Composable
-fun SetupClusterManagerAndRenderers(
+fun SetupListenersAndMapView(
     cameraPositionState: CameraPositionState,
     userLocation: LatLng,
     updateSelectedLocation: (LatLng) -> Unit,
@@ -198,32 +176,8 @@ fun SetupClusterManagerAndRenderers(
             )
         }
         if (userLocation.longitude != 0.0 && userLocation.latitude != 0.0 && goToUserLocation) {
-            map.setupUserLocation(scope, cameraPositionState, userLocation)
+            map.updateCameraLocation(scope, cameraPositionState, userLocation)
         }
         setGoToUserLocation(false)
     }
-}
-
-fun hasLocationPermission(context: Context): Boolean {
-    return ContextCompat.checkSelfPermission(
-        context,
-        android.Manifest.permission.ACCESS_FINE_LOCATION
-    ) == PackageManager.PERMISSION_GRANTED
-}
-
-@SuppressLint("MissingPermission")
-fun getCurrentLocation(context: Context, callback: (Double, Double) -> Unit) {
-    val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
-    fusedLocationClient.lastLocation
-        .addOnSuccessListener { location ->
-            if (location != null) {
-                val lat = location.latitude
-                val long = location.longitude
-                callback(lat, long)
-            }
-        }
-        .addOnFailureListener { exception ->
-            // Handle location retrieval failure
-            exception.printStackTrace()
-        }
 }

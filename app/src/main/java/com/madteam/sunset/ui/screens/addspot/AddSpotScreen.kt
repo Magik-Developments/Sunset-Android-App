@@ -1,5 +1,6 @@
 package com.madteam.sunset.ui.screens.addspot
 
+import android.annotation.SuppressLint
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -23,17 +24,21 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -43,6 +48,12 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.CameraPositionState
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapEffect
+import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.MapsComposeExperimentalApi
+import com.google.maps.android.compose.rememberCameraPositionState
 import com.madteam.sunset.R
 import com.madteam.sunset.navigation.SunsetRoutes
 import com.madteam.sunset.ui.common.AutoSlidingCarousel
@@ -53,6 +64,10 @@ import com.madteam.sunset.ui.screens.addpost.MAX_IMAGES_SELECTED
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineL
 import com.madteam.sunset.ui.theme.secondaryRegularHeadlineS
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
+import com.madteam.sunset.utils.googlemaps.MapState
+import com.madteam.sunset.utils.googlemaps.MapStyles
+import com.madteam.sunset.utils.googlemaps.setMapProperties
+import com.madteam.sunset.utils.googlemaps.updateCameraLocation
 import com.madteam.sunset.utils.shimmerBrush
 
 private const val MAX_CHAR_LENGTH_SPOT_TITLE = 24
@@ -69,6 +84,7 @@ fun AddSpotScreen(
     val selectedImageUri by viewModel.selectedImageUri.collectAsStateWithLifecycle()
     val spotTitle by viewModel.spotTitle.collectAsStateWithLifecycle()
     val spotDescription by viewModel.spotDescription.collectAsStateWithLifecycle()
+    val mapState by viewModel.mapState.collectAsStateWithLifecycle()
 
     val multiplePhotoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickMultipleVisualMedia(maxItems = MAX_IMAGES_SELECTED),
@@ -103,7 +119,8 @@ fun AddSpotScreen(
                     onSpotTitleChanged = viewModel::modifySpotTitle,
                     onSpotDescriptionChanged = viewModel::modifySpotDescription,
                     navigateTo = navController::navigate,
-                    selectedLocation = selectedLocation
+                    selectedLocation = selectedLocation,
+                    mapState = mapState
                 )
             }
         }
@@ -123,11 +140,14 @@ fun AddSpotContent(
     spotDescription: String,
     onSpotDescriptionChanged: (String) -> Unit,
     navigateTo: (String) -> Unit,
-    selectedLocation: LatLng
+    selectedLocation: LatLng,
+    mapState: MapState
 ) {
 
     val context = LocalContext.current
     val scrollState = rememberScrollState()
+    val isLocationSelected = (selectedLocation.longitude != 0.0 && selectedLocation.latitude != 0.0)
+    val cameraPositionState = rememberCameraPositionState()
 
     Column(
         verticalArrangement = Arrangement.Top,
@@ -169,7 +189,6 @@ fun AddSpotContent(
         LazyRow {
             itemsIndexed(images) { _, image ->
                 Box(Modifier.size(150.dp)) {
-
                     GlideImage(
                         model = image,
                         contentDescription = null,
@@ -260,23 +279,76 @@ fun AddSpotContent(
                 .background(Color(0xFFD9D9D9)),
             contentAlignment = Alignment.Center
         ) {
-            Column(
-                Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
+            GoogleMap(
+                modifier = Modifier
+                    .fillMaxSize(),
+                properties = setMapProperties(mapState = mapState, MapStyles.NAKED),
+                cameraPositionState = cameraPositionState,
+                uiSettings = MapUiSettings(
+                    zoomControlsEnabled = false,
+                    compassEnabled = false,
+                    zoomGesturesEnabled = false,
+                    scrollGesturesEnabled = false,
+                    indoorLevelPickerEnabled = false,
+                    mapToolbarEnabled = false,
+                    myLocationButtonEnabled = false,
+                    rotationGesturesEnabled = false,
+                    scrollGesturesEnabledDuringRotateOrZoom = false,
+                    tiltGesturesEnabled = false
+                )
             ) {
-                Button(onClick = {
-                    if (selectedLocation.longitude != 0.0 && selectedLocation.latitude != 0.0) {
+                SetupMapView(
+                    cameraPositionState = cameraPositionState,
+                    userLocation = selectedLocation
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(Color.Transparent, Color.Black),
+                            startY = 0f,
+                            endY = 1000f
+                        )
+                    )
+            )
+            Button(
+                modifier = Modifier.align(Alignment.Center),
+                onClick = {
+                    if (isLocationSelected) {
                         navigateTo("select_location_screen/lat=${selectedLocation.latitude}long=${selectedLocation.longitude}")
                     } else {
                         navigateTo(SunsetRoutes.SelectLocationScreen.route)
                     }
-                }) {
-
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFB600))
+            ) {
+                if (!isLocationSelected) {
+                    Text(text = stringResource(id = R.string.add_location), color = Color.White)
+                } else {
+                    Text(
+                        text = stringResource(id = R.string.modify_location),
+                        color = Color.White
+                    )
                 }
-                Text(text = "${selectedLocation.latitude} ${selectedLocation.longitude}")
             }
         }
+    }
+}
 
+@SuppressLint("PotentialBehaviorOverride")
+@OptIn(MapsComposeExperimentalApi::class)
+@Composable
+fun SetupMapView(
+    cameraPositionState: CameraPositionState,
+    userLocation: LatLng
+) {
+
+    val scope = rememberCoroutineScope()
+    MapEffect(key1 = userLocation) { map ->
+        if (userLocation.latitude != 0.0 && userLocation.longitude != 0.0) {
+            map.updateCameraLocation(scope, cameraPositionState, userLocation, 5f)
+        }
     }
 }

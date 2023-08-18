@@ -185,7 +185,7 @@ fun SetupListenersAndMapView(
             )
         }
         if (userLocation.longitude != 0.0 && userLocation.latitude != 0.0 && goToUserLocation) {
-            map.updateCameraLocation(scope, cameraPositionState, userLocation)
+            map.updateCameraLocation(scope, cameraPositionState, userLocation, 18f)
         }
         setGoToUserLocation(false)
     }

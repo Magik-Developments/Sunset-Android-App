@@ -3,8 +3,8 @@ package com.madteam.sunset.ui.screens.addspot
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import com.google.android.gms.maps.model.LatLng
-import com.madteam.sunset.repositories.DatabaseRepository
 import com.madteam.sunset.ui.screens.addpost.MAX_IMAGES_SELECTED
+import com.madteam.sunset.utils.googlemaps.MapState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,7 +12,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AddSpotViewModel @Inject constructor(
-    private val databaseRepository: DatabaseRepository
 ) : ViewModel() {
 
     private val _imageUris: MutableStateFlow<List<Uri>> = MutableStateFlow(listOf())
@@ -29,6 +28,9 @@ class AddSpotViewModel @Inject constructor(
 
     private val _spotLocation: MutableStateFlow<LatLng> = MutableStateFlow(LatLng(0.0, 0.0))
     val spotLocation: StateFlow<LatLng> = _spotLocation
+
+    private val _mapState: MutableStateFlow<MapState> = MutableStateFlow(MapState())
+    val mapState: StateFlow<MapState> = _mapState
 
     fun updateSelectedImages(uris: List<Uri>) {
         if (uris.size <= MAX_IMAGES_SELECTED && _imageUris.value.size <= MAX_IMAGES_SELECTED && _imageUris.value.size + uris.size <= MAX_IMAGES_SELECTED) {

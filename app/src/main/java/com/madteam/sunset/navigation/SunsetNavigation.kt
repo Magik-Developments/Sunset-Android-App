@@ -109,6 +109,30 @@ fun SunsetNavigation() {
         }
 
         composable(
+            route = "select_location_screen/lat={lat}long={long}",
+            arguments = listOf(
+                navArgument("lat") {
+                    type = NavType.FloatType
+                    defaultValue = 0f
+                },
+                navArgument("long") {
+                    type = NavType.FloatType
+                    defaultValue = 0f
+                }
+            )
+        ) { backStackEntry ->
+            val latLocation = backStackEntry.arguments?.getFloat("lat")
+            val longLocation = backStackEntry.arguments?.getFloat("long")
+            if (latLocation != null && longLocation != null) {
+                SelectLocationScreen(
+                    navController = navController,
+                    lat = latLocation,
+                    long = longLocation
+                )
+            }
+        }
+
+        composable(
             route = "spot_detail_screen/spotReference={spotReference}",
             arguments = listOf(
                 navArgument("spotReference") {

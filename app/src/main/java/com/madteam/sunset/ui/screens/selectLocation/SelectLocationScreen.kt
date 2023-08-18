@@ -44,13 +44,17 @@ import com.madteam.sunset.utils.hasLocationPermission
 @Composable
 fun SelectLocationScreen(
     navController: NavController,
-    viewModel: SelectLocationViewModel = hiltViewModel()
+    viewModel: SelectLocationViewModel = hiltViewModel(),
+    lat: Float = 0f,
+    long: Float = 0f
 ) {
 
     val mapState by viewModel.mapState.collectAsStateWithLifecycle()
     val selectedLocation by viewModel.selectedLocation.collectAsStateWithLifecycle()
     val userLocation by viewModel.userLocation.collectAsStateWithLifecycle()
     val goToUserLocation by viewModel.goToUserLocation.collectAsStateWithLifecycle()
+
+    viewModel.updateSelectedLocation(LatLng(lat.toDouble(), long.toDouble()))
 
     Scaffold(
         topBar = {

@@ -22,6 +22,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -33,10 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -259,10 +257,7 @@ fun AddSpotContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(200.dp)
-                .background(Color(0xFFD9D9D9))
-                .clickable {
-                    navigateTo(SunsetRoutes.SelectLocationScreen.route)
-                },
+                .background(Color(0xFFD9D9D9)),
             contentAlignment = Alignment.Center
         ) {
             Column(
@@ -270,12 +265,15 @@ fun AddSpotContent(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = stringResource(id = R.string.add_location),
-                    style = secondarySemiBoldHeadLineS,
-                    color = Color(0xFF666666)
-                )
-                Text(text = "🗺️📍", fontSize = TextUnit(24f, TextUnitType.Sp))
+                Button(onClick = {
+                    if (selectedLocation.longitude != 0.0 && selectedLocation.latitude != 0.0) {
+                        navigateTo("select_location_screen/lat=${selectedLocation.latitude}long=${selectedLocation.longitude}")
+                    } else {
+                        navigateTo(SunsetRoutes.SelectLocationScreen.route)
+                    }
+                }) {
+
+                }
                 Text(text = "${selectedLocation.latitude} ${selectedLocation.longitude}")
             }
         }

@@ -30,6 +30,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -62,6 +63,8 @@ import com.madteam.sunset.ui.common.CustomTextField
 import com.madteam.sunset.ui.common.GoForwardTopAppBar
 import com.madteam.sunset.ui.screens.addpost.MAX_IMAGES_SELECTED
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineL
+import com.madteam.sunset.ui.theme.primaryBoldHeadlineM
+import com.madteam.sunset.ui.theme.primaryMediumHeadlineS
 import com.madteam.sunset.ui.theme.secondaryRegularHeadlineS
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
 import com.madteam.sunset.utils.googlemaps.MapState
@@ -69,6 +72,7 @@ import com.madteam.sunset.utils.googlemaps.MapStyles
 import com.madteam.sunset.utils.googlemaps.setMapProperties
 import com.madteam.sunset.utils.googlemaps.updateCameraLocation
 import com.madteam.sunset.utils.shimmerBrush
+import kotlinx.coroutines.launch
 
 private const val MAX_CHAR_LENGTH_SPOT_TITLE = 24
 private const val MAX_CHAR_LENGTH_SPOT_DESCRIPTION = 580
@@ -85,10 +89,15 @@ fun AddSpotScreen(
     val spotTitle by viewModel.spotTitle.collectAsStateWithLifecycle()
     val spotDescription by viewModel.spotDescription.collectAsStateWithLifecycle()
     val mapState by viewModel.mapState.collectAsStateWithLifecycle()
+    val locationLocality by viewModel.spotLocationLocality.collectAsStateWithLifecycle()
+    val locationCountry by viewModel.spotLocationCountry.collectAsStateWithLifecycle()
 
     val multiplePhotoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickMultipleVisualMedia(maxItems = MAX_IMAGES_SELECTED),
         onResult = { uris -> viewModel.updateSelectedImages(uris) })
+
+    viewModel.modifySpotLocation(selectedLocation)
+    viewModel.obtainCountryAndCityFromLatLng()
 
     Scaffold(
         topBar = {
@@ -120,7 +129,9 @@ fun AddSpotScreen(
                     onSpotDescriptionChanged = viewModel::modifySpotDescription,
                     navigateTo = navController::navigate,
                     selectedLocation = selectedLocation,
-                    mapState = mapState
+                    mapState = mapState,
+                    locationLocality = locationLocality,
+                    locationCountry = locationCountry
                 )
             }
         }
@@ -141,11 +152,14 @@ fun AddSpotContent(
     onSpotDescriptionChanged: (String) -> Unit,
     navigateTo: (String) -> Unit,
     selectedLocation: LatLng,
-    mapState: MapState
+    mapState: MapState,
+    locationLocality: String,
+    locationCountry: String
 ) {
 
     val context = LocalContext.current
     val scrollState = rememberScrollState()
+    val scope = rememberCoroutineScope()
     val isLocationSelected = (selectedLocation.longitude != 0.0 && selectedLocation.latitude != 0.0)
     val cameraPositionState = rememberCameraPositionState()
 
@@ -155,6 +169,14 @@ fun AddSpotContent(
             .fillMaxSize()
             .verticalScroll(scrollState)
     ) {
+
+        LaunchedEffect(key1 = selectedLocation) {
+            if (selectedLocation.latitude != 0.0 && selectedLocation.longitude != 0.0) {
+                scope.launch {
+                    scrollState.animateScrollTo(scrollState.maxValue)
+                }
+            }
+        }
 
         //Add featured images section
 
@@ -314,7 +336,9 @@ fun AddSpotContent(
                     )
             )
             Button(
-                modifier = Modifier.align(Alignment.Center),
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .padding(bottom = 20.dp),
                 onClick = {
                     if (isLocationSelected) {
                         navigateTo("select_location_screen/lat=${selectedLocation.latitude}long=${selectedLocation.longitude}")
@@ -333,6 +357,17 @@ fun AddSpotContent(
                     )
                 }
             }
+            Column(
+                horizontalAlignment = Alignment.End,
+                verticalArrangement = Arrangement.Bottom,
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxSize()
+            ) {
+                Text(text = locationCountry, style = primaryBoldHeadlineM, color = Color.White)
+                Text(text = locationLocality, style = primaryMediumHeadlineS, color = Color.White)
+            }
+
         }
     }
 }
@@ -342,9 +377,8 @@ fun AddSpotContent(
 @Composable
 fun SetupMapView(
     cameraPositionState: CameraPositionState,
-    userLocation: LatLng
+    userLocation: LatLng,
 ) {
-
     val scope = rememberCoroutineScope()
     MapEffect(key1 = userLocation) { map ->
         if (userLocation.latitude != 0.0 && userLocation.longitude != 0.0) {

@@ -10,7 +10,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SelectLocationViewModel @Inject constructor(
-
 ) : ViewModel() {
 
     private val _mapState: MutableStateFlow<MapState> = MutableStateFlow(MapState())

@@ -44,6 +44,7 @@ import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.android.gms.maps.model.LatLng
 import com.madteam.sunset.R
 import com.madteam.sunset.navigation.SunsetRoutes
 import com.madteam.sunset.ui.common.AutoSlidingCarousel
@@ -62,7 +63,8 @@ private const val MAX_CHAR_LENGTH_SPOT_DESCRIPTION = 580
 @Composable
 fun AddSpotScreen(
     navController: NavController,
-    viewModel: AddSpotViewModel = hiltViewModel()
+    viewModel: AddSpotViewModel = hiltViewModel(),
+    selectedLocation: LatLng = LatLng(0.0, 0.0)
 ) {
 
     val imageUris by viewModel.imageUris.collectAsStateWithLifecycle()
@@ -102,7 +104,8 @@ fun AddSpotScreen(
                     spotDescription = spotDescription,
                     onSpotTitleChanged = viewModel::modifySpotTitle,
                     onSpotDescriptionChanged = viewModel::modifySpotDescription,
-                    navigateTo = navController::navigate
+                    navigateTo = navController::navigate,
+                    selectedLocation = selectedLocation
                 )
             }
         }
@@ -121,7 +124,8 @@ fun AddSpotContent(
     onSpotTitleChanged: (String) -> Unit,
     spotDescription: String,
     onSpotDescriptionChanged: (String) -> Unit,
-    navigateTo: (String) -> Unit
+    navigateTo: (String) -> Unit,
+    selectedLocation: LatLng
 ) {
 
     val context = LocalContext.current
@@ -272,6 +276,7 @@ fun AddSpotContent(
                     color = Color(0xFF666666)
                 )
                 Text(text = "🗺️📍", fontSize = TextUnit(24f, TextUnitType.Sp))
+                Text(text = "${selectedLocation.latitude} ${selectedLocation.longitude}")
             }
         }
 

@@ -10,6 +10,7 @@ import androidx.navigation.navArgument
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
+import com.google.android.gms.maps.model.LatLng
 import com.madteam.sunset.navigation.SunsetRoutes.DiscoverScreen
 import com.madteam.sunset.navigation.SunsetRoutes.LostPasswordScreen
 import com.madteam.sunset.navigation.SunsetRoutes.MyProfileScreen
@@ -94,8 +95,13 @@ fun SunsetNavigation() {
             HomeScreen(navController)
         }
 
-        composable(SunsetRoutes.AddSpotScreen.route) {
-            AddSpotScreen(navController)
+        composable(SunsetRoutes.AddSpotScreen.route) { entry ->
+            val selectedLocation = entry.savedStateHandle.get<LatLng>("location")
+            if (selectedLocation != null) {
+                AddSpotScreen(navController, selectedLocation = selectedLocation)
+            } else {
+                AddSpotScreen(navController)
+            }
         }
 
         composable(SunsetRoutes.SelectLocationScreen.route) {

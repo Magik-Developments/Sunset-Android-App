@@ -57,8 +57,13 @@ fun SelectLocationScreen(
             GoForwardTopAppBar(
                 title = R.string.add_location,
                 onQuitClick = { navController.popBackStack() },
-                onContinueClick = { /*TODO*/ },
-                canContinue = false
+                onContinueClick = {
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("location", selectedLocation)
+                    navController.popBackStack()
+                },
+                canContinue = selectedLocation.latitude != 0.0 && selectedLocation.longitude != 0.0
             )
         },
         content = { paddingValues ->

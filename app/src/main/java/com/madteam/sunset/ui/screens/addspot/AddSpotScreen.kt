@@ -7,10 +7,12 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,9 +21,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.outlined.Brightness4
+import androidx.compose.material.icons.outlined.Brightness5
+import androidx.compose.material.icons.outlined.Brightness6
+import androidx.compose.material.icons.outlined.Brightness7
+import androidx.compose.material.icons.outlined.BrightnessLow
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -35,12 +43,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -56,17 +67,26 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.MapsComposeExperimentalApi
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.madteam.sunset.R
+import com.madteam.sunset.model.SpotAttribute
 import com.madteam.sunset.navigation.SunsetRoutes
 import com.madteam.sunset.ui.common.AutoSlidingCarousel
 import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.CustomTextField
 import com.madteam.sunset.ui.common.GoForwardTopAppBar
+import com.madteam.sunset.ui.common.ScoreSlider
 import com.madteam.sunset.ui.screens.addpost.MAX_IMAGES_SELECTED
+import com.madteam.sunset.ui.screens.addreview.FAVORABLE_ATTRIBUTES
+import com.madteam.sunset.ui.screens.addreview.NON_FAVORABLE_ATTRIBUTES
+import com.madteam.sunset.ui.screens.addreview.SUNSET_ATTRIBUTES
+import com.madteam.sunset.ui.theme.primaryBoldDisplayS
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineL
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineM
 import com.madteam.sunset.ui.theme.primaryMediumHeadlineS
+import com.madteam.sunset.ui.theme.secondaryRegularBodyS
 import com.madteam.sunset.ui.theme.secondaryRegularHeadlineS
+import com.madteam.sunset.ui.theme.secondarySemiBoldBodyM
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
+import com.madteam.sunset.utils.getResourceId
 import com.madteam.sunset.utils.googlemaps.MapState
 import com.madteam.sunset.utils.googlemaps.MapStyles
 import com.madteam.sunset.utils.googlemaps.setMapProperties
@@ -89,8 +109,11 @@ fun AddSpotScreen(
     val spotTitle by viewModel.spotTitle.collectAsStateWithLifecycle()
     val spotDescription by viewModel.spotDescription.collectAsStateWithLifecycle()
     val mapState by viewModel.mapState.collectAsStateWithLifecycle()
-    val locationLocality by viewModel.spotLocationLocality.collectAsStateWithLifecycle()
-    val locationCountry by viewModel.spotLocationCountry.collectAsStateWithLifecycle()
+    val locationLocality: String? by viewModel.spotLocationLocality.collectAsStateWithLifecycle()
+    val locationCountry: String? by viewModel.spotLocationCountry.collectAsStateWithLifecycle()
+    val attributesList by viewModel.attributesList.collectAsStateWithLifecycle()
+    val selectedAttributes by viewModel.selectedAttributes.collectAsStateWithLifecycle()
+    val reviewScore by viewModel.reviewScore.collectAsStateWithLifecycle()
 
     val multiplePhotoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickMultipleVisualMedia(maxItems = MAX_IMAGES_SELECTED),
@@ -130,8 +153,13 @@ fun AddSpotScreen(
                     navigateTo = navController::navigate,
                     selectedLocation = selectedLocation,
                     mapState = mapState,
-                    locationLocality = locationLocality,
-                    locationCountry = locationCountry
+                    locationLocality = locationLocality ?: "",
+                    locationCountry = locationCountry ?: "",
+                    attributesList = attributesList,
+                    selectedAttributes = selectedAttributes,
+                    onAttributeClicked = viewModel::modifySelectedAttributes,
+                    reviewScore = reviewScore,
+                    onReviewScoreChanged = viewModel::modifyReviewScore
                 )
             }
         }
@@ -154,7 +182,12 @@ fun AddSpotContent(
     selectedLocation: LatLng,
     mapState: MapState,
     locationLocality: String,
-    locationCountry: String
+    locationCountry: String,
+    attributesList: List<SpotAttribute>,
+    selectedAttributes: List<SpotAttribute>,
+    onAttributeClicked: (SpotAttribute) -> Unit,
+    reviewScore: Int,
+    onReviewScoreChanged: (Float) -> Unit
 ) {
 
     val context = LocalContext.current
@@ -369,6 +402,213 @@ fun AddSpotContent(
             }
 
         }
+
+        // Add attributes section
+        CustomSpacer(size = 24.dp)
+        Text(
+            text = stringResource(id = R.string.add_attributes_review),
+            style = secondarySemiBoldHeadLineS,
+            modifier = Modifier.padding(start = 16.dp)
+        )
+        CustomSpacer(size = 16.dp)
+        Text(
+            text = stringResource(id = R.string.good_attributes),
+            style = secondaryRegularHeadlineS,
+            modifier = Modifier.padding(start = 16.dp),
+            color = Color(0xFF666666)
+        )
+        CustomSpacer(size = 8.dp)
+        LazyRow(
+            modifier = Modifier.padding(start = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            itemsIndexed(attributesList.filter { it.type == FAVORABLE_ATTRIBUTES }) { _, attribute ->
+                val isSelected = selectedAttributes.contains(attribute)
+                val customBackgroundColor = if (isSelected) Color(0x80FFB600) else Color.White
+                Box(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clip(RoundedCornerShape(20.dp))
+                        .border(1.dp, Color(0xFF999999), RoundedCornerShape(20.dp))
+                        .background(customBackgroundColor, RoundedCornerShape(20.dp))
+                        .clickable { onAttributeClicked(attribute) }
+
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        Icon(
+                            painter = painterResource(
+                                id = getResourceId(
+                                    attribute.icon,
+                                    context
+                                )
+                            ),
+                            contentDescription = "",
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Text(
+                            text = attribute.title,
+                            style = secondaryRegularBodyS,
+                            textAlign = TextAlign.Center,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
+                        )
+                    }
+                }
+            }
+        }
+        CustomSpacer(size = 16.dp)
+        Text(
+            text = stringResource(id = R.string.bad_attributes),
+            style = secondaryRegularHeadlineS,
+            modifier = Modifier.padding(start = 16.dp),
+            color = Color(0xFF666666)
+        )
+        CustomSpacer(size = 8.dp)
+        LazyRow(
+            modifier = Modifier.padding(start = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            itemsIndexed(attributesList.filter { it.type == NON_FAVORABLE_ATTRIBUTES }) { _, attribute ->
+                val isSelected = selectedAttributes.contains(attribute)
+                val customBackgroundColor = if (isSelected) Color(0x80FFB600) else Color.White
+                Box(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clip(RoundedCornerShape(20.dp))
+                        .border(1.dp, Color(0xFF999999), RoundedCornerShape(20.dp))
+                        .background(customBackgroundColor, RoundedCornerShape(20.dp))
+                        .clickable { onAttributeClicked(attribute) }
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        Icon(
+                            painter = painterResource(
+                                id = getResourceId(
+                                    attribute.icon,
+                                    context
+                                )
+                            ),
+                            contentDescription = "",
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Text(
+                            text = attribute.title,
+                            style = secondaryRegularBodyS,
+                            textAlign = TextAlign.Center,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
+                        )
+                    }
+                }
+            }
+        }
+        CustomSpacer(size = 16.dp)
+        Text(
+            text = stringResource(id = R.string.sunset_attributes),
+            style = secondaryRegularHeadlineS,
+            modifier = Modifier.padding(start = 16.dp),
+            color = Color(0xFF666666)
+        )
+        CustomSpacer(size = 8.dp)
+        LazyRow(
+            modifier = Modifier.padding(start = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            itemsIndexed(attributesList.filter { it.type == SUNSET_ATTRIBUTES }) { _, attribute ->
+                val isSelected = selectedAttributes.contains(attribute)
+                val customBackgroundColor = if (isSelected) Color(0x80FFB600) else Color.White
+                Box(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clip(RoundedCornerShape(20.dp))
+                        .border(1.dp, Color(0xFF999999), RoundedCornerShape(20.dp))
+                        .background(customBackgroundColor, RoundedCornerShape(20.dp))
+                        .clickable { onAttributeClicked(attribute) }
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        Icon(
+                            painter = painterResource(
+                                id = getResourceId(
+                                    attribute.icon,
+                                    context
+                                )
+                            ),
+                            contentDescription = "",
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Text(
+                            text = attribute.title,
+                            style = secondaryRegularBodyS,
+                            textAlign = TextAlign.Center,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
+                        )
+                    }
+                }
+            }
+        }
+        CustomSpacer(size = 32.dp)
+
+        //Add score section
+
+        Text(
+            text = stringResource(id = R.string.review_score),
+            style = primaryBoldHeadlineL,
+            modifier = Modifier.padding(start = 16.dp)
+        )
+        CustomSpacer(size = 4.dp)
+        Text(
+            text = stringResource(id = R.string.add_review_score),
+            style = secondarySemiBoldBodyM,
+            modifier = Modifier.padding(start = 16.dp)
+        )
+        ScoreSlider(
+            value = reviewScore.toFloat(),
+            onValueChange = { onReviewScoreChanged(it) },
+            modifier = Modifier.padding(horizontal = 12.dp)
+        )
+        Row(
+            Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                imageVector = if (reviewScore < 3) {
+                    Icons.Outlined.BrightnessLow
+                } else if (reviewScore < 5) {
+                    Icons.Outlined.Brightness4
+                } else if (reviewScore < 7) {
+                    Icons.Outlined.Brightness5
+                } else if (reviewScore < 9) {
+                    Icons.Outlined.Brightness6
+                } else if (reviewScore > 9) {
+                    Icons.Outlined.Brightness7
+                } else {
+                    Icons.Outlined.BrightnessLow
+                },
+                contentDescription = "Score icon",
+                modifier = Modifier
+                    .align(Alignment.CenterVertically)
+                    .size(36.dp)
+            )
+            CustomSpacer(size = 8.dp)
+            Text(text = reviewScore.toString(), style = primaryBoldDisplayS)
+        }
+        CustomSpacer(size = 24.dp)
     }
 }
 

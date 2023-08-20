@@ -2,8 +2,10 @@ package com.madteam.sunset.repositories
 
 import android.location.Address
 import android.location.Geocoder
+import android.util.Log
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
@@ -18,6 +20,9 @@ class LocationRepository @Inject constructor(
                 emit(address.countryName)
             }
         }
+    }.catch {
+        emit("")
+        Log.e("LocationRepository::obtainCountryFromLatLng", "Error: ${it.message}")
     }
 
     override fun obtainLocalityFromLatLng(latLng: LatLng): Flow<String> = flow {
@@ -28,6 +33,9 @@ class LocationRepository @Inject constructor(
                 emit(address.locality)
             }
         }
+    }.catch {
+        emit("")
+        Log.e("LocationRepository::obtainLocalityFromLatLng", "Error: ${it.message}")
     }
 }
 

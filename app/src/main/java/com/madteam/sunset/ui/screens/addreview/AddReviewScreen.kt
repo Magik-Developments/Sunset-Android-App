@@ -63,9 +63,9 @@ import com.madteam.sunset.utils.getResourceId
 
 private const val MAX_CHAR_LENGTH_REVIEW_TITLE = 50
 private const val MAX_CHAR_LENGTH_REVIEW_DESCRIPTION = 2500
-private const val FAVORABLE_ATTRIBUTES = "favorable"
-private const val NON_FAVORABLE_ATTRIBUTES = "non-favorable"
-private const val SUNSET_ATTRIBUTES = "sunset"
+const val FAVORABLE_ATTRIBUTES = "favorable"
+const val NON_FAVORABLE_ATTRIBUTES = "non-favorable"
+const val SUNSET_ATTRIBUTES = "sunset"
 
 @Composable
 fun AddReviewScreen(

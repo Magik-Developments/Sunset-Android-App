@@ -10,6 +10,7 @@ import androidx.navigation.navArgument
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
+import com.google.android.gms.maps.model.LatLng
 import com.madteam.sunset.navigation.SunsetRoutes.DiscoverScreen
 import com.madteam.sunset.navigation.SunsetRoutes.LostPasswordScreen
 import com.madteam.sunset.navigation.SunsetRoutes.MyProfileScreen
@@ -18,6 +19,7 @@ import com.madteam.sunset.navigation.SunsetRoutes.SignUpCard
 import com.madteam.sunset.navigation.SunsetRoutes.WelcomeScreen
 import com.madteam.sunset.ui.screens.addpost.AddPostScreen
 import com.madteam.sunset.ui.screens.addreview.AddReviewScreen
+import com.madteam.sunset.ui.screens.addspot.AddSpotScreen
 import com.madteam.sunset.ui.screens.comments.CommentsScreen
 import com.madteam.sunset.ui.screens.discover.DiscoverScreen
 import com.madteam.sunset.ui.screens.home.HomeScreen
@@ -25,6 +27,7 @@ import com.madteam.sunset.ui.screens.lostpassword.LostPasswordScreen
 import com.madteam.sunset.ui.screens.myprofile.MyProfileScreen
 import com.madteam.sunset.ui.screens.post.PostScreen
 import com.madteam.sunset.ui.screens.review.PostReviewScreen
+import com.madteam.sunset.ui.screens.selectLocation.SelectLocationScreen
 import com.madteam.sunset.ui.screens.spotdetail.SpotDetailScreen
 import com.madteam.sunset.ui.screens.verifyaccount.VerifyAccountScreen
 import com.madteam.sunset.ui.screens.welcome.WelcomeScreen
@@ -90,6 +93,43 @@ fun SunsetNavigation() {
 
         composable(SunsetRoutes.HomeScreen.route) {
             HomeScreen(navController)
+        }
+
+        composable(SunsetRoutes.AddSpotScreen.route) { entry ->
+            val selectedLocation = entry.savedStateHandle.get<LatLng>("location")
+            if (selectedLocation != null) {
+                AddSpotScreen(navController, selectedLocation = selectedLocation)
+            } else {
+                AddSpotScreen(navController)
+            }
+        }
+
+        composable(SunsetRoutes.SelectLocationScreen.route) {
+            SelectLocationScreen(navController)
+        }
+
+        composable(
+            route = "select_location_screen/lat={lat}long={long}",
+            arguments = listOf(
+                navArgument("lat") {
+                    type = NavType.FloatType
+                    defaultValue = 0f
+                },
+                navArgument("long") {
+                    type = NavType.FloatType
+                    defaultValue = 0f
+                }
+            )
+        ) { backStackEntry ->
+            val latLocation = backStackEntry.arguments?.getFloat("lat")
+            val longLocation = backStackEntry.arguments?.getFloat("long")
+            if (latLocation != null && longLocation != null) {
+                SelectLocationScreen(
+                    navController = navController,
+                    lat = latLocation,
+                    long = longLocation
+                )
+            }
         }
 
         composable(

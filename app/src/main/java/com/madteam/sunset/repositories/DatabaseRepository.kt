@@ -2,6 +2,7 @@ package com.madteam.sunset.repositories
 
 import android.net.Uri
 import android.util.Log
+import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
@@ -34,6 +35,7 @@ private const val POSTS_COLLECTION_PATH = "posts"
 private const val COMMENTS_POST_COLLECTION_PATH = "comments"
 private const val LIKED_BY_POST_COLLECTION_PATH = "liked_by"
 private const val IMAGES_STORAGE_POSTS_PATH = "posts_images/"
+private const val IMAGES_STORAGE_SPOTS_PATH = "spots_images/"
 
 class DatabaseRepository @Inject constructor(
     private val firebaseFirestore: FirebaseFirestore,
@@ -667,6 +669,72 @@ class DatabaseRepository @Inject constructor(
         Log.e("DatabaseRepository::createSpotReview", "Error: ${exception.message}")
         emit(Resource.Success("Error: " + exception.message))
     }
+
+    override fun createSpot(
+        featuredImages: List<Uri>,
+        spotTitle: String,
+        spotDescription: String,
+        spotLocation: LatLng,
+        spotCountry: String?,
+        spotLocality: String?,
+        spotAuthor: String,
+        spotAttributes: List<SpotAttribute>,
+        spotScore: Int
+    ): Flow<Resource<String>> = flow<Resource<String>> {
+        val newSpotDocument = firebaseFirestore.collection(SPOTS_COLLECTION_PATH)
+            .document()
+        val newSpotLocationDocument = firebaseFirestore.collection(SPOTS_LOCATIONS_COLLECTION_PATH)
+            .document()
+        val authorReference = firebaseFirestore.collection(USERS_COLLECTION_PATH)
+            .document(spotAuthor)
+        var featuredImagesList = listOf<String>()
+        val attributesReferences = spotAttributes.map {
+            firebaseFirestore.collection(
+                SPOT_ATTRIBUTES_COLLECTION
+            ).document(it.id)
+        }
+        var locationText: String = ""
+
+        if (spotLocality.isNullOrBlank() && !spotCountry.isNullOrBlank()) {
+            locationText = spotCountry.toString()
+        } else if (!spotLocality.isNullOrBlank() && !spotCountry.isNullOrBlank()) {
+            locationText = "$spotLocality, $spotCountry"
+        }
+
+        uploadImages(
+            featuredImages,
+            "$IMAGES_STORAGE_SPOTS_PATH${newSpotDocument.id}/"
+        ).collectLatest { urlImagesList ->
+            featuredImagesList = urlImagesList
+        }
+
+        val newSpot = hashMapOf(
+            "featured_images" to featuredImagesList,
+            "name" to spotTitle,
+            "description" to spotDescription,
+            "location_in_latlng" to GeoPoint(spotLocation.latitude, spotLocation.longitude),
+            "location" to locationText,
+            "spotted_by" to authorReference,
+            "score" to spotScore,
+            "likes" to 0,
+            "posts" to emptyList<String>(),
+            "creation_date" to Calendar.getInstance().time.toString(),
+            "attributes" to attributesReferences
+        )
+
+        val newSpotLocation = hashMapOf(
+            "location" to GeoPoint(spotLocation.latitude, spotLocation.longitude),
+            "name" to spotTitle,
+            "spot" to newSpotDocument
+        )
+
+        newSpotDocument.set(newSpot).await()
+        newSpotLocationDocument.set(newSpotLocation).await()
+        emit(Resource.Success(newSpotDocument.id))
+    }.catch { exception ->
+        Log.e("DatabaseRepository::createSpot", "Error: ${exception.message}")
+        emit(Resource.Success("Error: " + exception.message))
+    }
 }
 
 interface DatabaseContract {
@@ -703,6 +771,18 @@ interface DatabaseContract {
         attributeList: List<SpotAttribute>,
         score: Int,
         author: UserProfile
+    ): Flow<Resource<String>>
+
+    fun createSpot(
+        featuredImages: List<Uri>,
+        spotTitle: String,
+        spotDescription: String,
+        spotLocation: LatLng,
+        spotCountry: String?,
+        spotLocality: String?,
+        spotAuthor: String,
+        spotAttributes: List<SpotAttribute>,
+        spotScore: Int
     ): Flow<Resource<String>>
 
 }

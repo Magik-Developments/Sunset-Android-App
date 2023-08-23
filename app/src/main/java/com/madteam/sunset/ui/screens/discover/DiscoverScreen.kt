@@ -28,6 +28,8 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.MapsComposeExperimentalApi
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.madteam.sunset.model.SpotClusterItem
+import com.madteam.sunset.navigation.SunsetRoutes
+import com.madteam.sunset.ui.common.AddSpotFAB
 import com.madteam.sunset.ui.common.SunsetBottomNavigation
 import com.madteam.sunset.ui.theme.SunsetTheme
 import com.madteam.sunset.utils.googlemaps.MapState
@@ -50,6 +52,13 @@ fun DiscoverScreen(
 
     Scaffold(
         bottomBar = { SunsetBottomNavigation(navController) },
+        floatingActionButton = {
+            if (!clusterInfo.isSelected) {
+                AddSpotFAB {
+                    navController.navigate(SunsetRoutes.AddSpotScreen.route)
+                }
+            }
+        },
         content = { paddingValues ->
             Box(
                 modifier = Modifier.padding(paddingValues),
@@ -92,7 +101,9 @@ fun DiscoverContent(
         modifier = Modifier.fillMaxSize(),
         properties = setMapProperties(mapState),
         cameraPositionState = cameraPositionState,
-        uiSettings = MapUiSettings()
+        uiSettings = MapUiSettings(
+            zoomControlsEnabled = false
+        )
     ) {
         SetupClusterManagerAndRenderers(
             mapState = mapState,

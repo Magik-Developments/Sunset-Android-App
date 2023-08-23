@@ -93,7 +93,8 @@ fun SpotDetailScreen(
             ) {
                 SpotDetailContent(
                     spotInfo = spotInfo,
-                    navigateTo = navController::navigate
+                    navigateTo = navController::navigate,
+                    goBack = navController::popBackStack
                 )
             }
         }
@@ -104,7 +105,8 @@ fun SpotDetailScreen(
 @Composable
 fun SpotDetailContent(
     spotInfo: Spot,
-    navigateTo: (String) -> Unit
+    navigateTo: (String) -> Unit,
+    goBack: () -> Unit
 ) {
     val scrollState = rememberScrollState()
     val showShimmer = remember { mutableStateOf(true) }
@@ -146,7 +148,7 @@ fun SpotDetailContent(
             RoundedLightBackButton(modifier = Modifier.constrainAs(backIconButton) {
                 top.linkTo(parent.top, 16.dp)
                 start.linkTo(parent.start, 24.dp)
-            }, onClick = {})
+            }, onClick = { goBack() })
             RoundedLightSaveButton(onClick = {}, modifier = Modifier.constrainAs(saveIconButton) {
                 top.linkTo(parent.top, 16.dp)
                 end.linkTo(parent.end, 24.dp)
@@ -195,7 +197,7 @@ fun SpotDetailContent(
                 text = if (showShimmer.value) {
                     ""
                 } else {
-                    "created ${spotInfo.creationDate}"
+                    "created ${formatDate(spotInfo.creationDate)}"
                 },
                 style = secondaryRegularBodyS,
                 color = Color(0xFF333333),
@@ -530,18 +532,27 @@ fun SpotDetailContent(
                     .padding(horizontal = 24.dp)
                     .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround
             ) {
-                LargeLightButton(
-                    onClick = { /*TODO*/ },
-                    text = R.string.show_all_reviews,
-                    modifier = Modifier
-                        .fillMaxWidth(0.7f)
-                )
-                IconButtonDark(
-                    buttonIcon = Icons.Filled.Add,
-                    description = R.string.add,
-                    onClick = { navigateTo("add_spot_review_screen/spotReference=${spotInfo.id}") },
-                    iconTint = Color.White
-                )
+                if (spotInfo.spotReviews.isEmpty()) {
+                    LargeLightButton(
+                        onClick = { navigateTo("add_spot_review_screen/spotReference=${spotInfo.id}") },
+                        text = R.string.be_first_to_review,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    )
+                } else {
+                    LargeLightButton(
+                        onClick = { /*TODO*/ },
+                        text = R.string.show_all_reviews,
+                        modifier = Modifier
+                            .fillMaxWidth(0.7f)
+                    )
+                    IconButtonDark(
+                        buttonIcon = Icons.Filled.Add,
+                        description = R.string.add,
+                        onClick = { navigateTo("add_spot_review_screen/spotReference=${spotInfo.id}") },
+                        iconTint = Color.White
+                    )
+                }
             }
             CustomSpacer(size = 24.dp)
             Divider(
@@ -574,18 +585,27 @@ fun SpotDetailContent(
                     .padding(horizontal = 24.dp)
                     .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround
             ) {
-                LargeLightButton(
-                    onClick = { /*TODO*/ },
-                    text = R.string.show_all_posts,
-                    modifier = Modifier
-                        .fillMaxWidth(0.7f)
-                )
-                IconButtonDark(
-                    buttonIcon = Icons.Filled.Add,
-                    description = R.string.add,
-                    onClick = { navigateTo("add_post_screen/spotReference=${spotInfo.id}") },
-                    iconTint = Color.White
-                )
+                if (spotInfo.spotPosts.isEmpty()) {
+                    LargeLightButton(
+                        onClick = { navigateTo("add_post_screen/spotReference=${spotInfo.id}") },
+                        text = R.string.be_first_to_post,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    )
+                } else {
+                    LargeLightButton(
+                        onClick = { /*TODO*/ },
+                        text = R.string.show_all_posts,
+                        modifier = Modifier
+                            .fillMaxWidth(0.7f)
+                    )
+                    IconButtonDark(
+                        buttonIcon = Icons.Filled.Add,
+                        description = R.string.add,
+                        onClick = { navigateTo("add_post_screen/spotReference=${spotInfo.id}") },
+                        iconTint = Color.White
+                    )
+                }
             }
         } else {
             //False shimmer effect when showshimmer is true

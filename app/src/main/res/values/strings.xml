@@ -25,7 +25,7 @@
     <string name="already_have_an_account">Already have an account?</string>
     <string name="username">Username</string>
     <string name="sunset_art_image_description">Vectorial art of a sunset on the beach</string>
-    <string name="privacy_dialog_title">In Sunset we value your privacy...</string>
+    <string name="privacy_dialog_title">In Sunset we value your privacy…</string>
     <string name="privacy_dialog_description">By clicking Sign Up, you agree with our Terms. Please, read how we process your data in our Privacy Policy and Cookies Policy.</string>
     <string name="read_policies">Read policies</string>
   <string name="invalid_form_icon_description">invalid form icon</string>
@@ -65,8 +65,8 @@
     <string name="max_characters_reached">You have reached the maximum characters.</string>
     <string name="spot_score">Spot score</string>
     <string name="add_review">Add review</string>
-    <string name="add_title_review">Add a title...</string>
-    <string name="add_description_review">Add a description...</string>
+    <string name="add_title_review">Add a title…</string>
+    <string name="add_description_review">Add a description…</string>
     <string name="how_it_was">How it was?</string>
     <string name="add_attributes_review">Add some attributes</string>
     <string name="good_attributes">Good attributes</string>
@@ -76,4 +76,9 @@
     <string name="add_review_score">Add a score</string>
     <string name="post_review_finished">Review posted!</string>
     <string name="post_review_finished_description">Your review has been posted, thank you for contributing!</string>
+    <string name="add_spot">Add Spot</string>
+    <string name="add_location">Add location</string>
+    <string name="modify_location">Modify location</string>
+    <string name="be_first_to_review">Be the first to review this!</string>
+    <string name="be_first_to_post">Be the first to post!</string>
 </resources>

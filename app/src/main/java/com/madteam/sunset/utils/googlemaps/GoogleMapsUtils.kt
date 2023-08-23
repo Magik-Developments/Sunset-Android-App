@@ -1,17 +1,17 @@
 package com.madteam.sunset.utils.googlemaps
 
-/**
-* A set of utility functions for centering the camera given some [LatLng] points.
-*/
-
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MapStyleOptions
+import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.MapProperties
-import com.madteam.sunset.R
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 fun List<LatLng>.getCenterOfPolygon(): LatLngBounds {
   val centerBuilder: LatLngBounds.Builder = LatLngBounds.builder()
@@ -43,7 +43,7 @@ fun List<LatLng>.calculateCameraViewPoints(pctView: Double = .25): List<LatLng> 
 }
 
 private fun List<LatLng>.findMaxMins(): CameraViewCoord {
-  check(size > 0) { "Cannot calculate the view coordinates of nothing." }
+  check(isNotEmpty()) { "Cannot calculate the view coordinates of nothing." }
   var viewCoord: CameraViewCoord? = null
   for(point in this) {
     viewCoord = CameraViewCoord(
@@ -81,11 +81,14 @@ private fun List<LatLng>.findMaxMins(): CameraViewCoord {
 }
 
 @Composable
-fun setMapProperties(mapState: MapState): MapProperties {
+fun setMapProperties(
+  mapState: MapState,
+  mapStyle: MapStyles = MapStyles.DEFAULT
+): MapProperties {
   val context = LocalContext.current
 
   val styleJson = remember {
-    context.resources.openRawResource(R.raw.map_style).run {
+    context.resources.openRawResource(mapStyle.mapStyleRes).run {
       bufferedReader().use { it.readText() }
     }
   }
@@ -94,4 +97,22 @@ fun setMapProperties(mapState: MapState): MapProperties {
     isMyLocationEnabled = mapState.lastKnownLocation != null,
     mapStyleOptions = MapStyleOptions(styleJson)
   )
+}
+
+fun GoogleMap.updateCameraLocation(
+  scope: CoroutineScope,
+  cameraPositionState: CameraPositionState,
+  newLocation: LatLng,
+  cameraZoom: Float
+) {
+  setOnMapLoadedCallback {
+    scope.launch {
+      cameraPositionState.animate(
+        update = CameraUpdateFactory.newLatLngZoom(
+          newLocation,
+          cameraZoom
+        )
+      )
+    }
+  }
 }

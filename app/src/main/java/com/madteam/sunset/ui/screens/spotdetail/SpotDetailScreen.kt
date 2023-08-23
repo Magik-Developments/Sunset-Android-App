@@ -328,13 +328,14 @@ fun SpotDetailContent(
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp)
             ) {
-                val (distanceText, distance, time, directions) = createRefs()
+                val (distanceText, distance, directions) = createRefs()
                 Text(
                     text = "You are only ",
                     style = secondaryRegularBodyL,
                     modifier = Modifier.constrainAs(distanceText) {
                         start.linkTo(parent.start)
-                        top.linkTo(parent.top, 8.dp)
+                        top.linkTo(parent.top)
+                        bottom.linkTo(parent.bottom)
                     })
                 Text(
                     text = "${
@@ -348,16 +349,8 @@ fun SpotDetailContent(
                     style = secondarySemiBoldBodyL,
                     modifier = Modifier.constrainAs(distance) {
                         start.linkTo(distanceText.end)
-                        top.linkTo(parent.top, 8.dp)
-                    })
-                Text(
-                    text = "or 10 minutes walking",
-                    style = secondaryRegularBodyM,
-                    modifier = Modifier.constrainAs(time) {
-                        start.linkTo(distanceText.start)
-                        end.linkTo(distance.end)
-                        top.linkTo(distance.bottom, 8.dp)
-                        bottom.linkTo(parent.bottom, 8.dp)
+                        top.linkTo(parent.top)
+                        bottom.linkTo(parent.bottom)
                     })
                 Icon(
                     modifier = Modifier

@@ -32,6 +32,7 @@ import com.madteam.sunset.navigation.SunsetRoutes
 import com.madteam.sunset.ui.common.CardHandler
 import com.madteam.sunset.ui.common.CardSubtitle
 import com.madteam.sunset.ui.common.CardTitle
+import com.madteam.sunset.ui.common.CircularLoadingDialog
 import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.EmailTextField
 import com.madteam.sunset.ui.common.ForgotPasswordText
@@ -96,45 +97,6 @@ fun BottomSheetSignInContent(
     validateForm(userValueText, passwordTValueText)
   }
 
-  when (signInState) {
-    is Resource.Loading -> {
-      Box(
-        contentAlignment = Alignment.TopCenter,
-        modifier = Modifier.padding(top = 20.dp)
-      ) {
-        CircularProgressIndicator()
-      }
-    }
-
-    is Resource.Success -> {
-      if (signInState.data != null && signInState.data.user!!.isEmailVerified) {
-        LaunchedEffect(key1 = signInState.data) {
-          navigateTo(SunsetRoutes.MyProfileScreen.route)
-        }
-        clearSignInState()
-      } else if (signInState.data != null && !signInState.data.user!!.isEmailVerified) {
-        LaunchedEffect(key1 = signInState.data) {
-          navigateTo(
-            "verify_account_screen/pass=${passwordTValueText}"
-          )
-        }
-        clearSignInState()
-      }
-    }
-
-    is Resource.Error -> {
-      if (signInState.message == "The password is invalid or the user does not have a password.") {
-        invalidCredentials = true
-      } else {
-        Box(contentAlignment = Alignment.Center) {
-          Toast.makeText(context, "${signInState.message}", Toast.LENGTH_SHORT).show()
-        }
-      }
-      clearSignInState()
-    }
-
-  }
-
   Column(
     horizontalAlignment = Alignment.CenterHorizontally,
     modifier = Modifier.padding(horizontal = 36.dp)
@@ -192,5 +154,44 @@ fun BottomSheetSignInContent(
       ).show()
     },
       secondMethod = { modalOptions() })
+  }
+
+  when (signInState) {
+    is Resource.Loading -> {
+      Box(
+        contentAlignment = Alignment.TopCenter,
+        modifier = Modifier.padding(top = 20.dp)
+      ) {
+        CircularLoadingDialog()
+      }
+    }
+
+    is Resource.Success -> {
+      if (signInState.data != null && signInState.data.user!!.isEmailVerified) {
+        LaunchedEffect(key1 = signInState.data) {
+          navigateTo(SunsetRoutes.MyProfileScreen.route)
+        }
+        clearSignInState()
+      } else if (signInState.data != null && !signInState.data.user!!.isEmailVerified) {
+        LaunchedEffect(key1 = signInState.data) {
+          navigateTo(
+            "verify_account_screen/pass=${passwordTValueText}"
+          )
+        }
+        clearSignInState()
+      }
+    }
+
+    is Resource.Error -> {
+      if (signInState.message == "The password is invalid or the user does not have a password.") {
+        invalidCredentials = true
+      } else {
+        Box(contentAlignment = Alignment.Center) {
+          Toast.makeText(context, "${signInState.message}", Toast.LENGTH_SHORT).show()
+        }
+      }
+      clearSignInState()
+    }
+
   }
 }

@@ -210,14 +210,16 @@ class DatabaseRepository @Inject constructor(
                 val name = document.getString("name")
                 val location = document.getGeoPoint("location")
                 val spot = document.getDocumentReference("spot")
+                val image = document.getString("image")
 
-                if (name != null && location != null && spot != null) {
+                if (name != null && location != null && spot != null && image != null) {
                     SpotClusterItem(
                         id = id,
                         name = name,
                         spot = spot,
                         location = location,
-                        isSelected = false
+                        isSelected = false,
+                        featuredImage = image
                     )
                 } else {
                     null
@@ -725,7 +727,8 @@ class DatabaseRepository @Inject constructor(
         val newSpotLocation = hashMapOf(
             "location" to GeoPoint(spotLocation.latitude, spotLocation.longitude),
             "name" to spotTitle,
-            "spot" to newSpotDocument
+            "spot" to newSpotDocument,
+            "image" to featuredImagesList.first()
         )
 
         newSpotDocument.set(newSpot).await()

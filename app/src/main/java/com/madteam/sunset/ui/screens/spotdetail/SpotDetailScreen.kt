@@ -280,7 +280,7 @@ fun SpotDetailContent(
                 CustomSpacer(size = 8.dp)
                 Text(text = "·", style = secondarySemiBoldBodyM)
                 CustomSpacer(size = 8.dp)
-                Text(text = "${spotLikes} likes", style = secondarySemiBoldBodyM)
+                Text(text = "$spotLikes likes", style = secondarySemiBoldBodyM)
             }
         }
         CustomSpacer(size = 8.dp)

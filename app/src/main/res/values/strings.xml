@@ -79,4 +79,6 @@
     <string name="add_spot">Add Spot</string>
     <string name="add_location">Add location</string>
     <string name="modify_location">Modify location</string>
+    <string name="be_first_to_review">Be the first to review this!</string>
+    <string name="be_first_to_post">Be the first to post!</string>
 </resources>

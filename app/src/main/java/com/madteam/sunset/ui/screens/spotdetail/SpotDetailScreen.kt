@@ -1,5 +1,7 @@
 package com.madteam.sunset.ui.screens.spotdetail
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -50,6 +52,8 @@ import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.ktx.utils.sphericalDistance
 import com.madteam.sunset.R
 import com.madteam.sunset.model.Spot
 import com.madteam.sunset.ui.common.AutoSlidingCarousel
@@ -71,9 +75,11 @@ import com.madteam.sunset.ui.theme.secondarySemiBoldBodyL
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyM
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineM
 import com.madteam.sunset.utils.formatDate
+import com.madteam.sunset.utils.getCurrentLocation
 import com.madteam.sunset.utils.getResourceId
 import com.madteam.sunset.utils.openDirectionsOnGoogleMaps
 import com.madteam.sunset.utils.shimmerBrush
+import kotlin.math.roundToInt
 
 @Composable
 fun SpotDetailScreen(
@@ -86,6 +92,7 @@ fun SpotDetailScreen(
     val spotInfo by viewModel.spotInfo.collectAsStateWithLifecycle()
     val isSpotLikedByUser by viewModel.spotIsLiked.collectAsStateWithLifecycle()
     val spotLikes by viewModel.spotLikes.collectAsStateWithLifecycle()
+    val userLocation by viewModel.userLocation.collectAsStateWithLifecycle()
 
     Scaffold(
         content = { paddingValues ->
@@ -99,7 +106,9 @@ fun SpotDetailScreen(
                     goBack = navController::popBackStack,
                     spotLikeClick = viewModel::modifyUserSpotLike,
                     spotLikedByUser = isSpotLikedByUser,
-                    spotLikes = spotLikes
+                    spotLikes = spotLikes,
+                    updateUserLocation = viewModel::updateUserLocation,
+                    userLocation = userLocation
                 )
             }
         }
@@ -114,14 +123,29 @@ fun SpotDetailContent(
     goBack: () -> Unit,
     spotLikeClick: () -> Unit,
     spotLikedByUser: Boolean,
-    spotLikes: Int
+    spotLikes: Int,
+    updateUserLocation: (LatLng) -> Unit,
+    userLocation: LatLng
 ) {
     val scrollState = rememberScrollState()
     val showShimmer = remember { mutableStateOf(true) }
     val context = LocalContext.current
 
+    val requestPermissionLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission(),
+            onResult = { isGranted ->
+                if (isGranted) {
+                    getCurrentLocation(context) { lat, long ->
+                        updateUserLocation(LatLng(lat, long))
+                    }
+                }
+            }
+        )
+
     if (spotInfo != Spot()) {
         showShimmer.value = false
+        requestPermissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
     }
 
     Column(
@@ -313,7 +337,14 @@ fun SpotDetailContent(
                         top.linkTo(parent.top, 8.dp)
                     })
                 Text(
-                    text = "2 km away",
+                    text = "${
+                        (userLocation.sphericalDistance(
+                            LatLng(
+                                spotInfo.locationInLatLng.latitude,
+                                spotInfo.locationInLatLng.longitude
+                            )
+                        ) / 1000).roundToInt()
+                    } kms away",
                     style = secondarySemiBoldBodyL,
                     modifier = Modifier.constrainAs(distance) {
                         start.linkTo(distanceText.end)

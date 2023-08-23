@@ -2,6 +2,7 @@ package com.madteam.sunset.ui.screens.spotdetail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.maps.model.LatLng
 import com.madteam.sunset.model.Spot
 import com.madteam.sunset.repositories.AuthRepository
 import com.madteam.sunset.repositories.DatabaseRepository
@@ -29,6 +30,9 @@ class SpotDetailViewModel @Inject constructor(
     private val _spotLikes: MutableStateFlow<Int> = MutableStateFlow(0)
     val spotLikes: StateFlow<Int> = _spotLikes
 
+    private val _userLocation: MutableStateFlow<LatLng> = MutableStateFlow(LatLng(0.0, 0.0))
+    val userLocation: StateFlow<LatLng> = _userLocation
+
     private lateinit var username: String
 
     init {
@@ -50,6 +54,10 @@ class SpotDetailViewModel @Inject constructor(
     fun setSpotReference(docReference: String) {
         _spotReference.value = docReference
         getSpotInfo()
+    }
+
+    fun updateUserLocation(location: LatLng) {
+        _userLocation.value = location
     }
 
     private fun getSpotInfo() {

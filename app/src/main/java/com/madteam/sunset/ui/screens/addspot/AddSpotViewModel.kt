@@ -5,9 +5,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
 import com.madteam.sunset.model.SpotAttribute
+import com.madteam.sunset.repositories.AuthRepository
 import com.madteam.sunset.repositories.DatabaseRepository
 import com.madteam.sunset.repositories.LocationRepository
 import com.madteam.sunset.ui.screens.addpost.MAX_IMAGES_SELECTED
+import com.madteam.sunset.utils.Resource
 import com.madteam.sunset.utils.googlemaps.MapState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +22,8 @@ import kotlin.math.roundToInt
 @HiltViewModel
 class AddSpotViewModel @Inject constructor(
     private val locationRepository: LocationRepository,
-    private val databaseRepository: DatabaseRepository
+    private val databaseRepository: DatabaseRepository,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _imageUris: MutableStateFlow<List<Uri>> = MutableStateFlow(listOf())
@@ -55,12 +58,25 @@ class AddSpotViewModel @Inject constructor(
         MutableStateFlow(mutableListOf())
     val selectedAttributes: StateFlow<List<SpotAttribute>> = _selectedAttributes
 
-    private val _reviewScore: MutableStateFlow<Int> =
+    private val _spotScore: MutableStateFlow<Int> =
         MutableStateFlow(0)
-    val reviewScore: StateFlow<Int> = _reviewScore
+    val spotScore: StateFlow<Int> = _spotScore
+
+    private val _showExitDialog: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val showExitDialog: StateFlow<Boolean> = _showExitDialog
+
+    private val _errorToastText: MutableStateFlow<String> = MutableStateFlow("")
+    val errorToastText: StateFlow<String> = _errorToastText
+
+    private val _uploadProgress: MutableStateFlow<Resource<String>> =
+        MutableStateFlow(Resource.Success(""))
+    val uploadProgress: StateFlow<Resource<String>> = _uploadProgress
+
+    private val _username: MutableStateFlow<String> = MutableStateFlow("")
 
     init {
         getSpotAttributesList()
+        getUserInfo()
     }
 
     private fun getSpotAttributesList() {
@@ -71,8 +87,16 @@ class AddSpotViewModel @Inject constructor(
         }
     }
 
+    private fun getUserInfo() {
+        authRepository.getCurrentUser()?.let { user ->
+            databaseRepository.getUserByEmail(user.email!!) {
+                _username.value = it.username
+            }
+        }
+    }
+
     fun modifyReviewScore(score: Float) {
-        _reviewScore.value = score.roundToInt()
+        _spotScore.value = score.roundToInt()
     }
 
     fun modifySelectedAttributes(attribute: SpotAttribute) {
@@ -116,6 +140,18 @@ class AddSpotViewModel @Inject constructor(
         _spotLocation.value = location
     }
 
+    fun clearUploadProgressState() {
+        _uploadProgress.value = Resource.Success("")
+    }
+
+    fun clearErrorToastText() {
+        _errorToastText.value = ""
+    }
+
+    fun setShowExitDialog(state: Boolean) {
+        _showExitDialog.value = state
+    }
+
     fun obtainCountryAndCityFromLatLng() {
         viewModelScope.launch {
             locationRepository.obtainCountryFromLatLng(_spotLocation.value).collectLatest {
@@ -123,6 +159,24 @@ class AddSpotViewModel @Inject constructor(
             }
             locationRepository.obtainLocalityFromLatLng(_spotLocation.value).collectLatest {
                 _spotLocationLocality.value = it
+            }
+        }
+    }
+
+    fun createNewSpotIntent() {
+        viewModelScope.launch {
+            databaseRepository.createSpot(
+                featuredImages = _imageUris.value,
+                spotTitle = _spotTitle.value,
+                spotDescription = _spotDescription.value,
+                spotLocation = _spotLocation.value,
+                spotCountry = _spotLocationCountry.value,
+                spotLocality = _spotLocationLocality.value,
+                spotAuthor = _username.value,
+                spotAttributes = _selectedAttributes.value,
+                spotScore = _spotScore.value
+            ).collectLatest {
+                _uploadProgress.value = it
             }
         }
     }

@@ -93,7 +93,8 @@ fun SpotDetailScreen(
             ) {
                 SpotDetailContent(
                     spotInfo = spotInfo,
-                    navigateTo = navController::navigate
+                    navigateTo = navController::navigate,
+                    goBack = navController::popBackStack
                 )
             }
         }
@@ -104,7 +105,8 @@ fun SpotDetailScreen(
 @Composable
 fun SpotDetailContent(
     spotInfo: Spot,
-    navigateTo: (String) -> Unit
+    navigateTo: (String) -> Unit,
+    goBack: () -> Unit
 ) {
     val scrollState = rememberScrollState()
     val showShimmer = remember { mutableStateOf(true) }
@@ -146,7 +148,7 @@ fun SpotDetailContent(
             RoundedLightBackButton(modifier = Modifier.constrainAs(backIconButton) {
                 top.linkTo(parent.top, 16.dp)
                 start.linkTo(parent.start, 24.dp)
-            }, onClick = {})
+            }, onClick = { goBack() })
             RoundedLightSaveButton(onClick = {}, modifier = Modifier.constrainAs(saveIconButton) {
                 top.linkTo(parent.top, 16.dp)
                 end.linkTo(parent.end, 24.dp)
@@ -195,7 +197,7 @@ fun SpotDetailContent(
                 text = if (showShimmer.value) {
                     ""
                 } else {
-                    "created ${spotInfo.creationDate}"
+                    "created ${formatDate(spotInfo.creationDate)}"
                 },
                 style = secondaryRegularBodyS,
                 color = Color(0xFF333333),

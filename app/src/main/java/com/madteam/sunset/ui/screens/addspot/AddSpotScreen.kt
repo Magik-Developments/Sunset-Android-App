@@ -70,8 +70,10 @@ import com.madteam.sunset.R
 import com.madteam.sunset.model.SpotAttribute
 import com.madteam.sunset.navigation.SunsetRoutes
 import com.madteam.sunset.ui.common.AutoSlidingCarousel
+import com.madteam.sunset.ui.common.CircularLoadingDialog
 import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.CustomTextField
+import com.madteam.sunset.ui.common.DismissAndPositiveDialog
 import com.madteam.sunset.ui.common.GoForwardTopAppBar
 import com.madteam.sunset.ui.common.ScoreSlider
 import com.madteam.sunset.ui.screens.addpost.MAX_IMAGES_SELECTED
@@ -86,6 +88,7 @@ import com.madteam.sunset.ui.theme.secondaryRegularBodyS
 import com.madteam.sunset.ui.theme.secondaryRegularHeadlineS
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyM
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
+import com.madteam.sunset.utils.Resource
 import com.madteam.sunset.utils.getResourceId
 import com.madteam.sunset.utils.googlemaps.MapState
 import com.madteam.sunset.utils.googlemaps.MapStyles
@@ -113,7 +116,10 @@ fun AddSpotScreen(
     val locationCountry: String? by viewModel.spotLocationCountry.collectAsStateWithLifecycle()
     val attributesList by viewModel.attributesList.collectAsStateWithLifecycle()
     val selectedAttributes by viewModel.selectedAttributes.collectAsStateWithLifecycle()
-    val reviewScore by viewModel.reviewScore.collectAsStateWithLifecycle()
+    val spotScore by viewModel.spotScore.collectAsStateWithLifecycle()
+    val uploadProgress by viewModel.uploadProgress.collectAsStateWithLifecycle()
+    val showExitDialog by viewModel.showExitDialog.collectAsStateWithLifecycle()
+    val errorToastText by viewModel.errorToastText.collectAsStateWithLifecycle()
 
     val multiplePhotoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickMultipleVisualMedia(maxItems = MAX_IMAGES_SELECTED),
@@ -127,8 +133,8 @@ fun AddSpotScreen(
             GoForwardTopAppBar(
                 title = R.string.add_spot,
                 onQuitClick = { navController.popBackStack() /* TODO: showExitDialog if it is ready to post */ },
-                onContinueClick = { /*TODO*/ },
-                canContinue = (reviewScore != 0 && selectedAttributes.isNotEmpty() && spotTitle.isNotEmpty() && spotDescription.isNotEmpty() && imageUris.isNotEmpty())
+                onContinueClick = { viewModel.createNewSpotIntent() },
+                canContinue = (spotScore != 0 && selectedAttributes.isNotEmpty() && spotTitle.isNotEmpty() && spotDescription.isNotEmpty() && imageUris.isNotEmpty())
             )
         },
         content = { paddingValues ->
@@ -158,8 +164,15 @@ fun AddSpotScreen(
                     attributesList = attributesList,
                     selectedAttributes = selectedAttributes,
                     onAttributeClicked = viewModel::modifySelectedAttributes,
-                    reviewScore = reviewScore,
-                    onReviewScoreChanged = viewModel::modifyReviewScore
+                    spotScore = spotScore,
+                    onReviewScoreChanged = viewModel::modifyReviewScore,
+                    uploadProgress = uploadProgress,
+                    clearUploadProgress = viewModel::clearUploadProgressState,
+                    clearErrorToast = viewModel::clearErrorToastText,
+                    errorToast = errorToastText,
+                    exitAddSpot = navController::popBackStack,
+                    setShowExitDialog = viewModel::setShowExitDialog,
+                    showExitDialog = showExitDialog
                 )
             }
         }
@@ -186,8 +199,15 @@ fun AddSpotContent(
     attributesList: List<SpotAttribute>,
     selectedAttributes: List<SpotAttribute>,
     onAttributeClicked: (SpotAttribute) -> Unit,
-    reviewScore: Int,
-    onReviewScoreChanged: (Float) -> Unit
+    spotScore: Int,
+    onReviewScoreChanged: (Float) -> Unit,
+    uploadProgress: Resource<String>,
+    clearUploadProgress: () -> Unit,
+    errorToast: String,
+    clearErrorToast: () -> Unit,
+    showExitDialog: Boolean,
+    exitAddSpot: () -> Unit,
+    setShowExitDialog: (Boolean) -> Unit
 ) {
 
     val context = LocalContext.current
@@ -195,6 +215,26 @@ fun AddSpotContent(
     val scope = rememberCoroutineScope()
     val isLocationSelected = (selectedLocation.longitude != 0.0 && selectedLocation.latitude != 0.0)
     val cameraPositionState = rememberCameraPositionState()
+
+    if (errorToast.isNotBlank()) {
+        Toast.makeText(context, errorToast, Toast.LENGTH_SHORT).show()
+        clearErrorToast()
+    }
+
+    if (showExitDialog) {
+        DismissAndPositiveDialog(
+            setShowDialog = { setShowExitDialog(it) },
+            dialogTitle = R.string.are_you_sure,
+            dialogDescription = R.string.exit_post_dialog,
+            positiveButtonText = R.string.discard_changes,
+            dismissButtonText = R.string.cancel,
+            dismissClickedAction = { setShowExitDialog(false) },
+            positiveClickedAction = {
+                setShowExitDialog(false)
+                exitAddSpot()
+            }
+        )
+    }
 
     Column(
         verticalArrangement = Arrangement.Top,
@@ -577,7 +617,7 @@ fun AddSpotContent(
             modifier = Modifier.padding(start = 16.dp)
         )
         ScoreSlider(
-            value = reviewScore.toFloat(),
+            value = spotScore.toFloat(),
             onValueChange = { onReviewScoreChanged(it) },
             modifier = Modifier.padding(horizontal = 12.dp)
         )
@@ -587,15 +627,15 @@ fun AddSpotContent(
             horizontalArrangement = Arrangement.Center
         ) {
             Icon(
-                imageVector = if (reviewScore < 3) {
+                imageVector = if (spotScore < 3) {
                     Icons.Outlined.BrightnessLow
-                } else if (reviewScore < 5) {
+                } else if (spotScore < 5) {
                     Icons.Outlined.Brightness4
-                } else if (reviewScore < 7) {
+                } else if (spotScore < 7) {
                     Icons.Outlined.Brightness5
-                } else if (reviewScore < 9) {
+                } else if (spotScore < 9) {
                     Icons.Outlined.Brightness6
-                } else if (reviewScore > 9) {
+                } else if (spotScore > 9) {
                     Icons.Outlined.Brightness7
                 } else {
                     Icons.Outlined.BrightnessLow
@@ -606,9 +646,42 @@ fun AddSpotContent(
                     .size(36.dp)
             )
             CustomSpacer(size = 8.dp)
-            Text(text = reviewScore.toString(), style = primaryBoldDisplayS)
+            Text(text = spotScore.toString(), style = primaryBoldDisplayS)
         }
         CustomSpacer(size = 24.dp)
+    }
+
+    when (uploadProgress) {
+        is Resource.Loading -> {
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .background(Color.Transparent),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.background(Color.Transparent)
+                ) {
+                    CircularLoadingDialog()
+                }
+            }
+        }
+
+        is Resource.Success -> {
+            if (uploadProgress.data != "") {
+                LaunchedEffect(key1 = uploadProgress.data) {
+                    navigateTo("spot_detail_screen/spotReference=${uploadProgress.data}")
+                    clearUploadProgress()
+                }
+            } else if (uploadProgress.data.contains("Error")) {
+                Toast.makeText(context, "Error, try again later.", Toast.LENGTH_SHORT).show()
+                clearUploadProgress()
+            }
+        }
+
+        else -> {}
     }
 }
 

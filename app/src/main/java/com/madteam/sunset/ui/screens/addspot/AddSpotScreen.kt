@@ -128,7 +128,7 @@ fun AddSpotScreen(
                 title = R.string.add_spot,
                 onQuitClick = { navController.popBackStack() /* TODO: showExitDialog if it is ready to post */ },
                 onContinueClick = { /*TODO*/ },
-                canContinue = false
+                canContinue = (reviewScore != 0 && selectedAttributes.isNotEmpty() && spotTitle.isNotEmpty() && spotDescription.isNotEmpty() && imageUris.isNotEmpty())
             )
         },
         content = { paddingValues ->

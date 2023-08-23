@@ -84,6 +84,8 @@ fun SpotDetailScreen(
 
     viewModel.setSpotReference("spots/$spotReference")
     val spotInfo by viewModel.spotInfo.collectAsStateWithLifecycle()
+    val isSpotLikedByUser by viewModel.spotIsLiked.collectAsStateWithLifecycle()
+    val spotLikes by viewModel.spotLikes.collectAsStateWithLifecycle()
 
     Scaffold(
         content = { paddingValues ->
@@ -94,7 +96,10 @@ fun SpotDetailScreen(
                 SpotDetailContent(
                     spotInfo = spotInfo,
                     navigateTo = navController::navigate,
-                    goBack = navController::popBackStack
+                    goBack = navController::popBackStack,
+                    spotLikeClick = viewModel::modifyUserSpotLike,
+                    spotLikedByUser = isSpotLikedByUser,
+                    spotLikes = spotLikes
                 )
             }
         }
@@ -106,7 +111,10 @@ fun SpotDetailScreen(
 fun SpotDetailContent(
     spotInfo: Spot,
     navigateTo: (String) -> Unit,
-    goBack: () -> Unit
+    goBack: () -> Unit,
+    spotLikeClick: () -> Unit,
+    spotLikedByUser: Boolean,
+    spotLikes: Int
 ) {
     val scrollState = rememberScrollState()
     val showShimmer = remember { mutableStateOf(true) }
@@ -157,10 +165,14 @@ fun SpotDetailContent(
                 top.linkTo(parent.top, 16.dp)
                 end.linkTo(saveIconButton.start, 16.dp)
             }, onClick = {})
-            RoundedLightLikeButton(onClick = {}, modifier = Modifier.constrainAs(likeIconButton) {
-                end.linkTo(parent.end, 24.dp)
-                bottom.linkTo(parent.bottom, 16.dp)
-            }, isLiked = false)
+            RoundedLightLikeButton(
+                onClick = { spotLikeClick() },
+                modifier = Modifier.constrainAs(likeIconButton) {
+                    end.linkTo(parent.end, 24.dp)
+                    bottom.linkTo(parent.bottom, 16.dp)
+                },
+                isLiked = spotLikedByUser
+            )
         }
         //Spotter user information
         ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
@@ -268,7 +280,7 @@ fun SpotDetailContent(
                 CustomSpacer(size = 8.dp)
                 Text(text = "·", style = secondarySemiBoldBodyM)
                 CustomSpacer(size = 8.dp)
-                Text(text = "${spotInfo.likes} likes", style = secondarySemiBoldBodyM)
+                Text(text = "${spotLikes} likes", style = secondarySemiBoldBodyM)
             }
         }
         CustomSpacer(size = 8.dp)

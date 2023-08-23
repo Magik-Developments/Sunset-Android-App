@@ -34,6 +34,7 @@ private const val SPOTS_COLLECTION_PATH = "spots"
 private const val POSTS_COLLECTION_PATH = "posts"
 private const val COMMENTS_POST_COLLECTION_PATH = "comments"
 private const val LIKED_BY_POST_COLLECTION_PATH = "liked_by"
+private const val LIKED_BY_SPOT_COLLECTION_PATH = "liked_by"
 private const val IMAGES_STORAGE_POSTS_PATH = "posts_images/"
 private const val IMAGES_STORAGE_SPOTS_PATH = "spots_images/"
 
@@ -153,6 +154,35 @@ class DatabaseRepository @Inject constructor(
         Log.e("DatabaseRepository::modifyUserPostLike", "Error: ${exception.message}")
     }
 
+    override fun modifyUserSpotLike(
+        spotReference: String,
+        username: String
+    ): Flow<Resource<String>> = flow<Resource<String>> {
+        val likedByReference =
+            firebaseFirestore.document(spotReference)
+                .collection(LIKED_BY_SPOT_COLLECTION_PATH)
+        val userLikeDocumentSnapshot =
+            likedByReference.document(username).get().await()
+        if (userLikeDocumentSnapshot.exists()) {
+            likedByReference.document(username).delete()
+            firebaseFirestore.document(spotReference).update(
+                "likes", FieldValue.increment(-1)
+            ).await()
+        } else {
+            likedByReference.document(username).set(
+                hashMapOf(
+                    "date" to Calendar.getInstance().time.toString()
+                )
+            ).await()
+            firebaseFirestore.document(spotReference).update(
+                "likes", FieldValue.increment(1)
+            ).await()
+        }
+    }.catch { exception ->
+        emit(Resource.Error(exception.message.toString()))
+        Log.e("DatabaseRepository::modifyUserSpotLike", "Error: ${exception.message.toString()}")
+    }
+
     override fun checkIfPostIsLikedByUser(
         postReference: String,
         username: String
@@ -254,6 +284,8 @@ class DatabaseRepository @Inject constructor(
             var spotReviews = listOf<SpotReview>()
             val spotPostsRefs = documentSnapshot.get("posts") as List<DocumentReference>
             var spotPosts = listOf<SpotPost>()
+            val likedBySnapshot = documentReference.collection("liked_by").get().await()
+            val likedByList = likedBySnapshot.documents.map { doc -> doc.id }
             if (spottedByDocRef != null) {
                 getUserProfileByDocRef(spottedByDocRef).collectLatest { profile ->
                     spottedBy = profile
@@ -283,7 +315,8 @@ class DatabaseRepository @Inject constructor(
                 location = location ?: "",
                 attributes = spotAttributes,
                 spotReviews = spotReviews,
-                spotPosts = spotPosts
+                spotPosts = spotPosts,
+                likedBy = likedByList
             )
             emit(spotData)
         } else {
@@ -764,6 +797,7 @@ interface DatabaseContract {
     fun createPostComment(comment: PostComment, postDocument: String): Flow<Resource<String>>
     fun deletePostComment(comment: PostComment, postDocument: String): Flow<Resource<String>>
     fun modifyUserPostLike(postReference: String, username: String): Flow<Resource<String>>
+    fun modifyUserSpotLike(spotReference: String, username: String): Flow<Resource<String>>
     fun checkIfPostIsLikedByUser(postReference: String, username: String): Flow<Resource<Boolean>>
     fun getSpotReviewByDocRef(spotReference: String, docReference: String): Flow<SpotReview>
     fun getAllSpotAttributes(): Flow<List<SpotAttribute>>

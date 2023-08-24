@@ -22,6 +22,7 @@ import com.madteam.sunset.ui.screens.addreview.AddReviewScreen
 import com.madteam.sunset.ui.screens.addspot.AddSpotScreen
 import com.madteam.sunset.ui.screens.comments.CommentsScreen
 import com.madteam.sunset.ui.screens.discover.DiscoverScreen
+import com.madteam.sunset.ui.screens.editspot.EditSpotScreen
 import com.madteam.sunset.ui.screens.home.HomeScreen
 import com.madteam.sunset.ui.screens.lostpassword.LostPasswordScreen
 import com.madteam.sunset.ui.screens.myprofile.MyProfileScreen
@@ -144,6 +145,30 @@ fun SunsetNavigation() {
             val spotReference = backStackEntry.arguments?.getString("spotReference")
             spotReference?.let {
                 SpotDetailScreen(navController = navController, spotReference = spotReference)
+            }
+        }
+
+        composable(
+            route = "edit_spot_screen/spotReference={spotReference}",
+            arguments = listOf(
+                navArgument("spotReference") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                }
+            )
+        ) { backStackEntry ->
+            val spotReference = backStackEntry.arguments?.getString("spotReference")
+            val selectedLocation = backStackEntry.savedStateHandle.get<LatLng>("location")
+            spotReference?.let {
+                if (selectedLocation != null) {
+                    EditSpotScreen(
+                        navController = navController,
+                        spotReference = spotReference,
+                        selectedLocation = selectedLocation
+                    )
+                } else {
+                    EditSpotScreen(navController = navController, spotReference = spotReference)
+                }
             }
         }
 

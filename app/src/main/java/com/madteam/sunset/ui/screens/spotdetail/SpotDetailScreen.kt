@@ -32,6 +32,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -63,6 +64,7 @@ import com.madteam.sunset.ui.common.ImagePostCard
 import com.madteam.sunset.ui.common.LargeLightButton
 import com.madteam.sunset.ui.common.ProfileImage
 import com.madteam.sunset.ui.common.RoundedLightBackButton
+import com.madteam.sunset.ui.common.RoundedLightEditButton
 import com.madteam.sunset.ui.common.RoundedLightLikeButton
 import com.madteam.sunset.ui.common.RoundedLightSaveButton
 import com.madteam.sunset.ui.common.RoundedLightSendButton
@@ -143,9 +145,11 @@ fun SpotDetailContent(
             }
         )
 
-    if (spotInfo != Spot()) {
-        showShimmer.value = false
-        requestPermissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
+    LaunchedEffect(key1 = spotInfo) {
+        if (spotInfo != Spot()) {
+            showShimmer.value = false
+            requestPermissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
+        }
     }
 
     Column(
@@ -155,7 +159,7 @@ fun SpotDetailContent(
     ) {
         //Header image section
         ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
-            val (spotImage, backIconButton, saveIconButton, sendIconButton, likeIconButton) = createRefs()
+            val (spotImage, backIconButton, saveIconButton, sendIconButton, editIconButton, likeIconButton) = createRefs()
             AutoSlidingCarousel(
                 itemsCount = spotInfo.featuredImages.size,
                 itemContent = { index ->
@@ -189,6 +193,10 @@ fun SpotDetailContent(
                 top.linkTo(parent.top, 16.dp)
                 end.linkTo(saveIconButton.start, 16.dp)
             }, onClick = {})
+            RoundedLightEditButton(modifier = Modifier.constrainAs(editIconButton) {
+                top.linkTo(parent.top, 16.dp)
+                end.linkTo(sendIconButton.start, 16.dp)
+            }, onClick = { navigateTo("edit_spot_screen/spotReference=${spotInfo.id}") })
             RoundedLightLikeButton(
                 onClick = { spotLikeClick() },
                 modifier = Modifier.constrainAs(likeIconButton) {

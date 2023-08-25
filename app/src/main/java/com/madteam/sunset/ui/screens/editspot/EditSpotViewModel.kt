@@ -3,11 +3,11 @@ package com.madteam.sunset.ui.screens.editspot
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
+import com.madteam.sunset.model.Spot
 import com.madteam.sunset.model.SpotAttribute
 import com.madteam.sunset.repositories.AuthRepository
 import com.madteam.sunset.repositories.DatabaseRepository
 import com.madteam.sunset.repositories.LocationRepository
-import com.madteam.sunset.ui.screens.addpost.MAX_IMAGES_SELECTED
 import com.madteam.sunset.utils.Resource
 import com.madteam.sunset.utils.googlemaps.MapState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -39,6 +39,9 @@ class EditSpotViewModel @Inject constructor(
 
     private val _spotLocation: MutableStateFlow<LatLng> = MutableStateFlow(LatLng(0.0, 0.0))
     val spotLocation: StateFlow<LatLng> = _spotLocation
+
+    private val _spotInfo: MutableStateFlow<Spot> = MutableStateFlow(Spot())
+    val spotInfo: StateFlow<Spot> = _spotInfo
 
     private val _mapState: MutableStateFlow<MapState> = MutableStateFlow(MapState())
     val mapState: StateFlow<MapState> = _mapState
@@ -88,6 +91,7 @@ class EditSpotViewModel @Inject constructor(
     private fun getSpotInfo() {
         viewModelScope.launch {
             databaseRepository.getSpotByDocRef(_spotReference.value).collectLatest { spot ->
+                _spotInfo.value = spot
                 _spotTitle.value = spot.name
                 _imageUris.value = spot.featuredImages
                 _spotDescription.value = spot.description
@@ -127,27 +131,6 @@ class EditSpotViewModel @Inject constructor(
         }
     }
 
-    fun updateSelectedImages(uris: List<String>) {
-        if (uris.size <= MAX_IMAGES_SELECTED && _imageUris.value.size <= MAX_IMAGES_SELECTED && _imageUris.value.size + uris.size <= MAX_IMAGES_SELECTED) {
-            _imageUris.value = _imageUris.value + uris
-        } else {
-            //TODO: Error text _errorToastText.value = "Maximum 8 images"
-        }
-    }
-
-    fun removeSelectedImageFromList() {
-        _imageUris.value = imageUris.value.filterNot { it == _selectedImageUri.value }
-        _selectedImageUri.value = ""
-    }
-
-    fun addSelectedImage(uri: String) {
-        if (_selectedImageUri.value == uri) {
-            _selectedImageUri.value = ""
-        } else {
-            _selectedImageUri.value = uri
-        }
-    }
-
     fun modifySpotTitle(title: String) {
         _spotTitle.value = title
     }
@@ -183,16 +166,15 @@ class EditSpotViewModel @Inject constructor(
         }
     }
 
-    fun createNewSpotIntent() {
+    fun updateSpotIntent() {
         viewModelScope.launch {
-            databaseRepository.createSpot(
-                featuredImages = listOf(),
+            databaseRepository.updateSpot(
+                spotReference = _spotReference.value,
                 spotTitle = _spotTitle.value,
                 spotDescription = _spotDescription.value,
                 spotLocation = _spotLocation.value,
                 spotCountry = _spotLocationCountry.value,
                 spotLocality = _spotLocationLocality.value,
-                spotAuthor = _username.value,
                 spotAttributes = _selectedAttributes.value,
                 spotScore = _spotScore.value
             ).collectLatest {

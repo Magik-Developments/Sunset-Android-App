@@ -339,6 +339,36 @@ fun LargeLightButton(
     }
 }
 
+@Composable
+fun LargeDangerButton(
+    onClick: () -> Unit,
+    @StringRes text: Int,
+    modifier: Modifier = Modifier.fillMaxWidth()
+) {
+    Button(
+        onClick = onClick,
+        modifier = modifier.height(48.dp),
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = Color(0xFFFF4444),
+        ),
+        shape = RoundedCornerShape(16.dp),
+        border = BorderStroke(1.dp, Color(0xFFFF4444))
+    ) {
+        Box(
+            Modifier
+                .fillMaxSize()
+                .align(Alignment.CenterVertically)
+        ) {
+            Text(
+                modifier = Modifier.align(Alignment.Center),
+                text = stringResource(text),
+                color = Color.White,
+                style = secondarySemiBoldHeadLineS
+            )
+        }
+    }
+}
+
 @Preview
 @Composable
 fun PreviewLargeLightButton() {
@@ -346,6 +376,17 @@ fun PreviewLargeLightButton() {
         LargeLightButton(
             onClick = {},
             R.string.show_all_reviews
+        )
+    }
+}
+
+@Preview
+@Composable
+fun PreviewLargeDangerButton() {
+    SunsetTheme {
+        LargeDangerButton(
+            onClick = {},
+            R.string.delete_spot
         )
     }
 }

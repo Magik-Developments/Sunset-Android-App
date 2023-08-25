@@ -2,9 +2,6 @@ package com.madteam.sunset.ui.screens.editspot
 
 import android.annotation.SuppressLint
 import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -23,17 +20,14 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.Brightness4
 import androidx.compose.material.icons.outlined.Brightness5
 import androidx.compose.material.icons.outlined.Brightness6
 import androidx.compose.material.icons.outlined.Brightness7
 import androidx.compose.material.icons.outlined.BrightnessLow
-import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -73,8 +67,8 @@ import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.CustomTextField
 import com.madteam.sunset.ui.common.DismissAndPositiveDialog
 import com.madteam.sunset.ui.common.GoForwardTopAppBar
+import com.madteam.sunset.ui.common.LargeDangerButton
 import com.madteam.sunset.ui.common.ScoreSlider
-import com.madteam.sunset.ui.screens.addpost.MAX_IMAGES_SELECTED
 import com.madteam.sunset.ui.screens.addreview.FAVORABLE_ATTRIBUTES
 import com.madteam.sunset.ui.screens.addreview.NON_FAVORABLE_ATTRIBUTES
 import com.madteam.sunset.ui.screens.addreview.SUNSET_ATTRIBUTES
@@ -107,8 +101,8 @@ fun EditSpotScreen(
 
     viewModel.setSpotReference("spots/$spotReference")
 
+    val spotInfo by viewModel.spotInfo.collectAsStateWithLifecycle()
     val imageUris by viewModel.imageUris.collectAsStateWithLifecycle()
-    val selectedImageUri by viewModel.selectedImageUri.collectAsStateWithLifecycle()
     val spotTitle by viewModel.spotTitle.collectAsStateWithLifecycle()
     val spotDescription by viewModel.spotDescription.collectAsStateWithLifecycle()
     val mapState by viewModel.mapState.collectAsStateWithLifecycle()
@@ -122,10 +116,6 @@ fun EditSpotScreen(
     val errorToastText by viewModel.errorToastText.collectAsStateWithLifecycle()
     val spotLocation by viewModel.spotLocation.collectAsStateWithLifecycle()
 
-    val multiplePhotoPickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickMultipleVisualMedia(maxItems = MAX_IMAGES_SELECTED),
-        onResult = { uris -> viewModel.updateSelectedImages(listOf()) })
-
     viewModel.modifySpotLocation(selectedLocation)
     viewModel.obtainCountryAndCityFromLatLng()
 
@@ -134,8 +124,13 @@ fun EditSpotScreen(
             GoForwardTopAppBar(
                 title = R.string.edit_spot,
                 onQuitClick = { navController.popBackStack() /* TODO: showExitDialog if it is ready to post */ },
-                onContinueClick = { /* TODO: Edit spot intent */ },
-                canContinue = (spotScore != 0 && selectedAttributes.isNotEmpty() && spotTitle.isNotEmpty() && spotDescription.isNotEmpty() && imageUris.isNotEmpty())
+                onContinueClick = { viewModel.updateSpotIntent() },
+                canContinue = ((spotScore != spotInfo.score.toInt() &&
+                        spotScore != 0 || selectedAttributes != spotInfo.attributes &&
+                        selectedAttributes.isNotEmpty() || spotTitle != spotInfo.name &&
+                        spotTitle.isNotEmpty() || spotDescription != spotInfo.description &&
+                        spotDescription.isNotEmpty())
+                        )
             )
         },
         content = { paddingValues ->
@@ -145,14 +140,6 @@ fun EditSpotScreen(
             ) {
                 AddSpotContent(
                     images = imageUris,
-                    selectedImage = selectedImageUri,
-                    onImageSelected = viewModel::addSelectedImage,
-                    onAddImagesClick = {
-                        multiplePhotoPickerLauncher.launch(
-                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                        )
-                    },
-                    onDeleteImagesClick = viewModel::removeSelectedImageFromList,
                     spotTitle = spotTitle,
                     spotDescription = spotDescription,
                     onSpotTitleChanged = viewModel::modifySpotTitle,
@@ -185,10 +172,6 @@ fun EditSpotScreen(
 @Composable
 fun AddSpotContent(
     images: List<String>,
-    selectedImage: String,
-    onImageSelected: (String) -> Unit,
-    onAddImagesClick: () -> Unit,
-    onDeleteImagesClick: () -> Unit,
     spotTitle: String,
     onSpotTitleChanged: (String) -> Unit,
     spotDescription: String,
@@ -284,41 +267,6 @@ fun AddSpotContent(
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .size(150.dp)
-                            .clickable {
-                                onImageSelected(image)
-                            }
-                    )
-                    if (image == selectedImage) {
-                        Box(
-                            Modifier
-                                .fillMaxSize()
-                                .background(Color(0xCCFFB600)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            IconButton(onClick = { onDeleteImagesClick() }) {
-                                Icon(
-                                    imageVector = Icons.Outlined.Delete,
-                                    contentDescription = "Delete image",
-                                    tint = Color.White,
-                                    modifier = Modifier.size(36.dp)
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-
-            item {
-                IconButton(
-                    onClick = { onAddImagesClick() },
-                    modifier = Modifier
-                        .size(150.dp)
-                        .background(Color(0xFFFFB600))
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "Add image",
-                        tint = Color.White
                     )
                 }
             }
@@ -634,7 +582,20 @@ fun AddSpotContent(
             CustomSpacer(size = 8.dp)
             Text(text = spotScore.toString(), style = primaryBoldDisplayS)
         }
+        CustomSpacer(size = 56.dp)
+        LargeDangerButton(onClick = {
+
+        }, text = R.string.delete_spot, modifier = Modifier.padding(horizontal = 24.dp))
         CustomSpacer(size = 24.dp)
+    }
+
+    if (images.isEmpty()) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.background(Color.Transparent)
+        ) {
+            CircularLoadingDialog()
+        }
     }
 
     when (uploadProgress) {

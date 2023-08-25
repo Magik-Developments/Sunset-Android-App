@@ -771,6 +771,47 @@ class DatabaseRepository @Inject constructor(
         Log.e("DatabaseRepository::createSpot", "Error: ${exception.message}")
         emit(Resource.Success("Error: " + exception.message))
     }
+
+    override fun updateSpot(
+        spotReference: String,
+        spotTitle: String,
+        spotDescription: String,
+        spotLocation: LatLng,
+        spotCountry: String?,
+        spotLocality: String?,
+        spotAttributes: List<SpotAttribute>,
+        spotScore: Int
+    ): Flow<Resource<String>> = flow<Resource<String>> {
+        val spotDocumentReference = firebaseFirestore.document(spotReference)
+        var locationText: String? = null
+
+        if (spotLocality.isNullOrBlank() && !spotCountry.isNullOrBlank()) {
+            locationText = spotCountry.toString()
+        } else if (!spotLocality.isNullOrBlank() && !spotCountry.isNullOrBlank()) {
+            locationText = "$spotLocality, $spotCountry"
+        }
+
+        val attributesReferences = spotAttributes.map {
+            firebaseFirestore.collection(
+                SPOT_ATTRIBUTES_COLLECTION
+            ).document(it.id)
+        }
+
+        val updatedSpotData = hashMapOf(
+            "name" to spotTitle,
+            "description" to spotDescription,
+            "location_in_latlng" to GeoPoint(spotLocation.latitude, spotLocation.longitude),
+            "location" to locationText,
+            "score" to spotScore,
+            "attributes" to attributesReferences
+        )
+
+        spotDocumentReference.update(updatedSpotData).await()
+        emit(Resource.Success(spotDocumentReference.id))
+    }.catch { exception ->
+        Log.e("DatabaseRepository::updateSpot", "Error: ${exception.message}")
+        emit(Resource.Error("Error updating spot: ${exception.message}"))
+    }
 }
 
 interface DatabaseContract {
@@ -818,6 +859,17 @@ interface DatabaseContract {
         spotCountry: String?,
         spotLocality: String?,
         spotAuthor: String,
+        spotAttributes: List<SpotAttribute>,
+        spotScore: Int
+    ): Flow<Resource<String>>
+
+    fun updateSpot(
+        spotReference: String,
+        spotTitle: String,
+        spotDescription: String,
+        spotLocation: LatLng,
+        spotCountry: String?,
+        spotLocality: String?,
         spotAttributes: List<SpotAttribute>,
         spotScore: Int
     ): Flow<Resource<String>>

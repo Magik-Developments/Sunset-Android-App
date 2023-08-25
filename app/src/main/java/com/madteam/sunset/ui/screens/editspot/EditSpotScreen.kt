@@ -115,6 +115,7 @@ fun EditSpotScreen(
     val showExitDialog by viewModel.showExitDialog.collectAsStateWithLifecycle()
     val errorToastText by viewModel.errorToastText.collectAsStateWithLifecycle()
     val spotLocation by viewModel.spotLocation.collectAsStateWithLifecycle()
+    val showDeleteDialog by viewModel.showDeleteDialog.collectAsStateWithLifecycle()
 
     viewModel.modifySpotLocation(selectedLocation)
     viewModel.obtainCountryAndCityFromLatLng()
@@ -161,7 +162,10 @@ fun EditSpotScreen(
                     exitAddSpot = navController::popBackStack,
                     setShowExitDialog = viewModel::setShowExitDialog,
                     showExitDialog = showExitDialog,
-                    spotLocation = spotLocation
+                    spotLocation = spotLocation,
+                    showDeleteDialog = showDeleteDialog,
+                    setShowDeleteDialog = viewModel::setShowDeleteDialog,
+                    deleteSpot = viewModel::deleteSpotIntent
                 )
             }
         }
@@ -193,7 +197,10 @@ fun AddSpotContent(
     showExitDialog: Boolean,
     exitAddSpot: () -> Unit,
     setShowExitDialog: (Boolean) -> Unit,
-    spotLocation: LatLng
+    spotLocation: LatLng,
+    showDeleteDialog: Boolean,
+    setShowDeleteDialog: (Boolean) -> Unit,
+    deleteSpot: () -> Unit
 ) {
 
     val context = LocalContext.current
@@ -217,6 +224,21 @@ fun AddSpotContent(
             positiveClickedAction = {
                 setShowExitDialog(false)
                 exitAddSpot()
+            }
+        )
+    }
+
+    if (showDeleteDialog) {
+        DismissAndPositiveDialog(
+            setShowDialog = { setShowDeleteDialog(it) },
+            dialogTitle = R.string.are_you_sure,
+            dialogDescription = R.string.delete_spot_description,
+            positiveButtonText = R.string.delete_spot,
+            dismissButtonText = R.string.cancel,
+            dismissClickedAction = { setShowDeleteDialog(false) },
+            positiveClickedAction = {
+                setShowDeleteDialog(false)
+                deleteSpot()
             }
         )
     }
@@ -583,9 +605,11 @@ fun AddSpotContent(
             Text(text = spotScore.toString(), style = primaryBoldDisplayS)
         }
         CustomSpacer(size = 56.dp)
-        LargeDangerButton(onClick = {
-
-        }, text = R.string.delete_spot, modifier = Modifier.padding(horizontal = 24.dp))
+        LargeDangerButton(
+            onClick = { setShowDeleteDialog(true) },
+            text = R.string.delete_spot,
+            modifier = Modifier.padding(horizontal = 24.dp)
+        )
         CustomSpacer(size = 24.dp)
     }
 

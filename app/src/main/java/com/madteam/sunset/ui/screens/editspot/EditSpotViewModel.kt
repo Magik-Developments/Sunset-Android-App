@@ -67,6 +67,9 @@ class EditSpotViewModel @Inject constructor(
     private val _showExitDialog: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val showExitDialog: StateFlow<Boolean> = _showExitDialog
 
+    private val _showDeleteDialog: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val showDeleteDialog: StateFlow<Boolean> = _showDeleteDialog
+
     private val _errorToastText: MutableStateFlow<String> = MutableStateFlow("")
     val errorToastText: StateFlow<String> = _errorToastText
 
@@ -155,6 +158,10 @@ class EditSpotViewModel @Inject constructor(
         _showExitDialog.value = state
     }
 
+    fun setShowDeleteDialog(state: Boolean) {
+        _showDeleteDialog.value = state
+    }
+
     fun obtainCountryAndCityFromLatLng() {
         viewModelScope.launch {
             locationRepository.obtainCountryFromLatLng(_spotLocation.value).collectLatest {
@@ -181,6 +188,10 @@ class EditSpotViewModel @Inject constructor(
                 _uploadProgress.value = it
             }
         }
+    }
+
+    fun deleteSpotIntent() {
+
     }
 
 }

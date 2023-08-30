@@ -16,6 +16,7 @@ import androidx.compose.material.icons.outlined.Bookmark
 import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Visibility
@@ -210,6 +211,28 @@ fun RoundedLightSendButton(
             painter = painterResource(id = R.drawable.ic_send),
             contentDescription = "",
             modifier = Modifier.size(36.dp),
+            tint = Color.Black
+        )
+    }
+}
+
+@Composable
+fun RoundedLightEditButton(
+    onClick: () -> Unit,
+    modifier: Modifier
+) {
+    IconButton(
+        onClick = onClick, modifier = modifier
+            .size(48.dp)
+            .background(Color.White, RoundedCornerShape(50.dp))
+            .clip(
+                RoundedCornerShape(50.dp)
+            )
+    ) {
+        Icon(
+            imageVector = Icons.Outlined.Edit,
+            contentDescription = "",
+            modifier = Modifier.size(24.dp),
             tint = Color.Black
         )
     }

@@ -7,8 +7,9 @@ data class UserProfile(
     val creation_date: String,
     val name: String,
     val location: String,
-    val image: String
+    val image: String,
+    val admin: Boolean
 ) {
 
-    constructor() : this("", "", "", "", "", "", "")
+    constructor() : this("", "", "", "", "", "", "", false)
 }

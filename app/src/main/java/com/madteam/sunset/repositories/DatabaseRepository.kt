@@ -3,6 +3,8 @@ package com.madteam.sunset.repositories
 import android.net.Uri
 import android.util.Log
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
@@ -339,6 +341,7 @@ class DatabaseRepository @Inject constructor(
             val creationDate = userSnapshot.getString("creation_date")
             val userImage = userSnapshot.getString("image")
             val usernameName = userSnapshot.getString("name")
+            val isUserAdmin = userSnapshot.getBoolean("admin")
             val userProfile = UserProfile(
                 username = username ?: "",
                 email = email ?: "",
@@ -346,7 +349,8 @@ class DatabaseRepository @Inject constructor(
                 creation_date = creationDate ?: "",
                 name = usernameName ?: "",
                 location = location ?: "",
-                image = userImage ?: ""
+                image = userImage ?: "",
+                admin = isUserAdmin ?: false
             )
             emit(userProfile)
         }
@@ -812,6 +816,114 @@ class DatabaseRepository @Inject constructor(
         Log.e("DatabaseRepository::updateSpot", "Error: ${exception.message}")
         emit(Resource.Error("Error updating spot: ${exception.message}"))
     }
+
+    override fun deleteSpot(spotReference: String): Flow<Resource<String>> =
+        flow<Resource<String>> {
+            val spotDocumentReference = firebaseFirestore.document(spotReference)
+
+            //Deleting associated posts and its subcollections/documents
+            val spotPostsQuerySnapshot = firebaseFirestore.collection(POSTS_COLLECTION_PATH)
+                .whereEqualTo("spot", spotDocumentReference)
+                .get().await()
+            val deletePostsTasks = mutableListOf<Task<Void>>()
+            for (postDocumentSnapshot in spotPostsQuerySnapshot.documents) {
+                val postDocumentReference = postDocumentSnapshot.reference
+
+                // Delete comments subcollection
+                val commentsCollection = postDocumentReference.collection("comments")
+                deleteCollection(commentsCollection).collectLatest { }
+
+                // Delete liked_by subcollection
+                val likedByCollection = postDocumentReference.collection("liked_by")
+                deleteCollection(likedByCollection).collectLatest { }
+
+                val deleteTask = postDocumentSnapshot.reference.delete()
+                deletePostsTasks.add(deleteTask)
+            }
+
+            Tasks.whenAllComplete(deletePostsTasks).await()
+
+            val spotLocationQuerySnapshot = firebaseFirestore.collection(
+                SPOTS_LOCATIONS_COLLECTION_PATH
+            ).whereEqualTo("spot", spotDocumentReference).get().await()
+
+            if (!spotLocationQuerySnapshot.isEmpty) {
+                val spotLocationDocument = spotLocationQuerySnapshot.documents.first()
+                spotLocationDocument.reference.delete().await()
+            }
+
+            //Delete spot images
+            val featuredImagesList =
+                spotDocumentReference.get().await().get("featured_images") as List<String>
+            val deleteImagesTasks = mutableListOf<Task<Void>>()
+
+            for (imageUrl in featuredImagesList) {
+                val imageReference = firebaseStorage.getReferenceFromUrl(imageUrl)
+                val deleteTask = imageReference.delete()
+                deleteImagesTasks.add(deleteTask)
+            }
+
+            Tasks.whenAllComplete(deleteImagesTasks).await()
+
+            //Delete posts images
+            for (postDocumentSnapshot in spotPostsQuerySnapshot.documents) {
+                val imagesList = postDocumentSnapshot.get("images") as List<String>?
+                if (imagesList != null) {
+                    val deletePostImagesTasks = mutableListOf<Task<Void>>()
+
+                    for (imageUrl in imagesList) {
+                        val imageReference = firebaseStorage.getReferenceFromUrl(imageUrl)
+                        val deleteTask = imageReference.delete()
+                        deletePostImagesTasks.add(deleteTask)
+                    }
+
+                    Tasks.whenAllComplete(deletePostImagesTasks).await()
+                }
+            }
+
+            // Delete liked_by subcollection
+            val likedByCollection = spotDocumentReference.collection("liked_by")
+            deleteCollection(likedByCollection).collectLatest { }
+
+            // Delete spot_reviews subcollection
+            val spotReviewsCollection = spotDocumentReference.collection("spot_reviews")
+            deleteCollection(spotReviewsCollection).collectLatest { }
+
+            //Delete spot
+            spotDocumentReference.delete().await()
+            emit(Resource.Success("deleted successfully"))
+        }.catch { exception ->
+            Log.e("DatabaseRepository::deleteSpot", "Error: ${exception.message}")
+            emit(Resource.Error("Error deleting spot: ${exception.message}"))
+        }
+
+    override fun deleteCollection(collectionRef: CollectionReference): Flow<Unit> = flow {
+        val batchSize = 1000
+        var query = collectionRef.limit(batchSize.toLong())
+
+        while (true) {
+            val snapshot = query.get().await()
+
+            if (snapshot.isEmpty) {
+                break
+            }
+
+            val batch = collectionRef.firestore.batch()
+            for (documentSnapshot in snapshot) {
+                batch.delete(documentSnapshot.reference)
+            }
+
+            batch.commit().await()
+
+            if (snapshot.size() < batchSize) {
+                break
+            }
+
+            val lastDocument = snapshot.documents[snapshot.size() - 1]
+            query = collectionRef.startAfter(lastDocument)
+        }
+        emit(Unit)
+    }
 }
 
 interface DatabaseContract {
@@ -873,5 +985,13 @@ interface DatabaseContract {
         spotAttributes: List<SpotAttribute>,
         spotScore: Int
     ): Flow<Resource<String>>
+
+    fun deleteSpot(
+        spotReference: String
+    ): Flow<Resource<String>>
+
+    fun deleteCollection(
+        collectionRef: CollectionReference
+    ): Flow<Unit>
 
 }

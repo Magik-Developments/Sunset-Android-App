@@ -66,7 +66,7 @@ class CommentsViewModel @Inject constructor(
             val newPostComment = PostComment(
                 id = "",
                 comment = commentText,
-                author = UserProfile(username, "", "", "", "", "", userImage),
+                author = UserProfile(username, "", "", "", "", "", userImage, false),
                 creationDate = Calendar.getInstance().time.toString()
             )
             databaseRepository.createPostComment(newPostComment, _postReference.value)

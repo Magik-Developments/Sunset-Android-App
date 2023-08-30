@@ -191,7 +191,13 @@ class EditSpotViewModel @Inject constructor(
     }
 
     fun deleteSpotIntent() {
-
+        viewModelScope.launch {
+            databaseRepository.deleteSpot(
+                _spotReference.value
+            ).collectLatest {
+                _uploadProgress.value = it
+            }
+        }
     }
 
 }

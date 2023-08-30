@@ -22,6 +22,7 @@ class EditProfileViewModel @Inject constructor(
   val name = MutableStateFlow("")
   val location = MutableStateFlow("")
   val userImage = MutableStateFlow("")
+  val userIsAdmin = MutableStateFlow(false)
 
   init {
     setInitialValues()
@@ -35,6 +36,7 @@ class EditProfileViewModel @Inject constructor(
         name.value = it.name
         location.value = it.location
         userImage.value = it.image
+        userIsAdmin.value = it.admin
       }
     }
   }
@@ -55,7 +57,8 @@ class EditProfileViewModel @Inject constructor(
       creation_date = "",
       name = name.value,
       location = location.value,
-      image = userImage.value
+      image = userImage.value,
+      admin = userIsAdmin.value
     )
     viewModelScope.launch {
       databaseRepository.updateUser(newUser).collectLatest {}

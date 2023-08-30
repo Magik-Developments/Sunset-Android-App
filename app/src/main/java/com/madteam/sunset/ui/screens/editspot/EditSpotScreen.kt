@@ -25,8 +25,6 @@ import androidx.compose.material.icons.outlined.Brightness5
 import androidx.compose.material.icons.outlined.Brightness6
 import androidx.compose.material.icons.outlined.Brightness7
 import androidx.compose.material.icons.outlined.BrightnessLow
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -61,6 +59,7 @@ import com.google.maps.android.compose.MapsComposeExperimentalApi
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.madteam.sunset.R
 import com.madteam.sunset.model.SpotAttribute
+import com.madteam.sunset.navigation.SunsetRoutes
 import com.madteam.sunset.ui.common.AutoSlidingCarousel
 import com.madteam.sunset.ui.common.CircularLoadingDialog
 import com.madteam.sunset.ui.common.CustomSpacer
@@ -372,7 +371,7 @@ fun AddSpotContent(
                         )
                     )
             )
-            Button(
+            /* Button(
                 modifier = Modifier
                     .align(Alignment.Center)
                     .padding(bottom = 20.dp),
@@ -385,7 +384,7 @@ fun AddSpotContent(
                     text = stringResource(id = R.string.modify_location),
                     color = Color.White
                 )
-            }
+            } */
             Column(
                 horizontalAlignment = Alignment.End,
                 verticalArrangement = Arrangement.Bottom,
@@ -648,6 +647,10 @@ fun AddSpotContent(
                 }
             } else if (uploadProgress.data.contains("Error")) {
                 Toast.makeText(context, "Error, try again later.", Toast.LENGTH_SHORT).show()
+                clearUploadProgress()
+            } else if (uploadProgress.data.contains("deleted")) {
+                Toast.makeText(context, "Spot deleted successfully.", Toast.LENGTH_SHORT).show()
+                navigateTo(SunsetRoutes.DiscoverScreen.route)
                 clearUploadProgress()
             }
         }

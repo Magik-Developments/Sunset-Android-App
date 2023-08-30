@@ -95,6 +95,7 @@ fun SpotDetailScreen(
     val isSpotLikedByUser by viewModel.spotIsLiked.collectAsStateWithLifecycle()
     val spotLikes by viewModel.spotLikes.collectAsStateWithLifecycle()
     val userLocation by viewModel.userLocation.collectAsStateWithLifecycle()
+    val isUserAdmin by viewModel.userIsAbleToEditOrRemoveSpot.collectAsStateWithLifecycle()
 
     Scaffold(
         content = { paddingValues ->
@@ -110,7 +111,8 @@ fun SpotDetailScreen(
                     spotLikedByUser = isSpotLikedByUser,
                     spotLikes = spotLikes,
                     updateUserLocation = viewModel::updateUserLocation,
-                    userLocation = userLocation
+                    userLocation = userLocation,
+                    isUserAdmin = isUserAdmin
                 )
             }
         }
@@ -127,7 +129,8 @@ fun SpotDetailContent(
     spotLikedByUser: Boolean,
     spotLikes: Int,
     updateUserLocation: (LatLng) -> Unit,
-    userLocation: LatLng
+    userLocation: LatLng,
+    isUserAdmin: Boolean
 ) {
     val scrollState = rememberScrollState()
     val showShimmer = remember { mutableStateOf(true) }
@@ -193,10 +196,12 @@ fun SpotDetailContent(
                 top.linkTo(parent.top, 16.dp)
                 end.linkTo(saveIconButton.start, 16.dp)
             }, onClick = {})
-            RoundedLightEditButton(modifier = Modifier.constrainAs(editIconButton) {
-                top.linkTo(parent.top, 16.dp)
-                end.linkTo(sendIconButton.start, 16.dp)
-            }, onClick = { navigateTo("edit_spot_screen/spotReference=${spotInfo.id}") })
+            if (isUserAdmin) {
+                RoundedLightEditButton(modifier = Modifier.constrainAs(editIconButton) {
+                    top.linkTo(parent.top, 16.dp)
+                    end.linkTo(sendIconButton.start, 16.dp)
+                }, onClick = { navigateTo("edit_spot_screen/spotReference=${spotInfo.id}") })
+            }
             RoundedLightLikeButton(
                 onClick = { spotLikeClick() },
                 modifier = Modifier.constrainAs(likeIconButton) {

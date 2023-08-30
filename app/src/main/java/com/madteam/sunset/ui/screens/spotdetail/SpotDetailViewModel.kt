@@ -33,6 +33,9 @@ class SpotDetailViewModel @Inject constructor(
     private val _userLocation: MutableStateFlow<LatLng> = MutableStateFlow(LatLng(0.0, 0.0))
     val userLocation: StateFlow<LatLng> = _userLocation
 
+    private val _userIsAbleToEditOrRemoveSpot: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val userIsAbleToEditOrRemoveSpot: StateFlow<Boolean> = _userIsAbleToEditOrRemoveSpot
+
     private lateinit var username: String
 
     init {
@@ -46,6 +49,7 @@ class SpotDetailViewModel @Inject constructor(
             authRepository.getCurrentUser()?.let { user ->
                 databaseRepository.getUserByEmail(user.email!!) {
                     username = it.username
+                    _userIsAbleToEditOrRemoveSpot.value = it.admin
                 }
             }
         }

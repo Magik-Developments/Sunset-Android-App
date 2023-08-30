@@ -680,6 +680,7 @@ class DatabaseRepository @Inject constructor(
         score: Int,
         author: UserProfile
     ): Flow<Resource<String>> = flow {
+        emit(Resource.Loading())
         val newReviewDocument = firebaseFirestore.collection(SPOTS_COLLECTION_PATH)
             .document(spotReference)
             .collection(SPOT_REVIEWS_COLLECTION)
@@ -720,6 +721,7 @@ class DatabaseRepository @Inject constructor(
         spotAttributes: List<SpotAttribute>,
         spotScore: Int
     ): Flow<Resource<String>> = flow<Resource<String>> {
+        emit(Resource.Loading())
         val newSpotDocument = firebaseFirestore.collection(SPOTS_COLLECTION_PATH)
             .document()
         val newSpotLocationDocument = firebaseFirestore.collection(SPOTS_LOCATIONS_COLLECTION_PATH)
@@ -786,6 +788,7 @@ class DatabaseRepository @Inject constructor(
         spotAttributes: List<SpotAttribute>,
         spotScore: Int
     ): Flow<Resource<String>> = flow<Resource<String>> {
+        emit(Resource.Loading())
         val spotDocumentReference = firebaseFirestore.document(spotReference)
         var locationText: String? = null
 
@@ -819,6 +822,7 @@ class DatabaseRepository @Inject constructor(
 
     override fun deleteSpot(spotReference: String): Flow<Resource<String>> =
         flow<Resource<String>> {
+            emit(Resource.Loading())
             val spotDocumentReference = firebaseFirestore.document(spotReference)
 
             //Deleting associated posts and its subcollections/documents

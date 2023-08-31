@@ -66,6 +66,7 @@ import com.madteam.sunset.ui.common.ProfileImage
 import com.madteam.sunset.ui.common.RoundedLightBackButton
 import com.madteam.sunset.ui.common.RoundedLightEditButton
 import com.madteam.sunset.ui.common.RoundedLightLikeButton
+import com.madteam.sunset.ui.common.RoundedLightReportButton
 import com.madteam.sunset.ui.common.RoundedLightSaveButton
 import com.madteam.sunset.ui.common.RoundedLightSendButton
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineXS
@@ -162,7 +163,7 @@ fun SpotDetailContent(
     ) {
         //Header image section
         ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
-            val (spotImage, backIconButton, saveIconButton, sendIconButton, editIconButton, likeIconButton) = createRefs()
+            val (spotImage, backIconButton, saveIconButton, sendIconButton, editIconButton, likeIconButton, reportIconButton) = createRefs()
             AutoSlidingCarousel(
                 itemsCount = spotInfo.featuredImages.size,
                 itemContent = { index ->
@@ -202,6 +203,10 @@ fun SpotDetailContent(
                     end.linkTo(sendIconButton.start, 16.dp)
                 }, onClick = { navigateTo("edit_spot_screen/spotReference=${spotInfo.id}") })
             }
+            RoundedLightReportButton(modifier = Modifier.constrainAs(reportIconButton) {
+                top.linkTo(saveIconButton.top, 16.dp)
+                end.linkTo(parent.end, 16.dp)
+            }, onClick = { /*TODO*/ })
             RoundedLightLikeButton(
                 onClick = { spotLikeClick() },
                 modifier = Modifier.constrainAs(likeIconButton) {

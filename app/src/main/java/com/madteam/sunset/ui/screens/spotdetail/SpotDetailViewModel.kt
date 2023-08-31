@@ -36,6 +36,27 @@ class SpotDetailViewModel @Inject constructor(
     private val _userIsAbleToEditOrRemoveSpot: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val userIsAbleToEditOrRemoveSpot: StateFlow<Boolean> = _userIsAbleToEditOrRemoveSpot
 
+    private val _showReportDialog: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val showReportDialog: StateFlow<Boolean> = _showReportDialog
+
+    private val _availableOptionsToReport: MutableStateFlow<List<String>> = MutableStateFlow(
+        listOf(
+            "Spam",
+            "Offensive content",
+            "Wrong location",
+            "Wrong information",
+            "Others"
+        )
+    )
+    val availableOptionsToReport: StateFlow<List<String>> = _availableOptionsToReport
+
+    private val _selectedReportOption: MutableStateFlow<String> =
+        MutableStateFlow(_availableOptionsToReport.value.first())
+    val selectedReportOption: StateFlow<String> = _selectedReportOption
+
+    private val _additionalReportInformation: MutableStateFlow<String> = MutableStateFlow("")
+    val additionalReportInformation: StateFlow<String> = _additionalReportInformation
+
     private lateinit var username: String
 
     init {
@@ -60,8 +81,20 @@ class SpotDetailViewModel @Inject constructor(
         getSpotInfo()
     }
 
+    fun selectedReportOption(selectedOption: String) {
+        _selectedReportOption.value = selectedOption
+    }
+
+    fun setAdditionalReportInformation(text: String) {
+        _additionalReportInformation.value = text
+    }
+
     fun updateUserLocation(location: LatLng) {
         _userLocation.value = location
+    }
+
+    fun setShowReportDialog(show: Boolean) {
+        _showReportDialog.value = show
     }
 
     private fun getSpotInfo() {

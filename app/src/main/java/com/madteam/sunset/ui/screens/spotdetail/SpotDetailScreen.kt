@@ -63,6 +63,7 @@ import com.madteam.sunset.ui.common.IconButtonDark
 import com.madteam.sunset.ui.common.ImagePostCard
 import com.madteam.sunset.ui.common.LargeLightButton
 import com.madteam.sunset.ui.common.ProfileImage
+import com.madteam.sunset.ui.common.ReportDialog
 import com.madteam.sunset.ui.common.RoundedLightBackButton
 import com.madteam.sunset.ui.common.RoundedLightEditButton
 import com.madteam.sunset.ui.common.RoundedLightLikeButton
@@ -97,6 +98,10 @@ fun SpotDetailScreen(
     val spotLikes by viewModel.spotLikes.collectAsStateWithLifecycle()
     val userLocation by viewModel.userLocation.collectAsStateWithLifecycle()
     val isUserAdmin by viewModel.userIsAbleToEditOrRemoveSpot.collectAsStateWithLifecycle()
+    val showReportDialog by viewModel.showReportDialog.collectAsStateWithLifecycle()
+    val availableOptionsToReport by viewModel.availableOptionsToReport.collectAsStateWithLifecycle()
+    val selectedReportOption by viewModel.selectedReportOption.collectAsStateWithLifecycle()
+    val additionalReportInformation by viewModel.additionalReportInformation.collectAsStateWithLifecycle()
 
     Scaffold(
         content = { paddingValues ->
@@ -113,7 +118,14 @@ fun SpotDetailScreen(
                     spotLikes = spotLikes,
                     updateUserLocation = viewModel::updateUserLocation,
                     userLocation = userLocation,
-                    isUserAdmin = isUserAdmin
+                    isUserAdmin = isUserAdmin,
+                    showReportDialog = showReportDialog,
+                    setShowReportDialog = viewModel::setShowReportDialog,
+                    availableOptionsToReport = availableOptionsToReport,
+                    setSelectedReportOption = viewModel::selectedReportOption,
+                    selectedReportOption = selectedReportOption,
+                    additionalReportInformation = additionalReportInformation,
+                    setAdditionalReportInformation = viewModel::setAdditionalReportInformation
                 )
             }
         }
@@ -131,7 +143,14 @@ fun SpotDetailContent(
     spotLikes: Int,
     updateUserLocation: (LatLng) -> Unit,
     userLocation: LatLng,
-    isUserAdmin: Boolean
+    isUserAdmin: Boolean,
+    showReportDialog: Boolean,
+    setShowReportDialog: (Boolean) -> Unit,
+    availableOptionsToReport: List<String>,
+    setSelectedReportOption: (String) -> Unit,
+    selectedReportOption: String,
+    additionalReportInformation: String,
+    setAdditionalReportInformation: (String) -> Unit
 ) {
     val scrollState = rememberScrollState()
     val showShimmer = remember { mutableStateOf(true) }
@@ -154,6 +173,21 @@ fun SpotDetailContent(
             showShimmer.value = false
             requestPermissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
         }
+    }
+
+    if (showReportDialog) {
+        ReportDialog(
+            setShowDialog = { setShowReportDialog(it) },
+            dialogTitle = R.string.inform_about_spot,
+            dialogDescription = R.string.inform_about_spot_description,
+            availableOptions = availableOptionsToReport,
+            setSelectedOption = { setSelectedReportOption(it) },
+            selectedOptionText = selectedReportOption,
+            additionalInformation = additionalReportInformation,
+            setAdditionalInformation = { setAdditionalReportInformation(it) },
+            buttonText = R.string.send_report,
+            buttonClickedAction = { setShowReportDialog(false) }
+        )
     }
 
     Column(
@@ -204,9 +238,9 @@ fun SpotDetailContent(
                 }, onClick = { navigateTo("edit_spot_screen/spotReference=${spotInfo.id}") })
             }
             RoundedLightReportButton(modifier = Modifier.constrainAs(reportIconButton) {
-                top.linkTo(saveIconButton.top, 16.dp)
-                end.linkTo(parent.end, 16.dp)
-            }, onClick = { /*TODO*/ })
+                top.linkTo(saveIconButton.bottom, 16.dp)
+                end.linkTo(parent.end, 24.dp)
+            }, onClick = { setShowReportDialog(true) })
             RoundedLightLikeButton(
                 onClick = { spotLikeClick() },
                 modifier = Modifier.constrainAs(likeIconButton) {
@@ -680,4 +714,6 @@ fun SpotDetailContent(
             )
         }
     }
+
+
 }

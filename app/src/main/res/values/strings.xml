@@ -84,4 +84,8 @@
     <string name="edit_spot">Edit Spot</string>
     <string name="delete_spot">Delete Spot</string>
     <string name="delete_spot_description">If you delete this Spot it\'ll also delete all posts and reviews associated.</string>
+    <string name="inform_about_spot">🚩 Inform about an Spot</string>
+    <string name="inform_about_spot_description">Your user information and the report will be sent to our administrators to check your petition as soon as possible. Thanks.</string>
+    <string name="additional_information">Add additional information</string>
+    <string name="send_report">Send report</string>
 </resources>

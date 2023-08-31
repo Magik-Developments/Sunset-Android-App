@@ -34,6 +34,7 @@ private const val SPOT_REVIEWS_COLLECTION = "spot_reviews"
 private const val SPOT_ATTRIBUTES_COLLECTION = "spot_attributes"
 private const val SPOTS_COLLECTION_PATH = "spots"
 private const val POSTS_COLLECTION_PATH = "posts"
+private const val REPORTS_COLLECTION_PATH = "reports"
 private const val COMMENTS_POST_COLLECTION_PATH = "comments"
 private const val LIKED_BY_POST_COLLECTION_PATH = "liked_by"
 private const val LIKED_BY_SPOT_COLLECTION_PATH = "liked_by"
@@ -928,6 +929,33 @@ class DatabaseRepository @Inject constructor(
         }
         emit(Unit)
     }
+
+    override fun sendReport(
+        reportType: String,
+        reporterUsername: String,
+        reportIssue: String,
+        reportDescription: String,
+        documentReference: String
+    ): Flow<Resource<String>> = flow {
+        emit(Resource.Loading())
+        val newReportDocument = firebaseFirestore.collection(REPORTS_COLLECTION_PATH)
+            .document()
+        val reporterReference = firebaseFirestore.collection(USERS_COLLECTION_PATH)
+            .document(reporterUsername)
+        val newReport = hashMapOf(
+            "type" to reportType,
+            "reporter" to reporterReference,
+            "issue" to reportIssue,
+            "description" to reportDescription,
+            "doc_reference" to firebaseFirestore.document(documentReference),
+            "date" to Calendar.getInstance().time.toString()
+        )
+        newReportDocument.set(newReport).await()
+        emit(Resource.Success(newReportDocument.id))
+    }.catch { exception ->
+        Log.e("DatabaseRepository::sendReport", "Error: ${exception.message}")
+        emit(Resource.Success("Error: " + exception.message))
+    }
 }
 
 interface DatabaseContract {
@@ -997,5 +1025,13 @@ interface DatabaseContract {
     fun deleteCollection(
         collectionRef: CollectionReference
     ): Flow<Unit>
+
+    fun sendReport(
+        reportType: String,
+        reporterUsername: String,
+        reportIssue: String,
+        reportDescription: String,
+        documentReference: String
+    ): Flow<Resource<String>>
 
 }

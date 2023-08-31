@@ -39,6 +39,9 @@ class SpotDetailViewModel @Inject constructor(
     private val _showReportDialog: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val showReportDialog: StateFlow<Boolean> = _showReportDialog
 
+    private val _showReportSentDialog: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val showReportSentDialog: StateFlow<Boolean> = _showReportSentDialog
+
     private val _availableOptionsToReport: MutableStateFlow<List<String>> = MutableStateFlow(
         listOf(
             "Spam",
@@ -85,6 +88,10 @@ class SpotDetailViewModel @Inject constructor(
         _selectedReportOption.value = selectedOption
     }
 
+    fun setReportSentDialog(status: Boolean) {
+        _showReportSentDialog.value = status
+    }
+
     fun setAdditionalReportInformation(text: String) {
         _additionalReportInformation.value = text
     }
@@ -118,6 +125,18 @@ class SpotDetailViewModel @Inject constructor(
                 _spotLikes.value++
                 _spotIsLiked.value = true
             }
+        }
+    }
+
+    fun sendReportIntent() {
+        viewModelScope.launch {
+            databaseRepository.sendReport(
+                reportType = "Spot",
+                reporterUsername = username,
+                reportIssue = _selectedReportOption.value,
+                reportDescription = _additionalReportInformation.value,
+                documentReference = _spotReference.value
+            ).collectLatest { }
         }
     }
 }

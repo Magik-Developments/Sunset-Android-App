@@ -102,6 +102,7 @@ fun SpotDetailScreen(
     val availableOptionsToReport by viewModel.availableOptionsToReport.collectAsStateWithLifecycle()
     val selectedReportOption by viewModel.selectedReportOption.collectAsStateWithLifecycle()
     val additionalReportInformation by viewModel.additionalReportInformation.collectAsStateWithLifecycle()
+    val reportSentDialog by viewModel.showReportSentDialog.collectAsStateWithLifecycle()
 
     Scaffold(
         content = { paddingValues ->
@@ -125,7 +126,10 @@ fun SpotDetailScreen(
                     setSelectedReportOption = viewModel::selectedReportOption,
                     selectedReportOption = selectedReportOption,
                     additionalReportInformation = additionalReportInformation,
-                    setAdditionalReportInformation = viewModel::setAdditionalReportInformation
+                    setAdditionalReportInformation = viewModel::setAdditionalReportInformation,
+                    sendReportButton = viewModel::sendReportIntent,
+                    setReportSentDialog = viewModel::setReportSentDialog,
+                    reportSentDialog = reportSentDialog
                 )
             }
         }
@@ -150,7 +154,10 @@ fun SpotDetailContent(
     setSelectedReportOption: (String) -> Unit,
     selectedReportOption: String,
     additionalReportInformation: String,
-    setAdditionalReportInformation: (String) -> Unit
+    setAdditionalReportInformation: (String) -> Unit,
+    sendReportButton: () -> Unit,
+    setReportSentDialog: (Boolean) -> Unit,
+    reportSentDialog: Boolean
 ) {
     val scrollState = rememberScrollState()
     val showShimmer = remember { mutableStateOf(true) }
@@ -186,7 +193,14 @@ fun SpotDetailContent(
             additionalInformation = additionalReportInformation,
             setAdditionalInformation = { setAdditionalReportInformation(it) },
             buttonText = R.string.send_report,
-            buttonClickedAction = { setShowReportDialog(false) }
+            buttonClickedAction = {
+                sendReportButton()
+                setReportSentDialog(true)
+            },
+            reportSent = reportSentDialog,
+            setShowReportSent = {
+                setReportSentDialog(it)
+            }
         )
     }
 

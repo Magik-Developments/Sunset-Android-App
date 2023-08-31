@@ -17,7 +17,6 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -146,10 +145,11 @@ fun CircularLoadingDialog() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReportDialog(
     setShowDialog: (Boolean) -> Unit,
+    setShowReportSent: (Boolean) -> Unit,
     @StringRes dialogTitle: Int,
     @StringRes dialogDescription: Int,
     availableOptions: List<String>,
@@ -158,94 +158,125 @@ fun ReportDialog(
     additionalInformation: String,
     setAdditionalInformation: (String) -> Unit,
     @StringRes buttonText: Int,
-    buttonClickedAction: () -> Unit
+    buttonClickedAction: () -> Unit,
+    reportSent: Boolean
 ) {
 
     var expandedMenu by remember { mutableStateOf(false) }
 
-    Dialog(onDismissRequest = { setShowDialog(false) }) {
+    Dialog(onDismissRequest = {
+        setShowDialog(false)
+        setShowReportSent(false)
+    }) {
         Card(
             shape = RoundedCornerShape(20.dp),
             elevation = 2.dp,
             modifier = Modifier.padding(horizontal = 24.dp)
         ) {
-            Column {
-                CustomSpacer(size = 16.dp)
-                Row(
-                    horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        modifier = Modifier
-                            .padding(horizontal = 24.dp),
-                        text = stringResource(dialogTitle),
-                        style = primaryBoldHeadlineS,
-                        textAlign = TextAlign.Center
-                    )
-                }
-                CustomSpacer(size = 24.dp)
-                ExposedDropdownMenuBox(
-                    expanded = expandedMenu,
-                    onExpandedChange = { expandedMenu = !expandedMenu },
-                    modifier = Modifier.padding(horizontal = 24.dp)
-                ) {
-                    TextField(
-                        value = selectedOptionText,
-                        onValueChange = {},
-                        readOnly = true,
-                        modifier = Modifier.menuAnchor(),
-                        trailingIcon = {
-                            ExposedDropdownMenuDefaults.TrailingIcon(
-                                expanded = expandedMenu
-                            )
-                        }
-                    )
-                    ExposedDropdownMenu(
+            if (!reportSent) {
+                Column {
+                    CustomSpacer(size = 16.dp)
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            modifier = Modifier
+                                .padding(horizontal = 24.dp),
+                            text = stringResource(dialogTitle),
+                            style = primaryBoldHeadlineS,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                    CustomSpacer(size = 24.dp)
+                    ExposedDropdownMenuBox(
                         expanded = expandedMenu,
-                        onDismissRequest = { expandedMenu = false }) {
-                        availableOptions.forEach { selectionOption ->
-                            DropdownMenuItem(
-                                text = { Text(text = selectionOption) },
-                                onClick = {
-                                    setSelectedOption(selectionOption)
-                                    expandedMenu = false
-                                },
-                                contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
-                            )
+                        onExpandedChange = { expandedMenu = !expandedMenu },
+                        modifier = Modifier.padding(horizontal = 24.dp)
+                    ) {
+                        TextField(
+                            value = selectedOptionText,
+                            onValueChange = {},
+                            readOnly = true,
+                            modifier = Modifier.menuAnchor(),
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(
+                                    expanded = expandedMenu
+                                )
+                            }
+                        )
+                        ExposedDropdownMenu(
+                            expanded = expandedMenu,
+                            onDismissRequest = { expandedMenu = false }) {
+                            availableOptions.forEach { selectionOption ->
+                                DropdownMenuItem(
+                                    text = { Text(text = selectionOption) },
+                                    onClick = {
+                                        setSelectedOption(selectionOption)
+                                        expandedMenu = false
+                                    },
+                                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+                                )
+                            }
                         }
                     }
-                }
-                CustomSpacer(size = 24.dp)
-                TextField(
-                    modifier = Modifier.padding(horizontal = 24.dp),
-                    value = additionalInformation,
-                    onValueChange = { setAdditionalInformation(it) },
-                    label = { Text(text = stringResource(id = R.string.additional_information)) }
-                )
-                CustomSpacer(size = 24.dp)
-                Text(
-                    modifier = Modifier.padding(horizontal = 24.dp),
-                    text = stringResource(dialogDescription),
-                    style = secondaryRegularBodyL,
-                    textAlign = TextAlign.Center
-                )
-                CustomSpacer(size = 24.dp)
-                Button(
-                    onClick = buttonClickedAction,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(60.dp),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.Black),
-                    shape = RoundedCornerShape(0.dp)
-                ) {
-                    Text(
-                        text = stringResource(buttonText),
-                        style = secondarySemiBoldBodyL,
-                        color = Color.White,
-                        textAlign = Companion.Center
+                    CustomSpacer(size = 24.dp)
+                    TextField(
+                        modifier = Modifier.padding(horizontal = 24.dp),
+                        value = additionalInformation,
+                        onValueChange = { setAdditionalInformation(it) },
+                        placeholder = { Text(text = stringResource(id = R.string.additional_information)) }
                     )
+                    CustomSpacer(size = 24.dp)
+                    Text(
+                        modifier = Modifier.padding(horizontal = 24.dp),
+                        text = stringResource(dialogDescription),
+                        style = secondaryRegularBodyL,
+                        textAlign = TextAlign.Center
+                    )
+                    CustomSpacer(size = 24.dp)
+                    Button(
+                        onClick = buttonClickedAction,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(60.dp),
+                        colors = ButtonDefaults.buttonColors(backgroundColor = Color.Black),
+                        shape = RoundedCornerShape(0.dp)
+                    ) {
+                        Text(
+                            text = stringResource(buttonText),
+                            style = secondarySemiBoldBodyL,
+                            color = Color.White,
+                            textAlign = Companion.Center
+                        )
+                    }
+                }
+            } else {
+                Column {
+                    CustomSpacer(size = 16.dp)
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            modifier = Modifier
+                                .padding(horizontal = 24.dp),
+                            text = stringResource(R.string.report_sent),
+                            style = primaryBoldHeadlineS,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                    CustomSpacer(size = 16.dp)
+                    Text(
+                        modifier = Modifier.padding(horizontal = 24.dp),
+                        text = stringResource(R.string.report_sent_description),
+                        style = secondaryRegularBodyL,
+                        textAlign = TextAlign.Center
+                    )
+                    CustomSpacer(size = 16.dp)
                 }
             }
+
         }
 
     }
@@ -261,10 +292,12 @@ fun PreviewReportDialog() {
         setSelectedOption = {},
         dialogDescription = R.string.inform_about_spot_description,
         selectedOptionText = "opcion 1",
-        additionalInformation = "querría denunciar que la imagen es erronea",
+        additionalInformation = "",
         setAdditionalInformation = {},
         buttonText = R.string.continue_text,
-        buttonClickedAction = {}
+        buttonClickedAction = {},
+        reportSent = true,
+        setShowReportSent = {}
     )
 }
 

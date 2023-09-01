@@ -26,6 +26,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.madteam.sunset.R
+import com.madteam.sunset.navigation.SunsetRoutes
 import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.FollowsUserStates
 import com.madteam.sunset.ui.common.MyProfileTopAppBar
@@ -70,7 +71,7 @@ fun MyProfileScreen(
                     username = username,
                     isAdmin = true,
                     reportsNumbers = 0,
-                    goToReportsScreen = {})
+                    goToReportsScreen = { navController.navigate(SunsetRoutes.SeeReportsScreen.route) })
             },
             content = { paddingValues ->
                 Box(
@@ -78,7 +79,6 @@ fun MyProfileScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     MyProfileContent(
-                        username = username,
                         name = name,
                         location = location,
                         userImage = userImage,
@@ -93,7 +93,6 @@ fun MyProfileScreen(
 
 @Composable
 fun MyProfileContent(
-    username: String,
     name: String,
     location: String,
     userImage: String,
@@ -142,5 +141,5 @@ fun MyProfileContent(
 @Composable
 @Preview
 fun MyProfileScreenPreview() {
-    MyProfileContent("adriaa12", "Adrià Fernández", "", "🗺️ Terrassa, Bcn", {}) {}
+    MyProfileContent("Adrià Fernández", "", "🗺️ Terrassa, Bcn", {}) {}
 }

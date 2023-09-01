@@ -63,9 +63,11 @@ import com.madteam.sunset.ui.common.IconButtonDark
 import com.madteam.sunset.ui.common.ImagePostCard
 import com.madteam.sunset.ui.common.LargeLightButton
 import com.madteam.sunset.ui.common.ProfileImage
+import com.madteam.sunset.ui.common.ReportDialog
 import com.madteam.sunset.ui.common.RoundedLightBackButton
 import com.madteam.sunset.ui.common.RoundedLightEditButton
 import com.madteam.sunset.ui.common.RoundedLightLikeButton
+import com.madteam.sunset.ui.common.RoundedLightReportButton
 import com.madteam.sunset.ui.common.RoundedLightSaveButton
 import com.madteam.sunset.ui.common.RoundedLightSendButton
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineXS
@@ -96,6 +98,11 @@ fun SpotDetailScreen(
     val spotLikes by viewModel.spotLikes.collectAsStateWithLifecycle()
     val userLocation by viewModel.userLocation.collectAsStateWithLifecycle()
     val isUserAdmin by viewModel.userIsAbleToEditOrRemoveSpot.collectAsStateWithLifecycle()
+    val showReportDialog by viewModel.showReportDialog.collectAsStateWithLifecycle()
+    val availableOptionsToReport by viewModel.availableOptionsToReport.collectAsStateWithLifecycle()
+    val selectedReportOption by viewModel.selectedReportOption.collectAsStateWithLifecycle()
+    val additionalReportInformation by viewModel.additionalReportInformation.collectAsStateWithLifecycle()
+    val reportSentDialog by viewModel.showReportSentDialog.collectAsStateWithLifecycle()
 
     Scaffold(
         content = { paddingValues ->
@@ -112,7 +119,17 @@ fun SpotDetailScreen(
                     spotLikes = spotLikes,
                     updateUserLocation = viewModel::updateUserLocation,
                     userLocation = userLocation,
-                    isUserAdmin = isUserAdmin
+                    isUserAdmin = isUserAdmin,
+                    showReportDialog = showReportDialog,
+                    setShowReportDialog = viewModel::setShowReportDialog,
+                    availableOptionsToReport = availableOptionsToReport,
+                    setSelectedReportOption = viewModel::selectedReportOption,
+                    selectedReportOption = selectedReportOption,
+                    additionalReportInformation = additionalReportInformation,
+                    setAdditionalReportInformation = viewModel::setAdditionalReportInformation,
+                    sendReportButton = viewModel::sendReportIntent,
+                    setReportSentDialog = viewModel::setReportSentDialog,
+                    reportSentDialog = reportSentDialog
                 )
             }
         }
@@ -130,7 +147,17 @@ fun SpotDetailContent(
     spotLikes: Int,
     updateUserLocation: (LatLng) -> Unit,
     userLocation: LatLng,
-    isUserAdmin: Boolean
+    isUserAdmin: Boolean,
+    showReportDialog: Boolean,
+    setShowReportDialog: (Boolean) -> Unit,
+    availableOptionsToReport: List<String>,
+    setSelectedReportOption: (String) -> Unit,
+    selectedReportOption: String,
+    additionalReportInformation: String,
+    setAdditionalReportInformation: (String) -> Unit,
+    sendReportButton: () -> Unit,
+    setReportSentDialog: (Boolean) -> Unit,
+    reportSentDialog: Boolean
 ) {
     val scrollState = rememberScrollState()
     val showShimmer = remember { mutableStateOf(true) }
@@ -155,6 +182,28 @@ fun SpotDetailContent(
         }
     }
 
+    if (showReportDialog) {
+        ReportDialog(
+            setShowDialog = { setShowReportDialog(it) },
+            dialogTitle = R.string.inform_about_spot,
+            dialogDescription = R.string.inform_about_spot_description,
+            availableOptions = availableOptionsToReport,
+            setSelectedOption = { setSelectedReportOption(it) },
+            selectedOptionText = selectedReportOption,
+            additionalInformation = additionalReportInformation,
+            setAdditionalInformation = { setAdditionalReportInformation(it) },
+            buttonText = R.string.send_report,
+            buttonClickedAction = {
+                sendReportButton()
+                setReportSentDialog(true)
+            },
+            reportSent = reportSentDialog,
+            setShowReportSent = {
+                setReportSentDialog(it)
+            }
+        )
+    }
+
     Column(
         modifier = Modifier
             .verticalScroll(scrollState)
@@ -162,7 +211,7 @@ fun SpotDetailContent(
     ) {
         //Header image section
         ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
-            val (spotImage, backIconButton, saveIconButton, sendIconButton, editIconButton, likeIconButton) = createRefs()
+            val (spotImage, backIconButton, saveIconButton, sendIconButton, editIconButton, likeIconButton, reportIconButton) = createRefs()
             AutoSlidingCarousel(
                 itemsCount = spotInfo.featuredImages.size,
                 itemContent = { index ->
@@ -202,6 +251,10 @@ fun SpotDetailContent(
                     end.linkTo(sendIconButton.start, 16.dp)
                 }, onClick = { navigateTo("edit_spot_screen/spotReference=${spotInfo.id}") })
             }
+            RoundedLightReportButton(modifier = Modifier.constrainAs(reportIconButton) {
+                top.linkTo(saveIconButton.bottom, 16.dp)
+                end.linkTo(parent.end, 24.dp)
+            }, onClick = { setShowReportDialog(true) })
             RoundedLightLikeButton(
                 onClick = { spotLikeClick() },
                 modifier = Modifier.constrainAs(likeIconButton) {
@@ -675,4 +728,6 @@ fun SpotDetailContent(
             )
         }
     }
+
+
 }

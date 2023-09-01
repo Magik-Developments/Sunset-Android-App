@@ -18,6 +18,7 @@ import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material.icons.outlined.Flag
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.runtime.Composable
@@ -239,6 +240,29 @@ fun RoundedLightEditButton(
 }
 
 @Composable
+fun RoundedLightReportButton(
+    onClick: () -> Unit,
+    modifier: Modifier
+) {
+    IconButton(
+        onClick = onClick, modifier = modifier
+            .size(48.dp)
+            .background(Color.White, RoundedCornerShape(50.dp))
+            .clip(
+                RoundedCornerShape(50.dp)
+            )
+    ) {
+        Icon(
+            imageVector = Icons.Outlined.Flag,
+            contentDescription = "",
+            modifier = Modifier.size(24.dp),
+            tint = Color.Black
+        )
+    }
+}
+
+
+@Composable
 fun RoundedLightLikeButton(
     onClick: () -> Unit,
     modifier: Modifier,
@@ -271,5 +295,23 @@ fun RoundedLightLikeButton(
             tint = iconColor
         )
     }
+}
+
+@Preview
+@Composable
+fun PreviewRoundedLightReportButton() {
+    RoundedLightReportButton(onClick = { /*TODO*/ }, modifier = Modifier)
+}
+
+@Preview
+@Composable
+fun PreviewRoundedLightEditButton() {
+    RoundedLightEditButton(onClick = { /*TODO*/ }, modifier = Modifier)
+}
+
+@Preview
+@Composable
+fun PreviewRoundedLightLikeButton() {
+    RoundedLightLikeButton(onClick = { /*TODO*/ }, modifier = Modifier, isLiked = false)
 }
 

@@ -36,6 +36,23 @@ class SpotDetailViewModel @Inject constructor(
     private val _userIsAbleToEditOrRemoveSpot: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val userIsAbleToEditOrRemoveSpot: StateFlow<Boolean> = _userIsAbleToEditOrRemoveSpot
 
+    private val _showReportDialog: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val showReportDialog: StateFlow<Boolean> = _showReportDialog
+
+    private val _showReportSentDialog: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val showReportSentDialog: StateFlow<Boolean> = _showReportSentDialog
+
+    private val _availableOptionsToReport: MutableStateFlow<List<String>> =
+        MutableStateFlow(listOf(""))
+    val availableOptionsToReport: StateFlow<List<String>> = _availableOptionsToReport
+
+    private val _selectedReportOption: MutableStateFlow<String> =
+        MutableStateFlow("")
+    val selectedReportOption: StateFlow<String> = _selectedReportOption
+
+    private val _additionalReportInformation: MutableStateFlow<String> = MutableStateFlow("")
+    val additionalReportInformation: StateFlow<String> = _additionalReportInformation
+
     private lateinit var username: String
 
     init {
@@ -60,8 +77,34 @@ class SpotDetailViewModel @Inject constructor(
         getSpotInfo()
     }
 
+    fun selectedReportOption(selectedOption: String) {
+        _selectedReportOption.value = selectedOption
+    }
+
+    fun setReportSentDialog(status: Boolean) {
+        _showReportSentDialog.value = status
+    }
+
+    fun setAdditionalReportInformation(text: String) {
+        _additionalReportInformation.value = text
+    }
+
     fun updateUserLocation(location: LatLng) {
         _userLocation.value = location
+    }
+
+    fun setShowReportDialog(show: Boolean) {
+        _showReportDialog.value = show
+        getReportOptions()
+    }
+
+    private fun getReportOptions() {
+        viewModelScope.launch {
+            databaseRepository.getSpotReportsOptions().collectLatest {
+                _availableOptionsToReport.value = it
+                _selectedReportOption.value = it.firstOrNull() ?: "Other"
+            }
+        }
     }
 
     private fun getSpotInfo() {
@@ -85,6 +128,18 @@ class SpotDetailViewModel @Inject constructor(
                 _spotLikes.value++
                 _spotIsLiked.value = true
             }
+        }
+    }
+
+    fun sendReportIntent() {
+        viewModelScope.launch {
+            databaseRepository.sendReport(
+                reportType = "Spot",
+                reporterUsername = username,
+                reportIssue = _selectedReportOption.value,
+                reportDescription = _additionalReportInformation.value,
+                documentReference = _spotReference.value
+            ).collectLatest { }
         }
     }
 }

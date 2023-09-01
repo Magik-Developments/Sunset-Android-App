@@ -286,7 +286,10 @@ fun ReportDialog(
                     )
                     CustomSpacer(size = 16.dp)
                     Button(
-                        onClick = { setShowDialog(false) },
+                        onClick = {
+                            setShowDialog(false)
+                            setShowReportSent(false)
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(60.dp),

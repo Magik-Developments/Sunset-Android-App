@@ -12,7 +12,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
@@ -163,6 +166,7 @@ fun ReportDialog(
 ) {
 
     var expandedMenu by remember { mutableStateOf(false) }
+    val scrollState = rememberScrollState()
 
     Dialog(onDismissRequest = {
         setShowDialog(false)
@@ -171,10 +175,12 @@ fun ReportDialog(
         Card(
             shape = RoundedCornerShape(20.dp),
             elevation = 2.dp,
-            modifier = Modifier.padding(horizontal = 24.dp)
+            modifier = Modifier
+                .padding(horizontal = 24.dp)
+                .wrapContentHeight()
         ) {
             if (!reportSent) {
-                Column {
+                Column(modifier = Modifier.verticalScroll(scrollState)) {
                     CustomSpacer(size = 16.dp)
                     Row(
                         horizontalArrangement = Arrangement.Center,
@@ -235,20 +241,25 @@ fun ReportDialog(
                         textAlign = TextAlign.Center
                     )
                     CustomSpacer(size = 24.dp)
-                    Button(
-                        onClick = buttonClickedAction,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(60.dp),
-                        colors = ButtonDefaults.buttonColors(backgroundColor = Color.Black),
-                        shape = RoundedCornerShape(0.dp)
+                    Column(
+                        modifier = Modifier.height(60.dp),
+                        verticalArrangement = Arrangement.Bottom
                     ) {
-                        Text(
-                            text = stringResource(buttonText),
-                            style = secondarySemiBoldBodyL,
-                            color = Color.White,
-                            textAlign = Companion.Center
-                        )
+                        Button(
+                            onClick = buttonClickedAction,
+                            modifier = Modifier
+                                .height(60.dp)
+                                .fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(backgroundColor = Color.Black),
+                            shape = RoundedCornerShape(0.dp)
+                        ) {
+                            Text(
+                                text = stringResource(buttonText),
+                                style = secondarySemiBoldBodyL,
+                                color = Color.White,
+                                textAlign = Companion.Center
+                            )
+                        }
                     }
                 }
             } else {
@@ -274,6 +285,21 @@ fun ReportDialog(
                         textAlign = TextAlign.Center
                     )
                     CustomSpacer(size = 16.dp)
+                    Button(
+                        onClick = { setShowDialog(false) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(60.dp),
+                        colors = ButtonDefaults.buttonColors(backgroundColor = Color.Black),
+                        shape = RoundedCornerShape(0.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.continue_text),
+                            style = secondarySemiBoldBodyL,
+                            color = Color.White,
+                            textAlign = Companion.Center
+                        )
+                    }
                 }
             }
 

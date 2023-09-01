@@ -26,6 +26,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -200,9 +201,16 @@ fun ReportDialog(
                         onExpandedChange = { expandedMenu = !expandedMenu },
                         modifier = Modifier.padding(horizontal = 24.dp)
                     ) {
+                        val containerColor = Color(0xFFFFE094)
                         TextField(
                             value = selectedOptionText,
                             onValueChange = {},
+                            textStyle = secondaryRegularBodyL,
+                            colors = TextFieldDefaults.colors(
+                                focusedContainerColor = containerColor,
+                                unfocusedContainerColor = containerColor,
+                                disabledContainerColor = containerColor,
+                            ),
                             readOnly = true,
                             modifier = Modifier.menuAnchor(),
                             trailingIcon = {
@@ -221,17 +229,31 @@ fun ReportDialog(
                                         setSelectedOption(selectionOption)
                                         expandedMenu = false
                                     },
-                                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+                                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                                    modifier = Modifier.background(Color(0xFFFFE094))
                                 )
                             }
                         }
                     }
                     CustomSpacer(size = 24.dp)
+                    val containerColor = Color(0xFFFFE094)
                     TextField(
                         modifier = Modifier.padding(horizontal = 24.dp),
+                        textStyle = secondaryRegularBodyL,
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = containerColor,
+                            unfocusedContainerColor = containerColor,
+                            disabledContainerColor = containerColor,
+                        ),
                         value = additionalInformation,
                         onValueChange = { setAdditionalInformation(it) },
-                        placeholder = { Text(text = stringResource(id = R.string.additional_information)) }
+                        placeholder = {
+                            Text(
+                                text = stringResource(id = R.string.additional_information),
+                                style = secondaryRegularBodyL,
+                                color = Color(0xFF666666)
+                            )
+                        }
                     )
                     CustomSpacer(size = 24.dp)
                     Text(
@@ -325,7 +347,7 @@ fun PreviewReportDialog() {
         setAdditionalInformation = {},
         buttonText = R.string.continue_text,
         buttonClickedAction = {},
-        reportSent = true,
+        reportSent = false,
         setShowReportSent = {}
     )
 }

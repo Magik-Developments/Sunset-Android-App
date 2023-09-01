@@ -42,19 +42,12 @@ class SpotDetailViewModel @Inject constructor(
     private val _showReportSentDialog: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val showReportSentDialog: StateFlow<Boolean> = _showReportSentDialog
 
-    private val _availableOptionsToReport: MutableStateFlow<List<String>> = MutableStateFlow(
-        listOf(
-            "Spam",
-            "Offensive content",
-            "Wrong location",
-            "Wrong information",
-            "Others"
-        )
-    )
+    private val _availableOptionsToReport: MutableStateFlow<List<String>> =
+        MutableStateFlow(listOf(""))
     val availableOptionsToReport: StateFlow<List<String>> = _availableOptionsToReport
 
     private val _selectedReportOption: MutableStateFlow<String> =
-        MutableStateFlow(_availableOptionsToReport.value.first())
+        MutableStateFlow("")
     val selectedReportOption: StateFlow<String> = _selectedReportOption
 
     private val _additionalReportInformation: MutableStateFlow<String> = MutableStateFlow("")
@@ -102,6 +95,16 @@ class SpotDetailViewModel @Inject constructor(
 
     fun setShowReportDialog(show: Boolean) {
         _showReportDialog.value = show
+        getReportOptions()
+    }
+
+    private fun getReportOptions() {
+        viewModelScope.launch {
+            databaseRepository.getSpotReportsOptions().collectLatest {
+                _availableOptionsToReport.value = it
+                _selectedReportOption.value = it.firstOrNull() ?: "Other"
+            }
+        }
     }
 
     private fun getSpotInfo() {

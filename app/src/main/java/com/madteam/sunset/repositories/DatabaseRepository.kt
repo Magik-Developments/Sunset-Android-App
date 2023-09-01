@@ -35,6 +35,7 @@ private const val SPOT_ATTRIBUTES_COLLECTION = "spot_attributes"
 private const val SPOTS_COLLECTION_PATH = "spots"
 private const val POSTS_COLLECTION_PATH = "posts"
 private const val REPORTS_COLLECTION_PATH = "reports"
+private const val REPORT_OPTIONS_SPOT_COLLECTION_PATH = "reports/report_options/spot_report_options"
 private const val COMMENTS_POST_COLLECTION_PATH = "comments"
 private const val LIKED_BY_POST_COLLECTION_PATH = "liked_by"
 private const val LIKED_BY_SPOT_COLLECTION_PATH = "liked_by"
@@ -956,6 +957,20 @@ class DatabaseRepository @Inject constructor(
         Log.e("DatabaseRepository::sendReport", "Error: ${exception.message}")
         emit(Resource.Success("Error: " + exception.message))
     }
+
+    override fun getSpotReportsOptions(): Flow<List<String>> = flow {
+        val reportOptionsReference =
+            firebaseFirestore.collection(REPORT_OPTIONS_SPOT_COLLECTION_PATH).get().await()
+        val reportOptionsList = mutableListOf<String>()
+        reportOptionsReference.documents.mapNotNull { document ->
+            val reportOption = document.getString("title")
+            reportOptionsList.add(reportOption.toString())
+        }
+        emit(reportOptionsList)
+    }.catch { exception ->
+        Log.e("DatabaseRepository::getSpotReportsOptions", "Error: ${exception.message}")
+        emit(mutableListOf())
+    }
 }
 
 interface DatabaseContract {
@@ -1033,5 +1048,7 @@ interface DatabaseContract {
         reportDescription: String,
         documentReference: String
     ): Flow<Resource<String>>
+
+    fun getSpotReportsOptions(): Flow<List<String>>
 
 }

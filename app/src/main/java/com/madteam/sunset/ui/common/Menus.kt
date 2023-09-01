@@ -15,6 +15,10 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Report
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,10 +28,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.madteam.sunset.navigation.SunsetBottomNavItem
+import com.madteam.sunset.ui.theme.primaryBoldHeadlineM
 import com.madteam.sunset.utils.shadow
 
 @Composable
@@ -182,6 +188,58 @@ fun GoForwardTopAppBar(
             }
         },
         title = { Text(text = stringResource(id = title), color = Color.Black) }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MyProfileTopAppBar(
+    username: String,
+    isAdmin: Boolean,
+    reportsNumbers: Int,
+    goToReportsScreen: () -> Unit
+) {
+    TopAppBar(
+        title = { Text(text = username, style = primaryBoldHeadlineM) },
+        backgroundColor = Color.White,
+        actions = {
+            if (isAdmin) {
+                IconButton(onClick = { goToReportsScreen() }) {
+                    if (reportsNumbers > 0) {
+                        BadgedBox(badge = {
+                            Badge {
+                                Text(text = reportsNumbers.toString(), color = Color.White)
+                            }
+                        }) {
+                            androidx.compose.material3.Icon(
+                                imageVector = Icons.Filled.Report,
+                                contentDescription = "See report button"
+                            )
+                        }
+                    } else {
+                        IconButton(onClick = { goToReportsScreen() }) {
+                            androidx.compose.material3.Icon(
+                                imageVector = Icons.Filled.Report,
+                                contentDescription = "See report button"
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    )
+}
+
+@Preview
+@Composable
+fun MyProfileTopAppBarPreview(
+
+) {
+    MyProfileTopAppBar(
+        username = "adriaa12",
+        isAdmin = true,
+        reportsNumbers = 0,
+        goToReportsScreen = {}
     )
 }
 

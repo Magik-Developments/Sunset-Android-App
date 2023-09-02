@@ -1,6 +1,7 @@
 package com.madteam.sunset.ui.screens.myprofile
 
 import androidx.lifecycle.ViewModel
+import com.madteam.sunset.model.UserProfile
 import com.madteam.sunset.repositories.AuthContract
 import com.madteam.sunset.repositories.DatabaseContract
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,13 +15,11 @@ class MyProfileViewModel @Inject constructor(
     private val databaseRepository: DatabaseContract
 ) : ViewModel() {
 
-    val username = MutableStateFlow("")
-    val name = MutableStateFlow("")
-    val location = MutableStateFlow("")
-    val userImage = MutableStateFlow("")
+    private val _selectedTab: MutableStateFlow<Int> = MutableStateFlow(0)
+    val selectedTab: StateFlow<Int> = _selectedTab
 
-    private val _userIsAdmin: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    val userIsAdmin: StateFlow<Boolean> = _userIsAdmin
+    private val _userInfo: MutableStateFlow<UserProfile> = MutableStateFlow(UserProfile())
+    val userInfo: StateFlow<UserProfile> = _userInfo
 
     val navigateWelcomeScreen = MutableStateFlow(false)
 
@@ -31,13 +30,13 @@ class MyProfileViewModel @Inject constructor(
     private fun initUI() {
         authRepository.getCurrentUser()?.let { user ->
             databaseRepository.getUserByEmail(user.email!!) {
-                username.value = it.username
-                name.value = it.name
-                location.value = it.location
-                userImage.value = it.image
-                _userIsAdmin.value = it.admin
+                _userInfo.value = it
             }
         }
+    }
+
+    fun onTabClicked(tabClicked: Int) {
+        _selectedTab.value = tabClicked
     }
 
     fun logOut() {

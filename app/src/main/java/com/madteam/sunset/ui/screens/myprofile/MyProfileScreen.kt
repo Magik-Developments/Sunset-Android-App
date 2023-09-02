@@ -20,17 +20,18 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.madteam.sunset.R
+import com.madteam.sunset.model.UserProfile
 import com.madteam.sunset.navigation.SunsetRoutes
 import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.FollowsUserStates
 import com.madteam.sunset.ui.common.MyProfileTopAppBar
 import com.madteam.sunset.ui.common.ProfileImage
+import com.madteam.sunset.ui.common.ProfilePostTypeTab
 import com.madteam.sunset.ui.common.SunsetBottomNavigation
 import com.madteam.sunset.ui.common.ThinButtonLight
 import com.madteam.sunset.ui.common.UserLocationText
@@ -48,12 +49,9 @@ fun MyProfileScreen(
     val coroutineScope = rememberCoroutineScope()
     val editProfileModalState =
         ModalBottomSheetState(initialValue = Hidden, isSkipHalfExpanded = true)
-    val username by viewModel.username.collectAsStateWithLifecycle()
-    val name by viewModel.name.collectAsStateWithLifecycle()
-    val location by viewModel.location.collectAsStateWithLifecycle()
-    val userImage by viewModel.userImage.collectAsStateWithLifecycle()
+    val userInfo by viewModel.userInfo.collectAsStateWithLifecycle()
     val navigateUp by viewModel.navigateWelcomeScreen.collectAsStateWithLifecycle()
-    val userIsAdmin by viewModel.userIsAdmin.collectAsStateWithLifecycle()
+    val selectedTab by viewModel.selectedTab.collectAsStateWithLifecycle()
 
     if (navigateUp)
         navController.navigateUp()
@@ -68,8 +66,8 @@ fun MyProfileScreen(
             bottomBar = { SunsetBottomNavigation(navController) },
             topBar = {
                 MyProfileTopAppBar(
-                    username = username,
-                    isAdmin = userIsAdmin,
+                    username = userInfo.username,
+                    isAdmin = userInfo.admin,
                     reportsNumbers = 0,
                     goToReportsScreen = { navController.navigate(SunsetRoutes.SeeReportsScreen.route) },
                     logOutClick = viewModel::logOut
@@ -81,10 +79,10 @@ fun MyProfileScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     MyProfileContent(
-                        name = name,
-                        location = location,
-                        userImage = userImage,
+                        userInfo = userInfo,
                         onEditProfileClick = { coroutineScope.launch { editProfileModalState.show() } },
+                        selectedTab = selectedTab,
+                        onTabClicked = viewModel::onTabClicked
                     )
                 }
             }
@@ -94,10 +92,10 @@ fun MyProfileScreen(
 
 @Composable
 fun MyProfileContent(
-    name: String,
-    location: String,
-    userImage: String,
-    onEditProfileClick: () -> Unit
+    userInfo: UserProfile,
+    onEditProfileClick: () -> Unit,
+    selectedTab: Int,
+    onTabClicked: (Int) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -107,34 +105,33 @@ fun MyProfileContent(
             .background(Color.White)
     ) {
         CustomSpacer(size = 16.dp)
-        ProfileImage(imageUrl = userImage, size = 80.dp)
-        if (name.isNotBlank()) {
+        ProfileImage(imageUrl = userInfo.image, size = 80.dp)
+        if (userInfo.name.isNotBlank()) {
             CustomSpacer(size = 16.dp)
-            UserNameText(userName = name)
+            UserNameText(userName = userInfo.name)
             CustomSpacer(size = 8.dp)
         }
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = if (location.isNotBlank()) {
+            horizontalArrangement = if (userInfo.location.isNotBlank()) {
                 Arrangement.SpaceBetween
             } else {
                 Arrangement.Center
             }
         ) {
-            if (location.isNotBlank()) {
-                UserLocationText(location = location)
+            if (userInfo.location.isNotBlank()) {
+                UserLocationText(location = userInfo.location)
             }
             ThinButtonLight(onClick = onEditProfileClick, text = R.string.edit_profile)
         }
         CustomSpacer(size = 8.dp)
         FollowsUserStates()
-        CustomSpacer(size = 48.dp)
+        CustomSpacer(size = 24.dp)
+        ProfilePostTypeTab(
+            tabOptions = listOf("Posts", "Spots", "Saved"),
+            selectedTab = selectedTab,
+            tabOnClick = { onTabClicked(it) }
+        )
     }
-}
-
-@Composable
-@Preview
-fun MyProfileScreenPreview() {
-    MyProfileContent("Adrià Fernández", "", "🗺️ Terrassa, Bcn", {})
 }

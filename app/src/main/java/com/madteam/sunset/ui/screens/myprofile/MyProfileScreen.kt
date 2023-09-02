@@ -8,6 +8,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetLayout
@@ -25,10 +28,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.madteam.sunset.R
+import com.madteam.sunset.model.SpotPost
 import com.madteam.sunset.model.UserProfile
 import com.madteam.sunset.navigation.SunsetRoutes
 import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.FollowsUserStates
+import com.madteam.sunset.ui.common.ImagePostCardProfile
 import com.madteam.sunset.ui.common.MyProfileTopAppBar
 import com.madteam.sunset.ui.common.ProfileImage
 import com.madteam.sunset.ui.common.ProfilePostTypeTab
@@ -52,6 +57,7 @@ fun MyProfileScreen(
     val userInfo by viewModel.userInfo.collectAsStateWithLifecycle()
     val navigateUp by viewModel.navigateWelcomeScreen.collectAsStateWithLifecycle()
     val selectedTab by viewModel.selectedTab.collectAsStateWithLifecycle()
+    val userPosts by viewModel.userPosts.collectAsStateWithLifecycle()
 
     if (navigateUp)
         navController.navigateUp()
@@ -82,7 +88,9 @@ fun MyProfileScreen(
                         userInfo = userInfo,
                         onEditProfileClick = { coroutineScope.launch { editProfileModalState.show() } },
                         selectedTab = selectedTab,
-                        onTabClicked = viewModel::onTabClicked
+                        onTabClicked = viewModel::onTabClicked,
+                        userPosts = userPosts,
+                        navigateTo = navController::navigate
                     )
                 }
             }
@@ -95,7 +103,9 @@ fun MyProfileContent(
     userInfo: UserProfile,
     onEditProfileClick: () -> Unit,
     selectedTab: Int,
-    onTabClicked: (Int) -> Unit
+    onTabClicked: (Int) -> Unit,
+    userPosts: List<SpotPost>,
+    navigateTo: (String) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -133,5 +143,36 @@ fun MyProfileContent(
             selectedTab = selectedTab,
             tabOnClick = { onTabClicked(it) }
         )
+        CustomSpacer(size = 8.dp)
+        when (selectedTab) {
+            0 -> {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    content = {
+                        itemsIndexed(userPosts) { _, post ->
+                            ImagePostCardProfile(
+                                postInfo = post,
+                                onItemClicked = {
+                                    navigateTo("post_screen/postReference=${post.id}")
+                                }
+                            )
+                        }
+                    },
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                )
+            }
+
+            1 -> {
+
+            }
+
+            2 -> {
+
+            }
+        }
+        CustomSpacer(size = 8.dp)
     }
 }
+
+

@@ -226,3 +226,27 @@ fun ImagePostCard(
         }
     }
 }
+
+@OptIn(ExperimentalGlideComposeApi::class)
+@Composable
+fun ImagePostCardProfile(
+    postInfo: SpotPost,
+    onItemClicked: () -> Unit
+) {
+    Card(elevation = 4.dp, shape = RoundedCornerShape(20.dp), modifier =
+    Modifier
+        .size(180.dp)
+        .clip(
+            RoundedCornerShape(20.dp)
+        )
+        .clickable { onItemClicked() }) {
+        GlideImage(
+            model = postInfo.images.first(),
+            contentDescription = null,
+            modifier = Modifier
+                .fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+    }
+}
+

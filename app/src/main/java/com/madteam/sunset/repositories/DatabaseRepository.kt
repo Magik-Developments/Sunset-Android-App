@@ -1030,6 +1030,37 @@ class DatabaseRepository @Inject constructor(
         Log.e("DatabaseRepository::deleteReport", "Error: ${exception.message}")
         emit(Resource.Error("Error deleting report: ${exception.message}"))
     }
+
+    override fun getSpotPostsByUsername(username: String): Flow<List<SpotPost>> = flow {
+        val postsList = mutableListOf<SpotPost>()
+        val userReference = firebaseFirestore.collection(USERS_COLLECTION_PATH).document(username)
+        val querySnapshot = firebaseFirestore.collection(POSTS_COLLECTION_PATH)
+            .whereEqualTo("author", userReference)
+            .get()
+            .await()
+
+        for (documentSnapshot in querySnapshot.documents) {
+            val images = documentSnapshot.get("images") as List<String>
+            val id = documentSnapshot.id
+            val creationDate = documentSnapshot.getString("creation_date")
+            val post = SpotPost(
+                id = id,
+                description = "",
+                spotRef = "",
+                images = images,
+                author = UserProfile(),
+                creation_date = creationDate ?: "",
+                comments = listOf(),
+                likedBy = listOf(),
+                likes = 0
+            )
+            postsList.add(post)
+        }
+        emit(postsList)
+    }.catch { exception ->
+        Log.e("DatabaseRepository::getSpotPostsByUsername", "Error: ${exception.message}")
+        emit(mutableListOf())
+    }
 }
 
 interface DatabaseContract {
@@ -1043,6 +1074,7 @@ interface DatabaseContract {
     fun getSpotAttributesByDocRefs(docRefs: List<DocumentReference>): Flow<List<SpotAttribute>>
     fun getSpotReviewsByCollectionRef(collectionRef: CollectionReference): Flow<List<SpotReview>>
     fun getSpotPostsByDocRefs(docRefs: List<DocumentReference>): Flow<List<SpotPost>>
+    fun getSpotPostsByUsername(username: String): Flow<List<SpotPost>>
     fun getSpotPostByDocRef(docRef: String): Flow<SpotPost>
     fun getCommentsFromPostRef(postRef: String): Flow<List<PostComment>>
     fun createSpotPost(

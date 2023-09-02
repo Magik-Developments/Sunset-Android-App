@@ -31,7 +31,6 @@ import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.FollowsUserStates
 import com.madteam.sunset.ui.common.MyProfileTopAppBar
 import com.madteam.sunset.ui.common.ProfileImage
-import com.madteam.sunset.ui.common.SmallButtonDark
 import com.madteam.sunset.ui.common.SunsetBottomNavigation
 import com.madteam.sunset.ui.common.ThinButtonLight
 import com.madteam.sunset.ui.common.UserLocationText
@@ -72,7 +71,9 @@ fun MyProfileScreen(
                     username = username,
                     isAdmin = userIsAdmin,
                     reportsNumbers = 0,
-                    goToReportsScreen = { navController.navigate(SunsetRoutes.SeeReportsScreen.route) })
+                    goToReportsScreen = { navController.navigate(SunsetRoutes.SeeReportsScreen.route) },
+                    logOutClick = viewModel::logOut
+                )
             },
             content = { paddingValues ->
                 Box(
@@ -84,7 +85,6 @@ fun MyProfileScreen(
                         location = location,
                         userImage = userImage,
                         onEditProfileClick = { coroutineScope.launch { editProfileModalState.show() } },
-                        logout = { viewModel.logOut() }
                     )
                 }
             }
@@ -97,7 +97,6 @@ fun MyProfileContent(
     name: String,
     location: String,
     userImage: String,
-    logout: () -> Unit,
     onEditProfileClick: () -> Unit
 ) {
     Column(
@@ -131,16 +130,11 @@ fun MyProfileContent(
         CustomSpacer(size = 8.dp)
         FollowsUserStates()
         CustomSpacer(size = 48.dp)
-        SmallButtonDark(
-            onClick = logout,
-            text = R.string.log_out,
-            enabled = true
-        )
     }
 }
 
 @Composable
 @Preview
 fun MyProfileScreenPreview() {
-    MyProfileContent("Adrià Fernández", "", "🗺️ Terrassa, Bcn", {}) {}
+    MyProfileContent("Adrià Fernández", "", "🗺️ Terrassa, Bcn", {})
 }

@@ -15,6 +15,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Report
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
@@ -197,7 +198,8 @@ fun MyProfileTopAppBar(
     username: String,
     isAdmin: Boolean,
     reportsNumbers: Int,
-    goToReportsScreen: () -> Unit
+    goToReportsScreen: () -> Unit,
+    logOutClick: () -> Unit
 ) {
     TopAppBar(
         title = { Text(text = username, style = primaryBoldHeadlineM) },
@@ -226,6 +228,12 @@ fun MyProfileTopAppBar(
                     }
                 }
             }
+            IconButton(onClick = { logOutClick() }) {
+                androidx.compose.material3.Icon(
+                    imageVector = Icons.Filled.Logout,
+                    contentDescription = "Log out button"
+                )
+            }
         }
     )
 }
@@ -239,7 +247,8 @@ fun MyProfileTopAppBarPreview(
         username = "adriaa12",
         isAdmin = true,
         reportsNumbers = 0,
-        goToReportsScreen = {}
+        goToReportsScreen = {},
+        logOutClick = {}
     )
 }
 

@@ -2,6 +2,7 @@ package com.madteam.sunset.ui.screens.myprofile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.madteam.sunset.model.Spot
 import com.madteam.sunset.model.SpotPost
 import com.madteam.sunset.model.UserProfile
 import com.madteam.sunset.repositories.AuthContract
@@ -28,6 +29,9 @@ class MyProfileViewModel @Inject constructor(
     private val _userPosts: MutableStateFlow<List<SpotPost>> = MutableStateFlow(mutableListOf())
     val userPosts: StateFlow<List<SpotPost>> = _userPosts
 
+    private val _userSpots: MutableStateFlow<List<Spot>> = MutableStateFlow(mutableListOf())
+    val userSpots: StateFlow<List<Spot>> = _userSpots
+
     val navigateWelcomeScreen = MutableStateFlow(false)
 
     init {
@@ -39,6 +43,7 @@ class MyProfileViewModel @Inject constructor(
             databaseRepository.getUserByEmail(user.email!!) {
                 _userInfo.value = it
                 getUserPosts()
+                getUserSpots()
             }
         }
     }
@@ -51,6 +56,14 @@ class MyProfileViewModel @Inject constructor(
         viewModelScope.launch {
             databaseRepository.getSpotPostsByUsername(_userInfo.value.username).collectLatest {
                 _userPosts.value = it
+            }
+        }
+    }
+
+    private fun getUserSpots() {
+        viewModelScope.launch {
+            databaseRepository.getSpotsByUsername(_userInfo.value.username).collectLatest {
+                _userSpots.value = it
             }
         }
     }

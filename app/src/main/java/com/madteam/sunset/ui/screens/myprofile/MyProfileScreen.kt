@@ -28,12 +28,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.madteam.sunset.R
+import com.madteam.sunset.model.Spot
 import com.madteam.sunset.model.SpotPost
 import com.madteam.sunset.model.UserProfile
 import com.madteam.sunset.navigation.SunsetRoutes
 import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.FollowsUserStates
 import com.madteam.sunset.ui.common.ImagePostCardProfile
+import com.madteam.sunset.ui.common.ImageSpotCardProfile
 import com.madteam.sunset.ui.common.MyProfileTopAppBar
 import com.madteam.sunset.ui.common.ProfileImage
 import com.madteam.sunset.ui.common.ProfilePostTypeTab
@@ -58,6 +60,7 @@ fun MyProfileScreen(
     val navigateUp by viewModel.navigateWelcomeScreen.collectAsStateWithLifecycle()
     val selectedTab by viewModel.selectedTab.collectAsStateWithLifecycle()
     val userPosts by viewModel.userPosts.collectAsStateWithLifecycle()
+    val userSpots by viewModel.userSpots.collectAsStateWithLifecycle()
 
     if (navigateUp)
         navController.navigateUp()
@@ -90,6 +93,7 @@ fun MyProfileScreen(
                         selectedTab = selectedTab,
                         onTabClicked = viewModel::onTabClicked,
                         userPosts = userPosts,
+                        userSpots = userSpots,
                         navigateTo = navController::navigate
                     )
                 }
@@ -105,6 +109,7 @@ fun MyProfileContent(
     selectedTab: Int,
     onTabClicked: (Int) -> Unit,
     userPosts: List<SpotPost>,
+    userSpots: List<Spot>,
     navigateTo: (String) -> Unit
 ) {
     Column(
@@ -139,36 +144,58 @@ fun MyProfileContent(
         FollowsUserStates()
         CustomSpacer(size = 24.dp)
         ProfilePostTypeTab(
-            tabOptions = listOf("Posts", "Spots", "Saved"),
+            tabOptions = listOf("Posts", "Spots"),
             selectedTab = selectedTab,
             tabOnClick = { onTabClicked(it) }
         )
         CustomSpacer(size = 8.dp)
         when (selectedTab) {
             0 -> {
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    content = {
-                        itemsIndexed(userPosts) { _, post ->
-                            ImagePostCardProfile(
-                                postInfo = post,
-                                onItemClicked = {
-                                    navigateTo("post_screen/postReference=${post.id}")
-                                }
-                            )
-                        }
-                    },
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                )
+                if (userPosts.isNotEmpty()) {
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        content = {
+                            itemsIndexed(userPosts) { _, post ->
+                                ImagePostCardProfile(
+                                    postInfo = post,
+                                    onItemClicked = {
+                                        navigateTo("post_screen/postReference=${post.id}")
+                                    }
+                                )
+                            }
+                        },
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    )
+                } else {
+                    // TODO: Show image or copy saying user hasn't posted anything yet
+                }
             }
 
             1 -> {
-
+                if (userSpots.isNotEmpty()) {
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        content = {
+                            itemsIndexed(userSpots) { _, spot ->
+                                ImageSpotCardProfile(
+                                    spotInfo = spot,
+                                    onItemClicked = {
+                                        navigateTo("spot_detail_screen/spotReference=${spot.id}")
+                                    }
+                                )
+                            }
+                        },
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    )
+                } else {
+                    // TODO: Show image or copy saying user has not discovered spots yet
+                }
             }
 
             2 -> {
-
+                // TODO: Save spots on lists feature still not developed
             }
         }
         CustomSpacer(size = 8.dp)

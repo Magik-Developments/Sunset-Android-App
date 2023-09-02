@@ -1061,6 +1061,46 @@ class DatabaseRepository @Inject constructor(
         Log.e("DatabaseRepository::getSpotPostsByUsername", "Error: ${exception.message}")
         emit(mutableListOf())
     }
+
+    override fun getSpotsByUsername(username: String): Flow<List<Spot>> = flow {
+        val spotsList = mutableListOf<Spot>()
+        val userReference = firebaseFirestore.collection(USERS_COLLECTION_PATH).document(username)
+        val querySnapshot = firebaseFirestore.collection(SPOTS_COLLECTION_PATH)
+            .whereEqualTo("spotted_by", userReference)
+            .get()
+            .await()
+
+        for (documentSnapshot in querySnapshot.documents) {
+            val images = documentSnapshot.get("featured_images") as List<String>
+            val date = documentSnapshot.getString("creation_date")
+            val location = documentSnapshot.getString("location")
+            val name = documentSnapshot.getString("name")
+            val id = documentSnapshot.id
+            val spot = Spot(
+                id = id,
+                featuredImages = images,
+                spottedBy = UserProfile(),
+                creationDate = date ?: "",
+                name = name ?: "",
+                description = "",
+                score = 0.0f,
+                visitedTimes = 0,
+                likes = 0,
+                locationInLatLng = GeoPoint(0.0, 0.0),
+                location = location ?: "",
+                attributes = listOf(),
+                spotReviews = listOf(),
+                spotPosts = listOf(),
+                likedBy = listOf()
+            )
+            spotsList.add(spot)
+        }
+
+        emit(spotsList)
+    }.catch { exception ->
+        Log.e("DatabaseRepository::getSpotsByUsername", "Error: ${exception.message}")
+        emit(mutableListOf())
+    }
 }
 
 interface DatabaseContract {
@@ -1075,6 +1115,7 @@ interface DatabaseContract {
     fun getSpotReviewsByCollectionRef(collectionRef: CollectionReference): Flow<List<SpotReview>>
     fun getSpotPostsByDocRefs(docRefs: List<DocumentReference>): Flow<List<SpotPost>>
     fun getSpotPostsByUsername(username: String): Flow<List<SpotPost>>
+    fun getSpotsByUsername(username: String): Flow<List<Spot>>
     fun getSpotPostByDocRef(docRef: String): Flow<SpotPost>
     fun getCommentsFromPostRef(postRef: String): Flow<List<PostComment>>
     fun createSpotPost(

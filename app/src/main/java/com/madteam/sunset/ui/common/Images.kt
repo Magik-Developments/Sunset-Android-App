@@ -39,9 +39,11 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 import com.madteam.sunset.R.string
+import com.madteam.sunset.model.Spot
 import com.madteam.sunset.model.SpotPost
 import com.madteam.sunset.ui.theme.secondaryRegularBodyS
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyS
+import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
 import com.madteam.sunset.utils.formatDate
 import com.madteam.sunset.utils.shimmerBrush
 import kotlinx.coroutines.delay
@@ -250,3 +252,61 @@ fun ImagePostCardProfile(
     }
 }
 
+@OptIn(ExperimentalGlideComposeApi::class)
+@Composable
+fun ImageSpotCardProfile(
+    spotInfo: Spot,
+    onItemClicked: () -> Unit
+) {
+    Card(elevation = 4.dp, shape = RoundedCornerShape(20.dp)) {
+        ConstraintLayout(
+            modifier = Modifier
+                .size(180.dp)
+                .clip(
+                    RoundedCornerShape(20.dp)
+                )
+                .clickable {
+                    onItemClicked()
+                }
+        ) {
+            val (spotName, image) = createRefs()
+            GlideImage(
+                model = spotInfo.featuredImages.first(),
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .constrainAs(image) {
+                        top.linkTo(parent.top)
+                        bottom.linkTo(parent.bottom)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    },
+                contentScale = ContentScale.Crop
+            )
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(Color.Transparent, Color.Black),
+                            startY = 0f,
+                            endY = 4000f
+                        )
+                    ),
+                verticalArrangement = Arrangement.Bottom,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {}
+            Text(
+                text = spotInfo.name,
+                style = secondarySemiBoldHeadLineS,
+                color = Color.White,
+                modifier = Modifier.constrainAs(spotName) {
+                    start.linkTo(parent.start, 8.dp)
+                    bottom.linkTo(parent.bottom, 8.dp)
+                }
+            )
+        }
+
+    }
+}

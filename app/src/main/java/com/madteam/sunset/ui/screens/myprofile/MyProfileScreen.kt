@@ -54,6 +54,7 @@ fun MyProfileScreen(
     val location by viewModel.location.collectAsStateWithLifecycle()
     val userImage by viewModel.userImage.collectAsStateWithLifecycle()
     val navigateUp by viewModel.navigateWelcomeScreen.collectAsStateWithLifecycle()
+    val userIsAdmin by viewModel.userIsAdmin.collectAsStateWithLifecycle()
 
     if (navigateUp)
         navController.navigateUp()
@@ -69,7 +70,7 @@ fun MyProfileScreen(
             topBar = {
                 MyProfileTopAppBar(
                     username = username,
-                    isAdmin = true,
+                    isAdmin = userIsAdmin,
                     reportsNumbers = 0,
                     goToReportsScreen = { navController.navigate(SunsetRoutes.SeeReportsScreen.route) })
             },

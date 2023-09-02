@@ -8,6 +8,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetLayout
@@ -20,18 +23,21 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.madteam.sunset.R
+import com.madteam.sunset.model.Spot
+import com.madteam.sunset.model.SpotPost
+import com.madteam.sunset.model.UserProfile
 import com.madteam.sunset.navigation.SunsetRoutes
 import com.madteam.sunset.ui.common.CustomSpacer
-import com.madteam.sunset.ui.common.FollowsUserStates
+import com.madteam.sunset.ui.common.ImagePostCardProfile
+import com.madteam.sunset.ui.common.ImageSpotCardProfile
 import com.madteam.sunset.ui.common.MyProfileTopAppBar
 import com.madteam.sunset.ui.common.ProfileImage
-import com.madteam.sunset.ui.common.SmallButtonDark
+import com.madteam.sunset.ui.common.ProfilePostTypeTab
 import com.madteam.sunset.ui.common.SunsetBottomNavigation
 import com.madteam.sunset.ui.common.ThinButtonLight
 import com.madteam.sunset.ui.common.UserLocationText
@@ -49,12 +55,11 @@ fun MyProfileScreen(
     val coroutineScope = rememberCoroutineScope()
     val editProfileModalState =
         ModalBottomSheetState(initialValue = Hidden, isSkipHalfExpanded = true)
-    val username by viewModel.username.collectAsStateWithLifecycle()
-    val name by viewModel.name.collectAsStateWithLifecycle()
-    val location by viewModel.location.collectAsStateWithLifecycle()
-    val userImage by viewModel.userImage.collectAsStateWithLifecycle()
+    val userInfo by viewModel.userInfo.collectAsStateWithLifecycle()
     val navigateUp by viewModel.navigateWelcomeScreen.collectAsStateWithLifecycle()
-    val userIsAdmin by viewModel.userIsAdmin.collectAsStateWithLifecycle()
+    val selectedTab by viewModel.selectedTab.collectAsStateWithLifecycle()
+    val userPosts by viewModel.userPosts.collectAsStateWithLifecycle()
+    val userSpots by viewModel.userSpots.collectAsStateWithLifecycle()
 
     if (navigateUp)
         navController.navigateUp()
@@ -69,10 +74,12 @@ fun MyProfileScreen(
             bottomBar = { SunsetBottomNavigation(navController) },
             topBar = {
                 MyProfileTopAppBar(
-                    username = username,
-                    isAdmin = userIsAdmin,
+                    username = userInfo.username,
+                    isAdmin = userInfo.admin,
                     reportsNumbers = 0,
-                    goToReportsScreen = { navController.navigate(SunsetRoutes.SeeReportsScreen.route) })
+                    goToReportsScreen = { navController.navigate(SunsetRoutes.SeeReportsScreen.route) },
+                    logOutClick = viewModel::logOut
+                )
             },
             content = { paddingValues ->
                 Box(
@@ -80,11 +87,13 @@ fun MyProfileScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     MyProfileContent(
-                        name = name,
-                        location = location,
-                        userImage = userImage,
+                        userInfo = userInfo,
                         onEditProfileClick = { coroutineScope.launch { editProfileModalState.show() } },
-                        logout = { viewModel.logOut() }
+                        selectedTab = selectedTab,
+                        onTabClicked = viewModel::onTabClicked,
+                        userPosts = userPosts,
+                        userSpots = userSpots,
+                        navigateTo = navController::navigate
                     )
                 }
             }
@@ -94,11 +103,13 @@ fun MyProfileScreen(
 
 @Composable
 fun MyProfileContent(
-    name: String,
-    location: String,
-    userImage: String,
-    logout: () -> Unit,
-    onEditProfileClick: () -> Unit
+    userInfo: UserProfile,
+    onEditProfileClick: () -> Unit,
+    selectedTab: Int,
+    onTabClicked: (Int) -> Unit,
+    userPosts: List<SpotPost>,
+    userSpots: List<Spot>,
+    navigateTo: (String) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -108,39 +119,86 @@ fun MyProfileContent(
             .background(Color.White)
     ) {
         CustomSpacer(size = 16.dp)
-        ProfileImage(imageUrl = userImage, size = 80.dp)
-        if (name.isNotBlank()) {
+        ProfileImage(imageUrl = userInfo.image, size = 80.dp)
+        if (userInfo.name.isNotBlank()) {
             CustomSpacer(size = 16.dp)
-            UserNameText(userName = name)
+            UserNameText(userName = userInfo.name)
             CustomSpacer(size = 8.dp)
         }
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = if (location.isNotBlank()) {
+            horizontalArrangement = if (userInfo.location.isNotBlank()) {
                 Arrangement.SpaceBetween
             } else {
                 Arrangement.Center
             }
         ) {
-            if (location.isNotBlank()) {
-                UserLocationText(location = location)
+            if (userInfo.location.isNotBlank()) {
+                UserLocationText(location = userInfo.location)
             }
             ThinButtonLight(onClick = onEditProfileClick, text = R.string.edit_profile)
         }
         CustomSpacer(size = 8.dp)
-        FollowsUserStates()
-        CustomSpacer(size = 48.dp)
-        SmallButtonDark(
-            onClick = logout,
-            text = R.string.log_out,
-            enabled = true
+        // FollowsUserStates() TODO: User states won't be displayed until it has been developed
+        CustomSpacer(size = 24.dp)
+        ProfilePostTypeTab(
+            tabOptions = listOf("Posts", "Spots"),
+            selectedTab = selectedTab,
+            tabOnClick = { onTabClicked(it) }
         )
+        CustomSpacer(size = 8.dp)
+        when (selectedTab) {
+            0 -> {
+                if (userPosts.isNotEmpty()) {
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        content = {
+                            itemsIndexed(userPosts) { _, post ->
+                                ImagePostCardProfile(
+                                    postInfo = post,
+                                    onItemClicked = {
+                                        navigateTo("post_screen/postReference=${post.id}")
+                                    }
+                                )
+                            }
+                        },
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    )
+                } else {
+                    // TODO: Show image or copy saying user hasn't posted anything yet
+                }
+            }
+
+            1 -> {
+                if (userSpots.isNotEmpty()) {
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        content = {
+                            itemsIndexed(userSpots) { _, spot ->
+                                ImageSpotCardProfile(
+                                    spotInfo = spot,
+                                    onItemClicked = {
+                                        navigateTo("spot_detail_screen/spotReference=${spot.id}")
+                                    }
+                                )
+                            }
+                        },
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    )
+                } else {
+                    // TODO: Show image or copy saying user has not discovered spots yet
+                }
+            }
+
+            2 -> {
+                // TODO: Save spots on lists feature still not developed
+            }
+        }
+        CustomSpacer(size = 8.dp)
     }
 }
 
-@Composable
-@Preview
-fun MyProfileScreenPreview() {
-    MyProfileContent("Adrià Fernández", "", "🗺️ Terrassa, Bcn", {}) {}
-}
+

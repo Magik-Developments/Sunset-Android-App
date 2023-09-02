@@ -28,6 +28,7 @@ import com.madteam.sunset.ui.screens.lostpassword.LostPasswordScreen
 import com.madteam.sunset.ui.screens.myprofile.MyProfileScreen
 import com.madteam.sunset.ui.screens.post.PostScreen
 import com.madteam.sunset.ui.screens.review.PostReviewScreen
+import com.madteam.sunset.ui.screens.seereports.SeeReportsScreen
 import com.madteam.sunset.ui.screens.selectLocation.SelectLocationScreen
 import com.madteam.sunset.ui.screens.spotdetail.SpotDetailScreen
 import com.madteam.sunset.ui.screens.verifyaccount.VerifyAccountScreen
@@ -250,6 +251,10 @@ fun SunsetNavigation() {
         ) { backStackEntry ->
             val spotReference = backStackEntry.arguments?.getString("spotReference")
             AddReviewScreen(spotReference = spotReference!!, navController = navController)
+        }
+
+        composable(SunsetRoutes.SeeReportsScreen.route) {
+            SeeReportsScreen(navController)
         }
 
     }

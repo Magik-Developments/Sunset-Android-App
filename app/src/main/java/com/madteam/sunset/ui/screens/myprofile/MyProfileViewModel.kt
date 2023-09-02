@@ -5,6 +5,7 @@ import com.madteam.sunset.repositories.AuthContract
 import com.madteam.sunset.repositories.DatabaseContract
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 @HiltViewModel
@@ -17,6 +18,9 @@ class MyProfileViewModel @Inject constructor(
     val name = MutableStateFlow("")
     val location = MutableStateFlow("")
     val userImage = MutableStateFlow("")
+
+    private val _userIsAdmin: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val userIsAdmin: StateFlow<Boolean> = _userIsAdmin
 
     val navigateWelcomeScreen = MutableStateFlow(false)
 
@@ -31,6 +35,7 @@ class MyProfileViewModel @Inject constructor(
                 name.value = it.name
                 location.value = it.location
                 userImage.value = it.image
+                _userIsAdmin.value = it.admin
             }
         }
     }

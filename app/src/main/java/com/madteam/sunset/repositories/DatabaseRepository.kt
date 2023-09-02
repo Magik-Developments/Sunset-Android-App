@@ -12,6 +12,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.storage.FirebaseStorage
 import com.madteam.sunset.model.PostComment
+import com.madteam.sunset.model.Report
 import com.madteam.sunset.model.Spot
 import com.madteam.sunset.model.SpotAttribute
 import com.madteam.sunset.model.SpotClusterItem
@@ -941,11 +942,9 @@ class DatabaseRepository @Inject constructor(
         emit(Resource.Loading())
         val newReportDocument = firebaseFirestore.collection(REPORTS_COLLECTION_PATH)
             .document()
-        val reporterReference = firebaseFirestore.collection(USERS_COLLECTION_PATH)
-            .document(reporterUsername)
         val newReport = hashMapOf(
             "type" to reportType,
-            "reporter" to reporterReference,
+            "reporter" to reporterUsername,
             "issue" to reportIssue,
             "description" to reportDescription,
             "doc_reference" to firebaseFirestore.document(documentReference),
@@ -970,6 +969,66 @@ class DatabaseRepository @Inject constructor(
     }.catch { exception ->
         Log.e("DatabaseRepository::getSpotReportsOptions", "Error: ${exception.message}")
         emit(mutableListOf())
+    }
+
+    override fun getReportsList(): Flow<List<Report>> = flow {
+        val reportsList = mutableListOf<Report>()
+
+        val reportsListSnapshot =
+            firebaseFirestore.collection(REPORTS_COLLECTION_PATH).get().await()
+        for (reportDoc in reportsListSnapshot.documents) {
+            val reportId = reportDoc.id
+            val type = reportDoc.getString("type")
+            val reporter = reportDoc.get("reporter")
+            val issue = reportDoc.getString("issue")
+            val docReference: DocumentReference? = reportDoc.getDocumentReference("doc_reference")
+            val description = reportDoc.getString("description")
+            val date = reportDoc.getString("date")
+            val assignedBy = reportDoc.getString("assigned_by") ?: ""
+
+            if (reportId != "reportOptions" && type != null && reporter != null && issue != null && docReference != null && description != null) {
+                val report = Report(
+                    reportId,
+                    date.toString(),
+                    description,
+                    docReference,
+                    issue,
+                    reporter.toString(),
+                    type,
+                    assignedBy
+                )
+                reportsList.add(report)
+            }
+        }
+        emit(reportsList)
+    }.catch { exception ->
+        Log.e("DatabaseRepository::getReportsList", "Error: ${exception.message}")
+        emit(mutableListOf())
+    }
+
+    override fun assignReport(username: String, reportId: String): Flow<Resource<String>> = flow {
+        emit(Resource.Loading())
+        val reportDocumentReference =
+            firebaseFirestore.collection(REPORTS_COLLECTION_PATH).document(reportId)
+        val updatedReport = hashMapOf<String, Any>(
+            "assigned_by" to username
+        )
+        reportDocumentReference.update(updatedReport).await()
+        emit(Resource.Success("Updated successfully"))
+    }.catch { exception ->
+        Log.e("DatabaseRepository::assignReport", "Error: ${exception.message}")
+        emit(Resource.Error("Error updating report: ${exception.message}"))
+    }
+
+    override fun deleteReport(reportId: String): Flow<Resource<String>> = flow {
+        emit(Resource.Loading())
+        val reportDocumentReference =
+            firebaseFirestore.collection(REPORTS_COLLECTION_PATH).document(reportId)
+        reportDocumentReference.delete().await()
+        emit(Resource.Success("Deleted successfully"))
+    }.catch { exception ->
+        Log.e("DatabaseRepository::deleteReport", "Error: ${exception.message}")
+        emit(Resource.Error("Error deleting report: ${exception.message}"))
     }
 }
 
@@ -1050,5 +1109,14 @@ interface DatabaseContract {
     ): Flow<Resource<String>>
 
     fun getSpotReportsOptions(): Flow<List<String>>
+    fun getReportsList(): Flow<List<Report>>
+    fun assignReport(
+        username: String,
+        reportId: String
+    ): Flow<Resource<String>>
+
+    fun deleteReport(
+        reportId: String
+    ): Flow<Resource<String>>
 
 }

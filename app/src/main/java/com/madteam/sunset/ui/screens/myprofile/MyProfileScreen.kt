@@ -33,7 +33,6 @@ import com.madteam.sunset.model.SpotPost
 import com.madteam.sunset.model.UserProfile
 import com.madteam.sunset.navigation.SunsetRoutes
 import com.madteam.sunset.ui.common.CustomSpacer
-import com.madteam.sunset.ui.common.FollowsUserStates
 import com.madteam.sunset.ui.common.ImagePostCardProfile
 import com.madteam.sunset.ui.common.ImageSpotCardProfile
 import com.madteam.sunset.ui.common.MyProfileTopAppBar
@@ -141,7 +140,7 @@ fun MyProfileContent(
             ThinButtonLight(onClick = onEditProfileClick, text = R.string.edit_profile)
         }
         CustomSpacer(size = 8.dp)
-        FollowsUserStates()
+        // FollowsUserStates() TODO: User states won't be displayed until it has been developed
         CustomSpacer(size = 24.dp)
         ProfilePostTypeTab(
             tabOptions = listOf("Posts", "Spots"),

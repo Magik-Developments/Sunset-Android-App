@@ -29,11 +29,13 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.madteam.sunset.R
 import com.madteam.sunset.ui.theme.SunsetTheme
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyM
+import com.madteam.sunset.ui.theme.secondarySemiBoldBodyS
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
 
 @Composable
@@ -167,7 +169,9 @@ fun SmallButtonDark(
 
     ) {
         Text(
-            text = stringResource(id = text), style = secondarySemiBoldHeadLineS, color = Color.White
+            text = stringResource(id = text),
+            style = secondarySemiBoldHeadLineS,
+            color = Color.White
         )
     }
 }
@@ -211,7 +215,10 @@ fun PreviewOtherLoginIconButtons() {
 
 @Composable
 fun IconButtonLight(
-    buttonIcon: ImageVector, @StringRes description: Int, onClick: () -> Unit, iconTint: Color = Color.Unspecified
+    buttonIcon: ImageVector,
+    @StringRes description: Int,
+    onClick: () -> Unit,
+    iconTint: Color = Color.Unspecified
 ) {
     Box(
         modifier = Modifier
@@ -299,7 +306,9 @@ fun ThinButtonLight(
 
     ) {
         Text(
-            text = stringResource(id = text), style = secondarySemiBoldBodyM, color = Color(0xFF333333)
+            text = stringResource(id = text),
+            style = secondarySemiBoldBodyM,
+            color = Color(0xFF333333)
         )
     }
 }
@@ -413,6 +422,44 @@ fun LargeDarkButton(
             )
         }
     }
+}
+
+@Composable
+fun SmallSunsetButton(
+    onClick: () -> Unit,
+    @StringRes text: Int,
+    modifier: Modifier = Modifier
+) {
+    Button(
+        onClick = { onClick() },
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = Color(0xFFFFB600)
+        ),
+        modifier = modifier
+            .height(30.dp)
+            .width(120.dp)
+    ) {
+        Box(
+            modifier = Modifier,
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = stringResource(id = text),
+                style = secondarySemiBoldBodyS,
+                textAlign = TextAlign.Center,
+                color = Color.White
+            )
+        }
+    }
+
+}
+
+@Preview
+@Composable
+fun SmallSunsetButtonPreview(
+
+) {
+    SmallSunsetButton(onClick = { /*TODO*/ }, text = R.string.explore_spots)
 }
 
 @Preview

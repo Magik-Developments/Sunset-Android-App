@@ -21,13 +21,18 @@ import com.madteam.sunset.R
 import com.madteam.sunset.model.SunsetTimeResponse
 import com.madteam.sunset.ui.theme.primaryBoldDisplayM
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineXS
+import com.madteam.sunset.ui.theme.secondaryRegularBodyS
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyM
+import com.madteam.sunset.utils.convertHourToMilitaryFormat
 
 @Composable
 fun SunsetInfoModule(
     sunsetTimeInformation: SunsetTimeResponse,
+    remainingTimeToSunset: String,
+    userLocality: String,
     clickToExplore: () -> Unit
 ) {
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -38,7 +43,7 @@ fun SunsetInfoModule(
                 .fillMaxSize()
         ) {
 
-            val (sunsetTime, sunsetTimeIcon, remainingTime, remainingTimeDescription, exploreButton) = createRefs()
+            val (sunsetTime, sunsetTimeIcon, remainingTime, remainingTimeDescription, exploreButton, poweredBy) = createRefs()
             Image(
                 modifier = Modifier
                     .fillMaxSize(),
@@ -47,7 +52,7 @@ fun SunsetInfoModule(
                 contentDescription = ""
             )
             Text(
-                text = "1h 30min",
+                text = remainingTimeToSunset,
                 style = primaryBoldDisplayM,
                 color = Color.White,
                 modifier = Modifier
@@ -59,7 +64,11 @@ fun SunsetInfoModule(
                     }
             )
             Text(
-                text = "Remaining to Sunset in your location",
+                text = if (userLocality.isNotEmpty()) {
+                    "Remaining to Sunset in $userLocality"
+                } else {
+                    "Remaining to Sunset"
+                },
                 color = Color.White,
                 style = primaryBoldHeadlineXS,
                 modifier = Modifier
@@ -70,7 +79,7 @@ fun SunsetInfoModule(
                     }
             )
             Text(
-                text = sunsetTimeInformation.results.sunset,
+                text = convertHourToMilitaryFormat(sunsetTimeInformation.results.sunset),
                 style = secondarySemiBoldBodyM,
                 modifier = Modifier
                     .constrainAs(sunsetTime) {
@@ -90,6 +99,16 @@ fun SunsetInfoModule(
                         bottom.linkTo(sunsetTime.bottom)
                     },
                 tint = Color.White
+            )
+            Text(
+                text = "Powered by SunriseSunset.io",
+                style = secondaryRegularBodyS,
+                modifier = Modifier
+                    .constrainAs(poweredBy) {
+                        start.linkTo(parent.start, 8.dp)
+                        bottom.linkTo(parent.bottom, 4.dp)
+                    },
+                color = Color(0xFFd9d9d9)
             )
 
             /*

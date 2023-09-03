@@ -94,7 +94,7 @@ fun SunsetNavigation() {
         }
 
         composable(SunsetRoutes.HomeScreen.route) {
-            HomeScreen(navController)
+            HomeScreen(navController = navController)
         }
 
         composable(SunsetRoutes.AddSpotScreen.route) { entry ->

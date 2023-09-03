@@ -106,14 +106,17 @@ fun calculateTimeDifference(targetTime: String): String {
 
         val timeDifferenceMillis = targetTimeDate.time - currentTimeDate.time
 
-        return if (timeDifferenceMillis < 0) {
+        val hours = timeDifferenceMillis / (60 * 60 * 1000)
+        val minutes = (timeDifferenceMillis % (60 * 60 * 1000)) / (60 * 1000)
+
+        return if (hours == 0L) {
+            "$minutes min"
+        } else if (timeDifferenceMillis < 0) {
             val adjustedTimeDifferenceMillis = timeDifferenceMillis + 24 * 60 * 60 * 1000
-            val hours = adjustedTimeDifferenceMillis / (60 * 60 * 1000)
-            val minutes = (adjustedTimeDifferenceMillis % (60 * 60 * 1000)) / (60 * 1000)
-            "$hours h $minutes min"
+            val adjustedHours = adjustedTimeDifferenceMillis / (60 * 60 * 1000)
+            val adjustedMinutes = (adjustedTimeDifferenceMillis % (60 * 60 * 1000)) / (60 * 1000)
+            "$adjustedHours h $adjustedMinutes min"
         } else {
-            val hours = timeDifferenceMillis / (60 * 60 * 1000)
-            val minutes = (timeDifferenceMillis % (60 * 60 * 1000)) / (60 * 1000)
             "$hours h $minutes min"
         }
     } catch (e: Exception) {

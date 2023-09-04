@@ -12,9 +12,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetState
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -50,62 +56,77 @@ import com.madteam.sunset.utils.googlemaps.clusters.ZoneClusterManager
 import com.madteam.sunset.utils.googlemaps.setMapProperties
 import com.madteam.sunset.utils.googlemaps.updateCameraLocation
 import com.madteam.sunset.utils.hasLocationPermission
+import kotlinx.coroutines.launch
 
-const val MAP_PADDING = 200
-
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DiscoverScreen(
     navController: NavController,
     viewModel: DiscoverViewModel = hiltViewModel()
 ) {
 
+    val coroutineScope = rememberCoroutineScope()
+    val spotFiltersModalState =
+        ModalBottomSheetState(
+            initialValue = ModalBottomSheetValue.Hidden,
+            isSkipHalfExpanded = true
+        )
     val mapState by viewModel.mapState.collectAsStateWithLifecycle()
     val clusterInfo by viewModel.clusterInfo.collectAsStateWithLifecycle()
     val userLocation by viewModel.userLocation.collectAsStateWithLifecycle()
     val goToUserLocation by viewModel.goToUserLocation.collectAsStateWithLifecycle()
 
-    Scaffold(
-        bottomBar = { SunsetBottomNavigation(navController) },
-        floatingActionButton = {
-            if (!clusterInfo.isSelected) {
-                AddSpotFAB {
-                    navController.navigate(SunsetRoutes.AddSpotScreen.route)
+    ModalBottomSheetLayout(
+        sheetState = spotFiltersModalState,
+        sheetShape = RoundedCornerShape(20.dp, 20.dp, 0.dp, 0.dp),
+        sheetElevation = 10.dp,
+        sheetContent = { BottomSheetFilterSpotsScreen() }
+    ) {
+        Scaffold(
+            bottomBar = { SunsetBottomNavigation(navController) },
+            floatingActionButton = {
+                if (!clusterInfo.isSelected) {
+                    AddSpotFAB {
+                        navController.navigate(SunsetRoutes.AddSpotScreen.route)
+                    }
                 }
-            }
-        },
-        content = { paddingValues ->
-            Box(
-                modifier = Modifier.padding(paddingValues),
-                contentAlignment = Alignment.Center
-            ) {
-                DiscoverContent(
-                    mapState = mapState,
-                    selectedCluster = { clusterItem ->
-                        viewModel.clusterVisibility(clusterItem.copy(isSelected = true))
-                    },
-                    userLocation = userLocation,
-                    updateUserLocation = viewModel::updateUserLocation,
-                    goToUserLocation = goToUserLocation,
-                    setGoToUserLocation = viewModel::setGoToUserLocation
-                )
-                AnimatedVisibility(
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(24.dp),
-                    visible = clusterInfo.isSelected,
-                    enter = slideInVertically(initialOffsetY = { it }),
-                    exit = slideOutVertically(targetOffsetY = { it + 200 })
+            },
+            content = { paddingValues ->
+                Box(
+                    modifier = Modifier.padding(paddingValues),
+                    contentAlignment = Alignment.Center
                 ) {
-                    SpotClusterInfo(
-                        clusterInfo,
-                        onClose = { clusterItem ->
-                            viewModel.clusterVisibility(clusterItem.copy(isSelected = false))
+                    DiscoverContent(
+                        mapState = mapState,
+                        selectedCluster = { clusterItem ->
+                            viewModel.clusterVisibility(clusterItem.copy(isSelected = true))
                         },
-                        onItemClicked = { navController.navigate("spot_detail_screen/spotReference=${clusterInfo.spot.id}") })
+                        userLocation = userLocation,
+                        updateUserLocation = viewModel::updateUserLocation,
+                        goToUserLocation = goToUserLocation,
+                        setGoToUserLocation = viewModel::setGoToUserLocation,
+                        onFilterClick = { coroutineScope.launch { spotFiltersModalState.show() } }
+                    )
+                    AnimatedVisibility(
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(24.dp),
+                        visible = clusterInfo.isSelected,
+                        enter = slideInVertically(initialOffsetY = { it }),
+                        exit = slideOutVertically(targetOffsetY = { it + 200 })
+                    ) {
+                        SpotClusterInfo(
+                            clusterInfo,
+                            onClose = { clusterItem ->
+                                viewModel.clusterVisibility(clusterItem.copy(isSelected = false))
+                            },
+                            onItemClicked = { navController.navigate("spot_detail_screen/spotReference=${clusterInfo.spot.id}") })
+                    }
                 }
             }
-        }
-    )
+        )
+    }
+
 }
 
 @Composable
@@ -115,7 +136,8 @@ fun DiscoverContent(
     userLocation: LatLng,
     updateUserLocation: (LatLng) -> Unit,
     goToUserLocation: Boolean,
-    setGoToUserLocation: (Boolean) -> Unit
+    setGoToUserLocation: (Boolean) -> Unit,
+    onFilterClick: () -> Unit
 ) {
 
     val cameraPositionState = rememberCameraPositionState()
@@ -176,6 +198,17 @@ fun DiscoverContent(
             }) {
             Icon(
                 imageVector = Icons.Default.MyLocation,
+                contentDescription = "",
+                tint = Color.White
+            )
+        }
+        IconButton(
+            colors = IconButtonDefaults.iconButtonColors(containerColor = Color(0xFFFFB600)),
+            onClick = {
+                onFilterClick()
+            }) {
+            Icon(
+                imageVector = Icons.Default.Tune,
                 contentDescription = "",
                 tint = Color.White
             )

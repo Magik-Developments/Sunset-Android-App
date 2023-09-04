@@ -126,12 +126,13 @@ fun CloseIconButton(
 
 @Composable
 fun RoundedCloseIconButton(
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     IconButton(
-        onClick = onClick, modifier = Modifier
+        onClick = onClick, modifier = modifier
             .size(24.dp)
-            .background(Color(0x80000000), RoundedCornerShape(50.dp))
+            .background(Color.White, RoundedCornerShape(50.dp))
             .clip(
                 RoundedCornerShape(50.dp)
             )
@@ -139,8 +140,8 @@ fun RoundedCloseIconButton(
         Icon(
             imageVector = Icons.Outlined.Close,
             contentDescription = "",
-            modifier = Modifier.size(24.dp),
-            tint = Color.White
+            modifier = Modifier.size(16.dp),
+            tint = Color.Black
         )
     }
 }

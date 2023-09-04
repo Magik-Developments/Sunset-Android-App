@@ -242,18 +242,22 @@ class DatabaseRepository @Inject constructor(
             val spotList = spotCollection.documents.mapNotNull { document ->
                 val id = document.id
                 val name = document.getString("name")
-                val location = document.getGeoPoint("location_in_latlng")
+                val locationInLatLng = document.getGeoPoint("location_in_latlng")
                 val spot = firebaseFirestore.collection(SPOTS_COLLECTION_PATH).document(document.id)
-                val image = document.get("featured_images") as List<String>
+                val images = document.get("featured_images") as List<String>
+                val location = document.getString("location")
+                val score: Float = document.get("score").toString().toFloat()
 
-                if (name != null && location != null) {
+                if (name != null && locationInLatLng != null) {
                     SpotClusterItem(
                         id = id,
                         name = name,
                         spot = spot,
-                        location = location,
+                        locationInLatLng = locationInLatLng,
                         isSelected = false,
-                        featuredImage = image[0]
+                        featuredImages = images,
+                        location = location ?: "",
+                        score = score
                     )
                 } else {
                     null

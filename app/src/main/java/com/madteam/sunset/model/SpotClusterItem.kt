@@ -10,21 +10,25 @@ data class SpotClusterItem(
     val id: String,
     val name: String,
     val spot: DocumentReference,
-    val location: GeoPoint,
+    val locationInLatLng: GeoPoint,
     val isSelected: Boolean,
-    val featuredImage: String
+    val featuredImages: List<String>,
+    val location: String,
+    val score: Float
 ) : ClusterItem {
 
     constructor() : this(
         id = "",
         name = "",
         spot = FirebaseFirestore.getInstance().document(""),
-        location = GeoPoint(0.0, 0.0),
+        locationInLatLng = GeoPoint(0.0, 0.0),
         isSelected = false,
-        featuredImage = ""
+        featuredImages = listOf(),
+        location = "",
+        score = 0.0f
     )
 
     override fun getTitle() = name
     override fun getSnippet(): String? = null
-    override fun getPosition() = LatLng(location.latitude, location.longitude)
+    override fun getPosition() = LatLng(locationInLatLng.latitude, locationInLatLng.longitude)
 }

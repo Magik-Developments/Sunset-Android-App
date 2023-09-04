@@ -2,6 +2,7 @@ package com.madteam.sunset.ui.screens.discover
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.maps.model.LatLng
 import com.madteam.sunset.model.SpotClusterItem
 import com.madteam.sunset.repositories.DatabaseRepository
 import com.madteam.sunset.utils.googlemaps.MapState
@@ -16,11 +17,18 @@ class DiscoverViewModel @Inject constructor(
     private val databaseRepository: DatabaseRepository
 ) : ViewModel() {
 
-    private val _clusterInfo: MutableStateFlow<SpotClusterItem> = MutableStateFlow(SpotClusterItem())
+    private val _clusterInfo: MutableStateFlow<SpotClusterItem> =
+        MutableStateFlow(SpotClusterItem())
     val clusterInfo: StateFlow<SpotClusterItem> = _clusterInfo
 
     private val _mapState: MutableStateFlow<MapState> = MutableStateFlow(MapState())
     val mapState: StateFlow<MapState> = _mapState
+
+    private val _userLocation: MutableStateFlow<LatLng> = MutableStateFlow(LatLng(0.0, 0.0))
+    val userLocation: StateFlow<LatLng> = _userLocation
+
+    private val _goToUserLocation: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val goToUserLocation: StateFlow<Boolean> = _goToUserLocation
 
     init {
         viewModelScope.launch {
@@ -32,6 +40,14 @@ class DiscoverViewModel @Inject constructor(
 
     fun clusterVisibility(clusterItem: SpotClusterItem) {
         _clusterInfo.value = clusterItem
+    }
+
+    fun updateUserLocation(location: LatLng) {
+        _userLocation.value = location
+    }
+
+    fun setGoToUserLocation(state: Boolean) {
+        _goToUserLocation.value = state
     }
 
 }

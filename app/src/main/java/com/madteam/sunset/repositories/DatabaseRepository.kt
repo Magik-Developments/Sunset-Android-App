@@ -30,7 +30,6 @@ import java.util.UUID
 import javax.inject.Inject
 
 private const val USERS_COLLECTION_PATH = "users"
-private const val SPOTS_LOCATIONS_COLLECTION_PATH = "spots_locations"
 private const val SPOT_REVIEWS_COLLECTION = "spot_reviews"
 private const val SPOT_ATTRIBUTES_COLLECTION = "spot_attributes"
 private const val SPOTS_COLLECTION_PATH = "spots"
@@ -239,22 +238,22 @@ class DatabaseRepository @Inject constructor(
     override fun getSpotsLocations(): Flow<List<SpotClusterItem>> = flow {
         try {
             val spotCollection =
-                firebaseFirestore.collection(SPOTS_LOCATIONS_COLLECTION_PATH).get().await()
+                firebaseFirestore.collection(SPOTS_COLLECTION_PATH).get().await()
             val spotList = spotCollection.documents.mapNotNull { document ->
                 val id = document.id
                 val name = document.getString("name")
-                val location = document.getGeoPoint("location")
-                val spot = document.getDocumentReference("spot")
-                val image = document.getString("image")
+                val location = document.getGeoPoint("location_in_latlng")
+                val spot = firebaseFirestore.collection(SPOTS_COLLECTION_PATH).document(document.id)
+                val image = document.get("featured_images") as List<String>
 
-                if (name != null && location != null && spot != null && image != null) {
+                if (name != null && location != null) {
                     SpotClusterItem(
                         id = id,
                         name = name,
                         spot = spot,
                         location = location,
                         isSelected = false,
-                        featuredImage = image
+                        featuredImage = image[0]
                     )
                 } else {
                     null
@@ -727,8 +726,6 @@ class DatabaseRepository @Inject constructor(
         emit(Resource.Loading())
         val newSpotDocument = firebaseFirestore.collection(SPOTS_COLLECTION_PATH)
             .document()
-        val newSpotLocationDocument = firebaseFirestore.collection(SPOTS_LOCATIONS_COLLECTION_PATH)
-            .document()
         val authorReference = firebaseFirestore.collection(USERS_COLLECTION_PATH)
             .document(spotAuthor)
         var featuredImagesList = listOf<String>()
@@ -766,15 +763,7 @@ class DatabaseRepository @Inject constructor(
             "attributes" to attributesReferences
         )
 
-        val newSpotLocation = hashMapOf(
-            "location" to GeoPoint(spotLocation.latitude, spotLocation.longitude),
-            "name" to spotTitle,
-            "spot" to newSpotDocument,
-            "image" to featuredImagesList.first()
-        )
-
         newSpotDocument.set(newSpot).await()
-        newSpotLocationDocument.set(newSpotLocation).await()
         emit(Resource.Success(newSpotDocument.id))
     }.catch { exception ->
         Log.e("DatabaseRepository::createSpot", "Error: ${exception.message}")
@@ -849,15 +838,6 @@ class DatabaseRepository @Inject constructor(
             }
 
             Tasks.whenAllComplete(deletePostsTasks).await()
-
-            val spotLocationQuerySnapshot = firebaseFirestore.collection(
-                SPOTS_LOCATIONS_COLLECTION_PATH
-            ).whereEqualTo("spot", spotDocumentReference).get().await()
-
-            if (!spotLocationQuerySnapshot.isEmpty) {
-                val spotLocationDocument = spotLocationQuerySnapshot.documents.first()
-                spotLocationDocument.reference.delete().await()
-            }
 
             //Delete spot images
             val featuredImagesList =

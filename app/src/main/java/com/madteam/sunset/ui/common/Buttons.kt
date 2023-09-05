@@ -4,21 +4,27 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.BrightnessHigh
 import androidx.compose.material.icons.outlined.Mail
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -451,7 +457,67 @@ fun SmallSunsetButton(
             )
         }
     }
+}
 
+@Composable
+fun FilterScoreButton(
+    filterOptions: List<Int>,
+    selectedOption: Int,
+    onOptionClicked: (Int) -> Unit
+) {
+
+    LazyRow(
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        itemsIndexed(filterOptions) { _, option ->
+            val isSelected = selectedOption == option
+            val customBackgroundColor = if (isSelected) Color(0xFFFFE094) else Color.White
+            val customBorderColor = if (isSelected) Color(0xFFFFB600) else Color(0xFF999999)
+            val customTextColor = if (isSelected) Color.Black else Color(0xFF333333)
+            Box(
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .border(1.dp, customBorderColor, RoundedCornerShape(10.dp))
+                    .background(customBackgroundColor, RoundedCornerShape(10.dp))
+                    .clickable { onOptionClicked(option) }
+
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    androidx.compose.material3.Text(
+                        text = "> $option",
+                        style = secondarySemiBoldBodyM,
+                        color = customTextColor,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(vertical = 4.dp)
+                    )
+                    CustomSpacer(size = 4.dp)
+                    androidx.compose.material3.Icon(
+                        imageVector = Icons.Outlined.BrightnessHigh,
+                        contentDescription = "",
+                        modifier = Modifier
+                            .size(16.dp),
+                        tint = customTextColor
+                    )
+                }
+            }
+        }
+    }
+
+}
+
+@Preview
+@Composable
+fun FilterScoreButtonPreview() {
+    FilterScoreButton(
+        filterOptions = listOf(4, 6, 8),
+        selectedOption = 6,
+        onOptionClicked = {}
+    )
 }
 
 @Preview

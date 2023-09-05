@@ -14,16 +14,21 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.madteam.sunset.R
+import com.madteam.sunset.model.SpotAttribute
 import com.madteam.sunset.ui.common.CloseIconButton
 import com.madteam.sunset.ui.common.CustomSpacer
+import com.madteam.sunset.ui.common.FilterAttributesButton
 import com.madteam.sunset.ui.common.FilterScoreButton
 import com.madteam.sunset.ui.common.SmallButtonDark
+import com.madteam.sunset.ui.common.SmallButtonSunset
+import com.madteam.sunset.ui.screens.addreview.LOCATION_ATTRIBUTES
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyM
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
 
@@ -35,6 +40,8 @@ fun BottomSheetFilterSpotsScreen(
 
     val filterScoreList by viewModel.filterScoreList.collectAsStateWithLifecycle()
     val selectedFilterScore by viewModel.selectedFilterScore.collectAsStateWithLifecycle()
+    val attributesList by viewModel.attributesList.collectAsStateWithLifecycle()
+    val selectedLocationAttributes by viewModel.selectedLocationFilter.collectAsStateWithLifecycle()
 
     Card(
         modifier = Modifier
@@ -44,28 +51,36 @@ fun BottomSheetFilterSpotsScreen(
         shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
     ) {
         BottomSheetFilterSpotsContent(
+            attributesList = attributesList,
             filterScoreList = filterScoreList,
             selectedFilterScore = selectedFilterScore,
             onSelectedScoreFilterClicked = viewModel::updateSelectedFilterScore,
-            onCloseClicked = onCloseClicked
+            onCloseClicked = onCloseClicked,
+            onSelectedLocationFilterClicked = viewModel::updateSelectedLocationAttributes,
+            selectedFilterLocation = selectedLocationAttributes
         )
     }
 }
 
 @Composable
 fun BottomSheetFilterSpotsContent(
+    attributesList: List<SpotAttribute>,
+    onSelectedLocationFilterClicked: (SpotAttribute) -> Unit,
+    selectedFilterLocation: List<SpotAttribute>,
     filterScoreList: List<Int>,
     selectedFilterScore: Int,
     onSelectedScoreFilterClicked: (Int) -> Unit,
     onCloseClicked: () -> Unit
 ) {
+    val context = LocalContext.current
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
             .padding(horizontal = 24.dp)
     ) {
-        CustomSpacer(size = 8.dp)
+        CustomSpacer(size = 16.dp)
         Row(
             horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically
@@ -83,23 +98,34 @@ fun BottomSheetFilterSpotsContent(
             onOptionClicked = { onSelectedScoreFilterClicked(it) }
         )
         CustomSpacer(size = 24.dp)
+        Text(text = stringResource(id = R.string.where_it_is), style = secondarySemiBoldBodyM)
+        CustomSpacer(size = 16.dp)
+        FilterAttributesButton(
+            filterOptions = attributesList.filter { it.type == LOCATION_ATTRIBUTES },
+            selectedOptions = selectedFilterLocation,
+            onOptionClicked = { onSelectedLocationFilterClicked(it) },
+            context = context
+        )
+        CustomSpacer(size = 24.dp)
         Row(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             SmallButtonDark(onClick = { }, text = R.string.clear, enabled = false)
-
+            SmallButtonSunset(onClick = { /*TODO*/ }, text = R.string.apply, enabled = false)
         }
+        CustomSpacer(size = 16.dp)
     }
 }
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun PreviewBottomSheetEditProfileContent() {
-    BottomSheetFilterSpotsContent(
-        filterScoreList = listOf(4, 6, 8),
-        selectedFilterScore = 4,
-        onSelectedScoreFilterClicked = {},
-        onCloseClicked = {}
-    )
+    /* BottomSheetFilterSpotsContent(
+         filterScoreList = listOf(4, 6, 8),
+         selectedFilterScore = 4,
+         onSelectedScoreFilterClicked = {},
+         onCloseClicked = {}
+     ) */
 }

@@ -45,7 +45,7 @@ import com.madteam.sunset.ui.theme.secondarySemiBoldBodyS
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
 
 @Composable
-fun EmailButton(onClick: () -> Unit) {
+fun SunsetButton(onClick: () -> Unit) {
     Button(
         onClick = onClick,
         modifier = Modifier
@@ -69,7 +69,7 @@ fun EmailButton(onClick: () -> Unit) {
 @Preview
 @Composable
 fun PreviewEmailButton() {
-    SunsetTheme { EmailButton {} }
+    SunsetTheme { SunsetButton {} }
 }
 
 @Composable

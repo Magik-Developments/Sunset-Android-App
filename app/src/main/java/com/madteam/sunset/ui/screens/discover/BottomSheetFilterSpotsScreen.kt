@@ -14,19 +14,23 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.madteam.sunset.R
 import com.madteam.sunset.ui.common.CloseIconButton
 import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.FilterScoreButton
+import com.madteam.sunset.ui.common.SmallButtonDark
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyM
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
 
 @Composable
 fun BottomSheetFilterSpotsScreen(
-    viewModel: FilterSpotsViewModel = hiltViewModel()
+    viewModel: FilterSpotsViewModel = hiltViewModel(),
+    onCloseClicked: () -> Unit
 ) {
 
     val filterScoreList by viewModel.filterScoreList.collectAsStateWithLifecycle()
@@ -42,7 +46,8 @@ fun BottomSheetFilterSpotsScreen(
         BottomSheetFilterSpotsContent(
             filterScoreList = filterScoreList,
             selectedFilterScore = selectedFilterScore,
-            onSelectedScoreFilterClicked = viewModel::updateSelectedFilterScore
+            onSelectedScoreFilterClicked = viewModel::updateSelectedFilterScore,
+            onCloseClicked = onCloseClicked
         )
     }
 }
@@ -51,7 +56,8 @@ fun BottomSheetFilterSpotsScreen(
 fun BottomSheetFilterSpotsContent(
     filterScoreList: List<Int>,
     selectedFilterScore: Int,
-    onSelectedScoreFilterClicked: (Int) -> Unit
+    onSelectedScoreFilterClicked: (Int) -> Unit,
+    onCloseClicked: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -64,18 +70,26 @@ fun BottomSheetFilterSpotsContent(
             horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            CloseIconButton { /* to do */ }
+            CloseIconButton { onCloseClicked() }
             CustomSpacer(size = 16.dp)
             Text(text = "Filter Spots", style = secondarySemiBoldHeadLineS)
         }
         CustomSpacer(size = 24.dp)
-        Text(text = "Score", style = secondarySemiBoldBodyM)
+        Text(text = stringResource(id = R.string.score), style = secondarySemiBoldBodyM)
         CustomSpacer(size = 16.dp)
         FilterScoreButton(
             filterOptions = filterScoreList,
             selectedOption = selectedFilterScore,
             onOptionClicked = { onSelectedScoreFilterClicked(it) }
         )
+        CustomSpacer(size = 24.dp)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            SmallButtonDark(onClick = { }, text = R.string.clear, enabled = false)
+
+        }
     }
 }
 
@@ -85,6 +99,7 @@ fun PreviewBottomSheetEditProfileContent() {
     BottomSheetFilterSpotsContent(
         filterScoreList = listOf(4, 6, 8),
         selectedFilterScore = 4,
-        onSelectedScoreFilterClicked = {}
+        onSelectedScoreFilterClicked = {},
+        onCloseClicked = {}
     )
 }

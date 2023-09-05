@@ -80,7 +80,11 @@ fun DiscoverScreen(
         sheetState = spotFiltersModalState,
         sheetShape = RoundedCornerShape(20.dp, 20.dp, 0.dp, 0.dp),
         sheetElevation = 10.dp,
-        sheetContent = { BottomSheetFilterSpotsScreen() }
+        sheetContent = {
+            BottomSheetFilterSpotsScreen(
+                onCloseClicked = { coroutineScope.launch { spotFiltersModalState.hide() } }
+            )
+        }
     ) {
         Scaffold(
             bottomBar = { SunsetBottomNavigation(navController) },

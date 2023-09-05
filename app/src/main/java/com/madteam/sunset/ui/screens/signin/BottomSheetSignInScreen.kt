@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -26,7 +25,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.google.firebase.auth.AuthResult
 import com.madteam.sunset.BuildConfig
-import com.madteam.sunset.R
 import com.madteam.sunset.R.string
 import com.madteam.sunset.navigation.SunsetRoutes
 import com.madteam.sunset.ui.common.CardHandler
@@ -93,7 +91,9 @@ fun BottomSheetSignInContent(
 
   if (BuildConfig.DEBUG) {
     userValueText = "adriafernandez14@gmail.com"
+    //userValueText = "adrifernandevs@gmail.com"
     passwordTValueText = "abc.12345"
+    //passwordTValueText = "Abc.1234"
     validateForm(userValueText, passwordTValueText)
   }
 

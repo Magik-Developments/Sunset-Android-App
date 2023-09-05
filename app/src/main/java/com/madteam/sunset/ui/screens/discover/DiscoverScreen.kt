@@ -133,7 +133,7 @@ fun DiscoverContent(
             }
         )
 
-    LaunchedEffect(key1 = mapState) {
+    LaunchedEffect(key1 = goToUserLocation) {
         requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
     }
 
@@ -226,7 +226,7 @@ private fun SetupClusterManagerAndRenderers(
                 true
             }
         }
-        if (userLocation.longitude != 0.0 && userLocation.latitude != 0.0 || goToUserLocation) {
+        if (userLocation.longitude != 0.0 && userLocation.latitude != 0.0 && goToUserLocation) {
             map.updateCameraLocation(scope, cameraPositionState, userLocation, 10f)
         }
         setGoToUserLocation(false)

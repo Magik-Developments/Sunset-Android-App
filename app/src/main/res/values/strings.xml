@@ -92,4 +92,5 @@
     <string name="report_sent_description">Report has been sent successfully, we will resolve it as soon as possible.</string>
     <string name="reports">Reports</string>
     <string name="explore_spots">Explore Spots</string>
+    <string name="where_it_is">Where is the Spot?</string>
 </resources>

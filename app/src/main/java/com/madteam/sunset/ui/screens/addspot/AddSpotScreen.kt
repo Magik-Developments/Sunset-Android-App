@@ -78,6 +78,7 @@ import com.madteam.sunset.ui.common.GoForwardTopAppBar
 import com.madteam.sunset.ui.common.ScoreSlider
 import com.madteam.sunset.ui.screens.addpost.MAX_IMAGES_SELECTED
 import com.madteam.sunset.ui.screens.addreview.FAVORABLE_ATTRIBUTES
+import com.madteam.sunset.ui.screens.addreview.LOCATION_ATTRIBUTES
 import com.madteam.sunset.ui.screens.addreview.NON_FAVORABLE_ATTRIBUTES
 import com.madteam.sunset.ui.screens.addreview.SUNSET_ATTRIBUTES
 import com.madteam.sunset.ui.theme.primaryBoldDisplayS
@@ -134,7 +135,7 @@ fun AddSpotScreen(
                 title = R.string.add_spot,
                 onQuitClick = { navController.popBackStack() /* TODO: showExitDialog if it is ready to post */ },
                 onContinueClick = { viewModel.createNewSpotIntent() },
-                canContinue = (spotScore != 0 && selectedAttributes.isNotEmpty() && spotTitle.isNotEmpty() && spotDescription.isNotEmpty() && imageUris.isNotEmpty())
+                canContinue = (spotScore != 0 && selectedAttributes.isNotEmpty() && (selectedAttributes.filter { it.type == LOCATION_ATTRIBUTES }).isNotEmpty() && spotTitle.isNotEmpty() && spotDescription.isNotEmpty() && imageUris.isNotEmpty())
             )
         },
         content = { paddingValues ->
@@ -450,6 +451,57 @@ fun AddSpotContent(
             style = secondarySemiBoldHeadLineS,
             modifier = Modifier.padding(start = 16.dp)
         )
+        CustomSpacer(size = 16.dp)
+        Text(
+            text = stringResource(id = R.string.where_it_is),
+            style = secondaryRegularHeadlineS,
+            modifier = Modifier.padding(start = 16.dp),
+            color = Color(0xFF666666)
+        )
+        CustomSpacer(size = 8.dp)
+        LazyRow(
+            modifier = Modifier.padding(start = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            itemsIndexed(attributesList.filter { it.type == LOCATION_ATTRIBUTES }) { _, attribute ->
+                val isSelected = selectedAttributes.contains(attribute)
+                val customBackgroundColor = if (isSelected) Color(0x80FFB600) else Color.White
+                Box(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clip(RoundedCornerShape(20.dp))
+                        .border(1.dp, Color(0xFF999999), RoundedCornerShape(20.dp))
+                        .background(customBackgroundColor, RoundedCornerShape(20.dp))
+                        .clickable { onAttributeClicked(attribute) }
+
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        Icon(
+                            painter = painterResource(
+                                id = getResourceId(
+                                    attribute.icon,
+                                    context
+                                )
+                            ),
+                            contentDescription = "",
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Text(
+                            text = attribute.title,
+                            style = secondaryRegularBodyS,
+                            textAlign = TextAlign.Center,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
+                        )
+                    }
+                }
+            }
+        }
         CustomSpacer(size = 16.dp)
         Text(
             text = stringResource(id = R.string.good_attributes),

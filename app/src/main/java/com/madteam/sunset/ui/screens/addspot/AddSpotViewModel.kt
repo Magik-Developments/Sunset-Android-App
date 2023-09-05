@@ -9,6 +9,7 @@ import com.madteam.sunset.repositories.AuthRepository
 import com.madteam.sunset.repositories.DatabaseRepository
 import com.madteam.sunset.repositories.LocationRepository
 import com.madteam.sunset.ui.screens.addpost.MAX_IMAGES_SELECTED
+import com.madteam.sunset.ui.screens.addreview.LOCATION_ATTRIBUTES
 import com.madteam.sunset.utils.Resource
 import com.madteam.sunset.utils.googlemaps.MapState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -100,7 +101,11 @@ class AddSpotViewModel @Inject constructor(
     }
 
     fun modifySelectedAttributes(attribute: SpotAttribute) {
-        if (!_selectedAttributes.value.contains(attribute)) {
+        if (attribute.type == LOCATION_ATTRIBUTES) {
+            _selectedAttributes.value =
+                _selectedAttributes.value.filterNot { it.type == LOCATION_ATTRIBUTES }
+            _selectedAttributes.value = _selectedAttributes.value + attribute
+        } else if (!_selectedAttributes.value.contains(attribute)) {
             _selectedAttributes.value = _selectedAttributes.value + attribute
         } else {
             _selectedAttributes.value = _selectedAttributes.value - attribute

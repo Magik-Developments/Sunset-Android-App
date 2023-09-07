@@ -267,6 +267,12 @@ private fun SetupClusterManagerAndRenderers(
             clusterManager.clearItems()
             clusterManager.cluster()
             clusterManager.addItems(mapState.clusterItems)
+            clusterManager.cluster()
+            if (mapState.clusterItems.isEmpty()) {
+                map.clear()
+                clusterManager.clearItems()
+                clusterManager.cluster()
+            }
         }
         if (userLocation.longitude != 0.0 && userLocation.latitude != 0.0 && goToUserLocation) {
             map.updateCameraLocation(scope, cameraPositionState, userLocation, 10f)

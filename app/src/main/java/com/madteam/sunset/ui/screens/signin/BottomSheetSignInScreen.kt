@@ -24,7 +24,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.google.firebase.auth.AuthResult
-import com.madteam.sunset.BuildConfig
 import com.madteam.sunset.R.string
 import com.madteam.sunset.navigation.SunsetRoutes
 import com.madteam.sunset.ui.common.CardHandler
@@ -89,13 +88,18 @@ fun BottomSheetSignInContent(
   var passwordTValueText by remember { mutableStateOf("") }
   var invalidCredentials by remember { mutableStateOf(false) }
 
+  /*
+
   if (BuildConfig.DEBUG) {
+
     userValueText = "adriafernandez14@gmail.com"
     //userValueText = "adrifernandevs@gmail.com"
     passwordTValueText = "abc.12345"
     //passwordTValueText = "Abc.1234"
     validateForm(userValueText, passwordTValueText)
   }
+
+   */
 
   Column(
     horizontalAlignment = Alignment.CenterHorizontally,

@@ -24,6 +24,9 @@ class DiscoverViewModel @Inject constructor(
     private val _mapState: MutableStateFlow<MapState> = MutableStateFlow(MapState())
     val mapState: StateFlow<MapState> = _mapState
 
+    private val _originalMapState: MutableStateFlow<MapState> = MutableStateFlow(MapState())
+    val originalMapState: StateFlow<MapState> = _originalMapState
+
     private val _userLocation: MutableStateFlow<LatLng> = MutableStateFlow(LatLng(0.0, 0.0))
     val userLocation: StateFlow<LatLng> = _userLocation
 
@@ -34,12 +37,23 @@ class DiscoverViewModel @Inject constructor(
         viewModelScope.launch {
             databaseRepository.getSpotsLocations().collect { spots ->
                 _mapState.value = _mapState.value.copy(clusterItems = spots)
+                _originalMapState.value = _mapState.value.copy(clusterItems = spots)
             }
         }
     }
 
     fun clusterVisibility(clusterItem: SpotClusterItem) {
         _clusterInfo.value = clusterItem
+    }
+
+    fun applyScoreFilter(score: Int) {
+        if (score == 0) {
+            _mapState.value = _originalMapState.value
+        } else {
+            val mapStateFiltered = _mapState.value.clusterItems.filter { it.score > score }
+            _mapState.value = MapState(clusterItems = mapStateFiltered, lastKnownLocation = null)
+        }
+
     }
 
     fun updateUserLocation(location: LatLng) {

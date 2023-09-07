@@ -57,4 +57,13 @@ class FilterSpotsViewModel @Inject constructor(
         }
     }
 
+    fun clearFilters() {
+        _selectedLocationFilter.value = listOf()
+        _selectedFilterScore.value = 0
+    }
+
+    fun applyFilters() {
+
+    }
+
 }

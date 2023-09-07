@@ -32,7 +32,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -48,7 +47,6 @@ import com.madteam.sunset.model.SpotClusterItem
 import com.madteam.sunset.navigation.SunsetRoutes
 import com.madteam.sunset.ui.common.AddSpotFAB
 import com.madteam.sunset.ui.common.SunsetBottomNavigation
-import com.madteam.sunset.ui.theme.SunsetTheme
 import com.madteam.sunset.utils.getCurrentLocation
 import com.madteam.sunset.utils.googlemaps.MapState
 import com.madteam.sunset.utils.googlemaps.clusters.CustomClusterRenderer
@@ -82,7 +80,9 @@ fun DiscoverScreen(
         sheetElevation = 10.dp,
         sheetContent = {
             BottomSheetFilterSpotsScreen(
-                onCloseClicked = { coroutineScope.launch { spotFiltersModalState.hide() } }
+                onCloseClicked = { coroutineScope.launch { spotFiltersModalState.hide() } },
+                applyLocationFilter = { },
+                applyScoreFilter = viewModel::applyScoreFilter
             )
         }
     ) {
@@ -220,14 +220,6 @@ fun DiscoverContent(
     }
 }
 
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun PreviewDiscoverContent() {
-    SunsetTheme {
-
-    }
-}
-
 @SuppressLint("PotentialBehaviorOverride")
 @OptIn(MapsComposeExperimentalApi::class)
 @Composable
@@ -243,11 +235,10 @@ private fun SetupClusterManagerAndRenderers(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    MapEffect(key1 = mapState.clusterItems, key2 = userLocation, key3 = goToUserLocation) { map ->
+    MapEffect(key1 = mapState, key2 = userLocation, key3 = goToUserLocation) { map ->
         if (mapState.clusterItems.isNotEmpty()) {
             val clusterManager = ZoneClusterManager(context, map)
             val clusterRenderer = CustomClusterRenderer(context, map, clusterManager)
-            clusterManager.addItems(mapState.clusterItems)
 
             clusterManager.setOnClusterClickedListener { clusterItem ->
                 selectedCluster(clusterItem)
@@ -262,6 +253,9 @@ private fun SetupClusterManagerAndRenderers(
                 }
                 true
             }
+            clusterManager.clearItems()
+            clusterManager.cluster()
+            clusterManager.addItems(mapState.clusterItems)
         }
         if (userLocation.longitude != 0.0 && userLocation.latitude != 0.0 && goToUserLocation) {
             map.updateCameraLocation(scope, cameraPositionState, userLocation, 10f)

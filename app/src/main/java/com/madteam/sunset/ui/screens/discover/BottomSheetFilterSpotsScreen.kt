@@ -35,7 +35,9 @@ import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
 @Composable
 fun BottomSheetFilterSpotsScreen(
     viewModel: FilterSpotsViewModel = hiltViewModel(),
-    onCloseClicked: () -> Unit
+    onCloseClicked: () -> Unit,
+    applyScoreFilter: (Int) -> Unit,
+    applyLocationFilter: (List<SpotAttribute>) -> Unit
 ) {
 
     val filterScoreList by viewModel.filterScoreList.collectAsStateWithLifecycle()
@@ -57,7 +59,13 @@ fun BottomSheetFilterSpotsScreen(
             onSelectedScoreFilterClicked = viewModel::updateSelectedFilterScore,
             onCloseClicked = onCloseClicked,
             onSelectedLocationFilterClicked = viewModel::updateSelectedLocationAttributes,
-            selectedFilterLocation = selectedLocationAttributes
+            selectedFilterLocation = selectedLocationAttributes,
+            onClearClicked = viewModel::clearFilters,
+            onFilterApplied = {
+                applyLocationFilter(selectedLocationAttributes)
+                applyScoreFilter(selectedFilterScore)
+                onCloseClicked()
+            }
         )
     }
 }
@@ -70,7 +78,9 @@ fun BottomSheetFilterSpotsContent(
     filterScoreList: List<Int>,
     selectedFilterScore: Int,
     onSelectedScoreFilterClicked: (Int) -> Unit,
-    onCloseClicked: () -> Unit
+    onCloseClicked: () -> Unit,
+    onClearClicked: () -> Unit,
+    onFilterApplied: () -> Unit
 ) {
     val context = LocalContext.current
 
@@ -112,8 +122,16 @@ fun BottomSheetFilterSpotsContent(
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            SmallButtonDark(onClick = { }, text = R.string.clear, enabled = false)
-            SmallButtonSunset(onClick = { /*TODO*/ }, text = R.string.apply, enabled = false)
+            SmallButtonDark(
+                onClick = { onClearClicked() },
+                text = R.string.clear,
+                enabled = selectedFilterScore != 0 || selectedFilterLocation.isNotEmpty()
+            )
+            SmallButtonSunset(
+                onClick = { onFilterApplied() },
+                text = R.string.apply,
+                enabled = true
+            )
         }
         CustomSpacer(size = 16.dp)
     }

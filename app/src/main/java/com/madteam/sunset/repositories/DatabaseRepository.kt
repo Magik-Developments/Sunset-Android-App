@@ -243,21 +243,39 @@ class DatabaseRepository @Inject constructor(
                 val id = document.id
                 val name = document.getString("name")
                 val locationInLatLng = document.getGeoPoint("location_in_latlng")
-                val spot = firebaseFirestore.collection(SPOTS_COLLECTION_PATH).document(document.id)
-                val images = document.get("featured_images") as List<String>
-                val location = document.getString("location")
+                val spotReference =
+                    firebaseFirestore.collection(SPOTS_COLLECTION_PATH).document(document.id)
+                val featuredImages = document.get("featured_images") as List<String>
                 val score: Float = document.get("score").toString().toFloat()
+                val spotAttributesRefs =
+                    document.get("attributes") as List<DocumentReference>
+                var spotAttributes = listOf<SpotAttribute>()
+                getSpotAttributesByDocRefs(spotAttributesRefs).collectLatest { attributes ->
+                    spotAttributes = attributes
+                }
 
                 if (name != null && locationInLatLng != null) {
                     SpotClusterItem(
                         id = id,
-                        name = name,
-                        spot = spot,
-                        locationInLatLng = locationInLatLng,
-                        isSelected = false,
-                        featuredImages = images,
-                        location = location ?: "",
-                        score = score
+                        spotReference = spotReference,
+                        spot = Spot(
+                            id = id,
+                            featuredImages = featuredImages,
+                            spottedBy = UserProfile(),
+                            creationDate = "",
+                            name = name,
+                            description = "",
+                            score = score,
+                            visitedTimes = 0,
+                            likes = 0,
+                            locationInLatLng = locationInLatLng,
+                            location = "",
+                            attributes = spotAttributes,
+                            spotReviews = listOf(),
+                            spotPosts = listOf(),
+                            likedBy = listOf()
+                        ),
+                        isSelected = false
                     )
                 } else {
                     null
@@ -265,6 +283,7 @@ class DatabaseRepository @Inject constructor(
             }
             emit(spotList)
         } catch (e: Exception) {
+            Log.e("DatabaseRepository::getSpotsLocation", "Error: ${e.message}")
             emit(emptyList())
         }
     }

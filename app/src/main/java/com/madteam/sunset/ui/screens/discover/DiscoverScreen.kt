@@ -12,9 +12,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetState
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -26,7 +32,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -38,11 +43,11 @@ import com.google.maps.android.compose.MapEffect
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.MapsComposeExperimentalApi
 import com.google.maps.android.compose.rememberCameraPositionState
+import com.madteam.sunset.model.SpotAttribute
 import com.madteam.sunset.model.SpotClusterItem
 import com.madteam.sunset.navigation.SunsetRoutes
 import com.madteam.sunset.ui.common.AddSpotFAB
 import com.madteam.sunset.ui.common.SunsetBottomNavigation
-import com.madteam.sunset.ui.theme.SunsetTheme
 import com.madteam.sunset.utils.getCurrentLocation
 import com.madteam.sunset.utils.googlemaps.MapState
 import com.madteam.sunset.utils.googlemaps.clusters.CustomClusterRenderer
@@ -50,62 +55,86 @@ import com.madteam.sunset.utils.googlemaps.clusters.ZoneClusterManager
 import com.madteam.sunset.utils.googlemaps.setMapProperties
 import com.madteam.sunset.utils.googlemaps.updateCameraLocation
 import com.madteam.sunset.utils.hasLocationPermission
+import kotlinx.coroutines.launch
 
-const val MAP_PADDING = 200
-
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DiscoverScreen(
     navController: NavController,
     viewModel: DiscoverViewModel = hiltViewModel()
 ) {
 
+    val coroutineScope = rememberCoroutineScope()
+    val spotFiltersModalState =
+        ModalBottomSheetState(
+            initialValue = ModalBottomSheetValue.Hidden,
+            isSkipHalfExpanded = true
+        )
     val mapState by viewModel.mapState.collectAsStateWithLifecycle()
     val clusterInfo by viewModel.clusterInfo.collectAsStateWithLifecycle()
     val userLocation by viewModel.userLocation.collectAsStateWithLifecycle()
     val goToUserLocation by viewModel.goToUserLocation.collectAsStateWithLifecycle()
+    val scoreFilter by viewModel.scoreFilter.collectAsStateWithLifecycle()
+    val locationFilter by viewModel.locationFilter.collectAsStateWithLifecycle()
 
-    Scaffold(
-        bottomBar = { SunsetBottomNavigation(navController) },
-        floatingActionButton = {
-            if (!clusterInfo.isSelected) {
-                AddSpotFAB {
-                    navController.navigate(SunsetRoutes.AddSpotScreen.route)
-                }
-            }
-        },
-        content = { paddingValues ->
-            Box(
-                modifier = Modifier.padding(paddingValues),
-                contentAlignment = Alignment.Center
-            ) {
-                DiscoverContent(
-                    mapState = mapState,
-                    selectedCluster = { clusterItem ->
-                        viewModel.clusterVisibility(clusterItem.copy(isSelected = true))
-                    },
-                    userLocation = userLocation,
-                    updateUserLocation = viewModel::updateUserLocation,
-                    goToUserLocation = goToUserLocation,
-                    setGoToUserLocation = viewModel::setGoToUserLocation
-                )
-                AnimatedVisibility(
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(24.dp),
-                    visible = clusterInfo.isSelected,
-                    enter = slideInVertically(initialOffsetY = { it }),
-                    exit = slideOutVertically(targetOffsetY = { it + 200 })
-                ) {
-                    SpotClusterInfo(
-                        clusterInfo,
-                        onClose = { clusterItem ->
-                            viewModel.clusterVisibility(clusterItem.copy(isSelected = false))
-                        },
-                        onItemClicked = { navController.navigate("spot_detail_screen/spotReference=${clusterInfo.spot.id}") })
-                }
-            }
+    ModalBottomSheetLayout(
+        sheetState = spotFiltersModalState,
+        sheetShape = RoundedCornerShape(20.dp, 20.dp, 0.dp, 0.dp),
+        sheetElevation = 10.dp,
+        sheetContent = {
+            BottomSheetFilterSpotsScreen(
+                onCloseClicked = { coroutineScope.launch { spotFiltersModalState.hide() } },
+                applyFilters = viewModel::applyFilters
+            )
         }
-    )
+    ) {
+        Scaffold(
+            bottomBar = { SunsetBottomNavigation(navController) },
+            floatingActionButton = {
+                if (!clusterInfo.isSelected) {
+                    AddSpotFAB {
+                        navController.navigate(SunsetRoutes.AddSpotScreen.route)
+                    }
+                }
+            },
+            content = { paddingValues ->
+                Box(
+                    modifier = Modifier.padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    DiscoverContent(
+                        mapState = mapState,
+                        selectedCluster = { clusterItem ->
+                            viewModel.clusterVisibility(clusterItem.copy(isSelected = true))
+                        },
+                        userLocation = userLocation,
+                        updateUserLocation = viewModel::updateUserLocation,
+                        goToUserLocation = goToUserLocation,
+                        setGoToUserLocation = viewModel::setGoToUserLocation,
+                        onFilterClick = { coroutineScope.launch { spotFiltersModalState.show() } },
+                        scoreFilter = scoreFilter,
+                        locationFilter = locationFilter
+                    )
+                    AnimatedVisibility(
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(24.dp),
+                        visible = clusterInfo.isSelected,
+                        enter = slideInVertically(initialOffsetY = { it }),
+                        exit = slideOutVertically(targetOffsetY = { it + 200 })
+                    ) {
+                        SpotClusterInfo(
+                            clusterInfo,
+                            onClose = { clusterItem ->
+                                viewModel.clusterVisibility(clusterItem.copy(isSelected = false))
+                            },
+                            onItemClicked = { navController.navigate("spot_detail_screen/spotReference=${clusterInfo.spot.id}") })
+                    }
+                }
+            }
+        )
+    }
+
 }
 
 @Composable
@@ -115,7 +144,10 @@ fun DiscoverContent(
     userLocation: LatLng,
     updateUserLocation: (LatLng) -> Unit,
     goToUserLocation: Boolean,
-    setGoToUserLocation: (Boolean) -> Unit
+    setGoToUserLocation: (Boolean) -> Unit,
+    onFilterClick: () -> Unit,
+    scoreFilter: Int,
+    locationFilter: List<SpotAttribute>
 ) {
 
     val cameraPositionState = rememberCameraPositionState()
@@ -163,7 +195,7 @@ fun DiscoverContent(
         horizontalAlignment = Alignment.End
     ) {
         IconButton(
-            colors = IconButtonDefaults.iconButtonColors(containerColor = Color(0xFFFFB600)),
+            colors = IconButtonDefaults.iconButtonColors(containerColor = Color.White),
             onClick = {
                 if (hasLocationPermission(context)) {
                     getCurrentLocation(context) { lat, long ->
@@ -177,17 +209,20 @@ fun DiscoverContent(
             Icon(
                 imageVector = Icons.Default.MyLocation,
                 contentDescription = "",
-                tint = Color.White
+                tint = Color(0xFFFFB600)
             )
         }
-    }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun PreviewDiscoverContent() {
-    SunsetTheme {
-
+        IconButton(
+            colors = IconButtonDefaults.iconButtonColors(containerColor = Color.White),
+            onClick = {
+                onFilterClick()
+            }) {
+            Icon(
+                imageVector = Icons.Default.Tune,
+                contentDescription = "",
+                tint = Color(0xFFFFB600)
+            )
+        }
     }
 }
 
@@ -206,11 +241,10 @@ private fun SetupClusterManagerAndRenderers(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    MapEffect(key1 = mapState.clusterItems, key2 = userLocation, key3 = goToUserLocation) { map ->
+    MapEffect(key1 = mapState, key2 = userLocation, key3 = goToUserLocation) { map ->
         if (mapState.clusterItems.isNotEmpty()) {
             val clusterManager = ZoneClusterManager(context, map)
             val clusterRenderer = CustomClusterRenderer(context, map, clusterManager)
-            clusterManager.addItems(mapState.clusterItems)
 
             clusterManager.setOnClusterClickedListener { clusterItem ->
                 selectedCluster(clusterItem)
@@ -225,9 +259,19 @@ private fun SetupClusterManagerAndRenderers(
                 }
                 true
             }
+            map.clear()
+            clusterManager.clearItems()
+            clusterManager.cluster()
+            clusterManager.addItems(mapState.clusterItems)
+            clusterManager.cluster()
+            if (mapState.clusterItems.isEmpty()) {
+                map.clear()
+                clusterManager.clearItems()
+                clusterManager.cluster()
+            }
         }
         if (userLocation.longitude != 0.0 && userLocation.latitude != 0.0 && goToUserLocation) {
-            map.updateCameraLocation(scope, cameraPositionState, userLocation, 10f)
+            map.updateCameraLocation(scope, cameraPositionState, userLocation, 13f)
         }
         setGoToUserLocation(false)
     }

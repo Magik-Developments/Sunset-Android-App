@@ -19,11 +19,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.madteam.sunset.ui.common.CustomSpacer
-import com.madteam.sunset.ui.common.EmailButton
 import com.madteam.sunset.ui.common.FacebookButton
 import com.madteam.sunset.ui.common.GoogleButton
 import com.madteam.sunset.ui.common.MainTitle
 import com.madteam.sunset.ui.common.SubTitle
+import com.madteam.sunset.ui.common.SunsetButton
 import com.madteam.sunset.ui.common.SunsetLogoImage
 import kotlinx.coroutines.launch
 
@@ -53,8 +53,12 @@ fun WelcomeScreen(
                     }
                 }
             },
-            onGoogleClick = { Toast.makeText(context, "Do Google Login", Toast.LENGTH_SHORT).show() },
-            onFacebookClick = { Toast.makeText(context, "Do Facebook Login", Toast.LENGTH_SHORT).show() })
+            onGoogleClick = {
+                Toast.makeText(context, "Do Google Login", Toast.LENGTH_SHORT).show()
+            },
+            onFacebookClick = {
+                Toast.makeText(context, "Do Facebook Login", Toast.LENGTH_SHORT).show()
+            })
     }
 }
 
@@ -77,7 +81,7 @@ fun WelcomeContent(
         CustomSpacer(size = 8.dp)
         SubTitle(Modifier.align(Alignment.Start))
         CustomSpacer(size = 56.dp)
-        EmailButton(onClick = onEmailClick)
+        SunsetButton(onClick = onEmailClick)
         CustomSpacer(size = 16.dp)
         GoogleButton(onClick = onGoogleClick)
         CustomSpacer(size = 16.dp)

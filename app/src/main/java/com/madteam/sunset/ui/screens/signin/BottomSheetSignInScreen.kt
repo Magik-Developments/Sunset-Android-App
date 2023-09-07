@@ -89,18 +89,13 @@ fun BottomSheetSignInContent(
     var passwordTValueText by remember { mutableStateOf("") }
     var invalidCredentials by remember { mutableStateOf(false) }
 
-
-
     if (BuildConfig.DEBUG) {
-
         userValueText = "adriafernandez14@gmail.com"
         //userValueText = "adrifernandevs@gmail.com"
         passwordTValueText = "abc.12345"
         //passwordTValueText = "Abc.1234"
         validateForm(userValueText, passwordTValueText)
     }
-
-
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,

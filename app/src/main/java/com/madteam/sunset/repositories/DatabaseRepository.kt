@@ -61,17 +61,22 @@ class DatabaseRepository @Inject constructor(
             return@flow
         }
 
+        val imageStoragePath = "profile_images/default_images/${username.first()}.png"
+        val imageReference = firebaseStorage.getReference(imageStoragePath).downloadUrl.await()
+
         val currentDate = Calendar.getInstance().time.toString()
         val user = hashMapOf(
             "username" to username,
             "email" to email,
             "provider" to provider,
-            "creation_date" to currentDate
+            "creation_date" to currentDate,
+            "image" to imageReference.toString()
         )
 
         firebaseFirestore.collection(USERS_COLLECTION_PATH).document(username).set(user).await()
         emit(Resource.Success("User database has been created"))
     }.catch { exception ->
+        Log.e("DatabaseRepository::createUser", "Error: ${exception.stackTrace}")
         emit(Resource.Error(exception.message.toString()))
     }
 

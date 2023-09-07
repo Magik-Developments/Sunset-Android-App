@@ -197,7 +197,7 @@ fun DiscoverContent(
         horizontalAlignment = Alignment.End
     ) {
         IconButton(
-            colors = IconButtonDefaults.iconButtonColors(containerColor = Color(0xFFFFB600)),
+            colors = IconButtonDefaults.iconButtonColors(containerColor = Color.White),
             onClick = {
                 if (hasLocationPermission(context)) {
                     getCurrentLocation(context) { lat, long ->
@@ -211,18 +211,18 @@ fun DiscoverContent(
             Icon(
                 imageVector = Icons.Default.MyLocation,
                 contentDescription = "",
-                tint = Color.White
+                tint = Color(0xFFFFB600)
             )
         }
         IconButton(
-            colors = IconButtonDefaults.iconButtonColors(containerColor = Color(0xFFFFB600)),
+            colors = IconButtonDefaults.iconButtonColors(containerColor = Color.White),
             onClick = {
                 onFilterClick()
             }) {
             Icon(
                 imageVector = Icons.Default.Tune,
                 contentDescription = "",
-                tint = Color.White
+                tint = Color(0xFFFFB600)
             )
         }
     }

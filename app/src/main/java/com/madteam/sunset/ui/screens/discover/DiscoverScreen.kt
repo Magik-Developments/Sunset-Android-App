@@ -253,6 +253,7 @@ private fun SetupClusterManagerAndRenderers(
                 }
                 true
             }
+            map.clear()
             clusterManager.clearItems()
             clusterManager.cluster()
             clusterManager.addItems(mapState.clusterItems)

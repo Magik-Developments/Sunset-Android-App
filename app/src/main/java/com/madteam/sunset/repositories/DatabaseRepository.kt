@@ -247,10 +247,10 @@ class DatabaseRepository @Inject constructor(
                     firebaseFirestore.collection(SPOTS_COLLECTION_PATH).document(document.id)
                 val featuredImages = document.get("featured_images") as List<String>
                 val score: Float = document.get("score").toString().toFloat()
-                val reviewAttributesRefs =
-                    document.get("spot_attr") as List<DocumentReference>
+                val spotAttributesRefs =
+                    document.get("attributes") as List<DocumentReference>
                 var spotAttributes = listOf<SpotAttribute>()
-                getSpotAttributesByDocRefs(reviewAttributesRefs).collectLatest { attributes ->
+                getSpotAttributesByDocRefs(spotAttributesRefs).collectLatest { attributes ->
                     spotAttributes = attributes
                 }
 
@@ -283,6 +283,7 @@ class DatabaseRepository @Inject constructor(
             }
             emit(spotList)
         } catch (e: Exception) {
+            Log.e("DatabaseRepository::getSpotsLocation", "Error: ${e.message}")
             emit(emptyList())
         }
     }

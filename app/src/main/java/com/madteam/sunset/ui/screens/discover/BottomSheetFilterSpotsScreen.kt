@@ -112,7 +112,7 @@ fun BottomSheetFilterSpotsContent(
             onOptionClicked = { onSelectedScoreFilterClicked(it) }
         )
         CustomSpacer(size = 24.dp)
-        Text(text = stringResource(id = R.string.where_it_is), style = secondarySemiBoldBodyM)
+        Text(text = stringResource(id = R.string.environment), style = secondarySemiBoldBodyM)
         CustomSpacer(size = 16.dp)
         FilterAttributesButton(
             filterOptions = attributesList.filter { it.type == LOCATION_ATTRIBUTES },

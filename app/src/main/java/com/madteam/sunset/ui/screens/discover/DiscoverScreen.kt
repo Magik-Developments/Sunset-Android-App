@@ -81,8 +81,7 @@ fun DiscoverScreen(
         sheetContent = {
             BottomSheetFilterSpotsScreen(
                 onCloseClicked = { coroutineScope.launch { spotFiltersModalState.hide() } },
-                applyLocationFilter = { },
-                applyScoreFilter = viewModel::applyScoreFilter
+                applyFilters = viewModel::applyFilters
             )
         }
     ) {

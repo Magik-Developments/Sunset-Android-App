@@ -36,8 +36,10 @@ import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
 fun BottomSheetFilterSpotsScreen(
     viewModel: FilterSpotsViewModel = hiltViewModel(),
     onCloseClicked: () -> Unit,
-    applyScoreFilter: (Int) -> Unit,
-    applyLocationFilter: (List<SpotAttribute>) -> Unit
+    applyFilters: (
+        Int,
+        List<SpotAttribute>
+    ) -> Unit
 ) {
 
     val filterScoreList by viewModel.filterScoreList.collectAsStateWithLifecycle()
@@ -62,8 +64,10 @@ fun BottomSheetFilterSpotsScreen(
             selectedFilterLocation = selectedLocationAttributes,
             onClearClicked = viewModel::clearFilters,
             onFilterApplied = {
-                applyLocationFilter(selectedLocationAttributes)
-                applyScoreFilter(selectedFilterScore)
+                applyFilters(
+                    selectedFilterScore,
+                    selectedLocationAttributes
+                )
                 onCloseClicked()
             }
         )

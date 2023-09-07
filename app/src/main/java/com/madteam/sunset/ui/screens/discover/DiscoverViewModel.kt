@@ -3,6 +3,7 @@ package com.madteam.sunset.ui.screens.discover
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
+import com.madteam.sunset.model.SpotAttribute
 import com.madteam.sunset.model.SpotClusterItem
 import com.madteam.sunset.repositories.DatabaseRepository
 import com.madteam.sunset.utils.googlemaps.MapState
@@ -46,22 +47,39 @@ class DiscoverViewModel @Inject constructor(
         _clusterInfo.value = clusterItem
     }
 
-    fun applyScoreFilter(score: Int) {
-        if (score == 0) {
-            _mapState.value = _originalMapState.value
-        } else {
-            val mapStateFiltered = _mapState.value.clusterItems.filter { it.score > score }
-            _mapState.value = MapState(clusterItems = mapStateFiltered, lastKnownLocation = null)
-        }
-
-    }
-
     fun updateUserLocation(location: LatLng) {
         _userLocation.value = location
     }
 
     fun setGoToUserLocation(state: Boolean) {
         _goToUserLocation.value = state
+    }
+
+    fun applyFilters(
+        scoreFilter: Int,
+        locationFilter: List<SpotAttribute>
+    ) {
+        applyScoreFilter(scoreFilter)
+        applyLocationFilter(locationFilter)
+    }
+
+    private fun applyScoreFilter(scoreFilter: Int) {
+        if (scoreFilter != 0) {
+            val mapStateFiltered =
+                _mapState.value.clusterItems.filter { it.spot.score > scoreFilter }
+            _mapState.value = _mapState.value.copy(clusterItems = mapStateFiltered)
+        }
+    }
+
+    private fun applyLocationFilter(locationFilter: List<SpotAttribute>) {
+        if (locationFilter.isNotEmpty()) {
+            val mapStateFiltered = _mapState.value.clusterItems.filter { clusterItem ->
+                locationFilter.any { filterAttribute ->
+                    clusterItem.spot.attributes.contains(filterAttribute)
+                }
+            }
+            _mapState.value = _mapState.value.copy(clusterItems = mapStateFiltered)
+        }
     }
 
 }

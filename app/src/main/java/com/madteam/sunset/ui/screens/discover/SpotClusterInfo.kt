@@ -61,10 +61,10 @@ fun SpotClusterInfo(
                         start.linkTo(parent.start)
                         end.linkTo(parent.end)
                     },
-                itemsCount = selectedCluster.featuredImages.size,
+                itemsCount = selectedCluster.spot.featuredImages.size,
                 itemContent = { index ->
                     GlideImage(
-                        model = selectedCluster.featuredImages[index],
+                        model = selectedCluster.spot.featuredImages[index],
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.background(shimmerBrush(targetValue = 2000f))
@@ -81,7 +81,7 @@ fun SpotClusterInfo(
                     }
             )
             Text(
-                text = selectedCluster.location,
+                text = selectedCluster.spot.location,
                 style = secondaryRegularBodyL,
                 color = Color(0xFF666666),
                 modifier = Modifier
@@ -91,7 +91,7 @@ fun SpotClusterInfo(
                     }
             )
             Text(
-                text = "${selectedCluster.score}",
+                text = "${selectedCluster.spot.score}",
                 style = secondarySemiBoldBodyM,
                 modifier = Modifier
                     .constrainAs(score) {

@@ -43,6 +43,7 @@ import com.google.maps.android.compose.MapEffect
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.MapsComposeExperimentalApi
 import com.google.maps.android.compose.rememberCameraPositionState
+import com.madteam.sunset.model.SpotAttribute
 import com.madteam.sunset.model.SpotClusterItem
 import com.madteam.sunset.navigation.SunsetRoutes
 import com.madteam.sunset.ui.common.AddSpotFAB
@@ -73,6 +74,8 @@ fun DiscoverScreen(
     val clusterInfo by viewModel.clusterInfo.collectAsStateWithLifecycle()
     val userLocation by viewModel.userLocation.collectAsStateWithLifecycle()
     val goToUserLocation by viewModel.goToUserLocation.collectAsStateWithLifecycle()
+    val scoreFilter by viewModel.scoreFilter.collectAsStateWithLifecycle()
+    val locationFilter by viewModel.locationFilter.collectAsStateWithLifecycle()
 
     ModalBottomSheetLayout(
         sheetState = spotFiltersModalState,
@@ -108,7 +111,9 @@ fun DiscoverScreen(
                         updateUserLocation = viewModel::updateUserLocation,
                         goToUserLocation = goToUserLocation,
                         setGoToUserLocation = viewModel::setGoToUserLocation,
-                        onFilterClick = { coroutineScope.launch { spotFiltersModalState.show() } }
+                        onFilterClick = { coroutineScope.launch { spotFiltersModalState.show() } },
+                        scoreFilter = scoreFilter,
+                        locationFilter = locationFilter
                     )
                     AnimatedVisibility(
                         modifier = Modifier
@@ -140,7 +145,9 @@ fun DiscoverContent(
     updateUserLocation: (LatLng) -> Unit,
     goToUserLocation: Boolean,
     setGoToUserLocation: (Boolean) -> Unit,
-    onFilterClick: () -> Unit
+    onFilterClick: () -> Unit,
+    scoreFilter: Int,
+    locationFilter: List<SpotAttribute>
 ) {
 
     val cameraPositionState = rememberCameraPositionState()
@@ -176,7 +183,9 @@ fun DiscoverContent(
             cameraPositionState = cameraPositionState,
             userLocation = userLocation,
             goToUserLocation = goToUserLocation,
-            setGoToUserLocation = setGoToUserLocation
+            setGoToUserLocation = setGoToUserLocation,
+            scoreFilter = scoreFilter,
+            locationFilter = locationFilter
         )
     }
 
@@ -228,7 +237,9 @@ private fun SetupClusterManagerAndRenderers(
     cameraPositionState: CameraPositionState,
     userLocation: LatLng,
     goToUserLocation: Boolean,
-    setGoToUserLocation: (Boolean) -> Unit
+    setGoToUserLocation: (Boolean) -> Unit,
+    scoreFilter: Int,
+    locationFilter: List<SpotAttribute>
 ) {
 
     val context = LocalContext.current

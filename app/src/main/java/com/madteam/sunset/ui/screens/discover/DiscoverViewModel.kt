@@ -34,6 +34,12 @@ class DiscoverViewModel @Inject constructor(
     private val _goToUserLocation: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val goToUserLocation: StateFlow<Boolean> = _goToUserLocation
 
+    private val _scoreFilter: MutableStateFlow<Int> = MutableStateFlow(0)
+    val scoreFilter: StateFlow<Int> = _scoreFilter
+
+    private val _locationFilter: MutableStateFlow<List<SpotAttribute>> = MutableStateFlow(listOf())
+    val locationFilter: StateFlow<List<SpotAttribute>> = _locationFilter
+
     init {
         viewModelScope.launch {
             databaseRepository.getSpotsLocations().collect { spots ->
@@ -60,15 +66,12 @@ class DiscoverViewModel @Inject constructor(
         locationFilter: List<SpotAttribute>
     ) {
         applyScoreFilter(scoreFilter)
-        applyLocationFilter(locationFilter)
     }
 
     private fun applyScoreFilter(scoreFilter: Int) {
-        if (scoreFilter != 0) {
-            val mapStateFiltered =
-                _mapState.value.clusterItems.filter { it.spot.score > scoreFilter }
-            _mapState.value = _mapState.value.copy(clusterItems = mapStateFiltered)
-        }
+        val mapStateFiltered =
+            _originalMapState.value.clusterItems.filter { it.spot.score > scoreFilter }
+        _mapState.value = _mapState.value.copy(clusterItems = mapStateFiltered)
     }
 
     private fun applyLocationFilter(locationFilter: List<SpotAttribute>) {
@@ -80,6 +83,10 @@ class DiscoverViewModel @Inject constructor(
             }
             _mapState.value = _mapState.value.copy(clusterItems = mapStateFiltered)
         }
+    }
+
+    private fun removeFilters() {
+        _mapState.value = _originalMapState.value
     }
 
 }

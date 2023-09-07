@@ -183,9 +183,7 @@ fun DiscoverContent(
             cameraPositionState = cameraPositionState,
             userLocation = userLocation,
             goToUserLocation = goToUserLocation,
-            setGoToUserLocation = setGoToUserLocation,
-            scoreFilter = scoreFilter,
-            locationFilter = locationFilter
+            setGoToUserLocation = setGoToUserLocation
         )
     }
 
@@ -237,9 +235,7 @@ private fun SetupClusterManagerAndRenderers(
     cameraPositionState: CameraPositionState,
     userLocation: LatLng,
     goToUserLocation: Boolean,
-    setGoToUserLocation: (Boolean) -> Unit,
-    scoreFilter: Int,
-    locationFilter: List<SpotAttribute>
+    setGoToUserLocation: (Boolean) -> Unit
 ) {
 
     val context = LocalContext.current
@@ -275,7 +271,7 @@ private fun SetupClusterManagerAndRenderers(
             }
         }
         if (userLocation.longitude != 0.0 && userLocation.latitude != 0.0 && goToUserLocation) {
-            map.updateCameraLocation(scope, cameraPositionState, userLocation, 10f)
+            map.updateCameraLocation(scope, cameraPositionState, userLocation, 13f)
         }
         setGoToUserLocation(false)
     }

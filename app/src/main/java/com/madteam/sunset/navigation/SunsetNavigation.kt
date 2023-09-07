@@ -36,10 +36,19 @@ import com.madteam.sunset.ui.screens.welcome.WelcomeScreen
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun SunsetNavigation() {
+fun SunsetNavigation(
+    isAlreadyLoggedIn: Boolean = false
+) {
     val navController = rememberAnimatedNavController()
 
-    AnimatedNavHost(navController = navController, startDestination = WelcomeScreen.route) {
+    AnimatedNavHost(
+        navController = navController, startDestination =
+        if (isAlreadyLoggedIn) {
+            MyProfileScreen.route
+        } else {
+            WelcomeScreen.route
+        }
+    ) {
 
         composable(WelcomeScreen.route) {
             WelcomeScreen(navController)

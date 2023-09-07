@@ -62,7 +62,7 @@ fun MyProfileScreen(
     val userSpots by viewModel.userSpots.collectAsStateWithLifecycle()
 
     if (navigateUp)
-        navController.navigateUp()
+        navController.navigate(SunsetRoutes.WelcomeScreen.route)
 
     ModalBottomSheetLayout(
         sheetState = editProfileModalState,

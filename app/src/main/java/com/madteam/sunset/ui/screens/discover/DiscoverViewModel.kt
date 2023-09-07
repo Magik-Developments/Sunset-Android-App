@@ -65,23 +65,29 @@ class DiscoverViewModel @Inject constructor(
         scoreFilter: Int,
         locationFilter: List<SpotAttribute>
     ) {
-        applyScoreFilter(scoreFilter)
-    }
-
-    private fun applyScoreFilter(scoreFilter: Int) {
-        val mapStateFiltered =
-            _originalMapState.value.clusterItems.filter { it.spot.score > scoreFilter }
+        var mapStateFiltered = _originalMapState.value.clusterItems
+        mapStateFiltered = applyScoreFilter(scoreFilter, mapStateFiltered)
+        if (locationFilter.isNotEmpty()) {
+            mapStateFiltered = applyLocationFilter(locationFilter, mapStateFiltered)
+        }
         _mapState.value = _mapState.value.copy(clusterItems = mapStateFiltered)
     }
 
-    private fun applyLocationFilter(locationFilter: List<SpotAttribute>) {
-        if (locationFilter.isNotEmpty()) {
-            val mapStateFiltered = _mapState.value.clusterItems.filter { clusterItem ->
-                locationFilter.any { filterAttribute ->
-                    clusterItem.spot.attributes.contains(filterAttribute)
-                }
+    private fun applyScoreFilter(
+        scoreFilter: Int,
+        clusterItems: List<SpotClusterItem>
+    ): List<SpotClusterItem> {
+        return clusterItems.filter { it.spot.score > scoreFilter }
+    }
+
+    private fun applyLocationFilter(
+        locationFilter: List<SpotAttribute>,
+        clusterItems: List<SpotClusterItem>
+    ): List<SpotClusterItem> {
+        return clusterItems.filter { clusterItem ->
+            locationFilter.any { filterAttribute ->
+                clusterItem.spot.attributes.contains(filterAttribute)
             }
-            _mapState.value = _mapState.value.copy(clusterItems = mapStateFiltered)
         }
     }
 

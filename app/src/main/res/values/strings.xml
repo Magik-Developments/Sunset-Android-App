@@ -98,4 +98,6 @@
     <string name="environment">Environment</string>
     <string name="clear">Clear</string>
     <string name="apply">Apply</string>
+    <string name="no_posts_yet">No posts yet</string>
+    <string name="no_discovered_spots_yet">No discovered Spots yet</string>
 </resources>

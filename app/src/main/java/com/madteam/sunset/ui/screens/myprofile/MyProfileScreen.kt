@@ -8,21 +8,27 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Icon
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue.Hidden
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.CameraAlt
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -43,6 +49,7 @@ import com.madteam.sunset.ui.common.ThinButtonLight
 import com.madteam.sunset.ui.common.UserLocationText
 import com.madteam.sunset.ui.common.UserNameText
 import com.madteam.sunset.ui.screens.editprofile.BottomSheetEditProfileScreen
+import com.madteam.sunset.ui.theme.secondaryRegularBodyL
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -167,7 +174,25 @@ fun MyProfileContent(
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     )
                 } else {
-                    // TODO: Show image or copy saying user hasn't posted anything yet
+                    Column(
+                        Modifier
+                            .padding(24.dp)
+                            .fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            modifier = Modifier
+                                .size(48.dp),
+                            imageVector = Icons.Outlined.CameraAlt,
+                            contentDescription = "Posts not found"
+                        )
+                        CustomSpacer(size = 16.dp)
+                        Text(
+                            text = stringResource(id = R.string.no_posts_yet),
+                            style = secondaryRegularBodyL
+                        )
+                    }
                 }
             }
 
@@ -189,7 +214,25 @@ fun MyProfileContent(
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     )
                 } else {
-                    // TODO: Show image or copy saying user has not discovered spots yet
+                    Column(
+                        Modifier
+                            .padding(24.dp)
+                            .fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            modifier = Modifier
+                                .size(48.dp),
+                            imageVector = Icons.Outlined.CameraAlt,
+                            contentDescription = "Posts not found"
+                        )
+                        CustomSpacer(size = 16.dp)
+                        Text(
+                            text = stringResource(id = R.string.no_discovered_spots_yet),
+                            style = secondaryRegularBodyL
+                        )
+                    }
                 }
             }
 

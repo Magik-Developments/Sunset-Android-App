@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.madteam.sunset.R
@@ -30,6 +31,7 @@ import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.EmailTextField
 import com.madteam.sunset.ui.common.GenericTextField
 import com.madteam.sunset.ui.common.ProfileImage
+import com.madteam.sunset.ui.common.RoundedLightChangeImageButton
 import com.madteam.sunset.ui.common.SmallButtonDark
 import com.madteam.sunset.ui.common.UsernameTextField
 import com.madteam.sunset.ui.theme.SunsetTheme
@@ -88,21 +90,39 @@ fun BottomSheetEditProfileContent(
             .padding(horizontal = 24.dp)
     ) {
         CustomSpacer(size = 16.dp)
-        Row(horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             CloseIconButton { /* to do */ }
             CustomSpacer(size = 16.dp)
             Text(text = "Edit profile", style = secondarySemiBoldHeadLineS)
         }
         CustomSpacer(size = 36.dp)
-        Column(
+        ConstraintLayout(
             modifier = Modifier
                 .padding(horizontal = 24.dp)
-                .fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxWidth()
         ) {
-            ProfileImage(imageUrl = userImage, size = 150.dp)
-            CustomSpacer(size = 36.dp)
+            val (profileImage, changeImageButton) = createRefs()
+            ProfileImage(
+                imageUrl = userImage,
+                size = 150.dp,
+                modifier = Modifier.constrainAs(profileImage) {
+                    top.linkTo(parent.top)
+                    bottom.linkTo(parent.bottom)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                }
+            )
+            RoundedLightChangeImageButton(onClick = { /*TODO*/ },
+                modifier = Modifier.constrainAs(changeImageButton)
+                {
+                    bottom.linkTo(profileImage.bottom)
+                    start.linkTo(profileImage.end, (-32).dp)
+                })
         }
+        CustomSpacer(size = 36.dp)
         Column(
             modifier = Modifier
                 .padding(horizontal = 24.dp)

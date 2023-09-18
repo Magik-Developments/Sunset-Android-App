@@ -1,5 +1,8 @@
 package com.madteam.sunset.ui.screens.editprofile
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -34,7 +37,6 @@ import com.madteam.sunset.ui.common.ProfileImage
 import com.madteam.sunset.ui.common.RoundedLightChangeImageButton
 import com.madteam.sunset.ui.common.SmallButtonDark
 import com.madteam.sunset.ui.common.UsernameTextField
-import com.madteam.sunset.ui.theme.SunsetTheme
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyL
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
 
@@ -48,6 +50,15 @@ fun BottomSheetEditProfileScreen(
     val name by viewModel.name.collectAsStateWithLifecycle()
     val userImage by viewModel.userImage.collectAsStateWithLifecycle()
     val location by viewModel.location.collectAsStateWithLifecycle()
+
+    val singlePhotoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+        onResult = { uri ->
+            if (uri != null) {
+                viewModel.updateSelectedProfileImage(uri)
+            }
+        }
+    )
 
     Card(
         modifier = Modifier
@@ -64,7 +75,12 @@ fun BottomSheetEditProfileScreen(
             userImage = userImage,
             updateName = viewModel::updateName,
             updateLocation = viewModel::updateLocation,
-            saveData = viewModel::updateData
+            saveData = viewModel::updateData,
+            onEditProfileImageClick = {
+                singlePhotoPickerLauncher.launch(
+                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                )
+            }
         )
     }
 }
@@ -78,7 +94,8 @@ fun BottomSheetEditProfileContent(
     userImage: String,
     updateName: (String) -> Unit,
     updateLocation: (String) -> Unit,
-    saveData: () -> Unit
+    saveData: () -> Unit,
+    onEditProfileImageClick: () -> Unit
 ) {
 
     var dataHasChanged by remember { mutableStateOf(false) }
@@ -115,7 +132,7 @@ fun BottomSheetEditProfileContent(
                     end.linkTo(parent.end)
                 }
             )
-            RoundedLightChangeImageButton(onClick = { /*TODO*/ },
+            RoundedLightChangeImageButton(onClick = { onEditProfileImageClick() },
                 modifier = Modifier.constrainAs(changeImageButton)
                 {
                     bottom.linkTo(profileImage.bottom)
@@ -184,16 +201,5 @@ fun BottomSheetEditProfileContent(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun PreviewBottomSheetEditProfileContent() {
-    SunsetTheme {
-        BottomSheetEditProfileContent(
-            usernameValue = "usernameValue",
-            emailValue = "emailValue",
-            nameValue = "nameValue",
-            locationValue = "locationValue",
-            userImage = "userImage",
-            updateName = { _ -> },
-            updateLocation = { _ -> },
-            saveData = {}
-        )
-    }
+
 }

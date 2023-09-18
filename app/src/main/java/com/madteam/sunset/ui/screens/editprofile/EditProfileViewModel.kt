@@ -1,5 +1,6 @@
 package com.madteam.sunset.ui.screens.editprofile
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.madteam.sunset.model.UserProfile
@@ -64,4 +65,9 @@ class EditProfileViewModel @Inject constructor(
       databaseRepository.updateUser(newUser).collectLatest {}
     }
   }
+
+  fun updateSelectedProfileImage(uri: Uri) {
+    userImage.value = uri.toString()
+  }
+
 }

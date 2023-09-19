@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -45,6 +46,8 @@ import com.madteam.sunset.ui.common.UsernameTextField
 import com.madteam.sunset.ui.screens.signin.CARD_HEIGHT
 import com.madteam.sunset.utils.Resource
 
+private const val POLICIES_URL = "https://sunsetapp.es/index.php/privacy-policy/"
+
 @Composable
 fun BottomSheetSignUpScreen(
     navController: NavController,
@@ -69,7 +72,6 @@ fun BottomSheetSignUpScreen(
             isValidEmail = viewModel::isEmailValid,
             isValidUsername = viewModel::isUsernameValid,
             acceptDialogClicked = viewModel::signUpIntent,
-            readConditionsClicked = viewModel::goToPoliciesScreen,
             validateForm = viewModel::isValidForm,
             navigateTo = navController::navigate,
             clearSignUpState = viewModel::clearSignUpState
@@ -85,13 +87,13 @@ fun BottomSheetSignUpContent(
     isValidEmail: (String) -> Boolean,
     isValidUsername: (String) -> Boolean,
     acceptDialogClicked: (String, String, String) -> Unit,
-    readConditionsClicked: () -> Unit,
     validateForm: (String, String, String) -> Unit,
     navigateTo: (String) -> Unit,
     clearSignUpState: () -> Unit
 ) {
 
     val context = LocalContext.current
+    val uriHandler = LocalUriHandler.current
     var showDialog by remember { mutableStateOf(false) }
     var usernameValueText by remember { mutableStateOf("") }
     var passwordValueText by remember { mutableStateOf("") }
@@ -103,7 +105,7 @@ fun BottomSheetSignUpContent(
         DismissAndPositiveDialog(
             setShowDialog = { showDialog = it },
             dismissClickedAction = {
-                readConditionsClicked()
+                uriHandler.openUri(POLICIES_URL)
                 showDialog = false
             },
             dismissButtonText = string.read_policies,

@@ -99,37 +99,6 @@ fun BottomSheetSignUpContent(
     var userAlreadyExists by remember { mutableStateOf(false) }
     var emailAlreadyInUse by remember { mutableStateOf(false) }
 
-    when (signUpState) {
-        is Resource.Loading -> {
-            Box(
-                contentAlignment = Alignment.TopCenter,
-                modifier = Modifier.padding(top = 20.dp)
-            ) {
-                CircularProgressIndicator()
-            }
-        }
-
-        is Resource.Success -> {
-            if (signUpState.data != null) {
-                LaunchedEffect(key1 = signUpState.data) {
-                    navigateTo(
-                        "verify_account_screen/pass=${passwordValueText}"
-                    )
-                    clearSignUpState()
-                }
-            }
-        }
-
-        is Resource.Error -> {
-            if (signUpState.message == "e_user_already_exists") {
-                userAlreadyExists = true
-            } else if (signUpState.message == "The email address is already in use by another account.") {
-                emailAlreadyInUse = true
-            }
-            clearSignUpState()
-        }
-    }
-
     if (showDialog) {
         DismissAndPositiveDialog(
             setShowDialog = { showDialog = it },
@@ -221,6 +190,37 @@ fun BottomSheetSignUpContent(
             firstMethod = { Toast.makeText(context, "Do Google Login", Toast.LENGTH_SHORT).show() },
             secondMethod = { modalOptions() }
         )
+    }
+
+    when (signUpState) {
+        is Resource.Loading -> {
+            Box(
+                contentAlignment = Alignment.TopCenter,
+                modifier = Modifier.padding(top = 20.dp)
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+
+        is Resource.Success -> {
+            if (signUpState.data != null) {
+                LaunchedEffect(key1 = signUpState.data) {
+                    navigateTo(
+                        "verify_account_screen/pass=${passwordValueText}"
+                    )
+                    clearSignUpState()
+                }
+            }
+        }
+
+        is Resource.Error -> {
+            if (signUpState.message == "e_user_already_exists") {
+                userAlreadyExists = true
+            } else if (signUpState.message == "The email address is already in use by another account.") {
+                emailAlreadyInUse = true
+            }
+            clearSignUpState()
+        }
     }
 }
 

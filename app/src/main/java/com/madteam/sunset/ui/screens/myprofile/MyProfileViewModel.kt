@@ -52,6 +52,19 @@ class MyProfileViewModel @Inject constructor(
         _selectedTab.value = tabClicked
     }
 
+    fun updateUserInfo(userProfile: UserProfile) {
+        _userInfo.value = UserProfile(
+            username = _userInfo.value.username,
+            email = _userInfo.value.email,
+            provider = _userInfo.value.provider,
+            creation_date = _userInfo.value.creation_date,
+            admin = _userInfo.value.admin,
+            name = userProfile.name,
+            location = userProfile.location,
+            image = userProfile.image
+        )
+    }
+
     private fun getUserPosts() {
         viewModelScope.launch {
             databaseRepository.getSpotPostsByUsername(_userInfo.value.username).collectLatest {

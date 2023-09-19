@@ -2,6 +2,7 @@ package com.madteam.sunset.repositories
 
 import android.net.Uri
 import android.util.Log
+import androidx.core.net.toUri
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
@@ -41,6 +42,7 @@ private const val LIKED_BY_POST_COLLECTION_PATH = "liked_by"
 private const val LIKED_BY_SPOT_COLLECTION_PATH = "liked_by"
 private const val IMAGES_STORAGE_POSTS_PATH = "posts_images/"
 private const val IMAGES_STORAGE_SPOTS_PATH = "spots_images/"
+private const val IMAGES_STORAGE_PROFILE_IMAGES_PATH = "profile_images/"
 
 class DatabaseRepository @Inject constructor(
     private val firebaseFirestore: FirebaseFirestore,
@@ -230,14 +232,64 @@ class DatabaseRepository @Inject constructor(
             return@flow
         }
         val updateMap = HashMap<String, Any?>()
+        var profileImage = ""
+        if (user.image.isNotBlank()) {
+            uploadImages(
+                listOf(user.image.toUri()),
+                "$IMAGES_STORAGE_PROFILE_IMAGES_PATH${user.username}/"
+            ).collectLatest { urlImagesList ->
+                profileImage = urlImagesList.first()
+            }
+            updateMap["image"] = profileImage
+        }
         updateMap["name"] = user.name
         updateMap["location"] = user.location
-        firebaseFirestore.collection(USERS_COLLECTION_PATH).document(user.username)
-            .update(updateMap)
-            .await()
-        emit(Resource.Success("User database has been updated"))
+        try {
+            firebaseFirestore.collection(USERS_COLLECTION_PATH).document(user.username)
+                .update(updateMap)
+                .await()
+            val currentImages =
+                getImagesInStoragePath("$IMAGES_STORAGE_PROFILE_IMAGES_PATH${user.username}/")
+            currentImages.collectLatest { imageUrls ->
+                imageUrls.forEach { imageUrl ->
+                    if (imageUrl != profileImage) {
+                        deleteImage(imageUrl).collectLatest {
+                            if (it.data != null && it.data.contains("Error")) {
+                                emit(Resource.Error("Error deleting image"))
+                            }
+                        }
+                    }
+                }
+            }
+            emit(Resource.Success("User database has been updated"))
+        } catch (e: Exception) {
+            emit(Resource.Error("Error: ${e.message.toString()}"))
+        }
     }.catch {
-        emit(Resource.Error(it.message.toString()))
+        emit(Resource.Error("Error: ${it.message.toString()}"))
+    }
+
+    override fun deleteImage(imageUrl: String): Flow<Resource<String>> = flow {
+        emit(Resource.Loading())
+        try {
+            val imageReference = FirebaseStorage.getInstance().getReferenceFromUrl(imageUrl)
+            imageReference.delete().await()
+            emit(Resource.Success("Image deleted successfully"))
+        } catch (e: Exception) {
+            emit(Resource.Error("Error deleting image: ${e.message.toString()}"))
+        }
+    }.catch {
+        emit(Resource.Error("Error: ${it.message.toString()}"))
+    }
+
+    override fun getImagesInStoragePath(storagePath: String): Flow<List<String>> = flow {
+        var imageUrls = listOf<String>()
+        val storageReference = FirebaseStorage.getInstance().getReference(storagePath)
+        val listResult = storageReference.listAll().await()
+        imageUrls = listResult.items.map { it.downloadUrl.await().toString() }
+        emit(imageUrls)
+    }.catch {
+        emit(listOf())
     }
 
     override fun getSpotsLocations(): Flow<List<SpotClusterItem>> = flow {
@@ -762,7 +814,7 @@ class DatabaseRepository @Inject constructor(
                 SPOT_ATTRIBUTES_COLLECTION
             ).document(it.id)
         }
-        var locationText: String = ""
+        var locationText = ""
 
         if (spotLocality.isNullOrBlank() && !spotCountry.isNullOrBlank()) {
             locationText = spotCountry.toString()
@@ -1198,6 +1250,14 @@ interface DatabaseContract {
 
     fun deleteReport(
         reportId: String
+    ): Flow<Resource<String>>
+
+    fun getImagesInStoragePath(
+        storagePath: String
+    ): Flow<List<String>>
+
+    fun deleteImage(
+        imageUrl: String
     ): Flow<Resource<String>>
 
 }

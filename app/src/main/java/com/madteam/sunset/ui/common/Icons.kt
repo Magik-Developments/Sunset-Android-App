@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Bookmark
+import androidx.compose.material.icons.outlined.CameraAlt
 import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Close
@@ -238,6 +239,34 @@ fun RoundedLightEditButton(
             tint = Color.Black
         )
     }
+}
+
+@Composable
+fun RoundedLightChangeImageButton(
+    onClick: () -> Unit,
+    modifier: Modifier
+) {
+    IconButton(
+        onClick = onClick, modifier = modifier
+            .size(48.dp)
+            .background(Color(0xFFd9d9d9), RoundedCornerShape(50.dp))
+            .clip(
+                RoundedCornerShape(50.dp)
+            )
+    ) {
+        Icon(
+            imageVector = Icons.Outlined.CameraAlt,
+            contentDescription = "",
+            modifier = Modifier.size(24.dp),
+            tint = Color.Black
+        )
+    }
+}
+
+@Preview
+@Composable
+fun PreviewRoundedLightChangeImageButton() {
+    RoundedLightChangeImageButton(onClick = { /*TODO*/ }, modifier = Modifier)
 }
 
 @Composable

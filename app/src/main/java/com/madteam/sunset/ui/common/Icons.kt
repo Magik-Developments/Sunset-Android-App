@@ -10,10 +10,10 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Bookmark
-import androidx.compose.material.icons.outlined.CameraAlt
 import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Close
@@ -25,6 +25,7 @@ import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
@@ -249,16 +250,18 @@ fun RoundedLightChangeImageButton(
     IconButton(
         onClick = onClick, modifier = modifier
             .size(48.dp)
-            .background(Color(0xFFd9d9d9), RoundedCornerShape(50.dp))
+            .shadow(4.dp, RoundedCornerShape(50.dp))
+            .background(Color.White, RoundedCornerShape(50.dp))
             .clip(
                 RoundedCornerShape(50.dp)
             )
+
     ) {
         Icon(
-            imageVector = Icons.Outlined.CameraAlt,
+            imageVector = Icons.Filled.Edit,
             contentDescription = "",
             modifier = Modifier.size(24.dp),
-            tint = Color.Black
+            tint = Color(0xFFd9d9d9)
         )
     }
 }

@@ -101,4 +101,6 @@
     <string name="no_posts_yet">No posts yet</string>
     <string name="no_discovered_spots_yet">No discovered Spots yet</string>
     <string name="data_updated">Your information has been updated</string>
+    <string name="complete_information_name">Click to add your name</string>
+    <string name="complete_information_location">Click to add your location</string>
 </resources>

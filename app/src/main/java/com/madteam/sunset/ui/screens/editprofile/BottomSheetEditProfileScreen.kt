@@ -16,9 +16,6 @@ import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -50,6 +47,7 @@ fun BottomSheetEditProfileScreen(
     val name by viewModel.name.collectAsStateWithLifecycle()
     val userImage by viewModel.userImage.collectAsStateWithLifecycle()
     val location by viewModel.location.collectAsStateWithLifecycle()
+    val dataHasChanged by viewModel.dataHasChanged.collectAsStateWithLifecycle()
 
     val singlePhotoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
@@ -80,7 +78,8 @@ fun BottomSheetEditProfileScreen(
                 singlePhotoPickerLauncher.launch(
                     PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                 )
-            }
+            },
+            dataHasChanged = dataHasChanged
         )
     }
 }
@@ -95,10 +94,9 @@ fun BottomSheetEditProfileContent(
     updateName: (String) -> Unit,
     updateLocation: (String) -> Unit,
     saveData: () -> Unit,
-    onEditProfileImageClick: () -> Unit
+    onEditProfileImageClick: () -> Unit,
+    dataHasChanged: Boolean
 ) {
-
-    var dataHasChanged by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -164,7 +162,6 @@ fun BottomSheetEditProfileContent(
                 value = nameValue,
                 onValueChange = {
                     updateName(it)
-                    dataHasChanged = true
                 },
                 hint = R.string.name
             )
@@ -175,7 +172,6 @@ fun BottomSheetEditProfileContent(
                 value = locationValue,
                 onValueChange = {
                     updateLocation(it)
-                    dataHasChanged = true
                 },
                 hint = R.string.location
             )
@@ -191,7 +187,6 @@ fun BottomSheetEditProfileContent(
         ) {
             SmallButtonDark(onClick = {
                 saveData()
-                dataHasChanged = false
             }, text = R.string.save, enabled = dataHasChanged)
             CustomSpacer(size = 24.dp)
         }

@@ -1,5 +1,7 @@
 package com.madteam.sunset.ui.screens.discover
 
+import android.location.Location
+import android.location.LocationManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
@@ -54,7 +56,11 @@ class DiscoverViewModel @Inject constructor(
     }
 
     fun updateUserLocation(location: LatLng) {
+        val loc = Location(LocationManager.GPS_PROVIDER)
+        loc.latitude = location.latitude
+        loc.longitude = location.longitude
         _userLocation.value = location
+        _mapState.value = _mapState.value.copy(lastKnownLocation = loc)
     }
 
     fun setGoToUserLocation(state: Boolean) {

@@ -174,7 +174,8 @@ fun DiscoverContent(
         properties = setMapProperties(mapState),
         cameraPositionState = cameraPositionState,
         uiSettings = MapUiSettings(
-            zoomControlsEnabled = false
+            zoomControlsEnabled = false,
+            myLocationButtonEnabled = false
         )
     ) {
         SetupClusterManagerAndRenderers(

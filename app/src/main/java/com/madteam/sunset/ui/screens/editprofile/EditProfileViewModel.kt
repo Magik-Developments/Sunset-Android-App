@@ -58,7 +58,9 @@ class EditProfileViewModel @Inject constructor(
 
     private fun checkIfDataHasChanged() {
         _dataHasChanged.value =
-            !(_originalLocation.value == location.value && _originalName.value == name.value && _originalUserImage.value == userImage.value)
+            !(_originalLocation.value == location.value &&
+                    _originalName.value == name.value &&
+                    _originalUserImage.value == userImage.value)
     }
 
     fun updateName(newName: String) {

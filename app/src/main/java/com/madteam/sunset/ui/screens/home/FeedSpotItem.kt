@@ -37,7 +37,7 @@ import com.madteam.sunset.ui.theme.secondarySemiBoldBodyL
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun FeedPostItem(
+fun FeedSpotItem(
     spotInfo: Spot
 ) {
     Card(

@@ -95,7 +95,6 @@ fun HomeContent(
             .fillMaxSize()
             .padding(horizontal = 24.dp)
     ) {
-        CustomSpacer(size = 24.dp)
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
@@ -111,7 +110,7 @@ fun HomeContent(
                 }
             }
             itemsIndexed(spotsList) { _, item ->
-                FeedPostItem(item)
+                FeedSpotItem(item)
             }
         }
         CustomSpacer(size = 24.dp)

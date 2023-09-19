@@ -29,6 +29,7 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.madteam.sunset.R
 import com.madteam.sunset.model.Spot
+import com.madteam.sunset.model.UserProfile
 import com.madteam.sunset.ui.common.RoundedLightLikeButton
 import com.madteam.sunset.ui.common.RoundedLightSaveButton
 import com.madteam.sunset.ui.common.RoundedLightSendButton
@@ -38,7 +39,8 @@ import com.madteam.sunset.ui.theme.secondarySemiBoldBodyL
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun FeedSpotItem(
-    spotInfo: Spot
+    spotInfo: Spot,
+    userInfo: UserProfile
 ) {
     Card(
         elevation = CardDefaults.cardElevation(8.dp),
@@ -50,7 +52,7 @@ fun FeedSpotItem(
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            val (saveButton, userInformation, sendButton, likeButton, clickDetailsText, clickDetailsIcon, titleInformation, subtitleInformation) = createRefs()
+            val (saveButton, sendButton, likeButton, clickDetailsText, clickDetailsIcon, titleInformation, subtitleInformation) = createRefs()
             GlideImage(
                 model = spotInfo.featuredImages.first(),
                 contentDescription = null,
@@ -89,7 +91,7 @@ fun FeedSpotItem(
                         bottom.linkTo(parent.bottom, 16.dp)
                         end.linkTo(parent.end, 24.dp)
                     },
-                isLiked = false
+                isLiked = spotInfo.likedBy.contains(userInfo.username)
             )
             RoundedLightSendButton(
                 onClick = { /*TODO*/ },

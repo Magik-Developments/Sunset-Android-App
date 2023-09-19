@@ -25,6 +25,7 @@ import androidx.navigation.NavController
 import com.google.android.gms.maps.model.LatLng
 import com.madteam.sunset.model.Spot
 import com.madteam.sunset.model.SunsetTimeResponse
+import com.madteam.sunset.model.UserProfile
 import com.madteam.sunset.navigation.SunsetRoutes
 import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.SunsetBottomNavigation
@@ -41,6 +42,7 @@ fun HomeScreen(
     val userLocality by viewModel.userLocality.collectAsStateWithLifecycle()
     val remainingTimeToSunset by viewModel.remainingTimeToSunset.collectAsStateWithLifecycle()
     val spotsList by viewModel.spotsList.collectAsStateWithLifecycle()
+    val userInfo by viewModel.userInfo.collectAsStateWithLifecycle()
 
     Scaffold(
         bottomBar = { SunsetBottomNavigation(navController) },
@@ -55,7 +57,8 @@ fun HomeScreen(
                     remainingTimeToSunset = remainingTimeToSunset,
                     updateUserLocation = viewModel::updateUserLocation,
                     userLocality = userLocality,
-                    spotsList = spotsList
+                    spotsList = spotsList,
+                    userInfo = userInfo
                 )
             }
         }
@@ -69,7 +72,8 @@ fun HomeContent(
     remainingTimeToSunset: String,
     updateUserLocation: (LatLng) -> Unit,
     userLocality: String,
-    spotsList: List<Spot>
+    spotsList: List<Spot>,
+    userInfo: UserProfile
 ) {
 
     val context = LocalContext.current
@@ -110,7 +114,10 @@ fun HomeContent(
                 }
             }
             itemsIndexed(spotsList) { _, item ->
-                FeedSpotItem(item)
+                FeedSpotItem(
+                    item,
+                    userInfo
+                )
             }
         }
         CustomSpacer(size = 24.dp)

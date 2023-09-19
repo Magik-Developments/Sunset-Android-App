@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.madteam.sunset.model.UserProfile
 import com.madteam.sunset.repositories.AuthContract
 import com.madteam.sunset.repositories.DatabaseRepository
+import com.madteam.sunset.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -35,6 +36,10 @@ class EditProfileViewModel @Inject constructor(
     private val _dataHasChanged: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val dataHasChanged: StateFlow<Boolean> = _dataHasChanged
 
+    private val _uploadProgress: MutableStateFlow<Resource<String>> =
+        MutableStateFlow(Resource.Success(""))
+    val updloadProgress: StateFlow<Resource<String>> = _uploadProgress
+
     init {
         setInitialValues()
     }
@@ -60,7 +65,8 @@ class EditProfileViewModel @Inject constructor(
         _dataHasChanged.value =
             !(_originalLocation.value == location.value &&
                     _originalName.value == name.value &&
-                    _originalUserImage.value == userImage.value)
+                    _originalUserImage.value == userImage.value
+                    )
     }
 
     fun updateName(newName: String) {
@@ -73,7 +79,15 @@ class EditProfileViewModel @Inject constructor(
         checkIfDataHasChanged()
     }
 
+    fun clearUpdateProgressState() {
+        _uploadProgress.value = Resource.Success("")
+    }
+
     fun updateData() {
+        var newUserImage = ""
+        if (userImage.value != _originalUserImage.value) {
+            newUserImage = userImage.value
+        }
         val newUser = UserProfile(
             username = username.value,
             email = email.value,
@@ -81,12 +95,24 @@ class EditProfileViewModel @Inject constructor(
             creation_date = "",
             name = name.value,
             location = location.value,
-            image = userImage.value,
+            image = newUserImage,
             admin = userIsAdmin.value
         )
         viewModelScope.launch {
-            databaseRepository.updateUser(newUser).collectLatest {}
-            _dataHasChanged.value = false
+            databaseRepository.updateUser(newUser).collectLatest { result ->
+                when (result) {
+                    is Resource.Success -> {
+                        _dataHasChanged.value = false
+                        _originalUserImage.value = userImage.value
+                        _originalName.value = name.value
+                        _originalLocation.value = location.value
+                    }
+
+                    else -> {}
+                }
+                _uploadProgress.value = result
+            }
+
         }
     }
 

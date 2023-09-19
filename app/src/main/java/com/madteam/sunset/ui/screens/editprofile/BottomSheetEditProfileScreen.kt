@@ -1,9 +1,12 @@
 package com.madteam.sunset.ui.screens.editprofile
 
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -15,17 +18,20 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.madteam.sunset.R
+import com.madteam.sunset.ui.common.CircularLoadingDialog
 import com.madteam.sunset.ui.common.CloseIconButton
 import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.EmailTextField
@@ -36,6 +42,7 @@ import com.madteam.sunset.ui.common.SmallButtonDark
 import com.madteam.sunset.ui.common.UsernameTextField
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyL
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
+import com.madteam.sunset.utils.Resource
 
 @Composable
 fun BottomSheetEditProfileScreen(
@@ -48,6 +55,7 @@ fun BottomSheetEditProfileScreen(
     val userImage by viewModel.userImage.collectAsStateWithLifecycle()
     val location by viewModel.location.collectAsStateWithLifecycle()
     val dataHasChanged by viewModel.dataHasChanged.collectAsStateWithLifecycle()
+    val uploadProgress by viewModel.updloadProgress.collectAsStateWithLifecycle()
 
     val singlePhotoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
@@ -79,7 +87,9 @@ fun BottomSheetEditProfileScreen(
                     PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                 )
             },
-            dataHasChanged = dataHasChanged
+            dataHasChanged = dataHasChanged,
+            uploadProgress = uploadProgress,
+            clearUploadProgress = viewModel::clearUpdateProgressState
         )
     }
 }
@@ -95,8 +105,12 @@ fun BottomSheetEditProfileContent(
     updateLocation: (String) -> Unit,
     saveData: () -> Unit,
     onEditProfileImageClick: () -> Unit,
-    dataHasChanged: Boolean
+    dataHasChanged: Boolean,
+    uploadProgress: Resource<String>,
+    clearUploadProgress: () -> Unit
 ) {
+
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -190,6 +204,39 @@ fun BottomSheetEditProfileContent(
             }, text = R.string.save, enabled = dataHasChanged)
             CustomSpacer(size = 24.dp)
         }
+    }
+
+    when (uploadProgress) {
+        is Resource.Loading -> {
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .background(Color.Transparent),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.background(Color.Transparent)
+                ) {
+                    CircularLoadingDialog()
+                }
+            }
+        }
+
+        is Resource.Success -> {
+            if (uploadProgress.data != "") {
+                LaunchedEffect(key1 = uploadProgress.data) {
+                    Toast.makeText(context, R.string.data_updated, Toast.LENGTH_LONG).show()
+                    clearUploadProgress()
+                }
+            } else if (uploadProgress.data.contains("Error")) {
+                Toast.makeText(context, "Error, try again later.", Toast.LENGTH_SHORT).show()
+                clearUploadProgress()
+            }
+        }
+
+        else -> {}
     }
 }
 

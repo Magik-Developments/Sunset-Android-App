@@ -3,6 +3,7 @@ package com.madteam.sunset.ui.screens.home
 import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -95,23 +96,25 @@ fun HomeContent(
             .padding(horizontal = 24.dp)
     ) {
         CustomSpacer(size = 24.dp)
-        if (remainingTimeToSunset.isNotEmpty()) {
-            SunsetInfoModule(
-                sunsetTimeInformation = sunsetTimeInformation,
-                userLocality = userLocality,
-                remainingTimeToSunset = remainingTimeToSunset,
-                clickToExplore = { navigateTo(SunsetRoutes.DiscoverScreen.route) }
-            )
-        }
-        if (spotsList.isNotEmpty()) {
-            LazyColumn {
-                itemsIndexed(spotsList) { _, item ->
-                    FeedPostItem(
-                        item
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            item {
+                if (remainingTimeToSunset.isNotEmpty()) {
+                    CustomSpacer(size = 24.dp)
+                    SunsetInfoModule(
+                        sunsetTimeInformation = sunsetTimeInformation,
+                        userLocality = userLocality,
+                        remainingTimeToSunset = remainingTimeToSunset,
+                        clickToExplore = { navigateTo(SunsetRoutes.DiscoverScreen.route) }
                     )
                 }
             }
+            itemsIndexed(spotsList) { _, item ->
+                FeedPostItem(item)
+            }
         }
+        CustomSpacer(size = 24.dp)
     }
 }
 

@@ -119,7 +119,8 @@ fun HomeContent(
                 FeedSpotItem(
                     spotInfo = item,
                     userInfo = userInfo,
-                    spotLikeClick = { spotLikeClick(item.id) }
+                    spotLikeClick = { spotLikeClick(item.id) },
+                    onSpotClicked = { navigateTo("spot_detail_screen/spotReference=${item.id}") }
                 )
             }
         }

@@ -1,6 +1,7 @@
 package com.madteam.sunset.ui.screens.myprofile
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,6 +23,8 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CameraAlt
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.EditLocationAlt
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -46,10 +49,10 @@ import com.madteam.sunset.ui.common.ProfileImage
 import com.madteam.sunset.ui.common.ProfilePostTypeTab
 import com.madteam.sunset.ui.common.SunsetBottomNavigation
 import com.madteam.sunset.ui.common.ThinButtonLight
-import com.madteam.sunset.ui.common.UserLocationText
-import com.madteam.sunset.ui.common.UserNameText
 import com.madteam.sunset.ui.screens.editprofile.BottomSheetEditProfileScreen
 import com.madteam.sunset.ui.theme.secondaryRegularBodyL
+import com.madteam.sunset.ui.theme.secondaryRegularHeadlineS
+import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -132,22 +135,63 @@ fun MyProfileContent(
     ) {
         CustomSpacer(size = 16.dp)
         ProfileImage(imageUrl = userInfo.image, size = 80.dp)
+        CustomSpacer(size = 16.dp)
         if (userInfo.name.isNotBlank()) {
-            CustomSpacer(size = 16.dp)
-            UserNameText(userName = userInfo.name)
-            CustomSpacer(size = 8.dp)
+            Text(
+                text = userInfo.name,
+                style = secondarySemiBoldHeadLineS,
+                color = Color(0xFFd9d9d9)
+            )
+        } else {
+            Row(
+                modifier = Modifier.clickable {
+                    onEditProfileClick()
+                }
+            ) {
+                Text(
+                    text = stringResource(id = R.string.complete_information_name),
+                    style = secondarySemiBoldHeadLineS,
+                    color = Color(0xFFd9d9d9)
+                )
+                CustomSpacer(size = 4.dp)
+                Icon(
+                    imageVector = Icons.Outlined.Edit,
+                    contentDescription = "Add your name button",
+                    tint = Color(0xFFd9d9d9)
+                )
+            }
         }
+        CustomSpacer(size = 8.dp)
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = if (userInfo.location.isNotBlank()) {
-                Arrangement.SpaceBetween
-            } else {
-                Arrangement.Center
-            }
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             if (userInfo.location.isNotBlank()) {
-                UserLocationText(location = userInfo.location)
+                Text(
+                    text = userInfo.location,
+                    style = secondaryRegularHeadlineS,
+                    color = Color(0xFF333333)
+                )
+            } else {
+                Row(
+                    modifier = Modifier.clickable {
+                        onEditProfileClick()
+                    }
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.complete_information_location),
+                        style = secondaryRegularHeadlineS,
+                        color = Color(0xFFd9d9d9)
+                    )
+                    CustomSpacer(size = 4.dp)
+                    Icon(
+                        imageVector = Icons.Outlined.EditLocationAlt,
+                        contentDescription = "Add your location button",
+                        tint = Color(0xFFd9d9d9)
+                    )
+                }
+
             }
             ThinButtonLight(onClick = onEditProfileClick, text = R.string.edit_profile)
         }

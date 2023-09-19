@@ -90,10 +90,14 @@ fun BottomSheetSignInContent(
     var invalidCredentials by remember { mutableStateOf(false) }
 
     if (BuildConfig.DEBUG) {
-        userValueText = "adriafernandez14@gmail.com"
-        //userValueText = "adrifernandevs@gmail.com"
-        passwordTValueText = "abc.12345"
-        //passwordTValueText = "Abc.1234"
+        //userValueText = "adriafernandez14@gmail.com"
+        //passwordTValueText = "abc.12345"
+
+
+        userValueText = "adrifernandevs@gmail.com"
+        passwordTValueText = "Abc.1234"
+
+
         validateForm(userValueText, passwordTValueText)
     }
 

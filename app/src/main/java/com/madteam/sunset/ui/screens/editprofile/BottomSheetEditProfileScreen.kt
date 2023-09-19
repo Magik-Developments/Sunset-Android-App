@@ -31,6 +31,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.madteam.sunset.R
+import com.madteam.sunset.model.UserProfile
 import com.madteam.sunset.ui.common.CircularLoadingDialog
 import com.madteam.sunset.ui.common.CloseIconButton
 import com.madteam.sunset.ui.common.CustomSpacer
@@ -46,6 +47,8 @@ import com.madteam.sunset.utils.Resource
 
 @Composable
 fun BottomSheetEditProfileScreen(
+    onCloseButton: () -> Unit,
+    onProfileUpdated: (UserProfile) -> Unit,
     viewModel: EditProfileViewModel = hiltViewModel()
 ) {
 
@@ -89,7 +92,9 @@ fun BottomSheetEditProfileScreen(
             },
             dataHasChanged = dataHasChanged,
             uploadProgress = uploadProgress,
-            clearUploadProgress = viewModel::clearUpdateProgressState
+            clearUploadProgress = viewModel::clearUpdateProgressState,
+            onCloseButton = onCloseButton,
+            onProfileUpdated = onProfileUpdated
         )
     }
 }
@@ -107,7 +112,9 @@ fun BottomSheetEditProfileContent(
     onEditProfileImageClick: () -> Unit,
     dataHasChanged: Boolean,
     uploadProgress: Resource<String>,
-    clearUploadProgress: () -> Unit
+    clearUploadProgress: () -> Unit,
+    onCloseButton: () -> Unit,
+    onProfileUpdated: (UserProfile) -> Unit
 ) {
 
     val context = LocalContext.current
@@ -123,7 +130,7 @@ fun BottomSheetEditProfileContent(
             horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            CloseIconButton { /* to do */ }
+            CloseIconButton { onCloseButton() }
             CustomSpacer(size = 16.dp)
             Text(text = "Edit profile", style = secondarySemiBoldHeadLineS)
         }
@@ -229,6 +236,18 @@ fun BottomSheetEditProfileContent(
                 LaunchedEffect(key1 = uploadProgress.data) {
                     Toast.makeText(context, R.string.data_updated, Toast.LENGTH_LONG).show()
                     clearUploadProgress()
+                    onProfileUpdated(
+                        UserProfile(
+                            username = usernameValue,
+                            email = emailValue,
+                            provider = "",
+                            creation_date = "",
+                            name = nameValue,
+                            location = locationValue,
+                            image = userImage,
+                            admin = false
+                        )
+                    )
                 }
             } else if (uploadProgress.data.contains("Error")) {
                 Toast.makeText(context, "Error, try again later.", Toast.LENGTH_SHORT).show()

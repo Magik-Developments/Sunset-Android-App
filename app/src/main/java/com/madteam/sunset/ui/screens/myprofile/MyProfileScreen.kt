@@ -75,7 +75,12 @@ fun MyProfileScreen(
         sheetState = editProfileModalState,
         sheetShape = RoundedCornerShape(20.dp, 20.dp, 0.dp, 0.dp),
         sheetElevation = 10.dp,
-        sheetContent = { BottomSheetEditProfileScreen() }
+        sheetContent = {
+            BottomSheetEditProfileScreen(
+                onCloseButton = { coroutineScope.launch { editProfileModalState.hide() } },
+                onProfileUpdated = viewModel::updateUserInfo
+            )
+        }
     ) {
         Scaffold(
             bottomBar = { SunsetBottomNavigation(navController) },

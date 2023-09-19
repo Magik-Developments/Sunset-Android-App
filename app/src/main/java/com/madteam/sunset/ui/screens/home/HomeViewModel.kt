@@ -3,7 +3,9 @@ package com.madteam.sunset.ui.screens.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
+import com.madteam.sunset.model.Spot
 import com.madteam.sunset.model.SunsetTimeResponse
+import com.madteam.sunset.repositories.DatabaseRepository
 import com.madteam.sunset.repositories.LocationRepository
 import com.madteam.sunset.repositories.SunsetRepository
 import com.madteam.sunset.utils.Resource
@@ -21,7 +23,8 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val sunsetRepository: SunsetRepository,
-    private val locationRepository: LocationRepository
+    private val locationRepository: LocationRepository,
+    private val databaseRepository: DatabaseRepository
 ) : ViewModel() {
 
     private val _sunsetTimeInformation: MutableStateFlow<SunsetTimeResponse> =
@@ -36,6 +39,21 @@ class HomeViewModel @Inject constructor(
 
     private val _remainingTimeToSunset: MutableStateFlow<String> = MutableStateFlow("")
     val remainingTimeToSunset: StateFlow<String> = _remainingTimeToSunset
+
+    private val _spotsList: MutableStateFlow<List<Spot>> = MutableStateFlow(listOf())
+    val spotsList: StateFlow<List<Spot>> = _spotsList
+
+    init {
+        getSpotsList()
+    }
+
+    private fun getSpotsList() {
+        viewModelScope.launch {
+            databaseRepository.getAllSpots().collectLatest {
+                _spotsList.value = it
+            }
+        }
+    }
 
     fun updateUserLocation(location: LatLng) {
         _userLocation.value = location

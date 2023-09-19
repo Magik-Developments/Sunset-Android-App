@@ -103,4 +103,5 @@
     <string name="data_updated">Your information has been updated</string>
     <string name="complete_information_name">Click to add your name</string>
     <string name="complete_information_location">Click to add your location</string>
+    <string name="click_to_see_details">Click to see details</string>
 </resources>

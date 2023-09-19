@@ -13,28 +13,44 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
+import com.madteam.sunset.R
+import com.madteam.sunset.model.Spot
 import com.madteam.sunset.ui.common.RoundedLightLikeButton
 import com.madteam.sunset.ui.common.RoundedLightSaveButton
 import com.madteam.sunset.ui.common.RoundedLightSendButton
 import com.madteam.sunset.ui.theme.secondaryRegularBodyM
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyL
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun FeedPostItem() {
+fun FeedPostItem(
+    spotInfo: Spot
+) {
     Card(
         elevation = CardDefaults.cardElevation(8.dp),
         shape = RoundedCornerShape(20.dp),
         modifier = Modifier
-            .size(380.dp)
+            .size(370.dp)
     ) {
         ConstraintLayout(
             modifier = Modifier
                 .fillMaxSize()
         ) {
             val (saveButton, userInformation, sendButton, likeButton, clickDetailsText, clickDetailsIcon, titleInformation, subtitleInformation) = createRefs()
+            GlideImage(
+                model = spotInfo.featuredImages.first(),
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
             RoundedLightSaveButton(
                 onClick = { /*TODO*/ },
                 modifier = Modifier
@@ -64,7 +80,7 @@ fun FeedPostItem() {
                     }
             )
             Text(
-                text = "Click to see details",
+                text = stringResource(id = R.string.click_to_see_details),
                 style = secondaryRegularBodyM,
                 color = Color.White,
                 modifier = Modifier
@@ -76,7 +92,7 @@ fun FeedPostItem() {
             )
             Icon(
                 imageVector = Icons.Outlined.KeyboardArrowDown,
-                contentDescription = "Click to see details icon",
+                contentDescription = null,
                 tint = Color.White,
                 modifier = Modifier
                     .constrainAs(clickDetailsIcon) {
@@ -86,7 +102,7 @@ fun FeedPostItem() {
                     }
             )
             Text(
-                text = "Terrassa, Barcelona.",
+                text = spotInfo.location,
                 style = secondaryRegularBodyM,
                 color = Color.White,
                 modifier = Modifier
@@ -96,7 +112,7 @@ fun FeedPostItem() {
                     }
             )
             Text(
-                text = "La piscina de vallparadís",
+                text = spotInfo.name,
                 style = secondarySemiBoldBodyL,
                 color = Color.White,
                 modifier = Modifier
@@ -112,5 +128,4 @@ fun FeedPostItem() {
 @Preview
 @Composable
 fun FeedPostItemPreview() {
-    FeedPostItem()
 }

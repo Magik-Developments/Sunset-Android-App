@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -20,6 +22,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.google.android.gms.maps.model.LatLng
+import com.madteam.sunset.model.Spot
 import com.madteam.sunset.model.SunsetTimeResponse
 import com.madteam.sunset.navigation.SunsetRoutes
 import com.madteam.sunset.ui.common.CustomSpacer
@@ -36,6 +39,7 @@ fun HomeScreen(
     val sunsetTimeInformation by viewModel.sunsetTimeInformation.collectAsStateWithLifecycle()
     val userLocality by viewModel.userLocality.collectAsStateWithLifecycle()
     val remainingTimeToSunset by viewModel.remainingTimeToSunset.collectAsStateWithLifecycle()
+    val spotsList by viewModel.spotsList.collectAsStateWithLifecycle()
 
     Scaffold(
         bottomBar = { SunsetBottomNavigation(navController) },
@@ -49,7 +53,8 @@ fun HomeScreen(
                     navigateTo = navController::navigate,
                     remainingTimeToSunset = remainingTimeToSunset,
                     updateUserLocation = viewModel::updateUserLocation,
-                    userLocality = userLocality
+                    userLocality = userLocality,
+                    spotsList = spotsList
                 )
             }
         }
@@ -62,7 +67,8 @@ fun HomeContent(
     navigateTo: (String) -> Unit,
     remainingTimeToSunset: String,
     updateUserLocation: (LatLng) -> Unit,
-    userLocality: String
+    userLocality: String,
+    spotsList: List<Spot>
 ) {
 
     val context = LocalContext.current
@@ -96,6 +102,15 @@ fun HomeContent(
                 remainingTimeToSunset = remainingTimeToSunset,
                 clickToExplore = { navigateTo(SunsetRoutes.DiscoverScreen.route) }
             )
+        }
+        if (spotsList.isNotEmpty()) {
+            LazyColumn {
+                itemsIndexed(spotsList) { _, item ->
+                    FeedPostItem(
+                        item
+                    )
+                }
+            }
         }
     }
 }

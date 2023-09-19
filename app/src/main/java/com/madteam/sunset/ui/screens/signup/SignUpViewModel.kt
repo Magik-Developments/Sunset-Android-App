@@ -4,7 +4,6 @@ import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.AuthResult
-import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.madteam.sunset.repositories.AuthContract
 import com.madteam.sunset.repositories.DatabaseContract
 import com.madteam.sunset.utils.Resource
@@ -43,10 +42,6 @@ class SignUpViewModel @Inject constructor(
   fun isValidForm(email: String, password: String, username: String) {
     isValidForm.value =
       (isEmailValid(email) && isUsernameValid(username) && isPasswordValid(password))
-  }
-
-  fun goToPoliciesScreen() {
-    //TODO: Go to policies Screen
   }
 
   fun signUpIntent(email: String, password: String, username: String) {

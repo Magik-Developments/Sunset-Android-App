@@ -140,7 +140,7 @@ fun MyProfileContent(
             Text(
                 text = userInfo.name,
                 style = secondarySemiBoldHeadLineS,
-                color = Color(0xFFd9d9d9)
+                color = Color(0xFF333333)
             )
         } else {
             Row(

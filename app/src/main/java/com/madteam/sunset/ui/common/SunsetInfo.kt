@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.WbTwilight
 import androidx.compose.material3.Card
@@ -82,6 +83,7 @@ fun SunsetInfoModule(
                         end.linkTo(remainingTime.end)
                         top.linkTo(remainingTime.bottom)
                     }
+                    .padding(horizontal = 16.dp)
             )
             Text(
                 text = convertHourToMilitaryFormat(sunsetTimeInformation.results.sunset),

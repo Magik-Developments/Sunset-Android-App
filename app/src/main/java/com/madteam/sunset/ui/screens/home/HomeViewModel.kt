@@ -114,4 +114,38 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun modifyUserSpotLike(spotReference: String) {
+        viewModelScope.launch {
+            val indexToModify = _spotsList.value.indexOfFirst { it.id == spotReference }
+
+            if (indexToModify != -1) {
+                val spotLiked = _spotsList.value[indexToModify]
+
+                databaseRepository.modifyUserSpotLike(
+                    "spots/$spotReference",
+                    _userInfo.value.username
+                )
+                    .collectLatest {}
+
+                if (spotLiked.likedBy.contains(_userInfo.value.username)) {
+                    val updatedSpotLiked =
+                        spotLiked.copy(likedBy = spotLiked.likedBy - _userInfo.value.username)
+
+                    val updatedList = _spotsList.value.toMutableList()
+                    updatedList[indexToModify] = updatedSpotLiked
+
+                    _spotsList.emit(updatedList)
+                } else {
+                    val updatedSpotLiked =
+                        spotLiked.copy(likedBy = spotLiked.likedBy + _userInfo.value.username)
+
+                    val updatedList = _spotsList.value.toMutableList()
+                    updatedList[indexToModify] = updatedSpotLiked
+
+                    _spotsList.emit(updatedList)
+                }
+            }
+        }
+    }
+
 }

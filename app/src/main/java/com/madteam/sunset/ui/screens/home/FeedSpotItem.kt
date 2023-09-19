@@ -40,7 +40,8 @@ import com.madteam.sunset.ui.theme.secondarySemiBoldBodyL
 @Composable
 fun FeedSpotItem(
     spotInfo: Spot,
-    userInfo: UserProfile
+    userInfo: UserProfile,
+    spotLikeClick: () -> Unit
 ) {
     Card(
         elevation = CardDefaults.cardElevation(8.dp),
@@ -84,7 +85,7 @@ fun FeedSpotItem(
                     }
             )
             RoundedLightLikeButton(
-                onClick = { /*TODO*/ },
+                onClick = { spotLikeClick() },
                 modifier = Modifier
                     .shadow(4.dp, RoundedCornerShape(20.dp))
                     .constrainAs(likeButton) {

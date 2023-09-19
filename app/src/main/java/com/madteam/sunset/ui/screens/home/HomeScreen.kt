@@ -58,7 +58,8 @@ fun HomeScreen(
                     updateUserLocation = viewModel::updateUserLocation,
                     userLocality = userLocality,
                     spotsList = spotsList,
-                    userInfo = userInfo
+                    userInfo = userInfo,
+                    spotLikeClick = viewModel::modifyUserSpotLike
                 )
             }
         }
@@ -73,7 +74,8 @@ fun HomeContent(
     updateUserLocation: (LatLng) -> Unit,
     userLocality: String,
     spotsList: List<Spot>,
-    userInfo: UserProfile
+    userInfo: UserProfile,
+    spotLikeClick: (String) -> Unit
 ) {
 
     val context = LocalContext.current
@@ -115,8 +117,9 @@ fun HomeContent(
             }
             itemsIndexed(spotsList) { _, item ->
                 FeedSpotItem(
-                    item,
-                    userInfo
+                    spotInfo = item,
+                    userInfo = userInfo,
+                    spotLikeClick = { spotLikeClick(item.id) }
                 )
             }
         }

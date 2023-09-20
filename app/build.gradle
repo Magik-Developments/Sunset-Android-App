@@ -26,17 +26,35 @@ android {
         }
     }
 
+    signingConfigs {
+        debug {
+            storeFile file("dev.keystore")
+            storePassword "7Ju4f5Z]"
+            keyAlias "sunsetdev"
+            keyPassword "7Ju4f5Z]"
+        }
+
+        release {
+            storeFile file("release.keystore")
+            storePassword "7Ju4f5Z]"
+            keyAlias "sunsetrelease"
+            keyPassword "7Ju4f5Z]"
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
         debug {
             minifyEnabled false
             shrinkResources false
             debuggable true
             applicationIdSuffix '.dev'
+            signingConfig signingConfigs.debug
         }
     }
 

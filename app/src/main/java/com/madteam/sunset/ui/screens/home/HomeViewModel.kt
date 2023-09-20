@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
 import com.madteam.sunset.model.Spot
+import com.madteam.sunset.model.SpotPost
 import com.madteam.sunset.model.SunsetTimeResponse
 import com.madteam.sunset.model.UserProfile
 import com.madteam.sunset.repositories.AuthRepository
@@ -46,12 +47,24 @@ class HomeViewModel @Inject constructor(
     private val _spotsList: MutableStateFlow<List<Spot>> = MutableStateFlow(listOf())
     val spotsList: StateFlow<List<Spot>> = _spotsList
 
+    private val _postsList: MutableStateFlow<List<SpotPost>> = MutableStateFlow(listOf())
+    val postsList: StateFlow<List<SpotPost>> = _postsList
+
     private val _userInfo: MutableStateFlow<UserProfile> = MutableStateFlow(UserProfile())
     val userInfo: StateFlow<UserProfile> = _userInfo
 
     init {
         getSpotsList()
+        getPostsList()
         getUserInfo()
+    }
+
+    private fun getPostsList() {
+        viewModelScope.launch {
+            databaseRepository.getAllPosts().collectLatest {
+                _postsList.value = it
+            }
+        }
     }
 
     private fun getUserInfo() {
@@ -143,6 +156,40 @@ class HomeViewModel @Inject constructor(
                     updatedList[indexToModify] = updatedSpotLiked
 
                     _spotsList.emit(updatedList)
+                }
+            }
+        }
+    }
+
+    fun modifyUserPostLike(postReference: String) {
+        viewModelScope.launch {
+            val indexToModify = _postsList.value.indexOfFirst { it.id == postReference }
+
+            if (indexToModify != -1) {
+                val postLiked = _postsList.value[indexToModify]
+
+                databaseRepository.modifyUserPostLike(
+                    "posts/$postReference",
+                    _userInfo.value.username
+                )
+                    .collectLatest {}
+
+                if (postLiked.likedBy.contains(_userInfo.value.username)) {
+                    val updatedPostLiked =
+                        postLiked.copy(likedBy = postLiked.likedBy - _userInfo.value.username)
+
+                    val updatedList = _postsList.value.toMutableList()
+                    updatedList[indexToModify] = updatedPostLiked
+
+                    _postsList.emit(updatedList)
+                } else {
+                    val updatedPostLiked =
+                        postLiked.copy(likedBy = postLiked.likedBy + _userInfo.value.username)
+
+                    val updatedList = _postsList.value.toMutableList()
+                    updatedList[indexToModify] = updatedPostLiked
+
+                    _postsList.emit(updatedList)
                 }
             }
         }

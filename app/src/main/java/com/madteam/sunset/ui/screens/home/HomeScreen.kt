@@ -31,6 +31,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.google.android.gms.maps.model.LatLng
 import com.madteam.sunset.model.Spot
+import com.madteam.sunset.model.SpotPost
 import com.madteam.sunset.model.SunsetTimeResponse
 import com.madteam.sunset.model.UserProfile
 import com.madteam.sunset.navigation.SunsetRoutes
@@ -50,6 +51,7 @@ fun HomeScreen(
     val userLocality by viewModel.userLocality.collectAsStateWithLifecycle()
     val remainingTimeToSunset by viewModel.remainingTimeToSunset.collectAsStateWithLifecycle()
     val spotsList by viewModel.spotsList.collectAsStateWithLifecycle()
+    val postsList by viewModel.postsList.collectAsStateWithLifecycle()
     val userInfo by viewModel.userInfo.collectAsStateWithLifecycle()
 
     Scaffold(
@@ -67,7 +69,9 @@ fun HomeScreen(
                     userLocality = userLocality,
                     spotsList = spotsList,
                     userInfo = userInfo,
-                    spotLikeClick = viewModel::modifyUserSpotLike
+                    spotLikeClick = viewModel::modifyUserSpotLike,
+                    postsList = postsList,
+                    postLikeClick = viewModel::modifyUserPostLike
                 )
             }
         }
@@ -83,7 +87,9 @@ fun HomeContent(
     userLocality: String,
     spotsList: List<Spot>,
     userInfo: UserProfile,
-    spotLikeClick: (String) -> Unit
+    spotLikeClick: (String) -> Unit,
+    postsList: List<SpotPost>,
+    postLikeClick: (String) -> Unit
 ) {
 
     val context = LocalContext.current
@@ -123,17 +129,23 @@ fun HomeContent(
                     )
                 }
             }
-            if (spotsList.isNotEmpty()) {
-                itemsIndexed(spotsList) { _, item ->
-                    FeedSpotItem(
-                        spotInfo = item,
-                        userInfo = userInfo,
-                        spotLikeClick = { spotLikeClick(item.id) },
-                        onSpotClicked = { navigateTo("spot_detail_screen/spotReference=${item.id}") }
-                    )
-                }
-            } else {
-                //Shimmer function when list is empty
+            itemsIndexed(spotsList) { _, spot ->
+                FeedSpotItem(
+                    spotInfo = spot,
+                    userInfo = userInfo,
+                    spotLikeClick = { spotLikeClick(spot.id) },
+                    onSpotClicked = { navigateTo("spot_detail_screen/spotReference=${spot.id}") }
+                )
+            }
+            itemsIndexed(postsList) { _, post ->
+                FeedPostItem(
+                    postInfo = post,
+                    userInfo = userInfo,
+                    postLikeClick = { postLikeClick(post.id) },
+                    onPostClicked = { navigateTo("post_screen/postReference=${post.id}") }
+                )
+            }
+            if (spotsList.isEmpty() && postsList.isEmpty()) {
                 item {
                     Card(
                         colors = CardDefaults.cardColors(containerColor = Color.Transparent),

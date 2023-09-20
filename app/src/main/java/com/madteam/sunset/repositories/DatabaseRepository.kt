@@ -1189,6 +1189,52 @@ class DatabaseRepository @Inject constructor(
         emit(mutableListOf())
     }
 
+    override fun getAllPosts(): Flow<List<SpotPost>> = flow {
+        val postsList = mutableListOf<SpotPost>()
+        val postsCollectionSnapshot =
+            firebaseFirestore.collection(POSTS_COLLECTION_PATH).get().await()
+        for (post in postsCollectionSnapshot.documents) {
+            val id = post.id
+            val postRef = firebaseFirestore.collection(POSTS_COLLECTION_PATH).document(id)
+            val authorRef = post.getDocumentReference("author")
+            var author = UserProfile()
+            if (authorRef != null) {
+                getUserProfileByDocRef(authorRef).collectLatest { profile ->
+                    author = profile
+                }
+            }
+            var commentsList = listOf<PostComment>()
+            getCommentsFromPostRef(postRef.path).collectLatest { comments ->
+                commentsList = comments
+            }
+            val description = post.getString("description")
+            val creationDate = post.getString("creation_date")
+            val images = post.get("images") as List<String>
+            val spotRef = post.getDocumentReference("spot")?.path
+            val likes = post.get("likes")
+            val likedBySnapshot = postRef.collection("liked_by").get().await()
+            val likedByList = likedBySnapshot.documents.map { doc -> doc.id }
+            if (description != null && creationDate != null && spotRef != null) {
+                val spotPost = SpotPost(
+                    id,
+                    description,
+                    spotRef,
+                    images,
+                    author,
+                    creationDate,
+                    commentsList,
+                    likedByList,
+                    likes.toString().toInt()
+                )
+                postsList.add(spotPost)
+            }
+            emit(postsList)
+        }
+    }.catch { exception ->
+        Log.e("DatabaseRepository::getAllPosts", "Error: ${exception.message}")
+        emit(mutableListOf())
+    }
+
     override fun getSpotsByUsername(username: String): Flow<List<Spot>> = flow {
         val spotsList = mutableListOf<Spot>()
         val userReference = firebaseFirestore.collection(USERS_COLLECTION_PATH).document(username)
@@ -1328,5 +1374,6 @@ interface DatabaseContract {
     ): Flow<Resource<String>>
 
     fun getAllSpots(): Flow<List<Spot>>
+    fun getAllPosts(): Flow<List<SpotPost>>
 
 }

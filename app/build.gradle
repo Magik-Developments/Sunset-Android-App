@@ -17,8 +17,8 @@ android {
         applicationId "com.madteam.sunset"
         minSdk 24
         targetSdk 33
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "0.1.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -26,10 +26,33 @@ android {
         }
     }
 
+    signingConfigs {
+        debug {
+            storeFile file("dev.keystore")
+            storePassword "7Ju4f5Z]"
+            keyAlias "sunsetdev"
+            keyPassword "7Ju4f5Z]"
+        }
+
+        release {
+            storeFile file("keysunsetapp")
+            keyAlias "keysunset"
+        }
+    }
+
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+        debug {
+            minifyEnabled false
+            shrinkResources false
+            debuggable true
+            applicationIdSuffix '.dev'
+            signingConfig signingConfigs.debug
         }
     }
 

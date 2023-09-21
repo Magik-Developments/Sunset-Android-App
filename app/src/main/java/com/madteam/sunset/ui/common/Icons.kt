@@ -1,7 +1,11 @@
 package com.madteam.sunset.ui.common
 
 import androidx.annotation.StringRes
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -23,8 +27,11 @@ import androidx.compose.material.icons.outlined.Flag
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -35,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import com.madteam.sunset.R
 import com.madteam.sunset.R.string
 import com.madteam.sunset.ui.theme.SunsetTheme
+import kotlinx.coroutines.launch
 
 @Composable
 fun PasswordVisibilityOffIcon() {
@@ -301,6 +309,11 @@ fun RoundedLightLikeButton(
     modifier: Modifier,
     isLiked: Boolean
 ) {
+
+    val interactionSource = MutableInteractionSource()
+    val coroutineScope = rememberCoroutineScope()
+    val scale = remember { Animatable(1f) }
+
     val iconStyle = if (isLiked) {
         Icons.Filled.Favorite
     } else {
@@ -313,18 +326,37 @@ fun RoundedLightLikeButton(
     }
 
     IconButton(
-        onClick = onClick, modifier = modifier
+        modifier = modifier
             .height(46.dp)
             .width(66.dp)
             .background(Color.White, RoundedCornerShape(50.dp))
             .clip(
                 RoundedCornerShape(50.dp)
-            )
+            ),
+        onClick = {}
     ) {
         Icon(
             imageVector = iconStyle,
             contentDescription = "",
-            modifier = Modifier.size(24.dp),
+            modifier = Modifier
+                .size(24.dp)
+                .scale(scale.value)
+                .clickable(
+                    interactionSource = interactionSource,
+                    indication = null
+                ) {
+                    onClick()
+                    coroutineScope.launch {
+                        scale.animateTo(
+                            1.5f,
+                            animationSpec = tween(150)
+                        )
+                        scale.animateTo(
+                            1f,
+                            animationSpec = tween(150)
+                        )
+                    }
+                },
             tint = iconColor
         )
     }

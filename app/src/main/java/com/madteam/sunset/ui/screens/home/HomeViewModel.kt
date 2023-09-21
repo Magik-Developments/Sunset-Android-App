@@ -57,6 +57,11 @@ class HomeViewModel @Inject constructor(
         getSpotsList()
         getPostsList()
         getUserInfo()
+        initAdLoader()
+    }
+
+    private fun initAdLoader() {
+        // todo ???
     }
 
     private fun getPostsList() {

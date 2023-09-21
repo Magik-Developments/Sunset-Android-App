@@ -21,7 +21,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -37,6 +36,7 @@ import com.madteam.sunset.ui.common.AutoSlidingCarousel
 import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.GoBackTopAppBar
 import com.madteam.sunset.ui.common.ProfileImage
+import com.madteam.sunset.ui.common.RoundedLightGoToSpotButton
 import com.madteam.sunset.ui.common.RoundedLightLikeButton
 import com.madteam.sunset.ui.common.RoundedLightSaveButton
 import com.madteam.sunset.ui.common.RoundedLightSendButton
@@ -93,7 +93,6 @@ fun PostContent(
 ) {
     val scrollState = rememberScrollState()
     val showShimmer = remember { mutableStateOf(true) }
-    val context = LocalContext.current
 
     if (postInfo != SpotPost()) {
         showShimmer.value = false
@@ -106,7 +105,7 @@ fun PostContent(
     ) {
         //Header image section
         ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
-            val (spotImage, saveIconButton, sendIconButton, likeIconButton) = createRefs()
+            val (spotImage, saveIconButton, sendIconButton, likeIconButton, spotIconButton) = createRefs()
             AutoSlidingCarousel(
                 itemsCount = postInfo.images.size,
                 itemContent = { index ->
@@ -128,6 +127,20 @@ fun PostContent(
                     }
 
             )
+            RoundedLightGoToSpotButton(
+                onClick = {
+                    navigateTo(
+                        "spot_detail_screen/spotReference=${
+                            postInfo.spotRef.substringAfter(
+                                "/"
+                            )
+                        }"
+                    )
+                },
+                modifier = Modifier.constrainAs(spotIconButton) {
+                    top.linkTo(parent.top, 16.dp)
+                    start.linkTo(parent.start, 24.dp)
+                })
             RoundedLightSaveButton(onClick = {}, modifier = Modifier.constrainAs(saveIconButton) {
                 top.linkTo(parent.top, 16.dp)
                 end.linkTo(parent.end, 24.dp)

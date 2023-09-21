@@ -116,7 +116,8 @@ fun HomeContent(
             .padding(horizontal = 24.dp)
     ) {
         LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             item {
                 if (remainingTimeToSunset.isNotEmpty()) {
@@ -128,6 +129,9 @@ fun HomeContent(
                         clickToExplore = { navigateTo(SunsetRoutes.DiscoverScreen.route) }
                     )
                 }
+            }
+            item {
+                FeedAdItem()
             }
             itemsIndexed(spotsList) { _, spot ->
                 FeedSpotItem(

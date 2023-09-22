@@ -3,22 +3,28 @@ package com.madteam.sunset.ui.screens.home
 import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Scaffold
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -39,6 +45,7 @@ import com.madteam.sunset.ui.common.SunsetBottomNavigation
 import com.madteam.sunset.ui.common.SunsetInfoModule
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineS
 import com.madteam.sunset.utils.getCurrentLocation
+import com.madteam.sunset.utils.shimmerBrush
 
 @Composable
 fun HomeScreen(
@@ -151,7 +158,21 @@ fun HomeContent(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             item {
-                CustomSpacer(size = 4.dp)
+                CustomSpacer(size = 2.dp)
+            }
+            if (spotsList.isEmpty()) {
+                item {
+                    Card(
+                        modifier = Modifier
+                            .size(370.dp)
+                            .background(
+                                shimmerBrush(showShimmer = true),
+                                shape = RoundedCornerShape(20.dp)
+                            )
+                            .clip(RoundedCornerShape(20.dp)),
+                        elevation = CardDefaults.cardElevation(8.dp)
+                    ) {}
+                }
             }
             itemsIndexed(spotsList) { index, item ->
                 FeedSpotItem(
@@ -178,7 +199,21 @@ fun HomeContent(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             item {
-                CustomSpacer(size = 4.dp)
+                CustomSpacer(size = 2.dp)
+            }
+            if (postsList.isEmpty()) {
+                item {
+                    Card(
+                        modifier = Modifier
+                            .size(370.dp)
+                            .background(
+                                shimmerBrush(showShimmer = true),
+                                shape = RoundedCornerShape(20.dp)
+                            )
+                            .clip(RoundedCornerShape(20.dp)),
+                        elevation = CardDefaults.cardElevation(8.dp)
+                    ) {}
+                }
             }
             itemsIndexed(postsList) { index, item ->
                 FeedPostItem(

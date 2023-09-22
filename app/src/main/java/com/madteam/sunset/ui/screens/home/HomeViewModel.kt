@@ -61,7 +61,7 @@ class HomeViewModel @Inject constructor(
 
     private fun getLastPosts() {
         viewModelScope.launch {
-            databaseRepository.getLastPosts(1).collectLatest {
+            databaseRepository.getLastPosts(1, null).collectLatest {
                 _postsList.value = it
             }
         }
@@ -69,7 +69,10 @@ class HomeViewModel @Inject constructor(
 
     private fun getLastSpots() {
         viewModelScope.launch {
-            databaseRepository.getLastSpots(1).collectLatest {
+            databaseRepository.getLastSpots(
+                itemsPerQuery = 1,
+                lastItemId = null
+            ).collectLatest {
                 _spotsList.value = it
             }
         }
@@ -85,7 +88,10 @@ class HomeViewModel @Inject constructor(
 
     fun loadNextSpotsPage() {
         viewModelScope.launch {
-            databaseRepository.getLastSpots(1).collectLatest { feed ->
+            databaseRepository.getLastSpots(
+                itemsPerQuery = 1,
+                lastItemId = _spotsList.value.last().id
+            ).collectLatest { feed ->
                 _spotsList.value = _spotsList.value + feed
             }
         }
@@ -93,7 +99,7 @@ class HomeViewModel @Inject constructor(
 
     fun loadNextPostsPage() {
         viewModelScope.launch {
-            databaseRepository.getLastPosts(1).collectLatest { feed ->
+            databaseRepository.getLastPosts(1, _postsList.value.last().id).collectLatest { feed ->
                 _postsList.value = _postsList.value + feed
             }
         }

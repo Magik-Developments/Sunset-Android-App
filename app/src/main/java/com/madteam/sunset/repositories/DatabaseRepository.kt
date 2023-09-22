@@ -23,7 +23,6 @@ import com.madteam.sunset.model.SpotPost
 import com.madteam.sunset.model.SpotReview
 import com.madteam.sunset.model.UserProfile
 import com.madteam.sunset.utils.Resource
-import com.madteam.sunset.utils.toSpot
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
@@ -53,7 +52,9 @@ class DatabaseRepository @Inject constructor(
 ) : DatabaseContract {
 
     private var lastVisibleSpotOnHomeFeed: DocumentSnapshot? = null
+    private var lastSpotOnHomeFeedItemReached: Boolean = false
     private var lastVisiblePostOnHomeFeed: DocumentSnapshot? = null
+    private var lastPostOnHomeFeedItemReached: Boolean = false
 
     override fun createUser(
         email: String,
@@ -761,8 +762,12 @@ class DatabaseRepository @Inject constructor(
     }
 
     override fun getLastSpots(
-        itemsPerQuery: Int
+        itemsPerQuery: Int,
+        lastItemId: String?
     ): Flow<List<Spot>> = flow {
+        if (lastSpotOnHomeFeedItemReached) {
+            return@flow
+        }
         val spotsCollection = firebaseFirestore.collection(SPOTS_COLLECTION_PATH)
 
         val spotsList = mutableListOf<Spot>()
@@ -783,8 +788,41 @@ class DatabaseRepository @Inject constructor(
         }
 
         for (document in spotsQuerySnapshot.documents) {
-            val spot = document.toSpot()
-            spotsList.add(spot)
+            val creationDate = document.getString("creation_date")
+            val featuredImages = document.get("featured_images") as List<String>
+            val name = document.getString("name")
+            val description = document.getString("description")
+            val score = document.getDouble("score")
+            val visitedTimes = document.get("visited_times")
+            val likes = document.get("likes")
+            val locationInLatLng = document.getGeoPoint("location_in_latlng")
+            val location = document.getString("location")
+            val likedBySnapshot =
+                spotsCollection.document(document.id).collection("liked_by").get().await()
+            val likedByList = likedBySnapshot.documents.map { doc -> doc.id }
+
+            val spotData = Spot(
+                id = document.id,
+                spottedBy = UserProfile(),
+                featuredImages = featuredImages,
+                creationDate = creationDate ?: "",
+                name = name ?: "",
+                description = description ?: "",
+                score = score?.toFloat() ?: 0.0f,
+                visitedTimes = visitedTimes.toString().toIntOrNull() ?: 0,
+                likes = likes.toString().toIntOrNull() ?: 0,
+                locationInLatLng = locationInLatLng ?: GeoPoint(0.0, 0.0),
+                location = location ?: "",
+                attributes = listOf(),
+                spotReviews = listOf(),
+                spotPosts = listOf(),
+                likedBy = likedByList
+            )
+            if (lastItemId != null && spotData.id == lastItemId) {
+                lastSpotOnHomeFeedItemReached = true
+                return@flow
+            }
+            spotsList.add(spotData)
         }
 
         emit(spotsList)
@@ -794,8 +832,12 @@ class DatabaseRepository @Inject constructor(
     }
 
     override fun getLastPosts(
-        itemsPerQuery: Int
+        itemsPerQuery: Int,
+        lastItemId: String?
     ): Flow<List<SpotPost>> = flow {
+        if (lastPostOnHomeFeedItemReached) {
+            return@flow
+        }
         val postsCollection = firebaseFirestore.collection(POSTS_COLLECTION_PATH)
 
         val postsList = mutableListOf<SpotPost>()
@@ -829,6 +871,8 @@ class DatabaseRepository @Inject constructor(
             val images = document.get("images") as List<String>
             val spotRef = document.getDocumentReference("spot")?.path
             val likes = document.get("likes")
+            val likedBySnapshot = postsCollection.document(id).collection("liked_by").get().await()
+            val likedByList = likedBySnapshot.documents.map { doc -> doc.id }
             if (description != null && creationDate != null && spotRef != null) {
                 val spotPost = SpotPost(
                     id,
@@ -838,9 +882,13 @@ class DatabaseRepository @Inject constructor(
                     author,
                     creationDate,
                     listOf(),
-                    listOf(),
+                    likedByList,
                     likes.toString().toInt()
                 )
+                if (lastItemId != null && spotPost.id == lastItemId) {
+                    lastPostOnHomeFeedItemReached = true
+                    return@flow
+                }
                 postsList.add(spotPost)
             }
         }
@@ -1355,12 +1403,15 @@ interface DatabaseContract {
     fun deleteImage(
         imageUrl: String
     ): Flow<Resource<String>>
+
     fun getLastSpots(
-        itemsPerQuery: Int
+        itemsPerQuery: Int,
+        lastItemId: String?
     ): Flow<List<Spot>>
 
     fun getLastPosts(
-        itemsPerQuery: Int
+        itemsPerQuery: Int,
+        lastItemId: String?
     ): Flow<List<SpotPost>>
 
 }

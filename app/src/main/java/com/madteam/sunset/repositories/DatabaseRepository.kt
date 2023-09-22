@@ -760,73 +760,6 @@ class DatabaseRepository @Inject constructor(
         emit(mutableListOf())
     }
 
-    override fun getAllSpots(): Flow<List<Spot>> = flow {
-        val spotsList = mutableListOf<Spot>()
-
-        val spotsSnapshot = firebaseFirestore.collection(SPOTS_COLLECTION_PATH).get().await()
-
-        for (documentSnapshot in spotsSnapshot.documents) {
-            val id = documentSnapshot.id
-            val documentReference = firebaseFirestore.collection(SPOTS_COLLECTION_PATH).document(id)
-            val featuredImages = documentSnapshot.get("featured_images") as List<String>
-            val creationDate = documentSnapshot.getString("creation_date")
-            val name = documentSnapshot.getString("name")
-            val description = documentSnapshot.getString("description")
-            val score = documentSnapshot.getDouble("score")
-            val visitedTimes = documentSnapshot.get("visited_times")
-            val likes = documentSnapshot.get("likes")
-            val locationInLatLng = documentSnapshot.getGeoPoint("location_in_latlng")
-            val location = documentSnapshot.getString("location")
-            val spottedByDocRef = documentSnapshot.getDocumentReference("spotted_by")
-            val attributeDocRefs = documentSnapshot.get("attributes") as List<DocumentReference>
-            var spottedBy = UserProfile()
-            var spotAttributes = listOf<SpotAttribute>()
-            val spotReviewsRef = documentReference.collection("spot_reviews")
-            var spotReviews = listOf<SpotReview>()
-            val spotPostsRefs = documentSnapshot.get("posts") as List<DocumentReference>
-            var spotPosts = listOf<SpotPost>()
-            val likedBySnapshot = documentReference.collection("liked_by").get().await()
-            val likedByList = likedBySnapshot.documents.map { doc -> doc.id }
-            if (spottedByDocRef != null) {
-                getUserProfileByDocRef(spottedByDocRef).collectLatest { profile ->
-                    spottedBy = profile
-                }
-            }
-            getSpotAttributesByDocRefs(attributeDocRefs).collectLatest { attributes ->
-                spotAttributes = attributes
-            }
-            getSpotReviewsByCollectionRef(spotReviewsRef).collectLatest { reviews ->
-                spotReviews = reviews
-            }
-            getSpotPostsByDocRefs(spotPostsRefs).collectLatest { posts ->
-                spotPosts = posts
-            }
-
-            val spotData = Spot(
-                id = id,
-                spottedBy = spottedBy,
-                featuredImages = featuredImages,
-                creationDate = creationDate ?: "",
-                name = name ?: "",
-                description = description ?: "",
-                score = score?.toFloat() ?: 0.0f,
-                visitedTimes = visitedTimes.toString().toIntOrNull() ?: 0,
-                likes = likes.toString().toIntOrNull() ?: 0,
-                locationInLatLng = locationInLatLng ?: GeoPoint(0.0, 0.0),
-                location = location ?: "",
-                attributes = spotAttributes,
-                spotReviews = spotReviews,
-                spotPosts = spotPosts,
-                likedBy = likedByList
-            )
-            spotsList.add(spotData)
-        }
-        emit(spotsList)
-    }.catch { exception ->
-        Log.e("DatabaseRepository::getAllSpots", "Error: ${exception.message}")
-        emit(mutableListOf())
-    }
-
     override fun getLastSpots(
         itemsPerQuery: Int
     ): Flow<List<Spot>> = flow {
@@ -1285,52 +1218,6 @@ class DatabaseRepository @Inject constructor(
         emit(mutableListOf())
     }
 
-    override fun getAllPosts(): Flow<List<SpotPost>> = flow {
-        val postsList = mutableListOf<SpotPost>()
-        val postsCollectionSnapshot =
-            firebaseFirestore.collection(POSTS_COLLECTION_PATH).get().await()
-        for (post in postsCollectionSnapshot.documents) {
-            val id = post.id
-            val postRef = firebaseFirestore.collection(POSTS_COLLECTION_PATH).document(id)
-            val authorRef = post.getDocumentReference("author")
-            var author = UserProfile()
-            if (authorRef != null) {
-                getUserProfileByDocRef(authorRef).collectLatest { profile ->
-                    author = profile
-                }
-            }
-            var commentsList = listOf<PostComment>()
-            getCommentsFromPostRef(postRef.path).collectLatest { comments ->
-                commentsList = comments
-            }
-            val description = post.getString("description")
-            val creationDate = post.getString("creation_date")
-            val images = post.get("images") as List<String>
-            val spotRef = post.getDocumentReference("spot")?.path
-            val likes = post.get("likes")
-            val likedBySnapshot = postRef.collection("liked_by").get().await()
-            val likedByList = likedBySnapshot.documents.map { doc -> doc.id }
-            if (description != null && creationDate != null && spotRef != null) {
-                val spotPost = SpotPost(
-                    id,
-                    description,
-                    spotRef,
-                    images,
-                    author,
-                    creationDate,
-                    commentsList,
-                    likedByList,
-                    likes.toString().toInt()
-                )
-                postsList.add(spotPost)
-            }
-            emit(postsList)
-        }
-    }.catch { exception ->
-        Log.e("DatabaseRepository::getAllPosts", "Error: ${exception.message}")
-        emit(mutableListOf())
-    }
-
     override fun getSpotsByUsername(username: String): Flow<List<Spot>> = flow {
         val spotsList = mutableListOf<Spot>()
         val userReference = firebaseFirestore.collection(USERS_COLLECTION_PATH).document(username)
@@ -1468,9 +1355,6 @@ interface DatabaseContract {
     fun deleteImage(
         imageUrl: String
     ): Flow<Resource<String>>
-
-    fun getAllSpots(): Flow<List<Spot>>
-    fun getAllPosts(): Flow<List<SpotPost>>
     fun getLastSpots(
         itemsPerQuery: Int
     ): Flow<List<Spot>>

@@ -104,4 +104,7 @@
     <string name="complete_information_name">Click to add your name</string>
     <string name="complete_information_location">Click to add your location</string>
     <string name="click_to_see_details">Click to see details</string>
+    <string name="dont_miss_sunset">Don\'t miss the Sunset</string>
+    <string name="last_spots_posted">Last Spots discovered</string>
+    <string name="last_posts">Last posts</string>
 </resources>

@@ -8,9 +8,11 @@ import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
+import com.google.firebase.firestore.Query
 import com.google.firebase.storage.FirebaseStorage
 import com.madteam.sunset.model.PostComment
 import com.madteam.sunset.model.Report
@@ -48,6 +50,11 @@ class DatabaseRepository @Inject constructor(
     private val firebaseFirestore: FirebaseFirestore,
     private val firebaseStorage: FirebaseStorage
 ) : DatabaseContract {
+
+    private var lastVisibleSpotOnHomeFeed: DocumentSnapshot? = null
+    private var lastSpotOnHomeFeedItemReached: Boolean = false
+    private var lastVisiblePostOnHomeFeed: DocumentSnapshot? = null
+    private var lastPostOnHomeFeedItemReached: Boolean = false
 
     override fun createUser(
         email: String,
@@ -754,51 +761,49 @@ class DatabaseRepository @Inject constructor(
         emit(mutableListOf())
     }
 
-    override fun getAllSpots(): Flow<List<Spot>> = flow {
+    override fun getLastSpots(
+        itemsPerQuery: Int,
+        lastItemId: String?
+    ): Flow<List<Spot>> = flow {
+        if (lastSpotOnHomeFeedItemReached) {
+            return@flow
+        }
+        val spotsCollection = firebaseFirestore.collection(SPOTS_COLLECTION_PATH)
+
         val spotsList = mutableListOf<Spot>()
 
-        val spotsSnapshot = firebaseFirestore.collection(SPOTS_COLLECTION_PATH).get().await()
+        val spotsQuery = spotsCollection
+            .orderBy("creation_date", Query.Direction.DESCENDING)
 
-        for (documentSnapshot in spotsSnapshot.documents) {
-            val id = documentSnapshot.id
-            val documentReference = firebaseFirestore.collection(SPOTS_COLLECTION_PATH).document(id)
-            val featuredImages = documentSnapshot.get("featured_images") as List<String>
-            val creationDate = documentSnapshot.getString("creation_date")
-            val name = documentSnapshot.getString("name")
-            val description = documentSnapshot.getString("description")
-            val score = documentSnapshot.getDouble("score")
-            val visitedTimes = documentSnapshot.get("visited_times")
-            val likes = documentSnapshot.get("likes")
-            val locationInLatLng = documentSnapshot.getGeoPoint("location_in_latlng")
-            val location = documentSnapshot.getString("location")
-            val spottedByDocRef = documentSnapshot.getDocumentReference("spotted_by")
-            val attributeDocRefs = documentSnapshot.get("attributes") as List<DocumentReference>
-            var spottedBy = UserProfile()
-            var spotAttributes = listOf<SpotAttribute>()
-            val spotReviewsRef = documentReference.collection("spot_reviews")
-            var spotReviews = listOf<SpotReview>()
-            val spotPostsRefs = documentSnapshot.get("posts") as List<DocumentReference>
-            var spotPosts = listOf<SpotPost>()
-            val likedBySnapshot = documentReference.collection("liked_by").get().await()
+        if (lastVisibleSpotOnHomeFeed != null) {
+            spotsQuery.startAfter(lastVisibleSpotOnHomeFeed)
+        }
+
+        spotsQuery.limit(itemsPerQuery.toLong())
+
+        val spotsQuerySnapshot = spotsQuery.get().await()
+
+        if (!spotsQuerySnapshot.isEmpty) {
+            lastVisibleSpotOnHomeFeed = spotsQuerySnapshot.documents.last()
+        }
+
+        for (document in spotsQuerySnapshot.documents) {
+            val creationDate = document.getString("creation_date")
+            val featuredImages = document.get("featured_images") as List<String>
+            val name = document.getString("name")
+            val description = document.getString("description")
+            val score = document.getDouble("score")
+            val visitedTimes = document.get("visited_times")
+            val likes = document.get("likes")
+            val locationInLatLng = document.getGeoPoint("location_in_latlng")
+            val location = document.getString("location")
+            val likedBySnapshot =
+                spotsCollection.document(document.id).collection("liked_by").get().await()
             val likedByList = likedBySnapshot.documents.map { doc -> doc.id }
-            if (spottedByDocRef != null) {
-                getUserProfileByDocRef(spottedByDocRef).collectLatest { profile ->
-                    spottedBy = profile
-                }
-            }
-            getSpotAttributesByDocRefs(attributeDocRefs).collectLatest { attributes ->
-                spotAttributes = attributes
-            }
-            getSpotReviewsByCollectionRef(spotReviewsRef).collectLatest { reviews ->
-                spotReviews = reviews
-            }
-            getSpotPostsByDocRefs(spotPostsRefs).collectLatest { posts ->
-                spotPosts = posts
-            }
 
             val spotData = Spot(
-                id = id,
-                spottedBy = spottedBy,
+                id = document.id,
+                spottedBy = UserProfile(),
                 featuredImages = featuredImages,
                 creationDate = creationDate ?: "",
                 name = name ?: "",
@@ -808,16 +813,88 @@ class DatabaseRepository @Inject constructor(
                 likes = likes.toString().toIntOrNull() ?: 0,
                 locationInLatLng = locationInLatLng ?: GeoPoint(0.0, 0.0),
                 location = location ?: "",
-                attributes = spotAttributes,
-                spotReviews = spotReviews,
-                spotPosts = spotPosts,
+                attributes = listOf(),
+                spotReviews = listOf(),
+                spotPosts = listOf(),
                 likedBy = likedByList
             )
+            if (lastItemId != null && spotData.id == lastItemId) {
+                lastSpotOnHomeFeedItemReached = true
+                return@flow
+            }
             spotsList.add(spotData)
         }
+
         emit(spotsList)
     }.catch { exception ->
-        Log.e("DatabaseRepository::getAllSpots", "Error: ${exception.message}")
+        Log.e("DatabaseRepository::getLastSpots", "Error: ${exception.message}")
+        emit(mutableListOf())
+    }
+
+    override fun getLastPosts(
+        itemsPerQuery: Int,
+        lastItemId: String?
+    ): Flow<List<SpotPost>> = flow {
+        if (lastPostOnHomeFeedItemReached) {
+            return@flow
+        }
+        val postsCollection = firebaseFirestore.collection(POSTS_COLLECTION_PATH)
+
+        val postsList = mutableListOf<SpotPost>()
+
+        val postsQuery = postsCollection
+            .orderBy("creation_date", Query.Direction.DESCENDING)
+
+        if (lastVisiblePostOnHomeFeed != null) {
+            postsQuery.startAfter(lastVisiblePostOnHomeFeed)
+        }
+
+        postsQuery.limit(itemsPerQuery.toLong())
+
+        val postsQuerySnapshot = postsQuery.get().await()
+
+        if (!postsQuerySnapshot.isEmpty) {
+            lastVisiblePostOnHomeFeed = postsQuerySnapshot.documents.last()
+        }
+
+        for (document in postsQuerySnapshot.documents) {
+            val id = document.id
+            val authorRef = document.getDocumentReference("author")
+            var author = UserProfile()
+            if (authorRef != null) {
+                getUserProfileByDocRef(authorRef).collectLatest { profile ->
+                    author = profile
+                }
+            }
+            val description = document.getString("description")
+            val creationDate = document.getString("creation_date")
+            val images = document.get("images") as List<String>
+            val spotRef = document.getDocumentReference("spot")?.path
+            val likes = document.get("likes")
+            val likedBySnapshot = postsCollection.document(id).collection("liked_by").get().await()
+            val likedByList = likedBySnapshot.documents.map { doc -> doc.id }
+            if (description != null && creationDate != null && spotRef != null) {
+                val spotPost = SpotPost(
+                    id,
+                    description,
+                    spotRef,
+                    images,
+                    author,
+                    creationDate,
+                    listOf(),
+                    likedByList,
+                    likes.toString().toInt()
+                )
+                if (lastItemId != null && spotPost.id == lastItemId) {
+                    lastPostOnHomeFeedItemReached = true
+                    return@flow
+                }
+                postsList.add(spotPost)
+            }
+        }
+        emit(postsList)
+    }.catch { exception ->
+        Log.e("DatabaseRepository::getLastPosts", "Error: ${exception.message}")
         emit(mutableListOf())
     }
 
@@ -1189,52 +1266,6 @@ class DatabaseRepository @Inject constructor(
         emit(mutableListOf())
     }
 
-    override fun getAllPosts(): Flow<List<SpotPost>> = flow {
-        val postsList = mutableListOf<SpotPost>()
-        val postsCollectionSnapshot =
-            firebaseFirestore.collection(POSTS_COLLECTION_PATH).get().await()
-        for (post in postsCollectionSnapshot.documents) {
-            val id = post.id
-            val postRef = firebaseFirestore.collection(POSTS_COLLECTION_PATH).document(id)
-            val authorRef = post.getDocumentReference("author")
-            var author = UserProfile()
-            if (authorRef != null) {
-                getUserProfileByDocRef(authorRef).collectLatest { profile ->
-                    author = profile
-                }
-            }
-            var commentsList = listOf<PostComment>()
-            getCommentsFromPostRef(postRef.path).collectLatest { comments ->
-                commentsList = comments
-            }
-            val description = post.getString("description")
-            val creationDate = post.getString("creation_date")
-            val images = post.get("images") as List<String>
-            val spotRef = post.getDocumentReference("spot")?.path
-            val likes = post.get("likes")
-            val likedBySnapshot = postRef.collection("liked_by").get().await()
-            val likedByList = likedBySnapshot.documents.map { doc -> doc.id }
-            if (description != null && creationDate != null && spotRef != null) {
-                val spotPost = SpotPost(
-                    id,
-                    description,
-                    spotRef,
-                    images,
-                    author,
-                    creationDate,
-                    commentsList,
-                    likedByList,
-                    likes.toString().toInt()
-                )
-                postsList.add(spotPost)
-            }
-            emit(postsList)
-        }
-    }.catch { exception ->
-        Log.e("DatabaseRepository::getAllPosts", "Error: ${exception.message}")
-        emit(mutableListOf())
-    }
-
     override fun getSpotsByUsername(username: String): Flow<List<Spot>> = flow {
         val spotsList = mutableListOf<Spot>()
         val userReference = firebaseFirestore.collection(USERS_COLLECTION_PATH).document(username)
@@ -1373,7 +1404,14 @@ interface DatabaseContract {
         imageUrl: String
     ): Flow<Resource<String>>
 
-    fun getAllSpots(): Flow<List<Spot>>
-    fun getAllPosts(): Flow<List<SpotPost>>
+    fun getLastSpots(
+        itemsPerQuery: Int,
+        lastItemId: String?
+    ): Flow<List<Spot>>
+
+    fun getLastPosts(
+        itemsPerQuery: Int,
+        lastItemId: String?
+    ): Flow<List<SpotPost>>
 
 }

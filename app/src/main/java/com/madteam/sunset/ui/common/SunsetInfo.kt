@@ -33,11 +33,11 @@ fun SunsetInfoModule(
     sunsetTimeInformation: SunsetTimeResponse,
     remainingTimeToSunset: String,
     userLocality: String,
-    clickToExplore: () -> Unit
+    clickToExplore: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .height(180.dp)
     ) {

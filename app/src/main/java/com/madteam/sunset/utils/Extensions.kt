@@ -10,6 +10,11 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.GeoPoint
+import com.madteam.sunset.model.Spot
+import com.madteam.sunset.model.SpotPost
+import com.madteam.sunset.model.UserProfile
 
 fun Modifier.shadow(
     color: Color = Color.Black,
@@ -47,3 +52,56 @@ fun Modifier.shadow(
             )
         }
     })
+
+
+fun DocumentSnapshot.toSpot(): Spot {
+    val id = id
+    val creationDate = getString("creation_date")
+    val featuredImages = get("featured_images") as List<String>
+    val name = getString("name")
+    val description = getString("description")
+    val score = getDouble("score")
+    val visitedTimes = get("visited_times")
+    val likes = get("likes")
+    val locationInLatLng = getGeoPoint("location_in_latlng")
+    val location = getString("location")
+
+    return Spot(
+        id = id,
+        spottedBy = UserProfile(),
+        featuredImages = featuredImages,
+        creationDate = creationDate ?: "",
+        name = name ?: "",
+        description = description ?: "",
+        score = score?.toFloat() ?: 0.0f,
+        visitedTimes = visitedTimes.toString().toIntOrNull() ?: 0,
+        likes = likes.toString().toIntOrNull() ?: 0,
+        locationInLatLng = locationInLatLng ?: GeoPoint(0.0, 0.0),
+        location = location ?: "",
+        attributes = listOf(),
+        spotReviews = listOf(),
+        spotPosts = listOf(),
+        likedBy = listOf()
+    )
+}
+
+
+fun DocumentSnapshot.toSpotPost(): SpotPost {
+    val images = get("images") as List<String>
+    val id = id
+    val creationDate = getString("creation_date")
+    val description = getString("description")
+    val likes = getDouble("likes")
+    val spotRef = getDocumentReference("spot")
+    return SpotPost(
+        id = id,
+        description = description ?: "",
+        spotRef = spotRef?.path ?: "",
+        images = images,
+        author = UserProfile(),
+        creation_date = creationDate ?: "",
+        comments = listOf(),
+        likedBy = listOf(),
+        likes = likes?.toInt() ?: 0
+    )
+}

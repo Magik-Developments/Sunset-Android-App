@@ -54,20 +54,23 @@ class HomeViewModel @Inject constructor(
     val userInfo: StateFlow<UserProfile> = _userInfo
 
     init {
-        getSpotsList()
-        getPostsList()
         getUserInfo()
-        initAdLoader()
+        getLastSpots()
+        getLastPosts()
     }
 
-    private fun initAdLoader() {
-        // todo ???
-    }
-
-    private fun getPostsList() {
+    private fun getLastPosts() {
         viewModelScope.launch {
-            databaseRepository.getAllPosts().collectLatest {
+            databaseRepository.getLastPosts(1).collectLatest {
                 _postsList.value = it
+            }
+        }
+    }
+
+    private fun getLastSpots() {
+        viewModelScope.launch {
+            databaseRepository.getLastSpots(1).collectLatest {
+                _spotsList.value = it
             }
         }
     }
@@ -80,10 +83,18 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun getSpotsList() {
+    fun loadNextSpotsPage() {
         viewModelScope.launch {
-            databaseRepository.getAllSpots().collectLatest {
-                _spotsList.value = it
+            databaseRepository.getLastSpots(1).collectLatest { feed ->
+                _spotsList.value = _spotsList.value + feed
+            }
+        }
+    }
+
+    fun loadNextPostsPage() {
+        viewModelScope.launch {
+            databaseRepository.getLastPosts(1).collectLatest { feed ->
+                _postsList.value = _postsList.value + feed
             }
         }
     }

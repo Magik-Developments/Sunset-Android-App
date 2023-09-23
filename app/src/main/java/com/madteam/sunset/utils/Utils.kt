@@ -150,6 +150,10 @@ fun generateDeepLink(
             "https://sunsetapp.es/spotReference=$param"
         }
 
+        "post" -> {
+            "https://sunsetapp.es/postReference=$param"
+        }
+
         else -> {
             ""
         }

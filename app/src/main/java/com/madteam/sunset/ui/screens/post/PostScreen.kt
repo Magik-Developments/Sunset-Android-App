@@ -21,6 +21,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -45,6 +47,8 @@ import com.madteam.sunset.ui.theme.secondaryRegularBodyM
 import com.madteam.sunset.ui.theme.secondaryRegularBodyS
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyM
 import com.madteam.sunset.utils.formatDate
+import com.madteam.sunset.utils.generateDeepLink
+import com.madteam.sunset.utils.getShareIntent
 import com.madteam.sunset.utils.shimmerBrush
 
 @Composable
@@ -93,6 +97,13 @@ fun PostContent(
 ) {
     val scrollState = rememberScrollState()
     val showShimmer = remember { mutableStateOf(true) }
+    val context = LocalContext.current
+
+    val deepLinkToShare = generateDeepLink(screen = "post", postInfo.id)
+    val shareText = stringResource(
+        id = R.string.share_post_text,
+        postInfo.author.username
+    ) + " $deepLinkToShare"
 
     if (postInfo != SpotPost()) {
         showShimmer.value = false
@@ -148,7 +159,14 @@ fun PostContent(
             RoundedLightSendButton(modifier = Modifier.constrainAs(sendIconButton) {
                 top.linkTo(parent.top, 16.dp)
                 end.linkTo(saveIconButton.start, 16.dp)
-            }, onClick = {})
+            }, onClick = {
+                context.startActivity(
+                    getShareIntent(
+                        shareText = shareText,
+                        null
+                    )
+                )
+            })
             RoundedLightLikeButton(onClick = {
                 postLikeClick()
             }, modifier = Modifier.constrainAs(likeIconButton) {

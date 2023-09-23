@@ -192,6 +192,12 @@ fun SunsetNavigation(
 
         composable(
             route = "post_screen/postReference={postReference}",
+            deepLinks = listOf(
+                navDeepLink {
+                    uriPattern = "https://sunsetapp.es/postReference={postReference}"
+                    action = Intent.ACTION_VIEW
+                }
+            ),
             arguments = listOf(
                 navArgument("postReference") {
                     type = NavType.StringType

@@ -26,6 +26,7 @@ import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.Flag
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Menu
+import androidx.compose.material.icons.outlined.Send
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -36,11 +37,9 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.madteam.sunset.R
 import com.madteam.sunset.R.string
 import com.madteam.sunset.ui.theme.SunsetTheme
 import kotlinx.coroutines.launch
@@ -234,8 +233,13 @@ fun RoundedLightSendButton(
     onClick: () -> Unit,
     modifier: Modifier
 ) {
+
+    val interactionSource = MutableInteractionSource()
+    val coroutineScope = rememberCoroutineScope()
+    val scale = remember { Animatable(1f) }
+
     IconButton(
-        onClick = onClick, modifier = modifier
+        onClick = {}, modifier = modifier
             .size(48.dp)
             .background(Color.White, RoundedCornerShape(50.dp))
             .clip(
@@ -243,12 +247,35 @@ fun RoundedLightSendButton(
             )
     ) {
         Icon(
-            painter = painterResource(id = R.drawable.ic_send),
-            contentDescription = "",
-            modifier = Modifier.size(36.dp),
+            imageVector = Icons.Outlined.Send,
+            contentDescription = "Send icon button",
+            modifier = Modifier
+                .scale(scale.value)
+                .clickable(
+                    interactionSource = interactionSource,
+                    indication = null
+                ) {
+                    onClick()
+                    coroutineScope.launch {
+                        scale.animateTo(
+                            1.5f,
+                            animationSpec = tween(150)
+                        )
+                        scale.animateTo(
+                            1f,
+                            animationSpec = tween(150)
+                        )
+                    }
+                },
             tint = Color.Black
         )
     }
+}
+
+@Preview
+@Composable
+fun RoundedLightSendButtonPreview() {
+    RoundedLightSendButton(onClick = { /*TODO*/ }, modifier = Modifier)
 }
 
 @Composable

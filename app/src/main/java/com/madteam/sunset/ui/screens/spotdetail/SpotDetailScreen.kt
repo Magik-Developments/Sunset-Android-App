@@ -43,6 +43,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -79,8 +80,10 @@ import com.madteam.sunset.ui.theme.secondarySemiBoldBodyL
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyM
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineM
 import com.madteam.sunset.utils.formatDate
+import com.madteam.sunset.utils.generateDeepLink
 import com.madteam.sunset.utils.getCurrentLocation
 import com.madteam.sunset.utils.getResourceId
+import com.madteam.sunset.utils.getShareIntent
 import com.madteam.sunset.utils.openDirectionsOnGoogleMaps
 import com.madteam.sunset.utils.shimmerBrush
 import kotlin.math.roundToInt
@@ -163,6 +166,9 @@ fun SpotDetailContent(
     val showShimmer = remember { mutableStateOf(true) }
     val context = LocalContext.current
 
+    val deepLinkToShare = generateDeepLink(screen = "spot", spotInfo.id)
+    val shareText = stringResource(id = R.string.share_spot_text) + " $deepLinkToShare"
+
     val requestPermissionLauncher =
         rememberLauncherForActivityResult(
             contract = ActivityResultContracts.RequestPermission(),
@@ -244,7 +250,14 @@ fun SpotDetailContent(
             RoundedLightSendButton(modifier = Modifier.constrainAs(sendIconButton) {
                 top.linkTo(parent.top, 16.dp)
                 end.linkTo(saveIconButton.start, 16.dp)
-            }, onClick = {})
+            }, onClick = {
+                context.startActivity(
+                    getShareIntent(
+                        shareText = shareText,
+                        null
+                    )
+                )
+            })
             if (isUserAdmin) {
                 RoundedLightEditButton(modifier = Modifier.constrainAs(editIconButton) {
                     top.linkTo(parent.top, 16.dp)

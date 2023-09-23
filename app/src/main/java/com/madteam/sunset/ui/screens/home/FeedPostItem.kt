@@ -22,6 +22,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -37,6 +38,8 @@ import com.madteam.sunset.ui.common.RoundedLightSendButton
 import com.madteam.sunset.ui.theme.secondaryRegularBodyM
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyM
 import com.madteam.sunset.utils.formatDate
+import com.madteam.sunset.utils.generateDeepLink
+import com.madteam.sunset.utils.getShareIntent
 
 @OptIn(ExperimentalGlideComposeApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -46,6 +49,15 @@ fun FeedPostItem(
     postLikeClick: () -> Unit,
     onPostClicked: () -> Unit
 ) {
+
+    val context = LocalContext.current
+
+    val deepLinkToShare = generateDeepLink(screen = "post", postInfo.id)
+    val shareText = stringResource(
+        id = R.string.share_post_text,
+        postInfo.author.username
+    ) + " $deepLinkToShare"
+
     Card(
         elevation = CardDefaults.cardElevation(8.dp),
         shape = RoundedCornerShape(20.dp),
@@ -144,7 +156,14 @@ fun FeedPostItem(
                 isLiked = postInfo.likedBy.contains(userInfo.username)
             )
             RoundedLightSendButton(
-                onClick = { /*TODO*/ },
+                onClick = {
+                    context.startActivity(
+                        getShareIntent(
+                            shareText = shareText,
+                            null
+                        )
+                    )
+                },
                 modifier = Modifier
                     .shadow(4.dp, RoundedCornerShape(20.dp))
                     .constrainAs(sendButton) {

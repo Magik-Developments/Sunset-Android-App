@@ -1,5 +1,6 @@
 package com.madteam.sunset.navigation
 
+import android.content.Intent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
@@ -7,6 +8,7 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
@@ -145,6 +147,14 @@ fun SunsetNavigation(
 
         composable(
             route = "spot_detail_screen/spotReference={spotReference}",
+            deepLinks = if (isAlreadyLoggedIn) {
+                listOf(
+                    navDeepLink {
+                        uriPattern = "https://sunsetapp.es/spotReference={spotReference}"
+                        action = Intent.ACTION_VIEW
+                    }
+                )
+            } else listOf(),
             arguments = listOf(
                 navArgument("spotReference") {
                     type = NavType.StringType
@@ -184,6 +194,14 @@ fun SunsetNavigation(
 
         composable(
             route = "post_screen/postReference={postReference}",
+            deepLinks = if (isAlreadyLoggedIn) {
+                listOf(
+                    navDeepLink {
+                        uriPattern = "https://sunsetapp.es/postReference={postReference}"
+                        action = Intent.ACTION_VIEW
+                    }
+                )
+            } else listOf(),
             arguments = listOf(
                 navArgument("postReference") {
                     type = NavType.StringType

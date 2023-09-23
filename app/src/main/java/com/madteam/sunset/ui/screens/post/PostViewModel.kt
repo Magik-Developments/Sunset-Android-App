@@ -29,7 +29,7 @@ class PostViewModel @Inject constructor(
 
     private val _postReference: MutableStateFlow<String> = MutableStateFlow("")
 
-    private lateinit var username: String
+    private var username: String = ""
 
     init {
         viewModelScope.launch {

@@ -147,12 +147,14 @@ fun SunsetNavigation(
 
         composable(
             route = "spot_detail_screen/spotReference={spotReference}",
-            deepLinks = listOf(
-                navDeepLink {
-                    uriPattern = "https://sunsetapp.es/spotReference={spotReference}"
-                    action = Intent.ACTION_VIEW
-                }
-            ),
+            deepLinks = if (isAlreadyLoggedIn) {
+                listOf(
+                    navDeepLink {
+                        uriPattern = "https://sunsetapp.es/spotReference={spotReference}"
+                        action = Intent.ACTION_VIEW
+                    }
+                )
+            } else listOf(),
             arguments = listOf(
                 navArgument("spotReference") {
                     type = NavType.StringType
@@ -192,12 +194,14 @@ fun SunsetNavigation(
 
         composable(
             route = "post_screen/postReference={postReference}",
-            deepLinks = listOf(
-                navDeepLink {
-                    uriPattern = "https://sunsetapp.es/postReference={postReference}"
-                    action = Intent.ACTION_VIEW
-                }
-            ),
+            deepLinks = if (isAlreadyLoggedIn) {
+                listOf(
+                    navDeepLink {
+                        uriPattern = "https://sunsetapp.es/postReference={postReference}"
+                        action = Intent.ACTION_VIEW
+                    }
+                )
+            } else listOf(),
             arguments = listOf(
                 navArgument("postReference") {
                     type = NavType.StringType

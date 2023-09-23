@@ -56,9 +56,10 @@ class SignUpViewModel @Inject constructor(
             signUpState.value = Error(result.message.toString())
           }
 
-          else -> {
-            signUpState.value = Error(result.message.toString())
+          is Resource.Loading -> {
+            signUpState.value = Resource.Loading()
           }
+
         }
       }
     }

@@ -53,7 +53,7 @@ class SpotDetailViewModel @Inject constructor(
     private val _additionalReportInformation: MutableStateFlow<String> = MutableStateFlow("")
     val additionalReportInformation: StateFlow<String> = _additionalReportInformation
 
-    private lateinit var username: String
+    private var username: String = ""
 
     init {
         viewModelScope.launch {

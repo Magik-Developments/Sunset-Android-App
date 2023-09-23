@@ -31,7 +31,6 @@ fun openDirectionsOnGoogleMaps(context: Context, location: GeoPoint) {
     context.startActivity(intent)
 }
 
-//Shimmer to use in modifiers on any composable
 @Composable
 fun shimmerBrush(showShimmer: Boolean = true, targetValue: Float = 1000f): Brush {
     return if (showShimmer) {
@@ -124,4 +123,35 @@ fun calculateTimeDifference(targetTime: String): String {
     }
 
     return ""
+}
+
+fun getShareIntent(
+    shareText: String,
+    uriToImage: Uri?
+): Intent {
+    val sendIntent: Intent = Intent().apply {
+        action = Intent.ACTION_SEND
+        putExtra(Intent.EXTRA_TEXT, shareText)
+        type = "text/plain"
+        if (uriToImage != null) {
+            putExtra(Intent.EXTRA_STREAM, uriToImage)
+            type = "image/jpeg"
+        }
+    }
+    return Intent.createChooser(sendIntent, null)
+}
+
+fun generateDeepLink(
+    screen: String,
+    param: String
+): String {
+    return when (screen) {
+        "spot" -> {
+            "https://sunsetapp.es/spotReference=$param"
+        }
+
+        else -> {
+            ""
+        }
+    }
 }

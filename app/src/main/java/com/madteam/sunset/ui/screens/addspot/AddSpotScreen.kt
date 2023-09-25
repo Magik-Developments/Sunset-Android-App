@@ -3,6 +3,7 @@ package com.madteam.sunset.ui.screens.addspot
 import android.annotation.SuppressLint
 import android.net.Uri
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -130,11 +131,15 @@ fun AddSpotScreen(
     viewModel.modifySpotLocation(selectedLocation)
     viewModel.obtainCountryAndCityFromLatLng()
 
+    BackHandler {
+        viewModel.setShowExitDialog(true)
+    }
+
     Scaffold(
         topBar = {
             GoForwardTopAppBar(
                 title = R.string.add_spot,
-                onQuitClick = { navController.popBackStack() /* TODO: showExitDialog if it is ready to post */ },
+                onQuitClick = { viewModel.setShowExitDialog(true) },
                 onContinueClick = { viewModel.createNewSpotIntent() },
                 canContinue = (spotScore != 0 && selectedAttributes.isNotEmpty() && (selectedAttributes.filter { it.type == LOCATION_ATTRIBUTES }).isNotEmpty() && spotTitle.isNotEmpty() && spotDescription.isNotEmpty() && imageUris.isNotEmpty())
             )

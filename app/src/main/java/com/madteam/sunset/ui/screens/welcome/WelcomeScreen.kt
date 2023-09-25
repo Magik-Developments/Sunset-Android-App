@@ -25,6 +25,7 @@ import com.madteam.sunset.ui.common.MainTitle
 import com.madteam.sunset.ui.common.SubTitle
 import com.madteam.sunset.ui.common.SunsetButton
 import com.madteam.sunset.ui.common.SunsetLogoImage
+import com.madteam.sunset.utils.BackPressHandler
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -36,13 +37,23 @@ fun WelcomeScreen(
     val coroutineScope = rememberCoroutineScope()
     val modalState = ModalBottomSheetState(initialValue = Hidden, isSkipHalfExpanded = true)
 
+    BackPressHandler {}
+
     ModalBottomSheetLayout(
         sheetState = modalState,
         sheetShape = RoundedCornerShape(40.dp, 40.dp, 0.dp, 0.dp),
         sheetElevation = 10.dp,
         sheetContent = {
-            BottomSheetLoginScreen(navController = navController)
-        }) {
+            BottomSheetLoginScreen(
+                navController = navController,
+                hideModal = {
+                    coroutineScope.launch {
+                        modalState.hide()
+                    }
+                }
+            )
+        }
+    ) {
         WelcomeContent(
             onEmailClick = {
                 coroutineScope.launch {

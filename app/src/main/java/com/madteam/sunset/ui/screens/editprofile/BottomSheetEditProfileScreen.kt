@@ -43,6 +43,7 @@ import com.madteam.sunset.ui.common.SmallButtonDark
 import com.madteam.sunset.ui.common.UsernameTextField
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyL
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
+import com.madteam.sunset.utils.BackPressHandler
 import com.madteam.sunset.utils.Resource
 
 @Composable
@@ -59,6 +60,10 @@ fun BottomSheetEditProfileScreen(
     val location by viewModel.location.collectAsStateWithLifecycle()
     val dataHasChanged by viewModel.dataHasChanged.collectAsStateWithLifecycle()
     val uploadProgress by viewModel.updloadProgress.collectAsStateWithLifecycle()
+
+    BackPressHandler {
+        onCloseButton()
+    }
 
     val singlePhotoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),

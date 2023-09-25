@@ -47,6 +47,7 @@ import com.madteam.sunset.ui.common.SmallButtonDark
 import com.madteam.sunset.ui.common.SuccessIcon
 import com.madteam.sunset.ui.common.UsernameTextField
 import com.madteam.sunset.ui.screens.signin.CARD_HEIGHT
+import com.madteam.sunset.utils.BackPressHandler
 import com.madteam.sunset.utils.Resource
 
 private const val POLICIES_URL = "https://sunsetapp.es/index.php/privacy-policy/"
@@ -55,11 +56,16 @@ private const val POLICIES_URL = "https://sunsetapp.es/index.php/privacy-policy/
 fun BottomSheetSignUpScreen(
     navController: NavController,
     viewModel: SignUpViewModel = hiltViewModel(),
-    modalOptions: () -> Unit
+    modalOptions: () -> Unit,
+    hideModal: () -> Unit
 ) {
 
     val signUpState by viewModel.signUpState.collectAsStateWithLifecycle()
     val isValidForm by viewModel.isValidForm.collectAsStateWithLifecycle()
+
+    BackPressHandler {
+        hideModal()
+    }
 
     Card(
         modifier = Modifier

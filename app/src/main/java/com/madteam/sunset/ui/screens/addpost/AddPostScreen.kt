@@ -2,6 +2,7 @@ package com.madteam.sunset.ui.screens.addpost
 
 import android.net.Uri
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -69,12 +70,19 @@ fun AddPostScreen(
     val descriptionText by viewModel.descriptionText.collectAsStateWithLifecycle()
     val showExitDialog by viewModel.showExitDialog.collectAsStateWithLifecycle()
     val errorToastText by viewModel.errorToastText.collectAsStateWithLifecycle()
+    val isReadyToPost = imageUris.isNotEmpty()
 
     val multiplePhotoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickMultipleVisualMedia(maxItems = MAX_IMAGES_SELECTED),
         onResult = { uris -> viewModel.updateSelectedImages(uris) })
 
-    val isReadyToPost = imageUris.isNotEmpty()
+    BackHandler {
+        if (isReadyToPost) {
+            viewModel.setShowExitDialog(true)
+        } else {
+            navController.popBackStack()
+        }
+    }
 
     Scaffold(
         topBar = {

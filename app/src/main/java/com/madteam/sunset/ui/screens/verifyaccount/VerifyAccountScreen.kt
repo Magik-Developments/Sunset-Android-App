@@ -1,5 +1,6 @@
 package com.madteam.sunset.ui.screens.verifyaccount
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -46,6 +47,8 @@ fun VerifyAccountScreen(
   val resendCounter by viewModel.resendCounter.collectAsStateWithLifecycle()
   val recheckCounter by viewModel.recheckCounter.collectAsStateWithLifecycle()
   val isVerified by viewModel.userVerified.collectAsStateWithLifecycle()
+
+  BackHandler {}
 
   VerifyAccountContent(
     credential = pass,
@@ -142,7 +145,7 @@ fun VerifyAccountContent(
           checkButton(credential)
         }, text = string.im_verified, enabled = recheckCounter == 0)
         CustomSpacer(size = 48.dp)
-        Row() {
+        Row {
           Text(text = "Not arriving?", style = primaryMediumHeadlineS, color = Color(0xFF999999))
           CustomSpacer(size = 24.dp)
           Box(modifier = Modifier.clickable(onClick = { resendButton() })) {

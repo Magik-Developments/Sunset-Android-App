@@ -1,5 +1,6 @@
 package com.madteam.sunset.ui.screens.discover
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -36,16 +37,17 @@ import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
 fun BottomSheetFilterSpotsScreen(
     viewModel: FilterSpotsViewModel = hiltViewModel(),
     onCloseClicked: () -> Unit,
-    applyFilters: (
-        Int,
-        List<SpotAttribute>
-    ) -> Unit
+    applyFilters: (Int, List<SpotAttribute>) -> Unit
 ) {
 
     val filterScoreList by viewModel.filterScoreList.collectAsStateWithLifecycle()
     val selectedFilterScore by viewModel.selectedFilterScore.collectAsStateWithLifecycle()
     val attributesList by viewModel.attributesList.collectAsStateWithLifecycle()
     val selectedLocationAttributes by viewModel.selectedLocationFilter.collectAsStateWithLifecycle()
+
+    BackHandler {
+        onCloseClicked()
+    }
 
     Card(
         modifier = Modifier

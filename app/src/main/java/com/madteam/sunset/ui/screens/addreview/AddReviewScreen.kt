@@ -1,6 +1,7 @@
 package com.madteam.sunset.ui.screens.addreview
 
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -87,6 +88,14 @@ fun AddReviewScreen(
         selectedAttributes.isNotEmpty() && reviewTitle.isNotEmpty() && reviewDescription.isNotEmpty()
     val uploadProgress by viewModel.uploadProgress.collectAsStateWithLifecycle()
     val errorToastText by viewModel.errorToastText.collectAsStateWithLifecycle()
+
+    BackHandler {
+        if (isReadyToPost) {
+            viewModel.setShowExitDialog(true)
+        } else {
+            navController.popBackStack()
+        }
+    }
 
     Scaffold(
         topBar = {

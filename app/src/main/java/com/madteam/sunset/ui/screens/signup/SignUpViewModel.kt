@@ -85,7 +85,8 @@ class SignUpViewModel @Inject constructor(
             signUpState.value = authResult
           }
 
-          else -> { /* Not necessary */
+          else -> {
+            signUpState.value = Resource.Loading()
           }
         }
 

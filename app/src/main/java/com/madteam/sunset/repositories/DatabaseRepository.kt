@@ -63,14 +63,16 @@ class DatabaseRepository @Inject constructor(
     ): Flow<Resource<String>> = flow {
         emit(Resource.Loading())
 
-        val userDocument = firebaseFirestore.collection(USERS_COLLECTION_PATH).document(username)
+        val userDocumentId = username.lowercase()
+        val userDocument =
+            firebaseFirestore.collection(USERS_COLLECTION_PATH).document(userDocumentId)
         val documentSnapshot = userDocument.get().await()
         if (documentSnapshot.exists()) {
             emit(Resource.Error("e_user_already_exists"))
             return@flow
         }
 
-        val imageStoragePath = "profile_images/default_images/${username.first()}.png"
+        val imageStoragePath = "profile_images/default_images/${userDocumentId.first()}.png"
         val imageReference = firebaseStorage.getReference(imageStoragePath).downloadUrl.await()
 
         val currentDate = Calendar.getInstance().time.toString()
@@ -82,7 +84,8 @@ class DatabaseRepository @Inject constructor(
             "image" to imageReference.toString()
         )
 
-        firebaseFirestore.collection(USERS_COLLECTION_PATH).document(username).set(user).await()
+        firebaseFirestore.collection(USERS_COLLECTION_PATH).document(userDocumentId).set(user)
+            .await()
         emit(Resource.Success("User database has been created"))
     }.catch { exception ->
         Log.e("DatabaseRepository::createUser", "Error: ${exception.stackTrace}")
@@ -150,15 +153,15 @@ class DatabaseRepository @Inject constructor(
                 .collection(LIKED_BY_POST_COLLECTION_PATH)
 
         val userLikeDocumentSnapshot =
-            likedByReference.document(username).get().await()
+            likedByReference.document(username.lowercase()).get().await()
 
         if (userLikeDocumentSnapshot.exists()) {
-            likedByReference.document(username).delete()
+            likedByReference.document(username.lowercase()).delete()
             firebaseFirestore.document(postReference).update(
                 "likes", FieldValue.increment(-1)
             ).await()
         } else {
-            likedByReference.document(username).set(
+            likedByReference.document(username.lowercase()).set(
                 hashMapOf(
                     "date" to Calendar.getInstance().time.toString()
                 )
@@ -180,14 +183,14 @@ class DatabaseRepository @Inject constructor(
             firebaseFirestore.document(spotReference)
                 .collection(LIKED_BY_SPOT_COLLECTION_PATH)
         val userLikeDocumentSnapshot =
-            likedByReference.document(username).get().await()
+            likedByReference.document(username.lowercase()).get().await()
         if (userLikeDocumentSnapshot.exists()) {
-            likedByReference.document(username).delete()
+            likedByReference.document(username.lowercase()).delete()
             firebaseFirestore.document(spotReference).update(
                 "likes", FieldValue.increment(-1)
             ).await()
         } else {
-            likedByReference.document(username).set(
+            likedByReference.document(username.lowercase()).set(
                 hashMapOf(
                     "date" to Calendar.getInstance().time.toString()
                 )
@@ -211,7 +214,7 @@ class DatabaseRepository @Inject constructor(
                 .collection(LIKED_BY_POST_COLLECTION_PATH)
 
         val userLikeDocumentSnapshot =
-            likedByReference.document(username).get().await()
+            likedByReference.document(username.lowercase()).get().await()
 
         val postIsLikedByUser = userLikeDocumentSnapshot.exists()
         emit(Resource.Success(postIsLikedByUser))
@@ -231,8 +234,9 @@ class DatabaseRepository @Inject constructor(
 
     override fun updateUser(user: UserProfile): Flow<Resource<String>> = flow {
         emit(Resource.Loading())
+        val userDocumentId = user.username.lowercase()
         val userDocument =
-            firebaseFirestore.collection(USERS_COLLECTION_PATH).document(user.username)
+            firebaseFirestore.collection(USERS_COLLECTION_PATH).document(userDocumentId)
         val documentSnapshot = userDocument.get().await()
         if (!documentSnapshot.exists()) {
             emit(Resource.Error("e_user_database_not_found"))
@@ -243,7 +247,7 @@ class DatabaseRepository @Inject constructor(
         if (user.image.isNotBlank()) {
             uploadImages(
                 listOf(user.image.toUri()),
-                "$IMAGES_STORAGE_PROFILE_IMAGES_PATH${user.username}/"
+                "$IMAGES_STORAGE_PROFILE_IMAGES_PATH${userDocumentId}/"
             ).collectLatest { urlImagesList ->
                 profileImage = urlImagesList.first()
             }
@@ -252,11 +256,11 @@ class DatabaseRepository @Inject constructor(
         updateMap["name"] = user.name
         updateMap["location"] = user.location
         try {
-            firebaseFirestore.collection(USERS_COLLECTION_PATH).document(user.username)
+            firebaseFirestore.collection(USERS_COLLECTION_PATH).document(userDocumentId)
                 .update(updateMap)
                 .await()
             val currentImages =
-                getImagesInStoragePath("$IMAGES_STORAGE_PROFILE_IMAGES_PATH${user.username}/")
+                getImagesInStoragePath("$IMAGES_STORAGE_PROFILE_IMAGES_PATH${userDocumentId}/")
             currentImages.collectLatest { imageUrls ->
                 imageUrls.forEach { imageUrl ->
                     if (imageUrl != profileImage) {
@@ -1237,7 +1241,8 @@ class DatabaseRepository @Inject constructor(
 
     override fun getSpotPostsByUsername(username: String): Flow<List<SpotPost>> = flow {
         val postsList = mutableListOf<SpotPost>()
-        val userReference = firebaseFirestore.collection(USERS_COLLECTION_PATH).document(username)
+        val userReference =
+            firebaseFirestore.collection(USERS_COLLECTION_PATH).document(username.lowercase())
         val querySnapshot = firebaseFirestore.collection(POSTS_COLLECTION_PATH)
             .whereEqualTo("author", userReference)
             .get()
@@ -1268,7 +1273,8 @@ class DatabaseRepository @Inject constructor(
 
     override fun getSpotsByUsername(username: String): Flow<List<Spot>> = flow {
         val spotsList = mutableListOf<Spot>()
-        val userReference = firebaseFirestore.collection(USERS_COLLECTION_PATH).document(username)
+        val userReference =
+            firebaseFirestore.collection(USERS_COLLECTION_PATH).document(username.lowercase())
         val querySnapshot = firebaseFirestore.collection(SPOTS_COLLECTION_PATH)
             .whereEqualTo("spotted_by", userReference)
             .get()

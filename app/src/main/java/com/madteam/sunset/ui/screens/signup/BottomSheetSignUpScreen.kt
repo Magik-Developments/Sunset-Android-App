@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -32,6 +31,7 @@ import com.madteam.sunset.R.string
 import com.madteam.sunset.ui.common.CardHandler
 import com.madteam.sunset.ui.common.CardSubtitle
 import com.madteam.sunset.ui.common.CardTitle
+import com.madteam.sunset.ui.common.CircularLoadingDialog
 import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.DismissAndPositiveDialog
 import com.madteam.sunset.ui.common.EmailTextField
@@ -200,7 +200,7 @@ fun BottomSheetSignUpContent(
                 contentAlignment = Alignment.TopCenter,
                 modifier = Modifier.padding(top = 20.dp)
             ) {
-                CircularProgressIndicator()
+                CircularLoadingDialog()
             }
         }
 

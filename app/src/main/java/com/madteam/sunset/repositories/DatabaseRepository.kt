@@ -153,15 +153,15 @@ class DatabaseRepository @Inject constructor(
                 .collection(LIKED_BY_POST_COLLECTION_PATH)
 
         val userLikeDocumentSnapshot =
-            likedByReference.document(username).get().await()
+            likedByReference.document(username.lowercase()).get().await()
 
         if (userLikeDocumentSnapshot.exists()) {
-            likedByReference.document(username).delete()
+            likedByReference.document(username.lowercase()).delete()
             firebaseFirestore.document(postReference).update(
                 "likes", FieldValue.increment(-1)
             ).await()
         } else {
-            likedByReference.document(username).set(
+            likedByReference.document(username.lowercase()).set(
                 hashMapOf(
                     "date" to Calendar.getInstance().time.toString()
                 )
@@ -183,14 +183,14 @@ class DatabaseRepository @Inject constructor(
             firebaseFirestore.document(spotReference)
                 .collection(LIKED_BY_SPOT_COLLECTION_PATH)
         val userLikeDocumentSnapshot =
-            likedByReference.document(username).get().await()
+            likedByReference.document(username.lowercase()).get().await()
         if (userLikeDocumentSnapshot.exists()) {
-            likedByReference.document(username).delete()
+            likedByReference.document(username.lowercase()).delete()
             firebaseFirestore.document(spotReference).update(
                 "likes", FieldValue.increment(-1)
             ).await()
         } else {
-            likedByReference.document(username).set(
+            likedByReference.document(username.lowercase()).set(
                 hashMapOf(
                     "date" to Calendar.getInstance().time.toString()
                 )
@@ -214,7 +214,7 @@ class DatabaseRepository @Inject constructor(
                 .collection(LIKED_BY_POST_COLLECTION_PATH)
 
         val userLikeDocumentSnapshot =
-            likedByReference.document(username).get().await()
+            likedByReference.document(username.lowercase()).get().await()
 
         val postIsLikedByUser = userLikeDocumentSnapshot.exists()
         emit(Resource.Success(postIsLikedByUser))
@@ -1241,7 +1241,8 @@ class DatabaseRepository @Inject constructor(
 
     override fun getSpotPostsByUsername(username: String): Flow<List<SpotPost>> = flow {
         val postsList = mutableListOf<SpotPost>()
-        val userReference = firebaseFirestore.collection(USERS_COLLECTION_PATH).document(username)
+        val userReference =
+            firebaseFirestore.collection(USERS_COLLECTION_PATH).document(username.lowercase())
         val querySnapshot = firebaseFirestore.collection(POSTS_COLLECTION_PATH)
             .whereEqualTo("author", userReference)
             .get()
@@ -1272,7 +1273,8 @@ class DatabaseRepository @Inject constructor(
 
     override fun getSpotsByUsername(username: String): Flow<List<Spot>> = flow {
         val spotsList = mutableListOf<Spot>()
-        val userReference = firebaseFirestore.collection(USERS_COLLECTION_PATH).document(username)
+        val userReference =
+            firebaseFirestore.collection(USERS_COLLECTION_PATH).document(username.lowercase())
         val querySnapshot = firebaseFirestore.collection(SPOTS_COLLECTION_PATH)
             .whereEqualTo("spotted_by", userReference)
             .get()

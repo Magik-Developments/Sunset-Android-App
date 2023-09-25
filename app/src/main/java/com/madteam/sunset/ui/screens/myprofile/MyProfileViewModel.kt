@@ -32,6 +32,9 @@ class MyProfileViewModel @Inject constructor(
     private val _userSpots: MutableStateFlow<List<Spot>> = MutableStateFlow(mutableListOf())
     val userSpots: StateFlow<List<Spot>> = _userSpots
 
+    private val _showLogoutDialog: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val showLogoutDialog: StateFlow<Boolean> = _showLogoutDialog
+
     val navigateWelcomeScreen = MutableStateFlow(false)
 
     init {
@@ -50,6 +53,10 @@ class MyProfileViewModel @Inject constructor(
 
     fun onTabClicked(tabClicked: Int) {
         _selectedTab.value = tabClicked
+    }
+
+    fun setShowExitDialog(state: Boolean) {
+        _showLogoutDialog.value = state
     }
 
     fun updateUserInfo(userProfile: UserProfile) {

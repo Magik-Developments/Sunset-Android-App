@@ -234,8 +234,9 @@ class DatabaseRepository @Inject constructor(
 
     override fun updateUser(user: UserProfile): Flow<Resource<String>> = flow {
         emit(Resource.Loading())
+        val userDocumentId = user.username.lowercase()
         val userDocument =
-            firebaseFirestore.collection(USERS_COLLECTION_PATH).document(user.username)
+            firebaseFirestore.collection(USERS_COLLECTION_PATH).document(userDocumentId)
         val documentSnapshot = userDocument.get().await()
         if (!documentSnapshot.exists()) {
             emit(Resource.Error("e_user_database_not_found"))
@@ -246,7 +247,7 @@ class DatabaseRepository @Inject constructor(
         if (user.image.isNotBlank()) {
             uploadImages(
                 listOf(user.image.toUri()),
-                "$IMAGES_STORAGE_PROFILE_IMAGES_PATH${user.username}/"
+                "$IMAGES_STORAGE_PROFILE_IMAGES_PATH${userDocumentId}/"
             ).collectLatest { urlImagesList ->
                 profileImage = urlImagesList.first()
             }
@@ -255,11 +256,11 @@ class DatabaseRepository @Inject constructor(
         updateMap["name"] = user.name
         updateMap["location"] = user.location
         try {
-            firebaseFirestore.collection(USERS_COLLECTION_PATH).document(user.username)
+            firebaseFirestore.collection(USERS_COLLECTION_PATH).document(userDocumentId)
                 .update(updateMap)
                 .await()
             val currentImages =
-                getImagesInStoragePath("$IMAGES_STORAGE_PROFILE_IMAGES_PATH${user.username}/")
+                getImagesInStoragePath("$IMAGES_STORAGE_PROFILE_IMAGES_PATH${userDocumentId}/")
             currentImages.collectLatest { imageUrls ->
                 imageUrls.forEach { imageUrl ->
                     if (imageUrl != profileImage) {

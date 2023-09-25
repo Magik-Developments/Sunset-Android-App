@@ -72,7 +72,7 @@ class DatabaseRepository @Inject constructor(
             return@flow
         }
 
-        val imageStoragePath = "profile_images/default_images/${username.first()}.png"
+        val imageStoragePath = "profile_images/default_images/${userDocumentId.first()}.png"
         val imageReference = firebaseStorage.getReference(imageStoragePath).downloadUrl.await()
 
         val currentDate = Calendar.getInstance().time.toString()

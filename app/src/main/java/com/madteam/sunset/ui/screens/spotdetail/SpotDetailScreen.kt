@@ -58,6 +58,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.ktx.utils.sphericalDistance
 import com.madteam.sunset.R
 import com.madteam.sunset.model.Spot
+import com.madteam.sunset.navigation.SunsetRoutes
 import com.madteam.sunset.ui.common.AutoSlidingCarousel
 import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.IconButtonDark
@@ -116,7 +117,6 @@ fun SpotDetailScreen(
                 SpotDetailContent(
                     spotInfo = spotInfo,
                     navigateTo = navController::navigate,
-                    goBack = navController::popBackStack,
                     spotLikeClick = viewModel::modifyUserSpotLike,
                     spotLikedByUser = isSpotLikedByUser,
                     spotLikes = spotLikes,
@@ -144,7 +144,6 @@ fun SpotDetailScreen(
 fun SpotDetailContent(
     spotInfo: Spot,
     navigateTo: (String) -> Unit,
-    goBack: () -> Unit,
     spotLikeClick: () -> Unit,
     spotLikedByUser: Boolean,
     spotLikes: Int,
@@ -242,7 +241,9 @@ fun SpotDetailContent(
             RoundedLightBackButton(modifier = Modifier.constrainAs(backIconButton) {
                 top.linkTo(parent.top, 16.dp)
                 start.linkTo(parent.start, 24.dp)
-            }, onClick = { goBack() })
+            }, onClick = {
+                navigateTo(SunsetRoutes.DiscoverScreen.route)
+            })
             RoundedLightSaveButton(onClick = {}, modifier = Modifier.constrainAs(saveIconButton) {
                 top.linkTo(parent.top, 16.dp)
                 end.linkTo(parent.end, 24.dp)

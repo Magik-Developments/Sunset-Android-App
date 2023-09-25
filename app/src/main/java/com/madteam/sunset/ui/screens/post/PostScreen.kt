@@ -34,6 +34,7 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.madteam.sunset.R
 import com.madteam.sunset.model.SpotPost
+import com.madteam.sunset.navigation.SunsetRoutes
 import com.madteam.sunset.ui.common.AutoSlidingCarousel
 import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.GoBackTopAppBar
@@ -66,7 +67,11 @@ fun PostScreen(
     Scaffold(
         topBar = {
             GoBackTopAppBar(title = R.string.spot_post_title) {
-                navController.popBackStack()
+                if (navController.popBackStack()) {
+                    navController.popBackStack()
+                } else {
+                    navController.navigate(SunsetRoutes.MyProfileScreen.route)
+                }
             }
         },
         content = { paddingValues ->

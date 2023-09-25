@@ -1,6 +1,5 @@
 package com.madteam.sunset.ui.common
 
-import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column

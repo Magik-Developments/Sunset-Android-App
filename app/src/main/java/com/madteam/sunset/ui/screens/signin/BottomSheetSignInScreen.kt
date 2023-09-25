@@ -41,6 +41,7 @@ import com.madteam.sunset.ui.common.OtherLoginIconButtons
 import com.madteam.sunset.ui.common.OtherLoginMethodsSection
 import com.madteam.sunset.ui.common.PasswordTextField
 import com.madteam.sunset.ui.common.SmallButtonDark
+import com.madteam.sunset.utils.BackPressHandler
 import com.madteam.sunset.utils.Resource
 
 const val CARD_HEIGHT = 0.67
@@ -49,11 +50,16 @@ const val CARD_HEIGHT = 0.67
 fun BottomSheetSignInScreen(
     navController: NavController,
     viewModel: SignInViewModel = hiltViewModel(),
-    modalOptions: () -> Unit
+    modalOptions: () -> Unit,
+    hideModal: () -> Unit
 ) {
 
     val signInState by viewModel.signInState.collectAsStateWithLifecycle()
     val isValidForm by viewModel.isValidForm.collectAsStateWithLifecycle()
+
+    BackPressHandler {
+        hideModal()
+    }
 
     Card(
         modifier = Modifier
@@ -70,7 +76,8 @@ fun BottomSheetSignInScreen(
             navigateTo = navController::navigate,
             validateForm = viewModel::isValidForm,
             signInButton = viewModel::signInWithEmailAndPasswordIntent,
-            clearSignInState = viewModel::clearSignInState
+            clearSignInState = viewModel::clearSignInState,
+            navController = navController
         )
     }
 }
@@ -84,7 +91,8 @@ fun BottomSheetSignInContent(
     navigateTo: (String) -> Unit,
     validateForm: (String, String) -> Unit,
     signInButton: (String, String) -> Unit,
-    clearSignInState: () -> Unit
+    clearSignInState: () -> Unit,
+    navController: NavController
 ) {
     val context = LocalContext.current
 
@@ -177,7 +185,11 @@ fun BottomSheetSignInContent(
         is Resource.Success -> {
             if (signInState.data != null && signInState.data.user!!.isEmailVerified) {
                 LaunchedEffect(key1 = signInState.data) {
-                    navigateTo(SunsetRoutes.MyProfileScreen.route)
+                    navController.navigate(SunsetRoutes.MyProfileScreen.route) {
+                        popUpTo(navController.graph.id) {
+                            inclusive = true
+                        }
+                    }
                 }
                 clearSignInState()
             } else if (signInState.data != null && !signInState.data.user!!.isEmailVerified) {

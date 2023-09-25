@@ -63,7 +63,9 @@ class DatabaseRepository @Inject constructor(
     ): Flow<Resource<String>> = flow {
         emit(Resource.Loading())
 
-        val userDocument = firebaseFirestore.collection(USERS_COLLECTION_PATH).document(username)
+        val userDocumentId = username.lowercase()
+        val userDocument =
+            firebaseFirestore.collection(USERS_COLLECTION_PATH).document(userDocumentId)
         val documentSnapshot = userDocument.get().await()
         if (documentSnapshot.exists()) {
             emit(Resource.Error("e_user_already_exists"))
@@ -82,7 +84,8 @@ class DatabaseRepository @Inject constructor(
             "image" to imageReference.toString()
         )
 
-        firebaseFirestore.collection(USERS_COLLECTION_PATH).document(username).set(user).await()
+        firebaseFirestore.collection(USERS_COLLECTION_PATH).document(userDocumentId).set(user)
+            .await()
         emit(Resource.Success("User database has been created"))
     }.catch { exception ->
         Log.e("DatabaseRepository::createUser", "Error: ${exception.stackTrace}")

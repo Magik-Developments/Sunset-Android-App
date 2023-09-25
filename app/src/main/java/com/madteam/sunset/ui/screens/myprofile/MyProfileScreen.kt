@@ -41,7 +41,9 @@ import com.madteam.sunset.model.Spot
 import com.madteam.sunset.model.SpotPost
 import com.madteam.sunset.model.UserProfile
 import com.madteam.sunset.navigation.SunsetRoutes
+import com.madteam.sunset.ui.common.BottomSheetSettingsMenu
 import com.madteam.sunset.ui.common.CustomSpacer
+import com.madteam.sunset.ui.common.DismissAndPositiveDialog
 import com.madteam.sunset.ui.common.ImagePostCardProfile
 import com.madteam.sunset.ui.common.ImageSpotCardProfile
 import com.madteam.sunset.ui.common.MyProfileTopAppBar
@@ -65,55 +67,70 @@ fun MyProfileScreen(
     val coroutineScope = rememberCoroutineScope()
     val editProfileModalState =
         ModalBottomSheetState(initialValue = Hidden, isSkipHalfExpanded = true)
+    val settingsModalState =
+        ModalBottomSheetState(initialValue = Hidden, isSkipHalfExpanded = true)
     val userInfo by viewModel.userInfo.collectAsStateWithLifecycle()
     val navigateUp by viewModel.navigateWelcomeScreen.collectAsStateWithLifecycle()
     val selectedTab by viewModel.selectedTab.collectAsStateWithLifecycle()
     val userPosts by viewModel.userPosts.collectAsStateWithLifecycle()
     val userSpots by viewModel.userSpots.collectAsStateWithLifecycle()
+    val showLogoutDialog by viewModel.showLogoutDialog.collectAsStateWithLifecycle()
 
     if (navigateUp)
         navController.navigate(SunsetRoutes.WelcomeScreen.route)
 
     ModalBottomSheetLayout(
-        sheetState = editProfileModalState,
+        sheetContent = {
+            BottomSheetSettingsMenu(
+                onLogOutClick = { viewModel.setShowExitDialog(true) }
+            )
+        },
         sheetShape = RoundedCornerShape(20.dp, 20.dp, 0.dp, 0.dp),
         sheetElevation = 10.dp,
-        sheetContent = {
-            BottomSheetEditProfileScreen(
-                onCloseButton = { coroutineScope.launch { editProfileModalState.hide() } },
-                onProfileUpdated = viewModel::updateUserInfo
+        sheetState = settingsModalState
+    ) {
+        ModalBottomSheetLayout(
+            sheetState = editProfileModalState,
+            sheetShape = RoundedCornerShape(20.dp, 20.dp, 0.dp, 0.dp),
+            sheetElevation = 10.dp,
+            sheetContent = {
+                BottomSheetEditProfileScreen(
+                    onCloseButton = { coroutineScope.launch { editProfileModalState.hide() } },
+                    onProfileUpdated = viewModel::updateUserInfo
+                )
+            }
+        ) {
+            Scaffold(
+                bottomBar = { SunsetBottomNavigation(navController) },
+                topBar = {
+                    MyProfileTopAppBar(
+                        username = userInfo.username,
+                        openMenuClick = { coroutineScope.launch { settingsModalState.show() } }
+                    )
+                },
+                content = { paddingValues ->
+                    Box(
+                        modifier = Modifier.padding(paddingValues),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        MyProfileContent(
+                            userInfo = userInfo,
+                            onEditProfileClick = { coroutineScope.launch { editProfileModalState.show() } },
+                            selectedTab = selectedTab,
+                            onTabClicked = viewModel::onTabClicked,
+                            userPosts = userPosts,
+                            userSpots = userSpots,
+                            navigateTo = navController::navigate,
+                            showLogoutDialog = showLogoutDialog,
+                            setShowLogoutDialog = viewModel::setShowExitDialog,
+                            logOut = viewModel::logOut
+                        )
+                    }
+                }
             )
         }
-    ) {
-        Scaffold(
-            bottomBar = { SunsetBottomNavigation(navController) },
-            topBar = {
-                MyProfileTopAppBar(
-                    username = userInfo.username,
-                    isAdmin = userInfo.admin,
-                    reportsNumbers = 0,
-                    goToReportsScreen = { navController.navigate(SunsetRoutes.SeeReportsScreen.route) },
-                    logOutClick = viewModel::logOut
-                )
-            },
-            content = { paddingValues ->
-                Box(
-                    modifier = Modifier.padding(paddingValues),
-                    contentAlignment = Alignment.Center
-                ) {
-                    MyProfileContent(
-                        userInfo = userInfo,
-                        onEditProfileClick = { coroutineScope.launch { editProfileModalState.show() } },
-                        selectedTab = selectedTab,
-                        onTabClicked = viewModel::onTabClicked,
-                        userPosts = userPosts,
-                        userSpots = userSpots,
-                        navigateTo = navController::navigate
-                    )
-                }
-            }
-        )
     }
+
 }
 
 @Composable
@@ -124,8 +141,27 @@ fun MyProfileContent(
     onTabClicked: (Int) -> Unit,
     userPosts: List<SpotPost>,
     userSpots: List<Spot>,
-    navigateTo: (String) -> Unit
+    navigateTo: (String) -> Unit,
+    showLogoutDialog: Boolean,
+    setShowLogoutDialog: (Boolean) -> Unit,
+    logOut: () -> Unit
 ) {
+
+    if (showLogoutDialog) {
+        DismissAndPositiveDialog(
+            setShowDialog = { setShowLogoutDialog(it) },
+            dialogTitle = R.string.log_out,
+            dialogDescription = R.string.log_out_dialog,
+            positiveButtonText = R.string.log_out,
+            dismissButtonText = R.string.cancel,
+            dismissClickedAction = { setShowLogoutDialog(false) },
+            positiveClickedAction = {
+                setShowLogoutDialog(false)
+                logOut()
+            }
+        )
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()

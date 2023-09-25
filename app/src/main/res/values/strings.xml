@@ -109,4 +109,5 @@
     <string name="last_posts">Last posts</string>
     <string name="share_spot_text">See this stunning Spot I\'ve seen on Sunset</string>
     <string name="share_post_text">See this %1$s post I\'ve seen on Sunset</string>
+    <string name="log_out_dialog">If you log out you will have to log in again to use Sunset</string>
 </resources>

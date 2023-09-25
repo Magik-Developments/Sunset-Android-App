@@ -96,11 +96,13 @@ fun PreviewSubTitle() {
 //Sign In / Sign Up Card
 
 @Composable
-fun CardHandler() {
+fun CardHandler(
+    modifier: Modifier = Modifier
+) {
     Divider(
         color = Color(0xFFD9D9D9),
         thickness = 6.dp,
-        modifier = Modifier
+        modifier = modifier
             .width(122.dp)
             .clip(RoundedCornerShape(50.dp))
     )

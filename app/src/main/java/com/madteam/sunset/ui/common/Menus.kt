@@ -1,11 +1,17 @@
 package com.madteam.sunset.ui.common
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
+import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
@@ -16,22 +22,23 @@ import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Logout
-import androidx.compose.material.icons.filled.Report
-import androidx.compose.material3.Badge
-import androidx.compose.material3.BadgedBox
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.madteam.sunset.R
 import com.madteam.sunset.navigation.SunsetBottomNavItem
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineM
+import com.madteam.sunset.ui.theme.secondaryRegularBodyL
 import com.madteam.sunset.utils.shadow
 
 @Composable
@@ -188,63 +195,81 @@ fun GoForwardTopAppBar(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyProfileTopAppBar(
     username: String,
-    isAdmin: Boolean,
-    reportsNumbers: Int,
-    goToReportsScreen: () -> Unit,
-    logOutClick: () -> Unit
+    openMenuClick: () -> Unit
 ) {
     TopAppBar(
         title = { Text(text = username, style = primaryBoldHeadlineM) },
         backgroundColor = Color.White,
         actions = {
-            if (isAdmin) {
-                IconButton(onClick = { goToReportsScreen() }) {
-                    if (reportsNumbers > 0) {
-                        BadgedBox(badge = {
-                            Badge {
-                                Text(text = reportsNumbers.toString(), color = Color.White)
-                            }
-                        }) {
-                            androidx.compose.material3.Icon(
-                                imageVector = Icons.Filled.Report,
-                                contentDescription = "See report button"
-                            )
-                        }
-                    } else {
-                        IconButton(onClick = { goToReportsScreen() }) {
-                            androidx.compose.material3.Icon(
-                                imageVector = Icons.Filled.Report,
-                                contentDescription = "See report button"
-                            )
-                        }
-                    }
-                }
-            }
-            IconButton(onClick = { logOutClick() }) {
+            IconButton(onClick = { openMenuClick() }) {
                 androidx.compose.material3.Icon(
-                    imageVector = Icons.Filled.Logout,
-                    contentDescription = "Log out button"
+                    imageVector = Icons.Filled.Menu,
+                    contentDescription = "Open menu button"
                 )
             }
         }
     )
 }
 
+@Composable
+fun BottomSheetSettingsMenu(
+    onLogOutClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight(),
+        backgroundColor = Color.White,
+        shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            CustomSpacer(size = 8.dp)
+            CardHandler(modifier = Modifier.align(Alignment.CenterHorizontally))
+
+            //Log out option
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp)
+                    .clickable {
+                        onLogOutClick()
+                    },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                CustomSpacer(size = 24.dp)
+                androidx.compose.material3.Icon(
+                    imageVector = Icons.Default.Logout,
+                    contentDescription = "Log out button",
+                    tint = Color(0xFFFF4444)
+                )
+                CustomSpacer(size = 16.dp)
+                Text(
+                    text = stringResource(id = R.string.log_out),
+                    style = secondaryRegularBodyL,
+                    color = Color(0xFFFF4444),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                CustomSpacer(size = 24.dp)
+            }
+
+            //Add more options
+        }
+    }
+}
+
 @Preview
 @Composable
-fun MyProfileTopAppBarPreview(
-
-) {
+fun MyProfileTopAppBarPreview() {
     MyProfileTopAppBar(
         username = "adriaa12",
-        isAdmin = true,
-        reportsNumbers = 0,
-        goToReportsScreen = {},
-        logOutClick = {}
+        openMenuClick = {}
     )
 }
 

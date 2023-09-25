@@ -82,7 +82,9 @@ fun MyProfileScreen(
     ModalBottomSheetLayout(
         sheetContent = {
             BottomSheetSettingsMenu(
-                onLogOutClick = { viewModel.setShowExitDialog(true) }
+                onLogOutClick = { viewModel.setShowExitDialog(true) },
+                isUserAdmin = userInfo.admin,
+                onReportsClick = { navController.navigate(SunsetRoutes.SeeReportsScreen.route) }
             )
         },
         sheetShape = RoundedCornerShape(20.dp, 20.dp, 0.dp, 0.dp),

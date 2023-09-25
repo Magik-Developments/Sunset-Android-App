@@ -1,5 +1,6 @@
 package com.madteam.sunset.ui.common
 
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -14,6 +15,7 @@ import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.LocalContentColor
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
@@ -21,6 +23,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.Composable
@@ -29,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -216,6 +220,8 @@ fun MyProfileTopAppBar(
 
 @Composable
 fun BottomSheetSettingsMenu(
+    isUserAdmin: Boolean,
+    onReportsClick: () -> Unit,
     onLogOutClick: () -> Unit
 ) {
     Card(
@@ -233,34 +239,59 @@ fun BottomSheetSettingsMenu(
             CardHandler(modifier = Modifier.align(Alignment.CenterHorizontally))
 
             //Log out option
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp)
-                    .clickable {
-                        onLogOutClick()
-                    },
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                CustomSpacer(size = 24.dp)
-                androidx.compose.material3.Icon(
-                    imageVector = Icons.Default.Logout,
-                    contentDescription = "Log out button",
-                    tint = Color(0xFFFF4444)
+            SettingsMenuItem(
+                icon = Icons.Filled.Logout,
+                tint = Color(0xFFFF4444),
+                onClick = { onLogOutClick() },
+                text = R.string.log_out
+            )
+
+            //Reports screen [admins only]
+            if (isUserAdmin) {
+                SettingsMenuItem(
+                    icon = Icons.Filled.Flag,
+                    onClick = { onReportsClick() },
+                    text = R.string.reports
                 )
-                CustomSpacer(size = 16.dp)
-                Text(
-                    text = stringResource(id = R.string.log_out),
-                    style = secondaryRegularBodyL,
-                    color = Color(0xFFFF4444),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                CustomSpacer(size = 24.dp)
             }
 
             //Add more options
         }
+    }
+}
+
+@Composable
+fun SettingsMenuItem(
+    modifier: Modifier = Modifier,
+    tint: Color = LocalContentColor.current,
+    icon: ImageVector,
+    @StringRes text: Int,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(48.dp)
+            .clickable {
+                onClick()
+            },
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        CustomSpacer(size = 24.dp)
+        androidx.compose.material3.Icon(
+            imageVector = icon,
+            contentDescription = "Item button",
+            tint = tint
+        )
+        CustomSpacer(size = 16.dp)
+        Text(
+            text = stringResource(id = text),
+            style = secondaryRegularBodyL,
+            color = tint,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+        CustomSpacer(size = 24.dp)
     }
 }
 

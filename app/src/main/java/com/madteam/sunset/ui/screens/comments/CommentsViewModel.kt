@@ -91,7 +91,7 @@ class CommentsViewModel @Inject constructor(
     }
 
     fun checkIfUserIsCommentAuthor(): Boolean {
-        return _selectedComment.value.author.username == username
+        return _selectedComment.value.author.username.lowercase() == username.lowercase()
     }
 
     fun deleteSelectedComment() {

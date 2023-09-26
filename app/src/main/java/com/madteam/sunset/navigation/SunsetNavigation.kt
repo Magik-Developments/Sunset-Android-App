@@ -1,17 +1,13 @@
 package com.madteam.sunset.navigation
 
 import android.content.Intent
-import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
-import com.google.accompanist.navigation.animation.AnimatedNavHost
-import com.google.accompanist.navigation.animation.composable
-import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.google.android.gms.maps.model.LatLng
 import com.madteam.sunset.navigation.SunsetRoutes.DiscoverScreen
 import com.madteam.sunset.navigation.SunsetRoutes.LostPasswordScreen
@@ -36,14 +32,13 @@ import com.madteam.sunset.ui.screens.spotdetail.SpotDetailScreen
 import com.madteam.sunset.ui.screens.verifyaccount.VerifyAccountScreen
 import com.madteam.sunset.ui.screens.welcome.WelcomeScreen
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun SunsetNavigation(
     isAlreadyLoggedIn: Boolean = false
 ) {
-    val navController = rememberAnimatedNavController()
+    val navController = rememberNavController()
 
-    AnimatedNavHost(
+    NavHost(
         navController = navController, startDestination =
         if (isAlreadyLoggedIn) {
             MyProfileScreen.route
@@ -83,20 +78,7 @@ fun SunsetNavigation(
             }
         }
 
-        composable(
-            LostPasswordScreen.route,
-            enterTransition = {
-                slideInVertically(
-                    initialOffsetY = { it },
-                    animationSpec = tween(500)
-                )
-            },
-            exitTransition = {
-                slideOutVertically(
-                    targetOffsetY = { it },
-                    animationSpec = tween(500)
-                )
-            }) {
+        composable(LostPasswordScreen.route) {
             LostPasswordScreen(navController)
         }
 

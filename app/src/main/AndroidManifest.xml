@@ -32,9 +32,10 @@
             </intent-filter>
 
             <intent-filter android:autoVerify="true">
-                <data
-                    android:host="sunsetapp.es"
-                    android:scheme="https" />
+                <data android:scheme="https" />
+                <data android:host="sunsetapp.es" />
+                <data android:pathPrefix="/spotReference" />
+                <data android:pathPrefix="/postReference" />
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />

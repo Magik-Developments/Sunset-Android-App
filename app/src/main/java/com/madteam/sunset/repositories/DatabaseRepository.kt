@@ -104,7 +104,7 @@ class DatabaseRepository @Inject constructor(
             )
         val authorReference = firebaseFirestore
             .collection(USERS_COLLECTION_PATH)
-            .document(comment.author.username)
+            .document(comment.author.username.lowercase())
 
         println("authorReference: " + authorReference.path)
         val newCommentDocument = commentsReference.document()

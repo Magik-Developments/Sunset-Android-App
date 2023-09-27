@@ -17,7 +17,7 @@ class LocationRepository @Inject constructor(
         if (addresses != null) {
             if (addresses.isNotEmpty()) {
                 val address: Address = addresses[0]
-                emit(address.countryName)
+                emit(address.countryName ?: "")
             }
         }
     }.catch {

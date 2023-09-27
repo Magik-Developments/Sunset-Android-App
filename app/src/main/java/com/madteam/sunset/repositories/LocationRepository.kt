@@ -29,8 +29,14 @@ class LocationRepository @Inject constructor(
         val addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
         if (addresses != null) {
             if (addresses.isNotEmpty()) {
+                var locality = ""
                 val address: Address = addresses[0]
-                emit(address.locality)
+                if (address.locality != null) {
+                    locality = address.locality
+                } else if (address.subLocality != null) {
+                    locality = address.subLocality
+                }
+                emit(locality)
             }
         }
     }.catch {

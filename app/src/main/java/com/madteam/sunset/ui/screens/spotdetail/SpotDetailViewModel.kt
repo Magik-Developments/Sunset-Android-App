@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
 import com.madteam.sunset.model.Spot
+import com.madteam.sunset.model.SpotAttribute
 import com.madteam.sunset.repositories.AuthRepository
 import com.madteam.sunset.repositories.DatabaseRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -53,6 +54,14 @@ class SpotDetailViewModel @Inject constructor(
     private val _additionalReportInformation: MutableStateFlow<String> = MutableStateFlow("")
     val additionalReportInformation: StateFlow<String> = _additionalReportInformation
 
+    private val _showAttrInfoDialog: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val showAttrInfoDialog: StateFlow<Boolean> = _showAttrInfoDialog
+
+    private val _attrSelectedDialog: MutableStateFlow<SpotAttribute> = MutableStateFlow(
+        SpotAttribute()
+    )
+    val attrSelectedDialog: StateFlow<SpotAttribute> = _attrSelectedDialog
+
     private var username: String = ""
 
     init {
@@ -75,6 +84,14 @@ class SpotDetailViewModel @Inject constructor(
     fun setSpotReference(docReference: String) {
         _spotReference.value = docReference
         getSpotInfo()
+    }
+
+    fun setShowAttrInfoDialog(show: Boolean) {
+        _showAttrInfoDialog.value = show
+    }
+
+    fun setAttrSelectedDialog(attribute: SpotAttribute) {
+        _attrSelectedDialog.value = attribute
     }
 
     fun selectedReportOption(selectedOption: String) {

@@ -172,12 +172,12 @@ fun AttributeInfoDialog(
     Dialog(onDismissRequest = { setShowDialog(false) }) {
         Card(
             shape = RoundedCornerShape(20.dp),
-            elevation = 2.dp,
-            modifier = Modifier.padding(horizontal = 24.dp)
+            elevation = 2.dp
         ) {
             Column(
                 verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.padding(horizontal = 24.dp)
             ) {
                 CustomSpacer(size = 24.dp)
                 if (icon != null) {

@@ -1,5 +1,6 @@
 package com.madteam.sunset.ui.common
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -53,6 +54,7 @@ import com.madteam.sunset.model.SpotAttribute
 import com.madteam.sunset.ui.theme.secondaryRegularBodyM
 import com.madteam.sunset.ui.theme.secondaryRegularBodyS
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyL
+import com.madteam.sunset.ui.theme.secondarySemiBoldBodyM
 
 val fieldToIconMap = mapOf(
     "Beach" to Icons.Outlined.BeachAccess,
@@ -164,6 +166,109 @@ fun AttributesSmallListRow(
 }
 
 @Composable
+fun AttributesBigListSelectable(
+    attributesList: List<SpotAttribute>,
+    selectedAttributes: List<SpotAttribute>,
+    onAttributeClick: (SpotAttribute) -> Unit,
+    filterAttributesBy: String
+) {
+    LazyRow(
+        modifier = Modifier.padding(start = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        itemsIndexed(attributesList.filter { it.type == filterAttributesBy }) { _, attribute ->
+            val isSelected = selectedAttributes.contains(attribute)
+            val customBackgroundColor = if (isSelected) Color(0x80FFB600) else Color.White
+            val icon = fieldToIconMap[attribute.icon]
+            Box(
+                modifier = Modifier
+                    .size(100.dp)
+                    .clip(RoundedCornerShape(20.dp))
+                    .border(1.dp, Color(0xFF999999), RoundedCornerShape(20.dp))
+                    .background(customBackgroundColor, RoundedCornerShape(20.dp))
+                    .clickable { onAttributeClick(attribute) }
+
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    if (icon != null) {
+                        Icon(
+                            imageVector = icon,
+                            contentDescription = "",
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                    Text(
+                        text = attribute.title,
+                        style = secondaryRegularBodyS,
+                        textAlign = TextAlign.Center,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun FilterAttributesButton(
+    filterOptions: List<SpotAttribute>,
+    selectedOptions: List<SpotAttribute>,
+    onOptionClicked: (SpotAttribute) -> Unit
+) {
+    LazyRow(
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        itemsIndexed(filterOptions) { _, option ->
+            val icon = fieldToIconMap[option.icon]
+            val isSelected = selectedOptions.contains(option)
+            val customBackgroundColor = if (isSelected) Color(0xFFFFE094) else Color.White
+            val customBorderColor = if (isSelected) Color(0xFFFFB600) else Color(0xFF999999)
+            val customTextColor = if (isSelected) Color.Black else Color(0xFF333333)
+            Box(
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .border(1.dp, customBorderColor, RoundedCornerShape(10.dp))
+                    .background(customBackgroundColor, RoundedCornerShape(10.dp))
+                    .clickable { onOptionClicked(option) }
+
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    if (icon != null) {
+                        androidx.compose.material.Icon(
+                            imageVector = icon,
+                            contentDescription = "",
+                            modifier = Modifier
+                                .size(16.dp),
+                            tint = customTextColor
+                        )
+                    }
+                    CustomSpacer(size = 4.dp)
+                    androidx.compose.material.Text(
+                        text = option.title,
+                        style = secondarySemiBoldBodyM,
+                        color = customTextColor,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(vertical = 4.dp)
+                    )
+                }
+            }
+        }
+    }
+
+}
+
+@Composable
 fun AttributeInfoDialog(
     attribute: SpotAttribute,
     setShowDialog: (Boolean) -> Unit
@@ -177,9 +282,8 @@ fun AttributeInfoDialog(
             Column(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(horizontal = 24.dp)
+                modifier = Modifier.padding(24.dp)
             ) {
-                CustomSpacer(size = 24.dp)
                 if (icon != null) {
                     Icon(
                         imageVector = icon,
@@ -198,7 +302,6 @@ fun AttributeInfoDialog(
                     style = secondaryRegularBodyM,
                     textAlign = TextAlign.Center
                 )
-                CustomSpacer(size = 24.dp)
             }
         }
     }

@@ -119,8 +119,7 @@ fun BottomSheetFilterSpotsContent(
         FilterAttributesButton(
             filterOptions = attributesList.filter { it.type == LOCATION_ATTRIBUTES },
             selectedOptions = selectedFilterLocation,
-            onOptionClicked = { onSelectedLocationFilterClicked(it) },
-            context = context
+            onOptionClicked = { onSelectedLocationFilterClicked(it) }
         )
         CustomSpacer(size = 24.dp)
         Row(

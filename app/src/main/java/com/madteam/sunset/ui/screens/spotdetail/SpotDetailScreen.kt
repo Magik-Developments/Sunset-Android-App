@@ -57,7 +57,6 @@ import com.google.maps.android.ktx.utils.sphericalDistance
 import com.madteam.sunset.R
 import com.madteam.sunset.model.Spot
 import com.madteam.sunset.model.SpotAttribute
-import com.madteam.sunset.navigation.SunsetRoutes
 import com.madteam.sunset.ui.common.AttributeInfoDialog
 import com.madteam.sunset.ui.common.AttributesBigListRow
 import com.madteam.sunset.ui.common.AttributesSmallListRow
@@ -119,6 +118,7 @@ fun SpotDetailScreen(
             ) {
                 SpotDetailContent(
                     spotInfo = spotInfo,
+                    navController = navController,
                     navigateTo = navController::navigate,
                     spotLikeClick = viewModel::modifyUserSpotLike,
                     spotLikedByUser = isSpotLikedByUser,
@@ -150,6 +150,7 @@ fun SpotDetailScreen(
 @Composable
 fun SpotDetailContent(
     spotInfo: Spot,
+    navController: NavController,
     navigateTo: (String) -> Unit,
     spotLikeClick: () -> Unit,
     spotLikedByUser: Boolean,
@@ -260,7 +261,7 @@ fun SpotDetailContent(
                 top.linkTo(parent.top, 16.dp)
                 start.linkTo(parent.start, 24.dp)
             }, onClick = {
-                navigateTo(SunsetRoutes.DiscoverScreen.route)
+                navController.popBackStack()
             })
             RoundedLightSaveButton(onClick = {}, modifier = Modifier.constrainAs(saveIconButton) {
                 top.linkTo(parent.top, 16.dp)

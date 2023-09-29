@@ -1,4 +1,4 @@
-package com.madteam.sunset.model
+package com.madteam.sunset.data.model
 
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore

@@ -1,4 +1,4 @@
-package com.madteam.sunset.model
+package com.madteam.sunset.data.model
 
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.firestore.DocumentReference

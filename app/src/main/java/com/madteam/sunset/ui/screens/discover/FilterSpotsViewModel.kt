@@ -2,18 +2,19 @@ package com.madteam.sunset.ui.screens.discover
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.madteam.sunset.model.SpotAttribute
-import com.madteam.sunset.repositories.DatabaseRepository
+import com.madteam.sunset.data.model.SpotAttribute
+import com.madteam.sunset.data.repositories.DatabaseRepository
+import com.madteam.sunset.domain.usecases.GetSpotAttributesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class FilterSpotsViewModel @Inject constructor(
-    private val databaseRepository: DatabaseRepository
+    private val databaseRepository: DatabaseRepository,
+    private val getSpotAttributesUseCase: GetSpotAttributesUseCase
 ) : ViewModel() {
 
     val filterScoreList = MutableStateFlow(listOf(4, 6, 8))
@@ -43,8 +44,9 @@ class FilterSpotsViewModel @Inject constructor(
 
     private fun getSpotAttributesList() {
         viewModelScope.launch {
-            databaseRepository.getAllSpotAttributes().collectLatest { attributesList ->
-                _attributesList.value = attributesList
+            val result = getSpotAttributesUseCase.invoke()
+            if (result.isNotEmpty()) {
+                _attributesList.value = result
             }
         }
     }

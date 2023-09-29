@@ -51,7 +51,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.madteam.sunset.model.SpotAttribute
+import com.madteam.sunset.data.model.SpotAttribute
 import com.madteam.sunset.ui.screens.addreview.FAVORABLE_ATTRIBUTES
 import com.madteam.sunset.ui.screens.addreview.NON_FAVORABLE_ATTRIBUTES
 import com.madteam.sunset.ui.screens.addreview.SUNSET_ATTRIBUTES

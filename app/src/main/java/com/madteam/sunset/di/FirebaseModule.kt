@@ -4,6 +4,8 @@ import android.content.Context
 import android.location.Geocoder
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ktx.database
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -35,5 +37,9 @@ object FirebaseModule {
     @Singleton
     @Provides
     fun providesGeocoder(@ApplicationContext context: Context): Geocoder = Geocoder(context)
+
+    @Singleton
+    @Provides
+    fun providesFirebaseDatabase(): FirebaseDatabase = Firebase.database
 
 }

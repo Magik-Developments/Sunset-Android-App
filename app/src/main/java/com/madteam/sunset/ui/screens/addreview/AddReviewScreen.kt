@@ -36,7 +36,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.madteam.sunset.R
-import com.madteam.sunset.model.SpotAttribute
+import com.madteam.sunset.data.model.SpotAttribute
 import com.madteam.sunset.navigation.SunsetRoutes
 import com.madteam.sunset.ui.common.AttributesBigListSelectable
 import com.madteam.sunset.ui.common.CircularLoadingDialog

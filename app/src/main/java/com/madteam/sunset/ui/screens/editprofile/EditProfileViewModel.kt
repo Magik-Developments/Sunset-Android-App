@@ -3,9 +3,9 @@ package com.madteam.sunset.ui.screens.editprofile
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.madteam.sunset.model.UserProfile
-import com.madteam.sunset.repositories.AuthContract
-import com.madteam.sunset.repositories.DatabaseRepository
+import com.madteam.sunset.data.model.UserProfile
+import com.madteam.sunset.data.repositories.AuthContract
+import com.madteam.sunset.data.repositories.DatabaseRepository
 import com.madteam.sunset.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

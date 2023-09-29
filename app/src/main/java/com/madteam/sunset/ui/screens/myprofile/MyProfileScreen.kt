@@ -37,9 +37,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.madteam.sunset.R
-import com.madteam.sunset.model.Spot
-import com.madteam.sunset.model.SpotPost
-import com.madteam.sunset.model.UserProfile
+import com.madteam.sunset.data.model.Spot
+import com.madteam.sunset.data.model.SpotPost
+import com.madteam.sunset.data.model.UserProfile
 import com.madteam.sunset.navigation.SunsetRoutes
 import com.madteam.sunset.ui.common.BottomSheetSettingsMenu
 import com.madteam.sunset.ui.common.CustomSpacer

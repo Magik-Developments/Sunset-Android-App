@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.madteam.sunset.R
-import com.madteam.sunset.model.SpotAttribute
+import com.madteam.sunset.data.model.SpotAttribute
 import com.madteam.sunset.ui.common.CloseIconButton
 import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.FilterAttributesButton

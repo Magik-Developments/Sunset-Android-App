@@ -29,8 +29,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.madteam.sunset.R
-import com.madteam.sunset.model.SpotAttribute
-import com.madteam.sunset.model.SpotReview
+import com.madteam.sunset.data.model.SpotAttribute
+import com.madteam.sunset.data.model.SpotReview
 import com.madteam.sunset.ui.common.AttributeInfoDialog
 import com.madteam.sunset.ui.common.AttributesBigListRow
 import com.madteam.sunset.ui.common.CustomSpacer

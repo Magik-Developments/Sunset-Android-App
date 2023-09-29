@@ -3,11 +3,12 @@ package com.madteam.sunset.ui.screens.editspot
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
-import com.madteam.sunset.model.Spot
-import com.madteam.sunset.model.SpotAttribute
-import com.madteam.sunset.repositories.AuthRepository
-import com.madteam.sunset.repositories.DatabaseRepository
-import com.madteam.sunset.repositories.LocationRepository
+import com.madteam.sunset.data.model.Spot
+import com.madteam.sunset.data.model.SpotAttribute
+import com.madteam.sunset.data.repositories.AuthRepository
+import com.madteam.sunset.data.repositories.DatabaseRepository
+import com.madteam.sunset.data.repositories.LocationRepository
+import com.madteam.sunset.domain.usecases.GetSpotAttributesUseCase
 import com.madteam.sunset.utils.Resource
 import com.madteam.sunset.utils.googlemaps.MapState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,7 +23,8 @@ import kotlin.math.roundToInt
 class EditSpotViewModel @Inject constructor(
     private val locationRepository: LocationRepository,
     private val databaseRepository: DatabaseRepository,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val getSpotAttributesUseCase: GetSpotAttributesUseCase
 ) : ViewModel() {
 
     private val _imageUris: MutableStateFlow<List<String>> = MutableStateFlow(listOf())
@@ -108,8 +110,9 @@ class EditSpotViewModel @Inject constructor(
 
     private fun getSpotAttributesList() {
         viewModelScope.launch {
-            databaseRepository.getAllSpotAttributes().collectLatest { attributesList ->
-                _attributesList.value = attributesList
+            val result = getSpotAttributesUseCase.invoke()
+            if (result.isNotEmpty()) {
+                _attributesList.value = result
             }
         }
     }

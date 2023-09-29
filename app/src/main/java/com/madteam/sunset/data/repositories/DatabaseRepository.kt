@@ -1,4 +1,4 @@
-package com.madteam.sunset.repositories
+package com.madteam.sunset.data.repositories
 
 import android.net.Uri
 import android.util.Log
@@ -14,14 +14,17 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.Query
 import com.google.firebase.storage.FirebaseStorage
-import com.madteam.sunset.model.PostComment
-import com.madteam.sunset.model.Report
-import com.madteam.sunset.model.Spot
-import com.madteam.sunset.model.SpotAttribute
-import com.madteam.sunset.model.SpotClusterItem
-import com.madteam.sunset.model.SpotPost
-import com.madteam.sunset.model.SpotReview
-import com.madteam.sunset.model.UserProfile
+import com.madteam.sunset.data.database.dao.SpotAttributeDao
+import com.madteam.sunset.data.database.entities.SpotAttributeEntity
+import com.madteam.sunset.data.model.PostComment
+import com.madteam.sunset.data.model.Report
+import com.madteam.sunset.data.model.Spot
+import com.madteam.sunset.data.model.SpotAttribute
+import com.madteam.sunset.data.model.SpotClusterItem
+import com.madteam.sunset.data.model.SpotPost
+import com.madteam.sunset.data.model.SpotReview
+import com.madteam.sunset.data.model.UserProfile
+import com.madteam.sunset.data.model.toDomain
 import com.madteam.sunset.utils.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -48,7 +51,8 @@ private const val IMAGES_STORAGE_PROFILE_IMAGES_PATH = "profile_images/"
 
 class DatabaseRepository @Inject constructor(
     private val firebaseFirestore: FirebaseFirestore,
-    private val firebaseStorage: FirebaseStorage
+    private val firebaseStorage: FirebaseStorage,
+    private val spotAttributeDao: SpotAttributeDao
 ) : DatabaseContract {
 
     private var lastVisibleSpotOnHomeFeed: DocumentSnapshot? = null
@@ -735,7 +739,7 @@ class DatabaseRepository @Inject constructor(
         emit(review)
     }
 
-    override fun getAllSpotAttributes(): Flow<List<SpotAttribute>> = flow {
+    override suspend fun getAllSpotAttributesFromApi(): List<SpotAttribute> {
         val spotAttributesList = mutableListOf<SpotAttribute>()
 
         val spotAttributesSnapshot =
@@ -759,10 +763,16 @@ class DatabaseRepository @Inject constructor(
                 spotAttributesList.add(spotAttribute)
             }
         }
-        emit(spotAttributesList)
-    }.catch { exception ->
-        Log.e("DatabaseRepository::getAllSpotAttributes", "Error: ${exception.message}")
-        emit(mutableListOf())
+        return spotAttributesList
+    }
+
+    override suspend fun getAllSpotAttributesFromDatabase(): List<SpotAttribute> {
+        val response: List<SpotAttributeEntity> = spotAttributeDao.getAllSpotAttributes()
+        return response.map { it.toDomain() }
+    }
+
+    override suspend fun insertAllSpotAttributesOnDatabase(spotAttributes: List<SpotAttributeEntity>) {
+        spotAttributeDao.insertAllSpotAttributes(spotAttributes)
     }
 
     override fun getLastSpots(
@@ -1342,7 +1352,9 @@ interface DatabaseContract {
     fun modifyUserSpotLike(spotReference: String, username: String): Flow<Resource<String>>
     fun checkIfPostIsLikedByUser(postReference: String, username: String): Flow<Resource<Boolean>>
     fun getSpotReviewByDocRef(spotReference: String, docReference: String): Flow<SpotReview>
-    fun getAllSpotAttributes(): Flow<List<SpotAttribute>>
+    suspend fun getAllSpotAttributesFromApi(): List<SpotAttribute>
+    suspend fun getAllSpotAttributesFromDatabase(): List<SpotAttribute>
+    suspend fun insertAllSpotAttributesOnDatabase(spotAttributes: List<SpotAttributeEntity>)
     fun createSpotReview(
         spotReference: String,
         title: String,

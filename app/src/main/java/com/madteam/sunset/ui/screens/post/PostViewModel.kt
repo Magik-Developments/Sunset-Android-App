@@ -2,9 +2,9 @@ package com.madteam.sunset.ui.screens.post
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.madteam.sunset.model.SpotPost
-import com.madteam.sunset.repositories.AuthRepository
-import com.madteam.sunset.repositories.DatabaseRepository
+import com.madteam.sunset.data.model.SpotPost
+import com.madteam.sunset.data.repositories.AuthRepository
+import com.madteam.sunset.data.repositories.DatabaseRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

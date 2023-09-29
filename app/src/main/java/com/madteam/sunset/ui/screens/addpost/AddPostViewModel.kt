@@ -3,8 +3,8 @@ package com.madteam.sunset.ui.screens.addpost
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.madteam.sunset.repositories.AuthRepository
-import com.madteam.sunset.repositories.DatabaseRepository
+import com.madteam.sunset.data.repositories.AuthRepository
+import com.madteam.sunset.data.repositories.DatabaseRepository
 import com.madteam.sunset.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

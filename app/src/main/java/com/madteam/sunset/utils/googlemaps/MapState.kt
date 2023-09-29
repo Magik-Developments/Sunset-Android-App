@@ -2,7 +2,7 @@ package com.madteam.sunset.utils.googlemaps
 
 import android.location.Location
 import com.google.android.gms.maps.model.LatLngBounds
-import com.madteam.sunset.model.SpotClusterItem
+import com.madteam.sunset.data.model.SpotClusterItem
 
 data class MapState(
     val lastKnownLocation: Location?,

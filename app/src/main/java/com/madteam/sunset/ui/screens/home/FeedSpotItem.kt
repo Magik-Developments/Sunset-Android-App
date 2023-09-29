@@ -30,8 +30,8 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.madteam.sunset.R
-import com.madteam.sunset.model.Spot
-import com.madteam.sunset.model.UserProfile
+import com.madteam.sunset.data.model.Spot
+import com.madteam.sunset.data.model.UserProfile
 import com.madteam.sunset.ui.common.RoundedLightLikeButton
 import com.madteam.sunset.ui.common.RoundedLightSaveButton
 import com.madteam.sunset.ui.common.RoundedLightSendButton

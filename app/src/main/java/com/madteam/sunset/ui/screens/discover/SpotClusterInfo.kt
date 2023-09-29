@@ -21,7 +21,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.google.accompanist.pager.ExperimentalPagerApi
-import com.madteam.sunset.model.SpotClusterItem
+import com.madteam.sunset.data.model.SpotClusterItem
 import com.madteam.sunset.ui.common.AutoSlidingCarousel
 import com.madteam.sunset.ui.common.RoundedCloseIconButton
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineS

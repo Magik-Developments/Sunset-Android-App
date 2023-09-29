@@ -35,10 +35,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.google.android.gms.maps.model.LatLng
 import com.madteam.sunset.R
-import com.madteam.sunset.model.Spot
-import com.madteam.sunset.model.SpotPost
-import com.madteam.sunset.model.SunsetTimeResponse
-import com.madteam.sunset.model.UserProfile
+import com.madteam.sunset.data.model.Spot
+import com.madteam.sunset.data.model.SpotPost
+import com.madteam.sunset.data.model.SunsetTimeResponse
+import com.madteam.sunset.data.model.UserProfile
 import com.madteam.sunset.navigation.SunsetRoutes
 import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.SunsetBottomNavigation

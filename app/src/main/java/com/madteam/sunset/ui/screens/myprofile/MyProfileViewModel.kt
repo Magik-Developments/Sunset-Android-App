@@ -2,11 +2,11 @@ package com.madteam.sunset.ui.screens.myprofile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.madteam.sunset.model.Spot
-import com.madteam.sunset.model.SpotPost
-import com.madteam.sunset.model.UserProfile
-import com.madteam.sunset.repositories.AuthContract
-import com.madteam.sunset.repositories.DatabaseContract
+import com.madteam.sunset.data.model.Spot
+import com.madteam.sunset.data.model.SpotPost
+import com.madteam.sunset.data.model.UserProfile
+import com.madteam.sunset.data.repositories.AuthContract
+import com.madteam.sunset.data.repositories.DatabaseContract
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

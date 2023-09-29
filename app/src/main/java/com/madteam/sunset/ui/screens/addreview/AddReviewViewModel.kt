@@ -2,10 +2,11 @@ package com.madteam.sunset.ui.screens.addreview
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.madteam.sunset.model.SpotAttribute
-import com.madteam.sunset.model.UserProfile
-import com.madteam.sunset.repositories.AuthRepository
-import com.madteam.sunset.repositories.DatabaseRepository
+import com.madteam.sunset.data.model.SpotAttribute
+import com.madteam.sunset.data.model.UserProfile
+import com.madteam.sunset.data.repositories.AuthRepository
+import com.madteam.sunset.data.repositories.DatabaseRepository
+import com.madteam.sunset.domain.usecases.GetSpotAttributesUseCase
 import com.madteam.sunset.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +19,8 @@ import kotlin.math.roundToInt
 @HiltViewModel
 class AddReviewViewModel @Inject constructor(
     private val databaseRepository: DatabaseRepository,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val getSpotAttributesUseCase: GetSpotAttributesUseCase
 ) : ViewModel() {
 
     private val _attributesList: MutableStateFlow<List<SpotAttribute>> =
@@ -71,8 +73,9 @@ class AddReviewViewModel @Inject constructor(
 
     private fun getSpotAttributesList() {
         viewModelScope.launch {
-            databaseRepository.getAllSpotAttributes().collectLatest { attributesList ->
-                _attributesList.value = attributesList
+            val result = getSpotAttributesUseCase.invoke()
+            if (result.isNotEmpty()) {
+                _attributesList.value = result
             }
         }
     }

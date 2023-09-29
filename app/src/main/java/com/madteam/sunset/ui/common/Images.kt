@@ -39,8 +39,8 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 import com.madteam.sunset.R.string
-import com.madteam.sunset.model.Spot
-import com.madteam.sunset.model.SpotPost
+import com.madteam.sunset.data.model.Spot
+import com.madteam.sunset.data.model.SpotPost
 import com.madteam.sunset.ui.theme.secondaryRegularBodyS
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyS
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS

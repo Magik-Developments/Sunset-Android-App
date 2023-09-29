@@ -128,7 +128,7 @@ class SpotDetailViewModel @Inject constructor(
         viewModelScope.launch {
             databaseRepository.getSpotByDocRef(_spotReference.value).collect { spot ->
                 _spotInfo.value = spot
-                _spotIsLiked.value = spot.likedBy.contains(username)
+                _spotIsLiked.value = spot.likedBy.contains(username.lowercase())
                 _spotLikes.value = spot.likes
             }
         }

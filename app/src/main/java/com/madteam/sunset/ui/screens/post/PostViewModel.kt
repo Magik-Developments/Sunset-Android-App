@@ -56,7 +56,7 @@ class PostViewModel @Inject constructor(
         viewModelScope.launch {
             databaseRepository.getSpotPostByDocRef(_postReference.value).collectLatest { post ->
                 _postInfo.value = post
-                _postIsLiked.value = post.likedBy.contains(username)
+                _postIsLiked.value = post.likedBy.contains(username.lowercase())
                 _postLikes.value = post.likes
             }
         }

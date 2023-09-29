@@ -1,8 +1,8 @@
-package com.madteam.sunset.repositories
+package com.madteam.sunset.data.repositories
 
 import android.util.Log
 import com.madteam.sunset.api.SunsetApiService
-import com.madteam.sunset.model.SunsetTimeResponse
+import com.madteam.sunset.data.model.SunsetTimeResponse
 import com.madteam.sunset.utils.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch

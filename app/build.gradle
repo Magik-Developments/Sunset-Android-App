@@ -86,6 +86,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth-ktx'
     implementation 'com.google.firebase:firebase-firestore-ktx'
     implementation 'com.google.firebase:firebase-storage-ktx'
+    implementation 'com.google.firebase:firebase-config-ktx'
 
     //Google AdMob
     implementation 'com.google.android.gms:play-services-ads:22.4.0'
@@ -139,6 +140,9 @@ dependencies {
 
     //AppCompat
     implementation "androidx.appcompat:appcompat:1.6.1"
+
+    //datastore
+    implementation "androidx.datastore:datastore-preferences:1.0.0"
 
     // Permissions
     implementation 'com.google.accompanist:accompanist-permissions:0.30.1'

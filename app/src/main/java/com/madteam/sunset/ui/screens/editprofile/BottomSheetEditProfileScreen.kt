@@ -31,7 +31,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.madteam.sunset.R
-import com.madteam.sunset.model.UserProfile
+import com.madteam.sunset.data.model.UserProfile
 import com.madteam.sunset.ui.common.CircularLoadingDialog
 import com.madteam.sunset.ui.common.CloseIconButton
 import com.madteam.sunset.ui.common.CustomSpacer

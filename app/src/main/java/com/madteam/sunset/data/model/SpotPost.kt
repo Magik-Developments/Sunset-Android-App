@@ -1,4 +1,4 @@
-package com.madteam.sunset.model
+package com.madteam.sunset.data.model
 
 data class SpotPost(
     val id: String,

@@ -1,4 +1,4 @@
-package com.madteam.sunset.repositories
+package com.madteam.sunset.data.repositories
 
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.EmailAuthProvider

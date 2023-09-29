@@ -39,7 +39,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.google.firebase.firestore.FirebaseFirestore
 import com.madteam.sunset.R
-import com.madteam.sunset.model.Report
+import com.madteam.sunset.data.model.Report
 import com.madteam.sunset.ui.common.GoBackTopAppBar
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineXS
 import com.madteam.sunset.ui.theme.secondaryRegularBodyL

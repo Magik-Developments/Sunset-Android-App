@@ -43,8 +43,8 @@ import com.google.maps.android.compose.MapEffect
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.MapsComposeExperimentalApi
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.madteam.sunset.model.SpotAttribute
-import com.madteam.sunset.model.SpotClusterItem
+import com.madteam.sunset.data.model.SpotAttribute
+import com.madteam.sunset.data.model.SpotClusterItem
 import com.madteam.sunset.navigation.SunsetRoutes
 import com.madteam.sunset.ui.common.AddSpotFAB
 import com.madteam.sunset.ui.common.SunsetBottomNavigation

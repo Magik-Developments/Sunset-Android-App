@@ -1,6 +1,6 @@
 package com.madteam.sunset.api
 
-import com.madteam.sunset.model.SunsetTimeResponse
+import com.madteam.sunset.data.model.SunsetTimeResponse
 import retrofit2.http.GET
 import retrofit2.http.Query
 

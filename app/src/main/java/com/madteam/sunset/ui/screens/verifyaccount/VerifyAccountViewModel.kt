@@ -2,7 +2,7 @@ package com.madteam.sunset.ui.screens.verifyaccount
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.madteam.sunset.repositories.AuthContract
+import com.madteam.sunset.data.repositories.AuthContract
 import com.madteam.sunset.utils.Resource.Success
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay

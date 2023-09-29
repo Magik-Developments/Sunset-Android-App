@@ -3,10 +3,10 @@ package com.madteam.sunset.ui.screens.spotdetail
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
-import com.madteam.sunset.model.Spot
-import com.madteam.sunset.model.SpotAttribute
-import com.madteam.sunset.repositories.AuthRepository
-import com.madteam.sunset.repositories.DatabaseRepository
+import com.madteam.sunset.data.model.Spot
+import com.madteam.sunset.data.model.SpotAttribute
+import com.madteam.sunset.data.repositories.AuthRepository
+import com.madteam.sunset.data.repositories.DatabaseRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

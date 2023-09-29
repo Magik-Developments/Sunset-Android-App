@@ -4,8 +4,8 @@ import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.AuthResult
-import com.madteam.sunset.repositories.AuthContract
-import com.madteam.sunset.repositories.DatabaseContract
+import com.madteam.sunset.data.repositories.AuthContract
+import com.madteam.sunset.data.repositories.DatabaseContract
 import com.madteam.sunset.utils.Resource
 import com.madteam.sunset.utils.Resource.Error
 import com.madteam.sunset.utils.Resource.Success
@@ -19,8 +19,8 @@ private const val MIN_PASSWORD_LENGTH = 6
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
-  private val authRepository: AuthContract,
-  private val databaseRepository: DatabaseContract,
+    private val authRepository: AuthContract,
+    private val databaseRepository: DatabaseContract,
 ) : ViewModel() {
 
   val isValidForm = MutableStateFlow(false)

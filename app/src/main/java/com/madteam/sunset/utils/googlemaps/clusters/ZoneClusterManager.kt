@@ -4,7 +4,7 @@ import android.content.Context
 import com.google.android.gms.maps.GoogleMap
 import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.collections.MarkerManager
-import com.madteam.sunset.model.SpotClusterItem
+import com.madteam.sunset.data.model.SpotClusterItem
 
 class ZoneClusterManager(
     context: Context,

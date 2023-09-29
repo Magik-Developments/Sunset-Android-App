@@ -1,4 +1,4 @@
-package com.madteam.sunset.repositories
+package com.madteam.sunset.data.repositories
 
 import android.location.Address
 import android.location.Geocoder

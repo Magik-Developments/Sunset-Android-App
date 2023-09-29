@@ -3,7 +3,7 @@ package com.madteam.sunset.ui.screens.lostpassword
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.madteam.sunset.repositories.AuthContract
+import com.madteam.sunset.data.repositories.AuthContract
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch

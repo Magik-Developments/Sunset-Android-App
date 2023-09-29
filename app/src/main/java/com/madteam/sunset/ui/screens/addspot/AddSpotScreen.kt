@@ -64,7 +64,7 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.MapsComposeExperimentalApi
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.madteam.sunset.R
-import com.madteam.sunset.model.SpotAttribute
+import com.madteam.sunset.data.model.SpotAttribute
 import com.madteam.sunset.navigation.SunsetRoutes
 import com.madteam.sunset.ui.common.AttributesBigListSelectable
 import com.madteam.sunset.ui.common.AutoSlidingCarousel

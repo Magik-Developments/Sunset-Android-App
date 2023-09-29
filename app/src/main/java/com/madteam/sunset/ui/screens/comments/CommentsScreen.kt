@@ -28,7 +28,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.madteam.sunset.R
-import com.madteam.sunset.model.PostComment
+import com.madteam.sunset.data.model.PostComment
 import com.madteam.sunset.ui.common.ChatTextField
 import com.madteam.sunset.ui.common.CustomDivider
 import com.madteam.sunset.ui.common.CustomSpacer

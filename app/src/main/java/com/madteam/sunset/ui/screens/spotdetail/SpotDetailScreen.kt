@@ -55,8 +55,8 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.ktx.utils.sphericalDistance
 import com.madteam.sunset.R
-import com.madteam.sunset.model.Spot
-import com.madteam.sunset.model.SpotAttribute
+import com.madteam.sunset.data.model.Spot
+import com.madteam.sunset.data.model.SpotAttribute
 import com.madteam.sunset.ui.common.AttributeInfoDialog
 import com.madteam.sunset.ui.common.AttributesBigListRow
 import com.madteam.sunset.ui.common.AttributesSmallListRow

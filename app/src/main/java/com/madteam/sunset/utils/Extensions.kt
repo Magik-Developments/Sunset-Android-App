@@ -12,9 +12,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.GeoPoint
-import com.madteam.sunset.model.Spot
-import com.madteam.sunset.model.SpotPost
-import com.madteam.sunset.model.UserProfile
+import com.madteam.sunset.data.model.Spot
+import com.madteam.sunset.data.model.SpotPost
+import com.madteam.sunset.data.model.UserProfile
 
 fun Modifier.shadow(
     color: Color = Color.Black,

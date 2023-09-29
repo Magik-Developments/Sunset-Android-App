@@ -4,11 +4,11 @@ import android.content.Context
 import android.location.Geocoder
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ktx.database
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig
-import com.google.firebase.remoteconfig.ktx.remoteConfig
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
 import dagger.Module
@@ -40,6 +40,6 @@ object FirebaseModule {
 
     @Singleton
     @Provides
-    fun providesFirebaseRemoteConfig(): FirebaseRemoteConfig = Firebase.remoteConfig
+    fun providesFirebaseDatabase(): FirebaseDatabase = Firebase.database
 
 }

@@ -87,6 +87,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-firestore-ktx'
     implementation 'com.google.firebase:firebase-storage-ktx'
     implementation 'com.google.firebase:firebase-config-ktx'
+    implementation("com.google.firebase:firebase-database-ktx")
 
     //Google AdMob
     implementation 'com.google.android.gms:play-services-ads:22.4.0'

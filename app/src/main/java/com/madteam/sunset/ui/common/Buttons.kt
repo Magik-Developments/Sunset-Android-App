@@ -1,6 +1,5 @@
 package com.madteam.sunset.ui.common
 
-import android.content.Context
 import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -9,7 +8,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -41,12 +39,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.madteam.sunset.R
-import com.madteam.sunset.model.SpotAttribute
 import com.madteam.sunset.ui.theme.SunsetTheme
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyM
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyS
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
-import com.madteam.sunset.utils.getResourceId
 
 @Composable
 fun SunsetButton(onClick: () -> Unit) {
@@ -534,63 +530,6 @@ fun FilterScoreButton(
                         modifier = Modifier
                             .size(16.dp),
                         tint = customTextColor
-                    )
-                }
-            }
-        }
-    }
-
-}
-
-@Composable
-fun FilterAttributesButton(
-    context: Context,
-    filterOptions: List<SpotAttribute>,
-    selectedOptions: List<SpotAttribute>,
-    onOptionClicked: (SpotAttribute) -> Unit
-) {
-
-    LazyRow(
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        itemsIndexed(filterOptions) { _, option ->
-            val isSelected = selectedOptions.contains(option)
-            val customBackgroundColor = if (isSelected) Color(0xFFFFE094) else Color.White
-            val customBorderColor = if (isSelected) Color(0xFFFFB600) else Color(0xFF999999)
-            val customTextColor = if (isSelected) Color.Black else Color(0xFF333333)
-            Box(
-                modifier = Modifier
-                    .size(80.dp)
-                    .clip(RoundedCornerShape(10.dp))
-                    .border(1.dp, customBorderColor, RoundedCornerShape(10.dp))
-                    .background(customBackgroundColor, RoundedCornerShape(10.dp))
-                    .clickable { onOptionClicked(option) }
-
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    Icon(
-                        painter = painterResource(
-                            id = getResourceId(
-                                option.icon,
-                                context
-                            )
-                        ),
-                        contentDescription = "",
-                        modifier = Modifier
-                            .size(16.dp),
-                        tint = customTextColor
-                    )
-                    CustomSpacer(size = 4.dp)
-                    Text(
-                        text = option.title,
-                        style = secondarySemiBoldBodyM,
-                        color = customTextColor,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(vertical = 4.dp)
                     )
                 }
             }

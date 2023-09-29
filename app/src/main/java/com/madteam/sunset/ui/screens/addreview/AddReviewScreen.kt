@@ -3,8 +3,6 @@ package com.madteam.sunset.ui.screens.addreview
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,10 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Brightness4
@@ -32,14 +27,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -47,6 +38,7 @@ import androidx.navigation.NavController
 import com.madteam.sunset.R
 import com.madteam.sunset.model.SpotAttribute
 import com.madteam.sunset.navigation.SunsetRoutes
+import com.madteam.sunset.ui.common.AttributesBigListSelectable
 import com.madteam.sunset.ui.common.CircularLoadingDialog
 import com.madteam.sunset.ui.common.CustomDivider
 import com.madteam.sunset.ui.common.CustomSpacer
@@ -56,18 +48,15 @@ import com.madteam.sunset.ui.common.GoForwardTopAppBar
 import com.madteam.sunset.ui.common.ScoreSlider
 import com.madteam.sunset.ui.theme.primaryBoldDisplayS
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineL
-import com.madteam.sunset.ui.theme.secondaryRegularBodyS
 import com.madteam.sunset.ui.theme.secondaryRegularHeadlineS
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyM
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
 import com.madteam.sunset.utils.Resource
-import com.madteam.sunset.utils.getResourceId
 
 private const val MAX_CHAR_LENGTH_REVIEW_TITLE = 50
 private const val MAX_CHAR_LENGTH_REVIEW_DESCRIPTION = 2500
 const val FAVORABLE_ATTRIBUTES = "favorable"
 const val NON_FAVORABLE_ATTRIBUTES = "non-favorable"
-const val LOCATION_ATTRIBUTES = "location"
 const val SUNSET_ATTRIBUTES = "sunset"
 
 @Composable
@@ -256,49 +245,12 @@ fun AddReviewContent(
             color = Color(0xFF666666)
         )
         CustomSpacer(size = 8.dp)
-        LazyRow(
-            modifier = Modifier.padding(start = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            itemsIndexed(attributesList.filter { it.type == FAVORABLE_ATTRIBUTES }) { _, attribute ->
-                val isSelected = selectedAttributes.contains(attribute)
-                val customBackgroundColor = if (isSelected) Color(0x80FFB600) else Color.White
-                Box(
-                    modifier = Modifier
-                        .size(100.dp)
-                        .clip(RoundedCornerShape(20.dp))
-                        .border(1.dp, Color(0xFF999999), RoundedCornerShape(20.dp))
-                        .background(customBackgroundColor, RoundedCornerShape(20.dp))
-                        .clickable { onAttributeClicked(attribute) }
-
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center,
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        Icon(
-                            painter = painterResource(
-                                id = getResourceId(
-                                    attribute.icon,
-                                    context
-                                )
-                            ),
-                            contentDescription = "",
-                            modifier = Modifier.size(24.dp)
-                        )
-                        Text(
-                            text = attribute.title,
-                            style = secondaryRegularBodyS,
-                            textAlign = TextAlign.Center,
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
-                        )
-                    }
-                }
-            }
-        }
+        AttributesBigListSelectable(
+            attributesList = attributesList,
+            selectedAttributes = selectedAttributes,
+            onAttributeClick = { onAttributeClicked(it) },
+            filterAttributesBy = FAVORABLE_ATTRIBUTES
+        )
         CustomSpacer(size = 16.dp)
         Text(
             text = stringResource(id = R.string.bad_attributes),
@@ -307,48 +259,12 @@ fun AddReviewContent(
             color = Color(0xFF666666)
         )
         CustomSpacer(size = 8.dp)
-        LazyRow(
-            modifier = Modifier.padding(start = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            itemsIndexed(attributesList.filter { it.type == NON_FAVORABLE_ATTRIBUTES }) { _, attribute ->
-                val isSelected = selectedAttributes.contains(attribute)
-                val customBackgroundColor = if (isSelected) Color(0x80FFB600) else Color.White
-                Box(
-                    modifier = Modifier
-                        .size(100.dp)
-                        .clip(RoundedCornerShape(20.dp))
-                        .border(1.dp, Color(0xFF999999), RoundedCornerShape(20.dp))
-                        .background(customBackgroundColor, RoundedCornerShape(20.dp))
-                        .clickable { onAttributeClicked(attribute) }
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center,
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        Icon(
-                            painter = painterResource(
-                                id = getResourceId(
-                                    attribute.icon,
-                                    context
-                                )
-                            ),
-                            contentDescription = "",
-                            modifier = Modifier.size(24.dp)
-                        )
-                        Text(
-                            text = attribute.title,
-                            style = secondaryRegularBodyS,
-                            textAlign = TextAlign.Center,
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
-                        )
-                    }
-                }
-            }
-        }
+        AttributesBigListSelectable(
+            attributesList = attributesList,
+            selectedAttributes = selectedAttributes,
+            onAttributeClick = { onAttributeClicked(it) },
+            filterAttributesBy = NON_FAVORABLE_ATTRIBUTES
+        )
         CustomSpacer(size = 16.dp)
         Text(
             text = stringResource(id = R.string.sunset_attributes),
@@ -357,48 +273,12 @@ fun AddReviewContent(
             color = Color(0xFF666666)
         )
         CustomSpacer(size = 8.dp)
-        LazyRow(
-            modifier = Modifier.padding(start = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            itemsIndexed(attributesList.filter { it.type == SUNSET_ATTRIBUTES }) { _, attribute ->
-                val isSelected = selectedAttributes.contains(attribute)
-                val customBackgroundColor = if (isSelected) Color(0x80FFB600) else Color.White
-                Box(
-                    modifier = Modifier
-                        .size(100.dp)
-                        .clip(RoundedCornerShape(20.dp))
-                        .border(1.dp, Color(0xFF999999), RoundedCornerShape(20.dp))
-                        .background(customBackgroundColor, RoundedCornerShape(20.dp))
-                        .clickable { onAttributeClicked(attribute) }
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center,
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        Icon(
-                            painter = painterResource(
-                                id = getResourceId(
-                                    attribute.icon,
-                                    context
-                                )
-                            ),
-                            contentDescription = "",
-                            modifier = Modifier.size(24.dp)
-                        )
-                        Text(
-                            text = attribute.title,
-                            style = secondaryRegularBodyS,
-                            textAlign = TextAlign.Center,
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
-                        )
-                    }
-                }
-            }
-        }
+        AttributesBigListSelectable(
+            attributesList = attributesList,
+            selectedAttributes = selectedAttributes,
+            onAttributeClick = { onAttributeClicked(it) },
+            filterAttributesBy = SUNSET_ATTRIBUTES
+        )
         CustomSpacer(size = 32.dp)
         CustomDivider(
             modifier = Modifier

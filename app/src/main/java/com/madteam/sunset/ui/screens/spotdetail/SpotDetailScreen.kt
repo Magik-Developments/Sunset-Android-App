@@ -42,9 +42,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -58,7 +56,10 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.ktx.utils.sphericalDistance
 import com.madteam.sunset.R
 import com.madteam.sunset.model.Spot
-import com.madteam.sunset.navigation.SunsetRoutes
+import com.madteam.sunset.model.SpotAttribute
+import com.madteam.sunset.ui.common.AttributeInfoDialog
+import com.madteam.sunset.ui.common.AttributesBigListRow
+import com.madteam.sunset.ui.common.AttributesSmallListRow
 import com.madteam.sunset.ui.common.AutoSlidingCarousel
 import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.IconButtonDark
@@ -83,7 +84,6 @@ import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineM
 import com.madteam.sunset.utils.formatDate
 import com.madteam.sunset.utils.generateDeepLink
 import com.madteam.sunset.utils.getCurrentLocation
-import com.madteam.sunset.utils.getResourceId
 import com.madteam.sunset.utils.getShareIntent
 import com.madteam.sunset.utils.openDirectionsOnGoogleMaps
 import com.madteam.sunset.utils.shimmerBrush
@@ -107,6 +107,8 @@ fun SpotDetailScreen(
     val selectedReportOption by viewModel.selectedReportOption.collectAsStateWithLifecycle()
     val additionalReportInformation by viewModel.additionalReportInformation.collectAsStateWithLifecycle()
     val reportSentDialog by viewModel.showReportSentDialog.collectAsStateWithLifecycle()
+    val showAttrInfoDialog by viewModel.showAttrInfoDialog.collectAsStateWithLifecycle()
+    val selectedAttributeDialog by viewModel.attrSelectedDialog.collectAsStateWithLifecycle()
 
     Scaffold(
         content = { paddingValues ->
@@ -116,6 +118,7 @@ fun SpotDetailScreen(
             ) {
                 SpotDetailContent(
                     spotInfo = spotInfo,
+                    navController = navController,
                     navigateTo = navController::navigate,
                     spotLikeClick = viewModel::modifyUserSpotLike,
                     spotLikedByUser = isSpotLikedByUser,
@@ -132,7 +135,11 @@ fun SpotDetailScreen(
                     setAdditionalReportInformation = viewModel::setAdditionalReportInformation,
                     sendReportButton = viewModel::sendReportIntent,
                     setReportSentDialog = viewModel::setReportSentDialog,
-                    reportSentDialog = reportSentDialog
+                    reportSentDialog = reportSentDialog,
+                    setShowAttrInfoDialog = viewModel::setShowAttrInfoDialog,
+                    setAttrSelectedDialog = viewModel::setAttrSelectedDialog,
+                    showAttrInfoDialog = showAttrInfoDialog,
+                    selectedAttributeDialog = selectedAttributeDialog
                 )
             }
         }
@@ -143,6 +150,7 @@ fun SpotDetailScreen(
 @Composable
 fun SpotDetailContent(
     spotInfo: Spot,
+    navController: NavController,
     navigateTo: (String) -> Unit,
     spotLikeClick: () -> Unit,
     spotLikedByUser: Boolean,
@@ -159,7 +167,11 @@ fun SpotDetailContent(
     setAdditionalReportInformation: (String) -> Unit,
     sendReportButton: () -> Unit,
     setReportSentDialog: (Boolean) -> Unit,
-    reportSentDialog: Boolean
+    reportSentDialog: Boolean,
+    setShowAttrInfoDialog: (Boolean) -> Unit,
+    setAttrSelectedDialog: (SpotAttribute) -> Unit,
+    showAttrInfoDialog: Boolean,
+    selectedAttributeDialog: SpotAttribute
 ) {
     val scrollState = rememberScrollState()
     val showShimmer = remember { mutableStateOf(true) }
@@ -185,6 +197,13 @@ fun SpotDetailContent(
             showShimmer.value = false
             requestPermissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
         }
+    }
+
+    if (showAttrInfoDialog) {
+        AttributeInfoDialog(
+            attribute = selectedAttributeDialog,
+            setShowDialog = { setShowAttrInfoDialog(it) }
+        )
     }
 
     if (showReportDialog) {
@@ -242,7 +261,7 @@ fun SpotDetailContent(
                 top.linkTo(parent.top, 16.dp)
                 start.linkTo(parent.start, 24.dp)
             }, onClick = {
-                navigateTo(SunsetRoutes.DiscoverScreen.route)
+                navController.popBackStack()
             })
             RoundedLightSaveButton(onClick = {}, modifier = Modifier.constrainAs(saveIconButton) {
                 top.linkTo(parent.top, 16.dp)
@@ -461,44 +480,13 @@ fun SpotDetailContent(
                 modifier = Modifier.padding(horizontal = 24.dp)
             )
             CustomSpacer(size = 16.dp)
-            LazyRow(
-                modifier = Modifier,
-                contentPadding = PaddingValues(horizontal = 24.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                itemsIndexed(spotInfo.attributes) { _, attribute ->
-                    Box(
-                        modifier = Modifier
-                            .size(100.dp)
-                            .border(1.dp, Color(0xFF999999), RoundedCornerShape(20.dp))
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center,
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                            Icon(
-                                painter = painterResource(
-                                    id = getResourceId(
-                                        attribute.icon,
-                                        context
-                                    )
-                                ),
-                                contentDescription = "",
-                                modifier = Modifier.size(24.dp)
-                            )
-                            Text(
-                                text = attribute.title,
-                                style = secondaryRegularBodyS,
-                                textAlign = TextAlign.Center,
-                                maxLines = 2,
-                                overflow = TextOverflow.Ellipsis,
-                                modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
-                            )
-                        }
-                    }
+            AttributesBigListRow(
+                attributesList = spotInfo.attributes,
+                onAttributeClick = {
+                    setAttrSelectedDialog(it)
+                    setShowAttrInfoDialog(true)
                 }
-            }
+            )
             CustomSpacer(size = 24.dp)
             Divider(
                 modifier = Modifier.padding(horizontal = 24.dp),
@@ -602,39 +590,7 @@ fun SpotDetailContent(
                                         text = "How it was?",
                                         style = secondarySemiBoldBodyM
                                     )
-                                    LazyRow(
-                                        modifier = Modifier.padding(top = 16.dp),
-                                        horizontalArrangement = Arrangement.spacedBy(16.dp)
-                                    ) {
-                                        itemsIndexed(review.spotAttributes) { _, attribute ->
-                                            Box(
-                                                modifier = Modifier
-                                                    .size(40.dp)
-                                                    .border(
-                                                        1.dp,
-                                                        Color(0xFF999999),
-                                                        RoundedCornerShape(8.dp)
-                                                    )
-                                            ) {
-                                                Column(
-                                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                                    verticalArrangement = Arrangement.Center,
-                                                    modifier = Modifier.fillMaxSize()
-                                                ) {
-                                                    Icon(
-                                                        painter = painterResource(
-                                                            id = getResourceId(
-                                                                attribute.icon,
-                                                                context
-                                                            )
-                                                        ),
-                                                        contentDescription = "",
-                                                        modifier = Modifier.size(24.dp)
-                                                    )
-                                                }
-                                            }
-                                        }
-                                    }
+                                    AttributesSmallListRow(attributesList = review.spotAttributes)
                                 }
                             }
 

@@ -29,7 +29,7 @@ import com.madteam.sunset.ui.common.FilterAttributesButton
 import com.madteam.sunset.ui.common.FilterScoreButton
 import com.madteam.sunset.ui.common.SmallButtonDark
 import com.madteam.sunset.ui.common.SmallButtonSunset
-import com.madteam.sunset.ui.screens.addreview.LOCATION_ATTRIBUTES
+import com.madteam.sunset.ui.screens.addreview.SUNSET_ATTRIBUTES
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyM
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
 
@@ -117,10 +117,9 @@ fun BottomSheetFilterSpotsContent(
         Text(text = stringResource(id = R.string.environment), style = secondarySemiBoldBodyM)
         CustomSpacer(size = 16.dp)
         FilterAttributesButton(
-            filterOptions = attributesList.filter { it.type == LOCATION_ATTRIBUTES },
+            filterOptions = attributesList.filter { it.type == SUNSET_ATTRIBUTES },
             selectedOptions = selectedFilterLocation,
-            onOptionClicked = { onSelectedLocationFilterClicked(it) },
-            context = context
+            onOptionClicked = { onSelectedLocationFilterClicked(it) }
         )
         CustomSpacer(size = 24.dp)
         Row(

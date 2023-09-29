@@ -33,6 +33,7 @@ import androidx.compose.material.icons.outlined.LocalParking
 import androidx.compose.material.icons.outlined.Motorcycle
 import androidx.compose.material.icons.outlined.Payments
 import androidx.compose.material.icons.outlined.PedalBike
+import androidx.compose.material.icons.outlined.QuestionMark
 import androidx.compose.material.icons.outlined.SignalCellularAlt
 import androidx.compose.material.icons.outlined.Tram
 import androidx.compose.material.icons.outlined.Visibility
@@ -51,6 +52,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.madteam.sunset.model.SpotAttribute
+import com.madteam.sunset.ui.screens.addreview.FAVORABLE_ATTRIBUTES
+import com.madteam.sunset.ui.screens.addreview.NON_FAVORABLE_ATTRIBUTES
+import com.madteam.sunset.ui.screens.addreview.SUNSET_ATTRIBUTES
 import com.madteam.sunset.ui.theme.secondaryRegularBodyM
 import com.madteam.sunset.ui.theme.secondaryRegularBodyS
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyL
@@ -95,6 +99,23 @@ fun AttributesBigListRow(
     ) {
         itemsIndexed(attributesList) { _, attribute ->
             val icon = fieldToIconMap[attribute.icon]
+            val tint: Color = when (attribute.type) {
+                FAVORABLE_ATTRIBUTES -> {
+                    Color(0xFF81c784)
+                }
+
+                NON_FAVORABLE_ATTRIBUTES -> {
+                    Color(0xFFe57373)
+                }
+
+                SUNSET_ATTRIBUTES -> {
+                    Color(0xFFFFE094)
+                }
+
+                else -> {
+                    Color.Black
+                }
+            }
             Box(
                 modifier = Modifier
                     .size(100.dp)
@@ -111,7 +132,8 @@ fun AttributesBigListRow(
                         Icon(
                             imageVector = icon,
                             contentDescription = "",
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.size(24.dp),
+                            tint = tint
                         )
                     }
                     Text(
@@ -137,7 +159,24 @@ fun AttributesSmallListRow(
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         itemsIndexed(attributesList) { _, attribute ->
-            val icon = fieldToIconMap[attribute.icon]
+            val icon = fieldToIconMap[attribute.icon] ?: Icons.Outlined.QuestionMark
+            val tint: Color = when (attribute.type) {
+                FAVORABLE_ATTRIBUTES -> {
+                    Color(0xFF81c784)
+                }
+
+                NON_FAVORABLE_ATTRIBUTES -> {
+                    Color(0xFFe57373)
+                }
+
+                SUNSET_ATTRIBUTES -> {
+                    Color(0xFFFFE094)
+                }
+
+                else -> {
+                    Color.Black
+                }
+            }
             Box(
                 modifier = Modifier
                     .size(40.dp)
@@ -152,13 +191,12 @@ fun AttributesSmallListRow(
                     verticalArrangement = Arrangement.Center,
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    if (icon != null) {
-                        Icon(
-                            imageVector = icon,
-                            contentDescription = "",
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = "",
+                        modifier = Modifier.size(24.dp),
+                        tint = tint
+                    )
                 }
             }
         }
@@ -274,6 +312,23 @@ fun AttributeInfoDialog(
     setShowDialog: (Boolean) -> Unit
 ) {
     val icon = fieldToIconMap[attribute.icon]
+    val tint: Color = when (attribute.type) {
+        FAVORABLE_ATTRIBUTES -> {
+            Color(0xFF81c784)
+        }
+
+        NON_FAVORABLE_ATTRIBUTES -> {
+            Color(0xFFe57373)
+        }
+
+        SUNSET_ATTRIBUTES -> {
+            Color(0xFFFFE094)
+        }
+
+        else -> {
+            Color.Black
+        }
+    }
     Dialog(onDismissRequest = { setShowDialog(false) }) {
         Card(
             shape = RoundedCornerShape(20.dp),
@@ -287,7 +342,8 @@ fun AttributeInfoDialog(
                 if (icon != null) {
                     Icon(
                         imageVector = icon,
-                        contentDescription = "Attribute icon"
+                        contentDescription = "Attribute icon",
+                        tint = tint
                     )
                 }
                 CustomSpacer(size = 8.dp)

@@ -20,7 +20,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -32,6 +31,7 @@ import androidx.navigation.NavController
 import com.madteam.sunset.R
 import com.madteam.sunset.model.SpotAttribute
 import com.madteam.sunset.model.SpotReview
+import com.madteam.sunset.ui.common.AttributeInfoDialog
 import com.madteam.sunset.ui.common.AttributesBigListRow
 import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.GoBackVariantTitleTopAppBar
@@ -89,7 +89,13 @@ fun PostReviewContent(
     showAttrInfoDialog: Boolean,
     selectedAttrInfoDialog: SpotAttribute
 ) {
-    val context = LocalContext.current
+
+    if (showAttrInfoDialog) {
+        AttributeInfoDialog(
+            attribute = selectedAttrInfoDialog,
+            setShowDialog = { setShowAttrInfoDialog(it) }
+        )
+    }
 
     Column(
         Modifier

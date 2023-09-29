@@ -76,7 +76,6 @@ import com.madteam.sunset.ui.common.GoForwardTopAppBar
 import com.madteam.sunset.ui.common.ScoreSlider
 import com.madteam.sunset.ui.screens.addpost.MAX_IMAGES_SELECTED
 import com.madteam.sunset.ui.screens.addreview.FAVORABLE_ATTRIBUTES
-import com.madteam.sunset.ui.screens.addreview.LOCATION_ATTRIBUTES
 import com.madteam.sunset.ui.screens.addreview.NON_FAVORABLE_ATTRIBUTES
 import com.madteam.sunset.ui.screens.addreview.SUNSET_ATTRIBUTES
 import com.madteam.sunset.ui.theme.primaryBoldDisplayS
@@ -135,7 +134,7 @@ fun AddSpotScreen(
                 title = R.string.add_spot,
                 onQuitClick = { viewModel.setShowExitDialog(true) },
                 onContinueClick = { viewModel.createNewSpotIntent() },
-                canContinue = (spotScore != 0 && selectedAttributes.isNotEmpty() && (selectedAttributes.filter { it.type == LOCATION_ATTRIBUTES }).isNotEmpty() && spotTitle.isNotEmpty() && spotDescription.isNotEmpty() && imageUris.isNotEmpty())
+                canContinue = (spotScore != 0 && selectedAttributes.isNotEmpty() && spotTitle.isNotEmpty() && spotDescription.isNotEmpty() && imageUris.isNotEmpty())
             )
         },
         content = { paddingValues ->
@@ -450,20 +449,6 @@ fun AddSpotContent(
             text = stringResource(id = R.string.add_attributes_review),
             style = secondarySemiBoldHeadLineS,
             modifier = Modifier.padding(start = 16.dp)
-        )
-        CustomSpacer(size = 16.dp)
-        Text(
-            text = stringResource(id = R.string.where_it_is),
-            style = secondaryRegularHeadlineS,
-            modifier = Modifier.padding(start = 16.dp),
-            color = Color(0xFF666666)
-        )
-        CustomSpacer(size = 8.dp)
-        AttributesBigListSelectable(
-            attributesList = attributesList,
-            selectedAttributes = selectedAttributes,
-            onAttributeClick = { onAttributeClicked(it) },
-            filterAttributesBy = LOCATION_ATTRIBUTES
         )
         CustomSpacer(size = 16.dp)
         Text(

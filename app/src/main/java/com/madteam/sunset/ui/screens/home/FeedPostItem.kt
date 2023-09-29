@@ -153,7 +153,7 @@ fun FeedPostItem(
                         bottom.linkTo(parent.bottom, 16.dp)
                         end.linkTo(parent.end, 24.dp)
                     },
-                isLiked = postInfo.likedBy.contains(userInfo.username)
+                isLiked = postInfo.likedBy.contains(userInfo.username.lowercase())
             )
             RoundedLightSendButton(
                 onClick = {

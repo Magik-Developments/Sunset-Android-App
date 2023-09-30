@@ -18,9 +18,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -34,6 +38,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -48,9 +53,11 @@ import com.madteam.sunset.ui.common.CircularLoadingDialog
 import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.CustomTextField
 import com.madteam.sunset.ui.common.DismissAndPositiveDialog
-import com.madteam.sunset.ui.common.GoForwardTopAppBar
+import com.madteam.sunset.ui.common.GoBackTopAppBar
+import com.madteam.sunset.ui.common.SunsetButton
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineL
 import com.madteam.sunset.ui.theme.secondaryRegularBodyL
+import com.madteam.sunset.ui.theme.secondaryRegularBodyM
 import com.madteam.sunset.utils.Resource
 import com.madteam.sunset.utils.shimmerBrush
 
@@ -86,17 +93,15 @@ fun AddPostScreen(
 
     Scaffold(
         topBar = {
-            GoForwardTopAppBar(
+            GoBackTopAppBar(
                 title = R.string.add_post,
-                onQuitClick = {
+                onClick = {
                     if (isReadyToPost) {
                         viewModel.setShowExitDialog(true)
                     } else {
                         navController.popBackStack()
                     }
-                },
-                onContinueClick = { viewModel.createNewPost(spotReference) },
-                canContinue = isReadyToPost
+                }
             )
         },
         content = { paddingValues ->
@@ -123,7 +128,9 @@ fun AddPostScreen(
                     clearErrorToast = viewModel::clearErrorToastText,
                     uploadProgress = uploadProgress,
                     navigateTo = navController::navigate,
-                    clearUploadProgress = viewModel::clearUpdateProgressState
+                    clearUploadProgress = viewModel::clearUpdateProgressState,
+                    canContinue = isReadyToPost,
+                    onContinueClick = { viewModel.createNewPost(spotReference) }
                 )
             }
         }
@@ -148,10 +155,13 @@ fun AddPostContent(
     clearErrorToast: () -> Unit,
     uploadProgress: Resource<String>,
     navigateTo: (String) -> Unit,
-    clearUploadProgress: () -> Unit
+    clearUploadProgress: () -> Unit,
+    onContinueClick: () -> Unit,
+    canContinue: Boolean
 ) {
 
     val context = LocalContext.current
+    val scrollState = rememberScrollState()
 
     if (errorToast.isNotBlank()) {
         Toast.makeText(context, errorToast, Toast.LENGTH_SHORT).show()
@@ -173,7 +183,12 @@ fun AddPostContent(
         )
     }
 
-    Column(verticalArrangement = Arrangement.Top, modifier = Modifier.fillMaxSize()) {
+    Column(
+        verticalArrangement = Arrangement.Top,
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(scrollState)
+    ) {
         Box {
             AutoSlidingCarousel(
                 itemsCount = images.size,
@@ -266,6 +281,36 @@ fun AddPostContent(
             textStyle = secondaryRegularBodyL,
             textColor = Color(0xFF999999)
         )
+        CustomSpacer(size = 24.dp)
+        if (!canContinue) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp),
+                elevation = CardDefaults.cardElevation(8.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFFFB600))
+            ) {
+                Text(
+                    text = stringResource(id = R.string.rules_publish_post),
+                    textAlign = TextAlign.Justify,
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .align(Alignment.CenterHorizontally),
+                    color = Color.White,
+                    style = secondaryRegularBodyM
+                )
+            }
+            CustomSpacer(size = 24.dp)
+        }
+        SunsetButton(
+            text = R.string.continue_text,
+            enabled = canContinue,
+            onClick = {
+                onContinueClick()
+            },
+            modifier = Modifier.padding(horizontal = 24.dp)
+        )
+        CustomSpacer(size = 24.dp)
     }
 
     when (uploadProgress) {

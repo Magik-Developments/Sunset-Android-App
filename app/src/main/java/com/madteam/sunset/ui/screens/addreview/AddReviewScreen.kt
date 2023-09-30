@@ -19,6 +19,8 @@ import androidx.compose.material.icons.outlined.Brightness5
 import androidx.compose.material.icons.outlined.Brightness6
 import androidx.compose.material.icons.outlined.Brightness7
 import androidx.compose.material.icons.outlined.BrightnessLow
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -31,6 +33,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -44,10 +47,12 @@ import com.madteam.sunset.ui.common.CustomDivider
 import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.CustomTextField
 import com.madteam.sunset.ui.common.DismissAndPositiveDialog
-import com.madteam.sunset.ui.common.GoForwardTopAppBar
+import com.madteam.sunset.ui.common.GoBackTopAppBar
 import com.madteam.sunset.ui.common.ScoreSlider
+import com.madteam.sunset.ui.common.SunsetButton
 import com.madteam.sunset.ui.theme.primaryBoldDisplayS
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineL
+import com.madteam.sunset.ui.theme.secondaryRegularBodyM
 import com.madteam.sunset.ui.theme.secondaryRegularHeadlineS
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyM
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
@@ -88,19 +93,15 @@ fun AddReviewScreen(
 
     Scaffold(
         topBar = {
-            GoForwardTopAppBar(
+            GoBackTopAppBar(
                 title = R.string.add_review,
-                onQuitClick = {
+                onClick = {
                     if (isReadyToPost) {
                         viewModel.setShowExitDialog(true)
                     } else {
                         navController.popBackStack()
                     }
                 },
-                onContinueClick = {
-                    viewModel.createNewReview(spotReference)
-                },
-                canContinue = isReadyToPost
             )
         },
         content = { paddingValues ->
@@ -128,7 +129,9 @@ fun AddReviewScreen(
                     clearUploadProgress = viewModel::clearUpdateProgressState,
                     clearErrorToast = viewModel::clearErrorToastText,
                     showFinishedDialog = showFinishedDialog,
-                    setShowFinishedDialog = viewModel::setShowFinishedDialog
+                    setShowFinishedDialog = viewModel::setShowFinishedDialog,
+                    canContinue = isReadyToPost,
+                    onContinueClick = { viewModel.createNewReview(spotReference) }
                 )
             }
         }
@@ -156,7 +159,9 @@ fun AddReviewContent(
     navigateTo: (String) -> Unit,
     exitAddReview: () -> Unit,
     showFinishedDialog: Boolean,
-    setShowFinishedDialog: (Boolean) -> Unit
+    setShowFinishedDialog: (Boolean) -> Unit,
+    canContinue: Boolean,
+    onContinueClick: () -> Unit
 ) {
 
     val context = LocalContext.current
@@ -330,6 +335,35 @@ fun AddReviewContent(
             CustomSpacer(size = 8.dp)
             Text(text = reviewScore.toString(), style = primaryBoldDisplayS)
         }
+        CustomSpacer(size = 24.dp)
+        if (!canContinue) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp),
+                elevation = CardDefaults.cardElevation(8.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFFFB600))
+            ) {
+                Text(
+                    text = stringResource(id = R.string.rules_publish_review),
+                    textAlign = TextAlign.Justify,
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .align(Alignment.CenterHorizontally),
+                    color = Color.White,
+                    style = secondaryRegularBodyM
+                )
+            }
+            CustomSpacer(size = 24.dp)
+        }
+        SunsetButton(
+            text = R.string.continue_text,
+            enabled = canContinue,
+            onClick = {
+                onContinueClick()
+            },
+            modifier = Modifier.padding(horizontal = 24.dp)
+        )
         CustomSpacer(size = 24.dp)
     }
 

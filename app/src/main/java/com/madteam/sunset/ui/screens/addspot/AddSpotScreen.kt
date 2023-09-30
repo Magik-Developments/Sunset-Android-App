@@ -32,6 +32,8 @@ import androidx.compose.material.icons.outlined.BrightnessLow
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -72,8 +74,9 @@ import com.madteam.sunset.ui.common.CircularLoadingDialog
 import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.CustomTextField
 import com.madteam.sunset.ui.common.DismissAndPositiveDialog
-import com.madteam.sunset.ui.common.GoForwardTopAppBar
+import com.madteam.sunset.ui.common.GoBackTopAppBar
 import com.madteam.sunset.ui.common.ScoreSlider
+import com.madteam.sunset.ui.common.SunsetButton
 import com.madteam.sunset.ui.screens.addpost.MAX_IMAGES_SELECTED
 import com.madteam.sunset.ui.screens.addreview.FAVORABLE_ATTRIBUTES
 import com.madteam.sunset.ui.screens.addreview.NON_FAVORABLE_ATTRIBUTES
@@ -82,6 +85,7 @@ import com.madteam.sunset.ui.theme.primaryBoldDisplayS
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineL
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineM
 import com.madteam.sunset.ui.theme.primaryMediumHeadlineS
+import com.madteam.sunset.ui.theme.secondaryRegularBodyM
 import com.madteam.sunset.ui.theme.secondaryRegularHeadlineS
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyM
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
@@ -130,11 +134,9 @@ fun AddSpotScreen(
 
     Scaffold(
         topBar = {
-            GoForwardTopAppBar(
+            GoBackTopAppBar(
                 title = R.string.add_spot,
-                onQuitClick = { viewModel.setShowExitDialog(true) },
-                onContinueClick = { viewModel.createNewSpotIntent() },
-                canContinue = (spotScore != 0 && selectedAttributes.isNotEmpty() && spotTitle.isNotEmpty() && spotDescription.isNotEmpty() && imageUris.isNotEmpty())
+                onClick = { viewModel.setShowExitDialog(true) }
             )
         },
         content = { paddingValues ->
@@ -172,7 +174,9 @@ fun AddSpotScreen(
                     errorToast = errorToastText,
                     exitAddSpot = navController::popBackStack,
                     setShowExitDialog = viewModel::setShowExitDialog,
-                    showExitDialog = showExitDialog
+                    showExitDialog = showExitDialog,
+                    onContinueClick = { viewModel.createNewSpotIntent() },
+                    canContinue = (spotScore != 0 && selectedAttributes.isNotEmpty() && spotTitle.isNotEmpty() && spotDescription.isNotEmpty() && imageUris.isNotEmpty())
                 )
             }
         }
@@ -207,7 +211,9 @@ fun AddSpotContent(
     clearErrorToast: () -> Unit,
     showExitDialog: Boolean,
     exitAddSpot: () -> Unit,
-    setShowExitDialog: (Boolean) -> Unit
+    setShowExitDialog: (Boolean) -> Unit,
+    onContinueClick: () -> Unit,
+    canContinue: Boolean
 ) {
 
     val context = LocalContext.current
@@ -343,7 +349,7 @@ fun AddSpotContent(
                         .show()
                 }
             },
-            hint = R.string.add_title_review,
+            hint = R.string.add_name_spot,
             textStyle = secondarySemiBoldHeadLineS,
             textColor = Color(0xFF666666),
             maxLines = 2
@@ -539,6 +545,35 @@ fun AddSpotContent(
             CustomSpacer(size = 8.dp)
             Text(text = spotScore.toString(), style = primaryBoldDisplayS)
         }
+        CustomSpacer(size = 24.dp)
+        if (!canContinue) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp),
+                elevation = CardDefaults.cardElevation(8.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFFFB600))
+            ) {
+                Text(
+                    text = stringResource(id = R.string.rules_publish_spot),
+                    textAlign = TextAlign.Justify,
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .align(Alignment.CenterHorizontally),
+                    color = Color.White,
+                    style = secondaryRegularBodyM
+                )
+            }
+            CustomSpacer(size = 24.dp)
+        }
+        SunsetButton(
+            text = R.string.continue_text,
+            enabled = canContinue,
+            onClick = {
+                onContinueClick()
+            },
+            modifier = Modifier.padding(horizontal = 24.dp)
+        )
         CustomSpacer(size = 24.dp)
     }
 

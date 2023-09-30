@@ -34,7 +34,8 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.MapsComposeExperimentalApi
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.madteam.sunset.R
-import com.madteam.sunset.ui.common.GoForwardTopAppBar
+import com.madteam.sunset.ui.common.ContinueFAB
+import com.madteam.sunset.ui.common.GoBackTopAppBar
 import com.madteam.sunset.utils.getCurrentLocation
 import com.madteam.sunset.utils.googlemaps.MapState
 import com.madteam.sunset.utils.googlemaps.setMapProperties
@@ -58,17 +59,20 @@ fun SelectLocationScreen(
 
     Scaffold(
         topBar = {
-            GoForwardTopAppBar(
+            GoBackTopAppBar(
                 title = R.string.add_location,
-                onQuitClick = { navController.popBackStack() },
-                onContinueClick = {
+                onClick = { navController.popBackStack() }
+            )
+        },
+        floatingActionButton = {
+            if (selectedLocation.latitude != 0.0 && selectedLocation.longitude != 0.0) {
+                ContinueFAB {
                     navController.previousBackStackEntry
                         ?.savedStateHandle
                         ?.set("location", selectedLocation)
                     navController.popBackStack()
-                },
-                canContinue = selectedLocation.latitude != 0.0 && selectedLocation.longitude != 0.0
-            )
+                }
+            }
         },
         content = { paddingValues ->
             Box(

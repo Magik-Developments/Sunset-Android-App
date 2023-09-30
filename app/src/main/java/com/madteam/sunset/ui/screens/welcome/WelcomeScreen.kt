@@ -18,6 +18,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.madteam.sunset.R
 import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.FacebookButton
 import com.madteam.sunset.ui.common.GoogleButton
@@ -92,7 +93,7 @@ fun WelcomeContent(
         CustomSpacer(size = 8.dp)
         SubTitle(Modifier.align(Alignment.Start))
         CustomSpacer(size = 56.dp)
-        SunsetButton(onClick = onEmailClick)
+        SunsetButton(text = R.string.btn_continue_email, onClick = onEmailClick)
         CustomSpacer(size = 16.dp)
         GoogleButton(onClick = onGoogleClick)
         CustomSpacer(size = 16.dp)

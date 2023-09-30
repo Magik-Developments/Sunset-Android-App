@@ -1,5 +1,7 @@
 package com.madteam.sunset.ui.screens.selectLocation
 
+import android.location.Location
+import android.location.LocationManager
 import androidx.lifecycle.ViewModel
 import com.google.android.gms.maps.model.LatLng
 import com.madteam.sunset.utils.googlemaps.MapState
@@ -29,7 +31,11 @@ class SelectLocationViewModel @Inject constructor(
     }
 
     fun updateUserLocation(location: LatLng) {
+        val loc = Location(LocationManager.GPS_PROVIDER)
+        loc.latitude = location.latitude
+        loc.longitude = location.longitude
         _userLocation.value = location
+        _mapState.value = _mapState.value.copy(lastKnownLocation = loc)
     }
 
     fun setGoToUserLocation(state: Boolean) {

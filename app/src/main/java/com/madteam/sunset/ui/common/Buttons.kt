@@ -45,10 +45,16 @@ import com.madteam.sunset.ui.theme.secondarySemiBoldBodyS
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
 
 @Composable
-fun SunsetButton(onClick: () -> Unit) {
+fun SunsetButton(
+    @StringRes text: Int,
+    onClick: () -> Unit,
+    enabled: Boolean = true,
+    modifier: Modifier = Modifier
+) {
     Button(
         onClick = onClick,
-        modifier = Modifier
+        enabled = enabled,
+        modifier = modifier
             .fillMaxWidth()
             .height(48.dp)
             .clip(RoundedCornerShape(16.dp)),
@@ -59,7 +65,7 @@ fun SunsetButton(onClick: () -> Unit) {
     ) {
         Text(
             modifier = Modifier.align(Alignment.CenterVertically),
-            text = stringResource(R.string.btn_continue_email),
+            text = stringResource(text),
             color = Color(0xFFFFFFFF),
             style = secondarySemiBoldHeadLineS
         )
@@ -69,7 +75,8 @@ fun SunsetButton(onClick: () -> Unit) {
 @Preview
 @Composable
 fun PreviewEmailButton() {
-    SunsetTheme { SunsetButton {} }
+    SunsetTheme {
+    }
 }
 
 @Composable

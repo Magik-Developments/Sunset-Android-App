@@ -444,7 +444,7 @@ class DatabaseRepository @Inject constructor(
                 email = email ?: "",
                 provider = provider ?: "",
                 creation_date = creationDate ?: "",
-                name = usernameName ?: "",
+                name = usernameName?.lowercase() ?: "",
                 location = location ?: "",
                 image = userImage ?: "",
                 admin = isUserAdmin ?: false
@@ -649,7 +649,8 @@ class DatabaseRepository @Inject constructor(
         emit(Resource.Loading())
         val newPostDocument = firebaseFirestore.collection(POSTS_COLLECTION_PATH).document()
         val spotDocumentRef = firebaseFirestore.collection(SPOTS_COLLECTION_PATH).document(spotRef)
-        val authorRef = firebaseFirestore.collection(USERS_COLLECTION_PATH).document(authorUsername)
+        val authorRef =
+            firebaseFirestore.collection(USERS_COLLECTION_PATH).document(authorUsername.lowercase())
         var imagesList = listOf<String>()
         uploadImages(
             imagesUriList,
@@ -932,7 +933,8 @@ class DatabaseRepository @Inject constructor(
             ).document(it.id)
         }
 
-        val userRef = firebaseFirestore.collection(USERS_COLLECTION_PATH).document(author.username)
+        val userRef = firebaseFirestore.collection(USERS_COLLECTION_PATH)
+            .document(author.username.lowercase())
 
         val newReviewData = hashMapOf(
             "description" to description,
@@ -965,7 +967,7 @@ class DatabaseRepository @Inject constructor(
         val newSpotDocument = firebaseFirestore.collection(SPOTS_COLLECTION_PATH)
             .document()
         val authorReference = firebaseFirestore.collection(USERS_COLLECTION_PATH)
-            .document(spotAuthor)
+            .document(spotAuthor.lowercase())
         var featuredImagesList = listOf<String>()
         val attributesReferences = spotAttributes.map {
             firebaseFirestore.collection(
@@ -1162,7 +1164,7 @@ class DatabaseRepository @Inject constructor(
             .document()
         val newReport = hashMapOf(
             "type" to reportType,
-            "reporter" to reporterUsername,
+            "reporter" to reporterUsername.lowercase(),
             "issue" to reportIssue,
             "description" to reportDescription,
             "doc_reference" to firebaseFirestore.document(documentReference),
@@ -1229,7 +1231,7 @@ class DatabaseRepository @Inject constructor(
         val reportDocumentReference =
             firebaseFirestore.collection(REPORTS_COLLECTION_PATH).document(reportId)
         val updatedReport = hashMapOf<String, Any>(
-            "assigned_by" to username
+            "assigned_by" to username.lowercase()
         )
         reportDocumentReference.update(updatedReport).await()
         emit(Resource.Success("Updated successfully"))

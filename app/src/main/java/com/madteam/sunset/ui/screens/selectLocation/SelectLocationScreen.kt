@@ -119,7 +119,8 @@ fun SelectLocationContent(
         properties = setMapProperties(mapState = mapState),
         cameraPositionState = cameraPositionState,
         uiSettings = MapUiSettings(
-            zoomControlsEnabled = false
+            zoomControlsEnabled = false,
+            myLocationButtonEnabled = false
         )
     ) {
         SetupListenersAndMapView(

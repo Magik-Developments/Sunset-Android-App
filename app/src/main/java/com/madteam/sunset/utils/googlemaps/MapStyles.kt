@@ -6,5 +6,6 @@ enum class MapStyles(
     val mapStyleRes: Int
 ) {
     DEFAULT(R.raw.map_style),
-    NAKED(R.raw.naked_map_style)
+    NAKED(R.raw.naked_map_style),
+    DETAILED(R.raw.detailed_map_style)
 }

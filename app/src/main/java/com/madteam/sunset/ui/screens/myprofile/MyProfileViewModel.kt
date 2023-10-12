@@ -35,8 +35,6 @@ class MyProfileViewModel @Inject constructor(
     private val _showLogoutDialog: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val showLogoutDialog: StateFlow<Boolean> = _showLogoutDialog
 
-    val navigateWelcomeScreen = MutableStateFlow(false)
-
     init {
         initUI()
     }
@@ -90,6 +88,5 @@ class MyProfileViewModel @Inject constructor(
 
     fun logOut() {
         authRepository.logout()
-        navigateWelcomeScreen.value = true
     }
 }

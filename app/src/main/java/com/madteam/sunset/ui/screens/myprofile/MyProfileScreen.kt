@@ -70,14 +70,10 @@ fun MyProfileScreen(
     val settingsModalState =
         ModalBottomSheetState(initialValue = Hidden, isSkipHalfExpanded = true)
     val userInfo by viewModel.userInfo.collectAsStateWithLifecycle()
-    val navigateUp by viewModel.navigateWelcomeScreen.collectAsStateWithLifecycle()
     val selectedTab by viewModel.selectedTab.collectAsStateWithLifecycle()
     val userPosts by viewModel.userPosts.collectAsStateWithLifecycle()
     val userSpots by viewModel.userSpots.collectAsStateWithLifecycle()
     val showLogoutDialog by viewModel.showLogoutDialog.collectAsStateWithLifecycle()
-
-    if (navigateUp)
-        navController.navigate(SunsetRoutes.WelcomeScreen.route)
 
     ModalBottomSheetLayout(
         sheetContent = {
@@ -160,6 +156,7 @@ fun MyProfileContent(
             positiveClickedAction = {
                 setShowLogoutDialog(false)
                 logOut()
+                navigateTo(SunsetRoutes.WelcomeScreen.route)
             }
         )
     }

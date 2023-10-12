@@ -107,8 +107,8 @@ fun BottomSheetSignInContent(
         userValueText = "adrifernandevs@gmail.com"
         passwordTValueText = "Abc.1234"
 
-        userValueText = "oscarnav01@gmail.com"
-        passwordTValueText = "1234abcd"
+        // userValueText = "oscarnav01@gmail.com"
+        // passwordTValueText = "1234abcd"
 
         validateForm(userValueText, passwordTValueText)
     }

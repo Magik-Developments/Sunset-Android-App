@@ -237,14 +237,6 @@ fun BottomSheetSettingsMenu(
             CustomSpacer(size = 8.dp)
             CardHandler(modifier = Modifier.align(Alignment.CenterHorizontally))
 
-            //Log out option
-            SettingsMenuItem(
-                icon = Icons.Filled.Logout,
-                tint = Color(0xFFFF4444),
-                onClick = { onLogOutClick() },
-                text = R.string.log_out
-            )
-
             //Reports screen [admins only]
             if (isUserAdmin) {
                 SettingsMenuItem(
@@ -255,6 +247,14 @@ fun BottomSheetSettingsMenu(
             }
 
             //Add more options
+
+            //Log out option (Always the last option)
+            SettingsMenuItem(
+                icon = Icons.Filled.Logout,
+                tint = Color(0xFFFF4444),
+                onClick = { onLogOutClick() },
+                text = R.string.log_out
+            )
         }
     }
 }

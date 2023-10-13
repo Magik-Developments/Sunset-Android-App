@@ -76,7 +76,6 @@ fun MyProfileScreen(
     val showLogoutDialog by viewModel.showLogoutDialog.collectAsStateWithLifecycle()
 
     ModalBottomSheetLayout(
-        modifier = Modifier.padding(top = 24.dp),
         sheetContent = {
             BottomSheetSettingsMenu(
                 onLogOutClick = { viewModel.setShowExitDialog(true) },

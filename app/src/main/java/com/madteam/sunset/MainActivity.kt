@@ -1,9 +1,6 @@
 package com.madteam.sunset
 
-import android.content.Context
-import android.hardware.SensorManager
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -18,7 +15,6 @@ import com.google.android.gms.ads.MobileAds
 import com.madteam.sunset.data.repositories.AuthRepository
 import com.madteam.sunset.navigation.SunsetNavigation
 import com.madteam.sunset.ui.theme.SunsetTheme
-import com.squareup.seismic.ShakeDetector
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -31,12 +27,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-
-        val sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
-        val shakeDetector = ShakeDetector {
-            Toast.makeText(this, "ddd", Toast.LENGTH_SHORT).show()
-        }
-        shakeDetector.start(sensorManager, SensorManager.SENSOR_DELAY_GAME)
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
 

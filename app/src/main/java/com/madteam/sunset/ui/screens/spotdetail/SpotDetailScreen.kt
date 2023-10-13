@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
@@ -89,6 +90,7 @@ import com.madteam.sunset.utils.openDirectionsOnGoogleMaps
 import com.madteam.sunset.utils.shimmerBrush
 import kotlin.math.roundToInt
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun SpotDetailScreen(
     navController: NavController,
@@ -111,10 +113,9 @@ fun SpotDetailScreen(
     val selectedAttributeDialog by viewModel.attrSelectedDialog.collectAsStateWithLifecycle()
 
     Scaffold(
-        content = { paddingValues ->
+        content = { _ ->
             Box(
-                modifier = Modifier.padding(paddingValues),
-                contentAlignment = Alignment.Center
+                modifier = Modifier.padding(0.dp)
             ) {
                 SpotDetailContent(
                     spotInfo = spotInfo,
@@ -231,7 +232,7 @@ fun SpotDetailContent(
     Column(
         modifier = Modifier
             .verticalScroll(scrollState)
-            .padding(bottom = 40.dp)
+            .fillMaxSize()
     ) {
         //Header image section
         ConstraintLayout(modifier = Modifier.fillMaxWidth()) {

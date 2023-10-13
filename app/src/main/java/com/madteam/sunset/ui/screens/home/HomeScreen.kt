@@ -124,7 +124,6 @@ fun HomeContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 48.dp)
             .verticalScroll(scrollState)
     ) {
         if (remainingTimeToSunset.isNotEmpty()) {

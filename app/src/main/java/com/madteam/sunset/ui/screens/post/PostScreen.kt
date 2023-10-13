@@ -64,7 +64,6 @@ fun PostScreen(
     val postLikes by viewModel.postLikes.collectAsState()
 
     Scaffold(
-        modifier = Modifier.padding(top = 24.dp),
         topBar = {
             GoBackTopAppBar(title = R.string.spot_post_title) {
                 navController.popBackStack()

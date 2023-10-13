@@ -58,7 +58,6 @@ fun PostReviewScreen(
     val selectedAttrInfoDialog by viewModel.selectedAttrInfoDialog.collectAsStateWithLifecycle()
 
     Scaffold(
-        modifier = Modifier.padding(top = 24.dp),
         topBar = {
             GoBackVariantTitleTopAppBar(title = reviewInfo.postedBy.username + " review") {
                 navController.popBackStack()

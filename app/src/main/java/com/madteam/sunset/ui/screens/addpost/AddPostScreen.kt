@@ -48,6 +48,7 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.madteam.sunset.R
+import com.madteam.sunset.navigation.SunsetRoutes
 import com.madteam.sunset.ui.common.AutoSlidingCarousel
 import com.madteam.sunset.ui.common.CircularLoadingDialog
 import com.madteam.sunset.ui.common.CustomSpacer
@@ -127,7 +128,7 @@ fun AddPostScreen(
                     errorToast = errorToastText,
                     clearErrorToast = viewModel::clearErrorToastText,
                     uploadProgress = uploadProgress,
-                    navigateTo = navController::navigate,
+                    navController = navController,
                     clearUploadProgress = viewModel::clearUpdateProgressState,
                     canContinue = isReadyToPost,
                     onContinueClick = { viewModel.createNewPost(spotReference) }
@@ -154,7 +155,7 @@ fun AddPostContent(
     exitAddPost: () -> Unit,
     clearErrorToast: () -> Unit,
     uploadProgress: Resource<String>,
-    navigateTo: (String) -> Unit,
+    navController: NavController,
     clearUploadProgress: () -> Unit,
     onContinueClick: () -> Unit,
     canContinue: Boolean
@@ -337,7 +338,9 @@ fun AddPostContent(
         is Resource.Success -> {
             if (uploadProgress.data != "") {
                 LaunchedEffect(key1 = uploadProgress.data) {
-                    navigateTo("post_screen/postReference=${uploadProgress.data}")
+                    navController.navigate(SunsetRoutes.DiscoverScreen.route) {
+                        popUpTo(SunsetRoutes.AddPostScreen.route) { inclusive = true }
+                    }
                     clearUploadProgress()
                 }
             } else if (uploadProgress.data.contains("Error")) {

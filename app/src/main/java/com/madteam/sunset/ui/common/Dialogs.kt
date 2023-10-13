@@ -58,7 +58,7 @@ fun DismissAndPositiveDialog(
     dismissClickedAction: () -> Unit,
     positiveClickedAction: () -> Unit = {}
 ) {
-    Dialog(onDismissRequest = { setShowDialog(false) }) {
+    Dialog(onDismissRequest = { }) {
         Card(
             shape = RoundedCornerShape(20.dp),
             elevation = 2.dp,

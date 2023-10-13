@@ -92,6 +92,7 @@ fun AddReviewScreen(
     }
 
     Scaffold(
+        modifier = Modifier.padding(top = 24.dp),
         topBar = {
             GoBackTopAppBar(
                 title = R.string.add_review,

@@ -59,6 +59,7 @@ fun SelectLocationScreen(
     viewModel.updateSelectedLocation(LatLng(lat.toDouble(), long.toDouble()))
 
     Scaffold(
+        modifier = Modifier.padding(top = 24.dp),
         topBar = {
             GoBackTopAppBar(
                 title = R.string.add_location,

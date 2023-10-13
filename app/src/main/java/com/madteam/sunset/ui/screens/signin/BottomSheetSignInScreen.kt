@@ -101,14 +101,14 @@ fun BottomSheetSignInContent(
     var invalidCredentials by remember { mutableStateOf(false) }
 
     if (BuildConfig.DEBUG) {
-        //userValueText = "adriafernandez14@gmail.com"
-        //passwordTValueText = "abc.12345"
+        userValueText = "adriafernandez14@gmail.com"
+        passwordTValueText = "abc.12345"
 
-        userValueText = "adrifernandevs@gmail.com"
-        passwordTValueText = "Abc.1234"
+        //userValueText = "adrifernandevs@gmail.com"
+        //passwordTValueText = "Abc.1234"
 
-        userValueText = "oscarnav01@gmail.com"
-        passwordTValueText = "1234abcd"
+        // userValueText = "oscarnav01@gmail.com"
+        // passwordTValueText = "1234abcd"
 
         validateForm(userValueText, passwordTValueText)
     }
@@ -215,7 +215,5 @@ fun BottomSheetSignInContent(
             }
             clearSignInState()
         }
-
-        else -> {}
     }
 }

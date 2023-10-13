@@ -133,6 +133,7 @@ fun AddSpotScreen(
     }
 
     Scaffold(
+        modifier = Modifier.padding(top = 24.dp),
         topBar = {
             GoBackTopAppBar(
                 title = R.string.add_spot,
@@ -167,6 +168,7 @@ fun AddSpotScreen(
                     selectedAttributes = selectedAttributes,
                     onAttributeClicked = viewModel::modifySelectedAttributes,
                     spotScore = spotScore,
+                    navController = navController,
                     onReviewScoreChanged = viewModel::modifyReviewScore,
                     uploadProgress = uploadProgress,
                     clearUploadProgress = viewModel::clearUploadProgressState,
@@ -196,6 +198,7 @@ fun AddSpotContent(
     spotDescription: String,
     onSpotDescriptionChanged: (String) -> Unit,
     navigateTo: (String) -> Unit,
+    navController: NavController,
     selectedLocation: LatLng,
     mapState: MapState,
     locationLocality: String,
@@ -601,7 +604,13 @@ fun AddSpotContent(
         is Resource.Success -> {
             if (uploadProgress.data != "") {
                 LaunchedEffect(key1 = uploadProgress.data) {
-                    navigateTo("spot_detail_screen/spotReference=${uploadProgress.data}")
+                    navController.popBackStack(
+                        route = "spot_detail_screen/spotReference=${uploadProgress.data}",
+                        inclusive = false
+                    )
+                    navController.navigate("spot_detail_screen/spotReference=${uploadProgress.data}") {
+                        popUpTo(SunsetRoutes.AddSpotScreen.route) { inclusive = true }
+                    }
                     clearUploadProgress()
                 }
             } else if (uploadProgress.data.contains("Error")) {

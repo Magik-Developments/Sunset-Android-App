@@ -52,6 +52,7 @@ fun CommentsScreen(
     val selectedComment by viewModel.selectedComment.collectAsStateWithLifecycle()
 
     Scaffold(
+        modifier = Modifier.padding(top = 24.dp),
         topBar = {
             if (selectedComment == PostComment()) {
                 GoBackTopAppBar(title = R.string.comments_title) {

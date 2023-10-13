@@ -38,6 +38,7 @@ import com.madteam.sunset.ui.common.ContinueFAB
 import com.madteam.sunset.ui.common.GoBackTopAppBar
 import com.madteam.sunset.utils.getCurrentLocation
 import com.madteam.sunset.utils.googlemaps.MapState
+import com.madteam.sunset.utils.googlemaps.MapStyles
 import com.madteam.sunset.utils.googlemaps.setMapProperties
 import com.madteam.sunset.utils.googlemaps.updateCameraLocation
 import com.madteam.sunset.utils.hasLocationPermission
@@ -58,6 +59,7 @@ fun SelectLocationScreen(
     viewModel.updateSelectedLocation(LatLng(lat.toDouble(), long.toDouble()))
 
     Scaffold(
+        modifier = Modifier.padding(top = 24.dp),
         topBar = {
             GoBackTopAppBar(
                 title = R.string.add_location,
@@ -120,7 +122,7 @@ fun SelectLocationContent(
 
     GoogleMap(
         modifier = Modifier.fillMaxSize(),
-        properties = setMapProperties(mapState = mapState),
+        properties = setMapProperties(mapState = mapState, mapStyle = MapStyles.DETAILED),
         cameraPositionState = cameraPositionState,
         uiSettings = MapUiSettings(
             zoomControlsEnabled = false,

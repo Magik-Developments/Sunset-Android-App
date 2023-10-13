@@ -92,6 +92,7 @@ fun AddReviewScreen(
     }
 
     Scaffold(
+        modifier = Modifier.padding(top = 24.dp),
         topBar = {
             GoBackTopAppBar(
                 title = R.string.add_review,
@@ -125,7 +126,7 @@ fun AddReviewScreen(
                     exitAddReview = navController::popBackStack,
                     uploadProgress = uploadProgress,
                     errorToast = errorToastText,
-                    navigateTo = navController::navigate,
+                    navController = navController,
                     clearUploadProgress = viewModel::clearUpdateProgressState,
                     clearErrorToast = viewModel::clearErrorToastText,
                     showFinishedDialog = showFinishedDialog,
@@ -156,7 +157,7 @@ fun AddReviewContent(
     onAttributeClicked: (SpotAttribute) -> Unit,
     onReviewScoreChanged: (Float) -> Unit,
     setShowExitDialog: (Boolean) -> Unit,
-    navigateTo: (String) -> Unit,
+    navController: NavController,
     exitAddReview: () -> Unit,
     showFinishedDialog: Boolean,
     setShowFinishedDialog: (Boolean) -> Unit,
@@ -373,7 +374,11 @@ fun AddReviewContent(
             dialogTitle = R.string.post_review_finished,
             dialogDescription = R.string.post_review_finished_description,
             dismissButtonText = R.string.continue_text,
-            dismissClickedAction = { navigateTo(SunsetRoutes.DiscoverScreen.route) }
+            dismissClickedAction = {
+                navController.navigate(SunsetRoutes.DiscoverScreen.route) {
+                    popUpTo(SunsetRoutes.AddSpotReviewScreen.route) { inclusive = true }
+                }
+            }
         )
     }
 

@@ -198,7 +198,6 @@ fun AddSpotContent(
 
     val context = LocalContext.current
     val scrollState = rememberScrollState()
-    val scope = rememberCoroutineScope()
     val cameraPositionState = rememberCameraPositionState()
 
     if (errorToast.isNotBlank()) {
@@ -528,18 +527,22 @@ fun AddSpotContent(
         }
 
         is Resource.Success -> {
-            if (uploadProgress.data != "") {
+            if (uploadProgress.data != "" && uploadProgress.data!!.contains("Error")) {
+                LaunchedEffect(key1 = uploadProgress.data) {
+                    Toast.makeText(context, "Error, try again later.", Toast.LENGTH_SHORT).show()
+                    clearUploadProgress()
+                }
+            } else if (uploadProgress.data != "" && uploadProgress.data.contains("deleted")) {
+                LaunchedEffect(key1 = uploadProgress.data) {
+                    Toast.makeText(context, "Spot deleted successfully.", Toast.LENGTH_SHORT).show()
+                    navigateTo(SunsetRoutes.DiscoverScreen.route)
+                    clearUploadProgress()
+                }
+            } else if (uploadProgress.data != "") {
                 LaunchedEffect(key1 = uploadProgress.data) {
                     navigateTo("spot_detail_screen/spotReference=${uploadProgress.data}")
                     clearUploadProgress()
                 }
-            } else if (uploadProgress.data.contains("Error")) {
-                Toast.makeText(context, "Error, try again later.", Toast.LENGTH_SHORT).show()
-                clearUploadProgress()
-            } else if (uploadProgress.data.contains("deleted")) {
-                Toast.makeText(context, "Spot deleted successfully.", Toast.LENGTH_SHORT).show()
-                navigateTo(SunsetRoutes.DiscoverScreen.route)
-                clearUploadProgress()
             }
         }
 

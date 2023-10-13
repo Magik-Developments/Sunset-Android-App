@@ -56,6 +56,7 @@ fun SeeReportsScreen(
     val reportsList by viewModel.reportsList.collectAsStateWithLifecycle()
 
     Scaffold(
+        modifier = Modifier.padding(top = 24.dp),
         topBar = {
             GoBackTopAppBar(title = R.string.reports, onClick = { navController.popBackStack() })
         },

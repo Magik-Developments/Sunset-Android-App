@@ -45,9 +45,9 @@ fun SunsetPredictionScreen(
 
     Scaffold(
         bottomBar = { SunsetBottomNavigation(navController = navController) },
-        content = { paddingValues ->
+        content = { _ ->
             Box(
-                modifier = Modifier.padding(paddingValues),
+                modifier = Modifier.padding(0.dp),
                 contentAlignment = Alignment.Center
             ) {
                 SunsetPredictionContent()
@@ -85,6 +85,7 @@ fun SunsetPredictionContent(
         ConstraintLayout(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(top = 8.dp)
         ) {
 
             val (location, changeLocationButton, reloadInfoButton, date, backDayButton, nextDayButton, scoreNumber, score, scoreInfoButton) = createRefs()

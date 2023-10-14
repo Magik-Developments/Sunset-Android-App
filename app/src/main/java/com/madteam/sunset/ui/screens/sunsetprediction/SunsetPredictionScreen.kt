@@ -1,10 +1,13 @@
 package com.madteam.sunset.ui.screens.sunsetprediction
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -23,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -37,6 +41,7 @@ import com.madteam.sunset.ui.theme.primaryBoldDisplayM
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineM
 import com.madteam.sunset.ui.theme.primaryMediumHeadlineXS
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyL
+import kotlinx.coroutines.delay
 
 @Composable
 fun SunsetPredictionScreen(
@@ -45,9 +50,9 @@ fun SunsetPredictionScreen(
 
     Scaffold(
         bottomBar = { SunsetBottomNavigation(navController = navController) },
-        content = { _ ->
+        content = { paddingValues ->
             Box(
-                modifier = Modifier.padding(0.dp),
+                modifier = Modifier.padding(paddingValues),
                 contentAlignment = Alignment.Center
             ) {
                 SunsetPredictionContent()
@@ -62,7 +67,12 @@ fun SunsetPredictionContent(
 ) {
 
     val scrollState = rememberScrollState()
-    var scorePercentage by remember { mutableIntStateOf(0) }
+    var scorePercentage by remember {
+        mutableIntStateOf(0)
+    }
+    var scoreTextVisible by remember {
+        mutableStateOf(false)
+    }
     val scoreNumberAnimated by animateIntAsState(
         targetValue = scorePercentage,
         animationSpec = tween(
@@ -74,6 +84,10 @@ fun SunsetPredictionContent(
     )
     LaunchedEffect(Unit) {
         scorePercentage = 88
+    }
+    LaunchedEffect(Unit) {
+        delay(4000)
+        scoreTextVisible = true
     }
 
     Column(
@@ -177,29 +191,34 @@ fun SunsetPredictionContent(
                         end.linkTo(parent.end)
                     }
             )
-            Text(
-                text = "Excellent",
-                style = secondarySemiBoldBodyL,
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .constrainAs(score) {
                         top.linkTo(scoreNumber.bottom)
                         start.linkTo(scoreNumber.start)
                         end.linkTo(scoreNumber.end)
                     }
-            )
-            IconButton(
-                onClick = { /*TODO*/ },
-                modifier = Modifier
-                    .constrainAs(scoreInfoButton) {
-                        top.linkTo(score.bottom)
-                        start.linkTo(score.start)
-                        end.linkTo(score.end)
-                    }
             ) {
-                Icon(
-                    imageVector = Icons.Default.Info,
-                    contentDescription = "What does the score means"
-                )
+                AnimatedVisibility(visible = true) {
+                    Row(
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "Excellent",
+                            style = secondarySemiBoldBodyL,
+                            modifier = Modifier.align(Alignment.CenterVertically)
+                        )
+                        IconButton(
+                            onClick = { /*TODO*/ }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Info,
+                                contentDescription = "What does the score means"
+                            )
+                        }
+                    }
+                }
             }
 
         }

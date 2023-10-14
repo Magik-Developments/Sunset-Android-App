@@ -10,7 +10,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronLeft
@@ -18,6 +20,9 @@ import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -36,11 +41,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
+import com.madteam.sunset.R
+import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.SunsetBottomNavigation
 import com.madteam.sunset.ui.theme.primaryBoldDisplayM
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineM
 import com.madteam.sunset.ui.theme.primaryMediumHeadlineXS
+import com.madteam.sunset.ui.theme.secondaryRegularBodyM
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyL
+import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
 import kotlinx.coroutines.delay
 
 @Composable
@@ -62,6 +75,7 @@ fun SunsetPredictionScreen(
 
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SunsetPredictionContent(
 ) {
@@ -200,7 +214,7 @@ fun SunsetPredictionContent(
                         end.linkTo(scoreNumber.end)
                     }
             ) {
-                AnimatedVisibility(visible = true) {
+                AnimatedVisibility(visible = scoreTextVisible) {
                     Row(
                         horizontalArrangement = Arrangement.Center
                     ) {
@@ -222,7 +236,59 @@ fun SunsetPredictionContent(
             }
 
         }
+        CustomSpacer(size = 24.dp)
+        Card(
+            elevation = CardDefaults.cardElevation(8.dp),
+            shape = RoundedCornerShape(20.dp),
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            ConstraintLayout(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                val dayLightIconAnimation by rememberLottieComposition(
+                    spec = LottieCompositionSpec.RawRes(
+                        R.raw.sun_vector_animation
+                    )
+                )
+                val (dayLightIcon, dayLightText, dayLightTime) = createRefs()
 
+                Box(
+                    modifier = Modifier
+                        .size(80.dp)
+                        .constrainAs(dayLightIcon) {
+                            top.linkTo(parent.top)
+                            start.linkTo(parent.start, 16.dp)
+                        }
+                ) {
+                    LottieAnimation(
+                        composition = dayLightIconAnimation,
+                        iterations = LottieConstants.IterateForever,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+                Text(
+                    text = "Daylight",
+                    style = secondaryRegularBodyM,
+                    modifier = Modifier.constrainAs(dayLightText) {
+                        top.linkTo(dayLightIcon.bottom)
+                        start.linkTo(dayLightIcon.start)
+                        end.linkTo(dayLightIcon.end)
+                    }
+                )
+                Text(
+                    text = "18:56",
+                    style = secondarySemiBoldHeadLineS,
+                    modifier = Modifier
+                        .padding(bottom = 16.dp)
+                        .constrainAs(dayLightTime) {
+                            top.linkTo(dayLightText.bottom)
+                            start.linkTo(dayLightIcon.start)
+                            end.linkTo(dayLightIcon.end)
+                        }
+                )
+            }
+        }
     }
 
 }

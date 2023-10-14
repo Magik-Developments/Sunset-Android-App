@@ -1,5 +1,8 @@
 package com.madteam.sunset.ui.screens.sunsetprediction
 
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateIntAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,6 +20,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -51,10 +59,22 @@ fun SunsetPredictionScreen(
 
 @Composable
 fun SunsetPredictionContent(
-
 ) {
 
     val scrollState = rememberScrollState()
+    var scorePercentage by remember { mutableIntStateOf(0) }
+    val scoreNumberAnimated by animateIntAsState(
+        targetValue = scorePercentage,
+        animationSpec = tween(
+            durationMillis = 3000,
+            easing = FastOutSlowInEasing,
+            delayMillis = 500
+        ),
+        label = "Score number animation"
+    )
+    LaunchedEffect(Unit) {
+        scorePercentage = 88
+    }
 
     Column(
         modifier = Modifier
@@ -146,7 +166,7 @@ fun SunsetPredictionContent(
                 )
             }
             Text(
-                text = "88%",
+                text = "$scoreNumberAnimated%",
                 style = primaryBoldDisplayM,
                 fontSize = 60.sp,
                 modifier = Modifier

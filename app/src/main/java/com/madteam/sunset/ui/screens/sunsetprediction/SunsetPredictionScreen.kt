@@ -59,6 +59,7 @@ import com.madteam.sunset.ui.common.SunsetBottomNavigation
 import com.madteam.sunset.ui.theme.primaryBoldDisplayM
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineM
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineS
+import com.madteam.sunset.ui.theme.primaryBoldHeadlineXS
 import com.madteam.sunset.ui.theme.primaryMediumHeadlineXS
 import com.madteam.sunset.ui.theme.secondaryRegularBodyM
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
@@ -175,7 +176,7 @@ fun SunsetPredictionContent(
                 .fillMaxSize()
                 .padding(top = 8.dp)
         ) {
-            val (location, changeLocationButton, reloadInfoButton, date, scoreNumber) = createRefs()
+            val (location, changeLocationButton, reloadInfoButton, date, scoreNumber, qualityTitle) = createRefs()
             Text(
                 text = userLocality,
                 style = primaryBoldHeadlineM,
@@ -232,6 +233,16 @@ fun SunsetPredictionContent(
                 modifier = Modifier
                     .constrainAs(scoreNumber) {
                         top.linkTo(date.bottom, 24.dp)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    }
+            )
+            Text(
+                text = "Sunset quality score",
+                style = primaryBoldHeadlineXS,
+                modifier = Modifier
+                    .constrainAs(qualityTitle) {
+                        top.linkTo(scoreNumber.bottom)
                         start.linkTo(parent.start)
                         end.linkTo(parent.end)
                     }
@@ -346,6 +357,11 @@ fun SunsetPredictionContent(
                         R.raw.moon_vector_animation
                     )
                 )
+                val goldenHourIconAnimation by rememberLottieComposition(
+                    spec = LottieCompositionSpec.RawRes(
+                        R.raw.golden_hour_animation
+                    )
+                )
                 val (dayLightIcon, dayLightText, dayLightTime) = createRefs()
                 val (goldenHourIcon, goldenHourText, goldenHourTime) = createRefs()
                 val (blueHourIcon, blueHourText, blueHourTime) = createRefs()
@@ -394,12 +410,15 @@ fun SunsetPredictionContent(
                             top.linkTo(parent.top)
                             start.linkTo(parent.start)
                             end.linkTo(parent.end)
-                        }
+                        },
+                    contentAlignment = Alignment.Center
                 ) {
                     LottieAnimation(
-                        composition = dayLightIconAnimation,
+                        composition = goldenHourIconAnimation,
                         iterations = LottieConstants.IterateForever,
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier.size(50.dp),
+                        alignment = Alignment.Center,
+                        reverseOnRepeat = true
                     )
                 }
                 Text(

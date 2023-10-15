@@ -114,4 +114,6 @@
     <string name="rules_publish_spot">Complete the following information to publish the Spot: \n 1. Minimum 1 image \n 2. Add Name and Description \n 3. Add location \n 4. Add some attributes \n 5. Score it!</string>
     <string name="rules_publish_post">Add some images to post</string>
     <string name="rules_publish_review">Complete the following information to add the review: \n 1. Add a title and description \n 2. Add some attributes \n 3. Score it! </string>
+    <string name="enable_location_description">We need to know where you are in order to offer you the correct information about the Sunsets</string>
+    <string name="enable_location_title">Your location is needed</string>
 </resources>

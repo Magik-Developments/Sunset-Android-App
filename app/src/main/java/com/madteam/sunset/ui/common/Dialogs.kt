@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -42,7 +43,13 @@ import androidx.compose.ui.text.style.TextAlign.Companion
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.constraintlayout.compose.ConstraintLayout
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.madteam.sunset.R
+import com.madteam.sunset.ui.theme.primaryBoldHeadlineM
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineS
 import com.madteam.sunset.ui.theme.secondaryRegularBodyL
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyL
@@ -350,5 +357,79 @@ fun PreviewReportDialog() {
         reportSent = false,
         setShowReportSent = {}
     )
+}
+
+@Composable
+fun LocationPermissionDialog() {
+    Dialog(onDismissRequest = {}) {
+        Card(
+            shape = RoundedCornerShape(20.dp),
+            elevation = 2.dp,
+            modifier = Modifier
+                .padding(24.dp)
+                .wrapContentSize()
+        ) {
+            ConstraintLayout(
+                modifier = Modifier
+                    .padding(24.dp)
+            ) {
+                val (title, animation, description, button) = createRefs()
+                val locationAnimation by rememberLottieComposition(
+                    spec = LottieCompositionSpec.RawRes(
+                        R.raw.location_animation
+                    )
+                )
+
+                LottieAnimation(
+                    composition = locationAnimation,
+                    iterations = LottieConstants.IterateForever,
+                    modifier = Modifier
+                        .size(200.dp)
+                        .constrainAs(animation) {
+                            top.linkTo(parent.top)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                        }
+                )
+                Text(
+                    text = stringResource(id = R.string.enable_location_title),
+                    style = primaryBoldHeadlineM,
+                    textAlign = Companion.Center,
+                    modifier = Modifier.constrainAs(title) {
+                        top.linkTo(animation.bottom, 16.dp)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    }
+                )
+                Text(
+                    text = stringResource(id = R.string.enable_location_description),
+                    style = secondaryRegularBodyL,
+                    textAlign = Companion.Center,
+                    modifier = Modifier.constrainAs(description) {
+                        top.linkTo(title.bottom, 16.dp)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    }
+                )
+                SmallButtonSunset(
+                    onClick = { /*TODO*/ },
+                    text = R.string.enable_location,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .constrainAs(button) {
+                            top.linkTo(description.bottom, 24.dp)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                        }
+                )
+            }
+        }
+    }
+}
+
+@Preview(showSystemUi = true)
+@Composable
+fun LocationPermissionDialogPreview() {
+    LocationPermissionDialog()
 }
 

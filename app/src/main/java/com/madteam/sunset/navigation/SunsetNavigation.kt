@@ -268,7 +268,7 @@ fun SunsetNavigation(
         }
 
         composable(SunsetRoutes.SunsetPredictionScreen.route) {
-            SunsetPredictionScreen(navController)
+            SunsetPredictionScreen(navController = navController)
         }
 
     }

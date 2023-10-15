@@ -1,5 +1,8 @@
 package com.madteam.sunset.ui.screens.sunsetprediction
 
+import android.Manifest
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateIntAsState
@@ -33,6 +36,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -54,6 +58,7 @@ import com.madteam.sunset.ui.theme.primaryBoldHeadlineS
 import com.madteam.sunset.ui.theme.primaryMediumHeadlineXS
 import com.madteam.sunset.ui.theme.secondaryRegularBodyM
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
+import com.madteam.sunset.utils.hasLocationPermission
 import kotlinx.coroutines.delay
 
 @Composable
@@ -77,6 +82,29 @@ fun SunsetPredictionScreen(
 @Composable
 fun SunsetPredictionContent(
 ) {
+
+    val context = LocalContext.current
+
+    val requestLocationPermissionLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission(),
+            onResult = { isGranted ->
+                if (isGranted) {
+                    //TODO: Do whatever when granted
+                } else {
+                    //TODO: Not granted
+                }
+            })
+
+    LaunchedEffect(Unit) {
+        if (hasLocationPermission(context)) {
+            //TODO: Update location
+        } else {
+            //TODO: Launch location dialog
+            requestLocationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+    }
+
     val scrollState = rememberScrollState()
     var scorePercentage by remember {
         mutableIntStateOf(0)

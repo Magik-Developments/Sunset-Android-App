@@ -360,7 +360,9 @@ fun PreviewReportDialog() {
 }
 
 @Composable
-fun LocationPermissionDialog() {
+fun LocationPermissionDialog(
+    onContinueClick: () -> Unit
+) {
     Dialog(onDismissRequest = {}) {
         Card(
             shape = RoundedCornerShape(20.dp),
@@ -412,7 +414,7 @@ fun LocationPermissionDialog() {
                     }
                 )
                 SmallButtonSunset(
-                    onClick = { /*TODO*/ },
+                    onClick = { onContinueClick() },
                     text = R.string.enable_location,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -430,6 +432,6 @@ fun LocationPermissionDialog() {
 @Preview(showSystemUi = true)
 @Composable
 fun LocationPermissionDialogPreview() {
-    LocationPermissionDialog()
+    LocationPermissionDialog {}
 }
 

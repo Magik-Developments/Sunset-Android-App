@@ -251,8 +251,16 @@ fun SunsetPredictionContent(
                         R.raw.sun_vector_animation
                     )
                 )
+                val blueHourIconAnimation by rememberLottieComposition(
+                    spec = LottieCompositionSpec.RawRes(
+                        R.raw.moon_vector_animation
+                    )
+                )
                 val (dayLightIcon, dayLightText, dayLightTime) = createRefs()
+                val (goldenHourIcon, goldenHourText, goldenHourTime) = createRefs()
+                val (blueHourIcon, blueHourText, blueHourTime) = createRefs()
 
+                //Daylight
                 Box(
                     modifier = Modifier
                         .size(80.dp)
@@ -285,6 +293,79 @@ fun SunsetPredictionContent(
                             top.linkTo(dayLightText.bottom)
                             start.linkTo(dayLightIcon.start)
                             end.linkTo(dayLightIcon.end)
+                        }
+                )
+
+                //Golden hour
+                Box(
+                    modifier = Modifier
+                        .size(80.dp)
+                        .constrainAs(goldenHourIcon) {
+                            top.linkTo(parent.top)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                        }
+                ) {
+                    LottieAnimation(
+                        composition = dayLightIconAnimation,
+                        iterations = LottieConstants.IterateForever,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+                Text(
+                    text = "Golden hour",
+                    style = secondaryRegularBodyM,
+                    modifier = Modifier.constrainAs(goldenHourText) {
+                        top.linkTo(goldenHourIcon.bottom)
+                        start.linkTo(goldenHourIcon.start)
+                        end.linkTo(goldenHourIcon.end)
+                    }
+                )
+                Text(
+                    text = "19:24",
+                    style = secondarySemiBoldHeadLineS,
+                    modifier = Modifier
+                        .padding(bottom = 16.dp)
+                        .constrainAs(goldenHourTime) {
+                            top.linkTo(goldenHourText.bottom)
+                            start.linkTo(goldenHourIcon.start)
+                            end.linkTo(goldenHourIcon.end)
+                        }
+                )
+
+                //Blue hour
+                Box(
+                    modifier = Modifier
+                        .size(80.dp)
+                        .constrainAs(blueHourIcon) {
+                            top.linkTo(parent.top)
+                            end.linkTo(parent.end, 16.dp)
+                        }
+                ) {
+                    LottieAnimation(
+                        composition = blueHourIconAnimation,
+                        iterations = LottieConstants.IterateForever,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+                Text(
+                    text = "Blue hour",
+                    style = secondaryRegularBodyM,
+                    modifier = Modifier.constrainAs(blueHourText) {
+                        top.linkTo(blueHourIcon.bottom)
+                        start.linkTo(blueHourIcon.start)
+                        end.linkTo(blueHourIcon.end)
+                    }
+                )
+                Text(
+                    text = "19:53",
+                    style = secondarySemiBoldHeadLineS,
+                    modifier = Modifier
+                        .padding(bottom = 16.dp)
+                        .constrainAs(blueHourTime) {
+                            top.linkTo(blueHourText.bottom)
+                            start.linkTo(blueHourIcon.start)
+                            end.linkTo(blueHourIcon.end)
                         }
                 )
             }

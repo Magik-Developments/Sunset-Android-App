@@ -9,20 +9,17 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ChevronLeft
-import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.ExpandMore
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -36,6 +33,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -50,9 +49,9 @@ import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.SunsetBottomNavigation
 import com.madteam.sunset.ui.theme.primaryBoldDisplayM
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineM
+import com.madteam.sunset.ui.theme.primaryBoldHeadlineS
 import com.madteam.sunset.ui.theme.primaryMediumHeadlineXS
 import com.madteam.sunset.ui.theme.secondaryRegularBodyM
-import com.madteam.sunset.ui.theme.secondarySemiBoldBodyL
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
 import kotlinx.coroutines.delay
 
@@ -75,7 +74,6 @@ fun SunsetPredictionScreen(
 
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SunsetPredictionContent(
 ) {
@@ -84,7 +82,7 @@ fun SunsetPredictionContent(
     var scorePercentage by remember {
         mutableIntStateOf(0)
     }
-    var scoreTextVisible by remember {
+    var isQualityModuleVisible by remember {
         mutableStateOf(false)
     }
     val scoreNumberAnimated by animateIntAsState(
@@ -101,7 +99,7 @@ fun SunsetPredictionContent(
     }
     LaunchedEffect(Unit) {
         delay(4000)
-        scoreTextVisible = true
+        isQualityModuleVisible = true
     }
 
     Column(
@@ -116,7 +114,7 @@ fun SunsetPredictionContent(
                 .padding(top = 8.dp)
         ) {
 
-            val (location, changeLocationButton, reloadInfoButton, date, backDayButton, nextDayButton, scoreNumber, score, scoreInfoButton) = createRefs()
+            val (location, changeLocationButton, reloadInfoButton, date, scoreNumber) = createRefs()
 
             Text(
                 text = "Terrassa, BCN",
@@ -166,34 +164,6 @@ fun SunsetPredictionContent(
                     contentDescription = "Reload sunset info"
                 )
             }
-            IconButton(
-                onClick = { /*TODO*/ },
-                modifier = Modifier
-                    .constrainAs(backDayButton) {
-                        top.linkTo(date.top)
-                        bottom.linkTo(date.bottom)
-                        end.linkTo(date.start)
-                    }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.ChevronLeft,
-                    contentDescription = "See back day prediction"
-                )
-            }
-            IconButton(
-                onClick = { /*TODO*/ },
-                modifier = Modifier
-                    .constrainAs(nextDayButton) {
-                        top.linkTo(date.top)
-                        bottom.linkTo(date.bottom)
-                        start.linkTo(date.end)
-                    }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.ChevronRight,
-                    contentDescription = "See next day prediction"
-                )
-            }
             Text(
                 text = "$scoreNumberAnimated%",
                 style = primaryBoldDisplayM,
@@ -205,38 +175,97 @@ fun SunsetPredictionContent(
                         end.linkTo(parent.end)
                     }
             )
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .constrainAs(score) {
-                        top.linkTo(scoreNumber.bottom)
-                        start.linkTo(scoreNumber.start)
-                        end.linkTo(scoreNumber.end)
-                    }
+        }
+        CustomSpacer(size = 24.dp)
+        //Temperature and quality sunset module
+        AnimatedVisibility(visible = isQualityModuleVisible) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                AnimatedVisibility(visible = scoreTextVisible) {
-                    Row(
-                        horizontalArrangement = Arrangement.Center
+                Card(
+                    elevation = CardDefaults.cardElevation(8.dp),
+                    shape = RoundedCornerShape(20.dp),
+                    modifier = Modifier
+                        .size(150.dp)
+                ) {
+                    ConstraintLayout(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp)
                     ) {
-                        Text(
-                            text = "Excellent",
-                            style = secondarySemiBoldBodyL,
-                            modifier = Modifier.align(Alignment.CenterVertically)
-                        )
-                        IconButton(
-                            onClick = { /*TODO*/ }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Info,
-                                contentDescription = "What does the score means"
+                        val sunnyIconAnimation by rememberLottieComposition(
+                            spec = LottieCompositionSpec.RawRes(
+                                R.raw.globe_sunny_animation
                             )
-                        }
+                        )
+                        val (degreesText, animation) = createRefs()
+                        LottieAnimation(
+                            composition = sunnyIconAnimation,
+                            iterations = LottieConstants.IterateForever,
+                            modifier = Modifier
+                                .size(80.dp)
+                                .constrainAs(animation) {
+                                    top.linkTo(parent.top)
+                                    start.linkTo(parent.start)
+                                    end.linkTo(parent.end)
+                                }
+                        )
+                        Text(
+                            text = "23º",
+                            style = primaryBoldDisplayM,
+                            modifier = Modifier.constrainAs(degreesText) {
+                                bottom.linkTo(parent.bottom)
+                                start.linkTo(parent.start)
+                                end.linkTo(parent.end)
+                            })
+                    }
+                }
+                Card(
+                    elevation = CardDefaults.cardElevation(8.dp),
+                    shape = RoundedCornerShape(20.dp),
+                    modifier = Modifier
+                        .size(150.dp)
+                ) {
+                    ConstraintLayout(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp)
+                    ) {
+                        val (qualityText, animation) = createRefs()
+                        val takingPhotosAnimation by rememberLottieComposition(
+                            spec = LottieCompositionSpec.RawRes(
+                                R.raw.person_taking_photos_animation
+                            )
+                        )
+                        LottieAnimation(
+                            composition = takingPhotosAnimation,
+                            iterations = LottieConstants.IterateForever,
+                            modifier = Modifier
+                                .size(80.dp)
+                                .constrainAs(animation) {
+                                    top.linkTo(parent.top)
+                                    start.linkTo(parent.start)
+                                    end.linkTo(parent.end)
+                                }
+                        )
+                        Text(
+                            text = "Excellent quality",
+                            maxLines = 2,
+                            textAlign = TextAlign.Center,
+                            overflow = TextOverflow.Ellipsis,
+                            style = primaryBoldHeadlineS,
+                            modifier = Modifier.constrainAs(qualityText) {
+                                bottom.linkTo(parent.bottom)
+                                start.linkTo(parent.start)
+                                end.linkTo(parent.end)
+                            })
                     }
                 }
             }
-
         }
         CustomSpacer(size = 24.dp)
+        //Sunset phases times module
         Card(
             elevation = CardDefaults.cardElevation(8.dp),
             shape = RoundedCornerShape(20.dp),
@@ -371,7 +400,6 @@ fun SunsetPredictionContent(
             }
         }
     }
-
 }
 
 @Preview(showSystemUi = true)

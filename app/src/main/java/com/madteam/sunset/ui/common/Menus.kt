@@ -52,6 +52,7 @@ fun SunsetBottomNavigation(navController: NavController) {
 
     val items = listOf(
         SunsetBottomNavItem.Home,
+        SunsetBottomNavItem.SunsetPrediction,
         SunsetBottomNavItem.Discover,
         SunsetBottomNavItem.Profile
     )

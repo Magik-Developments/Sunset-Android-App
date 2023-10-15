@@ -7,6 +7,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -39,18 +40,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
+import com.google.android.gms.maps.model.LatLng
 import com.madteam.sunset.R
+import com.madteam.sunset.data.model.SunsetTimeResponse
 import com.madteam.sunset.ui.common.CustomSpacer
+import com.madteam.sunset.ui.common.LocationPermissionDialog
 import com.madteam.sunset.ui.common.SunsetBottomNavigation
 import com.madteam.sunset.ui.theme.primaryBoldDisplayM
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineM
@@ -58,7 +62,10 @@ import com.madteam.sunset.ui.theme.primaryBoldHeadlineS
 import com.madteam.sunset.ui.theme.primaryMediumHeadlineXS
 import com.madteam.sunset.ui.theme.secondaryRegularBodyM
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
+import com.madteam.sunset.utils.convertHourToMilitaryFormat
+import com.madteam.sunset.utils.getCurrentLocation
 import com.madteam.sunset.utils.hasLocationPermission
+import com.madteam.sunset.utils.shimmerBrush
 import kotlinx.coroutines.delay
 
 @Composable
@@ -66,6 +73,11 @@ fun SunsetPredictionScreen(
     viewModel: SunsetPredictionViewModel = hiltViewModel(),
     navController: NavController
 ) {
+
+    val showLocationPermissionDialog by viewModel.showLocationPermissionDialog.collectAsStateWithLifecycle()
+    val userLocality by viewModel.userLocality.collectAsStateWithLifecycle()
+    val sunsetTimeInformation by viewModel.sunsetTimeInformation.collectAsStateWithLifecycle()
+
     Scaffold(
         bottomBar = { SunsetBottomNavigation(navController = navController) },
         content = { paddingValues ->
@@ -73,7 +85,13 @@ fun SunsetPredictionScreen(
                 modifier = Modifier.padding(paddingValues),
                 contentAlignment = Alignment.Center
             ) {
-                SunsetPredictionContent()
+                SunsetPredictionContent(
+                    showLocationPermissionDialog = showLocationPermissionDialog,
+                    setShowLocationPermissionDialog = viewModel::showLocationPermissionDialog,
+                    updateUserLocation = viewModel::updateUserLocation,
+                    userLocality = userLocality,
+                    sunsetTimeInformation = sunsetTimeInformation
+                )
             }
         }
     )
@@ -81,6 +99,11 @@ fun SunsetPredictionScreen(
 
 @Composable
 fun SunsetPredictionContent(
+    showLocationPermissionDialog: Boolean,
+    setShowLocationPermissionDialog: (Boolean) -> Unit,
+    updateUserLocation: (LatLng) -> Unit,
+    userLocality: String,
+    sunsetTimeInformation: SunsetTimeResponse
 ) {
 
     val context = LocalContext.current
@@ -90,7 +113,9 @@ fun SunsetPredictionContent(
             contract = ActivityResultContracts.RequestPermission(),
             onResult = { isGranted ->
                 if (isGranted) {
-                    //TODO: Do whatever when granted
+                    getCurrentLocation(context) { lat, long ->
+                        updateUserLocation(LatLng(lat, long))
+                    }
                 } else {
                     //TODO: Not granted
                 }
@@ -98,10 +123,18 @@ fun SunsetPredictionContent(
 
     LaunchedEffect(Unit) {
         if (hasLocationPermission(context)) {
-            //TODO: Update location
+            getCurrentLocation(context) { lat, long ->
+                updateUserLocation(LatLng(lat, long))
+            }
         } else {
-            //TODO: Launch location dialog
+            setShowLocationPermissionDialog(true)
+        }
+    }
+
+    if (showLocationPermissionDialog) {
+        LocationPermissionDialog {
             requestLocationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            setShowLocationPermissionDialog(false)
         }
     }
 
@@ -144,7 +177,7 @@ fun SunsetPredictionContent(
         ) {
             val (location, changeLocationButton, reloadInfoButton, date, scoreNumber) = createRefs()
             Text(
-                text = "Terrassa, BCN",
+                text = userLocality,
                 style = primaryBoldHeadlineM,
                 modifier = Modifier
                     .constrainAs(location) {
@@ -152,6 +185,7 @@ fun SunsetPredictionContent(
                         start.linkTo(parent.start)
                         end.linkTo(parent.end)
                     }
+                    .background(shimmerBrush(showShimmer = userLocality.isEmpty()))
             )
             Text(
                 text = "14 Octubre, Sabado",
@@ -341,7 +375,7 @@ fun SunsetPredictionContent(
                     }
                 )
                 Text(
-                    text = "18:56",
+                    text = convertHourToMilitaryFormat(sunsetTimeInformation.results.sunset),
                     style = secondarySemiBoldHeadLineS,
                     modifier = Modifier
                         .padding(bottom = 16.dp)
@@ -378,7 +412,7 @@ fun SunsetPredictionContent(
                     }
                 )
                 Text(
-                    text = "19:24",
+                    text = convertHourToMilitaryFormat(sunsetTimeInformation.results.golden_hour),
                     style = secondarySemiBoldHeadLineS,
                     modifier = Modifier
                         .padding(bottom = 16.dp)
@@ -414,7 +448,7 @@ fun SunsetPredictionContent(
                     }
                 )
                 Text(
-                    text = "19:53",
+                    text = convertHourToMilitaryFormat(sunsetTimeInformation.results.dusk),
                     style = secondarySemiBoldHeadLineS,
                     modifier = Modifier
                         .padding(bottom = 16.dp)
@@ -427,10 +461,4 @@ fun SunsetPredictionContent(
             }
         }
     }
-}
-
-@Preview(showSystemUi = true)
-@Composable
-fun SunsetPredictionContentPreview() {
-    SunsetPredictionContent()
 }

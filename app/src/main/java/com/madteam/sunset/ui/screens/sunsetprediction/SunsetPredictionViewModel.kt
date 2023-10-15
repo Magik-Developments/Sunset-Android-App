@@ -32,6 +32,9 @@ class SunsetPredictionViewModel @Inject constructor(
     )
     val sunsetTimeInformation: StateFlow<SunsetTimeResponse> = _sunsetTimeInformation
 
+    private val _showLocationPermissionDialog: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val showLocationPermissionDialog: StateFlow<Boolean> = _showLocationPermissionDialog
+
     fun updateUserLocation(location: LatLng) {
         _userLocation.value = location
         getUserLocality()
@@ -62,6 +65,10 @@ class SunsetPredictionViewModel @Inject constructor(
                 _userLocality.value = it
             }
         }
+    }
+
+    fun showLocationPermissionDialog(state: Boolean) {
+        _showLocationPermissionDialog.value = state
     }
 
 }

@@ -8,6 +8,7 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,7 +38,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -56,6 +59,7 @@ import com.madteam.sunset.data.model.SunsetTimeResponse
 import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.LocationPermissionDialog
 import com.madteam.sunset.ui.common.SunsetBottomNavigation
+import com.madteam.sunset.ui.common.SunsetPhasesInfoDialog
 import com.madteam.sunset.ui.theme.primaryBoldDisplayM
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineM
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineS
@@ -78,6 +82,7 @@ fun SunsetPredictionScreen(
     val showLocationPermissionDialog by viewModel.showLocationPermissionDialog.collectAsStateWithLifecycle()
     val userLocality by viewModel.userLocality.collectAsStateWithLifecycle()
     val sunsetTimeInformation by viewModel.sunsetTimeInformation.collectAsStateWithLifecycle()
+    val phasesInfoDialog by viewModel.phasesInfoDialog.collectAsStateWithLifecycle()
 
     Scaffold(
         bottomBar = { SunsetBottomNavigation(navController = navController) },
@@ -91,7 +96,9 @@ fun SunsetPredictionScreen(
                     setShowLocationPermissionDialog = viewModel::showLocationPermissionDialog,
                     updateUserLocation = viewModel::updateUserLocation,
                     userLocality = userLocality,
-                    sunsetTimeInformation = sunsetTimeInformation
+                    sunsetTimeInformation = sunsetTimeInformation,
+                    setPhasesInfoDialog = viewModel::setPhasesInfoDialog,
+                    phasesInfoDialog = phasesInfoDialog
                 )
             }
         }
@@ -104,7 +111,9 @@ fun SunsetPredictionContent(
     setShowLocationPermissionDialog: (Boolean) -> Unit,
     updateUserLocation: (LatLng) -> Unit,
     userLocality: String,
-    sunsetTimeInformation: SunsetTimeResponse
+    sunsetTimeInformation: SunsetTimeResponse,
+    setPhasesInfoDialog: (String) -> Unit,
+    phasesInfoDialog: String
 ) {
 
     val context = LocalContext.current
@@ -137,6 +146,15 @@ fun SunsetPredictionContent(
             requestLocationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
             setShowLocationPermissionDialog(false)
         }
+    }
+
+    if (phasesInfoDialog.isNotBlank()) {
+        SunsetPhasesInfoDialog(
+            phase = phasesInfoDialog,
+            setShowDialog = {
+                setPhasesInfoDialog("")
+            }
+        )
     }
 
     val scrollState = rememberScrollState()
@@ -370,6 +388,10 @@ fun SunsetPredictionContent(
                 Box(
                     modifier = Modifier
                         .size(80.dp)
+                        .clip(RoundedCornerShape(20.dp))
+                        .clickable {
+                            setPhasesInfoDialog("daylight")
+                        }
                         .constrainAs(dayLightIcon) {
                             top.linkTo(parent.top)
                             start.linkTo(parent.start, 16.dp)
@@ -382,7 +404,7 @@ fun SunsetPredictionContent(
                     )
                 }
                 Text(
-                    text = "Daylight",
+                    text = stringResource(id = R.string.daylight),
                     style = secondaryRegularBodyM,
                     modifier = Modifier.constrainAs(dayLightText) {
                         top.linkTo(dayLightIcon.bottom)
@@ -405,6 +427,10 @@ fun SunsetPredictionContent(
                 //Golden hour
                 Box(
                     modifier = Modifier
+                        .clip(RoundedCornerShape(20.dp))
+                        .clickable {
+                            setPhasesInfoDialog("golden_hour")
+                        }
                         .size(80.dp)
                         .constrainAs(goldenHourIcon) {
                             top.linkTo(parent.top)
@@ -422,7 +448,7 @@ fun SunsetPredictionContent(
                     )
                 }
                 Text(
-                    text = "Golden hour",
+                    text = stringResource(id = R.string.golden_hour),
                     style = secondaryRegularBodyM,
                     modifier = Modifier.constrainAs(goldenHourText) {
                         top.linkTo(goldenHourIcon.bottom)
@@ -445,6 +471,10 @@ fun SunsetPredictionContent(
                 //Blue hour
                 Box(
                     modifier = Modifier
+                        .clip(RoundedCornerShape(20.dp))
+                        .clickable {
+                            setPhasesInfoDialog("blue_hour")
+                        }
                         .size(80.dp)
                         .constrainAs(blueHourIcon) {
                             top.linkTo(parent.top)
@@ -458,7 +488,7 @@ fun SunsetPredictionContent(
                     )
                 }
                 Text(
-                    text = "Blue hour",
+                    text = stringResource(id = R.string.blue_hour),
                     style = secondaryRegularBodyM,
                     modifier = Modifier.constrainAs(blueHourText) {
                         top.linkTo(blueHourIcon.bottom)

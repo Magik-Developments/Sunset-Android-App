@@ -52,6 +52,8 @@ import com.madteam.sunset.R
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineM
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineS
 import com.madteam.sunset.ui.theme.secondaryRegularBodyL
+import com.madteam.sunset.ui.theme.secondaryRegularBodyM
+import com.madteam.sunset.ui.theme.secondaryRegularBodyS
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyL
 
 @Composable
@@ -433,5 +435,105 @@ fun LocationPermissionDialog(
 @Composable
 fun LocationPermissionDialogPreview() {
     LocationPermissionDialog {}
+}
+
+@Composable
+fun SunsetPhasesInfoDialog(
+    phase: String,
+    setShowDialog: (Boolean) -> Unit
+) {
+    val phaseTitle: Int = when (phase) {
+        "daylight" -> {
+            R.string.daylight
+        }
+
+        "golden_hour" -> {
+            R.string.golden_hour
+        }
+
+        "blue_hour" -> {
+            R.string.blue_hour
+        }
+
+        else -> {
+            R.string.daylight
+        }
+    }
+    val phaseDescription: Int = when (phase) {
+        "daylight" -> {
+            R.string.daylight_description
+        }
+
+        "golden_hour" -> {
+            R.string.golden_hour_description
+        }
+
+        "blue_hour" -> {
+            R.string.blue_hour_description
+        }
+
+        else -> {
+            R.string.daylight_description
+        }
+    }
+    val phaseAnimation: Int = when (phase) {
+        "daylight" -> {
+            R.raw.sun_vector_animation
+        }
+
+        "golden_hour" -> {
+            R.raw.golden_hour_animation
+        }
+
+        "blue_hour" -> {
+            R.raw.moon_vector_animation
+        }
+
+        else -> {
+            R.raw.sun_vector_animation
+        }
+    }
+    val iconAnimation by rememberLottieComposition(
+        spec = LottieCompositionSpec.RawRes(
+            phaseAnimation
+        )
+    )
+    Dialog(onDismissRequest = { setShowDialog(false) }) {
+        Card(
+            shape = RoundedCornerShape(20.dp),
+            elevation = 2.dp
+        ) {
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.padding(24.dp)
+            ) {
+                LottieAnimation(
+                    composition = iconAnimation,
+                    iterations = LottieConstants.IterateForever,
+                    modifier = Modifier.size(80.dp),
+                    alignment = Alignment.Center
+                )
+                CustomSpacer(size = 8.dp)
+                androidx.compose.material3.Text(
+                    text = stringResource(id = phaseTitle),
+                    style = secondarySemiBoldBodyL,
+                    textAlign = TextAlign.Center
+                )
+                CustomSpacer(size = 8.dp)
+                androidx.compose.material3.Text(
+                    text = stringResource(id = phaseDescription),
+                    style = secondaryRegularBodyM,
+                    textAlign = TextAlign.Center
+                )
+                CustomSpacer(size = 16.dp)
+                androidx.compose.material3.Text(
+                    text = stringResource(id = R.string.credits_sunrisesunsetio),
+                    style = secondaryRegularBodyS,
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+    }
 }
 

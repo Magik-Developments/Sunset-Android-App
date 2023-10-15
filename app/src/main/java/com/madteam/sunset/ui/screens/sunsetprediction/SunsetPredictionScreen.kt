@@ -39,6 +39,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
@@ -57,9 +58,9 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun SunsetPredictionScreen(
+    viewModel: SunsetPredictionViewModel = hiltViewModel(),
     navController: NavController
 ) {
-
     Scaffold(
         bottomBar = { SunsetBottomNavigation(navController = navController) },
         content = { paddingValues ->
@@ -71,13 +72,11 @@ fun SunsetPredictionScreen(
             }
         }
     )
-
 }
 
 @Composable
 fun SunsetPredictionContent(
 ) {
-
     val scrollState = rememberScrollState()
     var scorePercentage by remember {
         mutableIntStateOf(0)
@@ -94,6 +93,7 @@ fun SunsetPredictionContent(
         ),
         label = "Score number animation"
     )
+
     LaunchedEffect(Unit) {
         scorePercentage = 88
     }
@@ -108,14 +108,13 @@ fun SunsetPredictionContent(
             .padding(24.dp)
             .verticalScroll(scrollState)
     ) {
+        //Location and Date module
         ConstraintLayout(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = 8.dp)
         ) {
-
             val (location, changeLocationButton, reloadInfoButton, date, scoreNumber) = createRefs()
-
             Text(
                 text = "Terrassa, BCN",
                 style = primaryBoldHeadlineM,

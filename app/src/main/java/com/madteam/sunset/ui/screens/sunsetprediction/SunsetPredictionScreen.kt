@@ -22,7 +22,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandMore
-import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -215,7 +214,7 @@ fun SunsetPredictionContent(
                 .fillMaxSize()
                 .padding(top = 8.dp)
         ) {
-            val (location, changeLocationButton, reloadInfoButton, date, scoreNumber, qualityTitle) = createRefs()
+            val (location, changeLocationButton, date, scoreNumber, qualityTitle) = createRefs()
             Text(
                 text = userLocality,
                 style = primaryBoldHeadlineM,
@@ -249,20 +248,6 @@ fun SunsetPredictionContent(
                 Icon(
                     imageVector = Icons.Default.ExpandMore,
                     contentDescription = "Change location"
-                )
-            }
-            IconButton(
-                onClick = { /*TODO*/ },
-                modifier = Modifier
-                    .constrainAs(reloadInfoButton) {
-                        top.linkTo(location.top)
-                        bottom.linkTo(location.bottom)
-                        end.linkTo(location.start)
-                    }
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.Refresh,
-                    contentDescription = "Reload sunset info"
                 )
             }
             Text(

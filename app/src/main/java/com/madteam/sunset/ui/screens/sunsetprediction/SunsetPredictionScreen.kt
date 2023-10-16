@@ -295,9 +295,42 @@ fun SunsetPredictionContent(
                                 R.raw.globe_sunny_animation
                             )
                         )
+                        val coldIconAnimation by rememberLottieComposition(
+                            spec = LottieCompositionSpec.RawRes(
+                                R.raw.snowman_cat_animation
+                            )
+                        )
+                        val snowingIconAnimation by rememberLottieComposition(
+                            spec = LottieCompositionSpec.RawRes(
+                                R.raw.snowing_animation
+                            )
+                        )
+                        val hotIconAnimation by rememberLottieComposition(
+                            spec = LottieCompositionSpec.RawRes(
+                                R.raw.melting_icecream_animation
+                            )
+                        )
+                        val normalIconAnimation by rememberLottieComposition(
+                            spec = LottieCompositionSpec.RawRes(
+                                R.raw.cycling_animation
+                            )
+                        )
                         val (degreesText, animation) = createRefs()
                         LottieAnimation(
-                            composition = sunnyIconAnimation,
+                            composition =
+                            if (sunsetTemperature <= 0.0) {
+                                snowingIconAnimation
+                            } else if (sunsetTemperature <= 15) {
+                                coldIconAnimation
+                            } else if (sunsetTemperature <= 23) {
+                                normalIconAnimation
+                            } else if (sunsetTemperature <= 30) {
+                                sunnyIconAnimation
+                            } else if (sunsetTemperature > 30) {
+                                hotIconAnimation
+                            } else {
+                                sunnyIconAnimation
+                            },
                             iterations = LottieConstants.IterateForever,
                             modifier = Modifier
                                 .size(80.dp)

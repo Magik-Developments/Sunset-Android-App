@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
 import com.madteam.sunset.api.SunsetApiService
+import com.madteam.sunset.api.WeatherApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -45,6 +46,11 @@ object ApplicationDependencies {
     @Provides
     fun providesSunsetApiService(@Named("SunriseSunset") retrofit: Retrofit): SunsetApiService {
         return retrofit.create(SunsetApiService::class.java)
+    }
+
+    @Provides
+    fun providesWeatherApiService(@Named("WeatherApi") retrofit: Retrofit): WeatherApiService {
+        return retrofit.create(WeatherApiService::class.java)
     }
 
     @Singleton

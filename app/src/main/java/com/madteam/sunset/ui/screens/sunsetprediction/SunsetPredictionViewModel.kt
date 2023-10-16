@@ -51,6 +51,9 @@ class SunsetPredictionViewModel @Inject constructor(
     private val _sunsetTemperature: MutableStateFlow<Double> = MutableStateFlow(0.0)
     val sunsetTemperature: StateFlow<Double> = _sunsetTemperature
 
+    private val _qualityInfoDialog: MutableStateFlow<Int> = MutableStateFlow(-1)
+    val qualityInfoDialog: StateFlow<Int> = _qualityInfoDialog
+
     fun updateUserLocation(location: LatLng) {
         _userLocation.value = location
         getUserLocality()
@@ -118,6 +121,10 @@ class SunsetPredictionViewModel @Inject constructor(
 
     fun setPhasesInfoDialog(phase: String) {
         _phasesInfoDialog.value = phase
+    }
+
+    fun setQualityInfoDialog(quality: Int) {
+        _qualityInfoDialog.value = quality
     }
 
 }

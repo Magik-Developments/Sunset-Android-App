@@ -128,4 +128,9 @@
     <string name="good">Good</string>
     <string name="great">Great</string>
     <string name="quality">quality</string>
+    <string name="poor_description">Little to no color, with precipitation or a thick cloud layer often blocking a direct view of the sun.</string>
+    <string name="fair_description">Some color for a short time, with conditions ranging from mostly cloudy, or hazy, to clear, with little to no clouds at all levels.</string>
+    <string name="good_description">A fair amount of color, often multi-colored, lasting a considerable amount of time. Often caused by scattered clouds at multiple levels.</string>
+    <string name="great_description">Extremely vibrant color lasting 30 minutes or more. Often caused by multiple arrangements of clouds at multiple levels, transitioning through multiple stages of vivid color.</string>
+    <string name="credits_weatherapi">Information provided by weatherapi.com</string>
 </resources>

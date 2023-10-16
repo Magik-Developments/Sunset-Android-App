@@ -60,6 +60,7 @@ import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.LocationPermissionDialog
 import com.madteam.sunset.ui.common.SunsetBottomNavigation
 import com.madteam.sunset.ui.common.SunsetPhasesInfoDialog
+import com.madteam.sunset.ui.common.SunsetQualityInfoDialog
 import com.madteam.sunset.ui.theme.primaryBoldDisplayM
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineM
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineS
@@ -85,6 +86,7 @@ fun SunsetPredictionScreen(
     val phasesInfoDialog by viewModel.phasesInfoDialog.collectAsStateWithLifecycle()
     val sunsetScore by viewModel.sunsetScore.collectAsStateWithLifecycle()
     val sunsetTemperature by viewModel.sunsetTemperature.collectAsStateWithLifecycle()
+    val qualityInfoDialog by viewModel.qualityInfoDialog.collectAsStateWithLifecycle()
 
     Scaffold(
         bottomBar = { SunsetBottomNavigation(navController = navController) },
@@ -102,7 +104,9 @@ fun SunsetPredictionScreen(
                     setPhasesInfoDialog = viewModel::setPhasesInfoDialog,
                     phasesInfoDialog = phasesInfoDialog,
                     sunsetScore = sunsetScore,
-                    sunsetTemperature = sunsetTemperature
+                    sunsetTemperature = sunsetTemperature,
+                    qualityInfoDialog = qualityInfoDialog,
+                    setQualityInfoDialog = viewModel::setQualityInfoDialog
                 )
             }
         }
@@ -119,7 +123,9 @@ fun SunsetPredictionContent(
     setPhasesInfoDialog: (String) -> Unit,
     phasesInfoDialog: String,
     sunsetScore: Int,
-    sunsetTemperature: Double
+    sunsetTemperature: Double,
+    qualityInfoDialog: Int,
+    setQualityInfoDialog: (Int) -> Unit
 ) {
 
     val context = LocalContext.current
@@ -161,6 +167,14 @@ fun SunsetPredictionContent(
                 setPhasesInfoDialog("")
             }
         )
+    }
+
+    if (qualityInfoDialog != -1) {
+        SunsetQualityInfoDialog(
+            score = sunsetScore,
+            setShowDialog = {
+                setQualityInfoDialog(-1)
+            })
     }
 
     val scrollState = rememberScrollState()
@@ -360,6 +374,10 @@ fun SunsetPredictionContent(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(16.dp)
+                            .clip(RoundedCornerShape(20.dp))
+                            .clickable {
+                                setQualityInfoDialog(sunsetScore)
+                            }
                     ) {
                         val (qualityText, animation) = createRefs()
                         val quality = if (scorePercentage <= 25) {

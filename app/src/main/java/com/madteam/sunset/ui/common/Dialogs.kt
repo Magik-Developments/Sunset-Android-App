@@ -537,3 +537,79 @@ fun SunsetPhasesInfoDialog(
     }
 }
 
+@Composable
+fun SunsetQualityInfoDialog(
+    score: Int,
+    setShowDialog: (Boolean) -> Unit
+) {
+    val qualityTitle = if (score <= 25) {
+        R.string.poor
+    } else if (score <= 50) {
+        R.string.fair
+    } else if (score <= 75) {
+        R.string.good
+    } else {
+        R.string.great
+    }
+    val qualityDescription = if (score <= 25) {
+        R.string.poor_description
+    } else if (score <= 50) {
+        R.string.fair_description
+    } else if (score <= 75) {
+        R.string.good_description
+    } else {
+        R.string.great_description
+    }
+    val qualityAnimation = if (score <= 25) {
+        R.raw.sad_cat_animation
+    } else if (score <= 50) {
+        R.raw.cat_tv_animation
+    } else if (score <= 75) {
+        R.raw.dog_selfie_animation
+    } else {
+        R.raw.guy_photo_animation
+    }
+    val iconAnimation by rememberLottieComposition(
+        spec = LottieCompositionSpec.RawRes(
+            qualityAnimation
+        )
+    )
+    Dialog(onDismissRequest = { setShowDialog(false) }) {
+        Card(
+            shape = RoundedCornerShape(20.dp),
+            elevation = 2.dp
+        ) {
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.padding(24.dp)
+            ) {
+                LottieAnimation(
+                    composition = iconAnimation,
+                    iterations = LottieConstants.IterateForever,
+                    modifier = Modifier.size(80.dp),
+                    alignment = Alignment.Center
+                )
+                CustomSpacer(size = 8.dp)
+                androidx.compose.material3.Text(
+                    text = stringResource(id = qualityTitle),
+                    style = secondarySemiBoldBodyL,
+                    textAlign = TextAlign.Center
+                )
+                CustomSpacer(size = 8.dp)
+                androidx.compose.material3.Text(
+                    text = stringResource(id = qualityDescription),
+                    style = secondaryRegularBodyM,
+                    textAlign = TextAlign.Center
+                )
+                CustomSpacer(size = 16.dp)
+                androidx.compose.material3.Text(
+                    text = stringResource(id = R.string.credits_weatherapi),
+                    style = secondaryRegularBodyS,
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+    }
+}
+

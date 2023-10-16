@@ -180,7 +180,7 @@ fun SunsetPredictionContent(
         label = "Score number animation"
     )
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(sunsetScore) {
         scorePercentage = sunsetScore
     }
     LaunchedEffect(Unit) {

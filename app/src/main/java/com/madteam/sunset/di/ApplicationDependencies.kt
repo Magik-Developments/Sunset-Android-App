@@ -13,6 +13,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Named
 import javax.inject.Singleton
 
 private const val USER_PREFERENCES = "user_preferences"
@@ -22,7 +23,8 @@ private const val USER_PREFERENCES = "user_preferences"
 object ApplicationDependencies {
 
     @Provides
-    fun providesRetrofit(
+    @Named("SunriseSunset")
+    fun providesSunriseSunsetRetrofit(
     ): Retrofit {
         return Retrofit.Builder()
             .baseUrl("https://api.sunrisesunset.io/")
@@ -31,7 +33,17 @@ object ApplicationDependencies {
     }
 
     @Provides
-    fun providesSunsetApiService(retrofit: Retrofit): SunsetApiService {
+    @Named("WeatherApi")
+    fun providesWeatherApiRetrofit(
+    ): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl("https://api.weatherapi.com/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    @Provides
+    fun providesSunsetApiService(@Named("SunriseSunset") retrofit: Retrofit): SunsetApiService {
         return retrofit.create(SunsetApiService::class.java)
     }
 

@@ -37,7 +37,7 @@ object ApplicationDependencies {
     fun providesWeatherApiRetrofit(
     ): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("https://api.weatherapi.com/")
+            .baseUrl("https://api.weatherapi.com/v1/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }

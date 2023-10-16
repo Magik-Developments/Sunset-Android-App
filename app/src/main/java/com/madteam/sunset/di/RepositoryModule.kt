@@ -5,6 +5,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.madteam.sunset.api.SunsetApiService
+import com.madteam.sunset.api.WeatherApiService
 import com.madteam.sunset.data.database.dao.SpotAttributeDao
 import com.madteam.sunset.data.repositories.AuthContract
 import com.madteam.sunset.data.repositories.AuthRepository
@@ -14,6 +15,8 @@ import com.madteam.sunset.data.repositories.LocationContract
 import com.madteam.sunset.data.repositories.LocationRepository
 import com.madteam.sunset.data.repositories.SunsetContract
 import com.madteam.sunset.data.repositories.SunsetRepository
+import com.madteam.sunset.data.repositories.WeatherContract
+import com.madteam.sunset.data.repositories.WeatherRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,12 +27,12 @@ import dagger.hilt.components.SingletonComponent
 object RepositoryModule {
 
     @Provides
-    fun provideFirebaseAuthRepository(
+    fun providesFirebaseAuthRepository(
         firebaseAuth: FirebaseAuth
     ): AuthContract = AuthRepository(firebaseAuth)
 
     @Provides
-    fun provideDatabaseRepository(
+    fun providesDatabaseRepository(
         firestore: FirebaseFirestore,
         storage: FirebaseStorage,
         spotAttributeDao: SpotAttributeDao
@@ -37,14 +40,20 @@ object RepositoryModule {
         DatabaseRepository(firestore, storage, spotAttributeDao)
 
     @Provides
-    fun provideLocationRepository(
+    fun providesLocationRepository(
         geocoder: Geocoder
     ): LocationContract =
         LocationRepository(geocoder)
 
     @Provides
-    fun provideSunsetRepository(
+    fun providesSunsetRepository(
         apiService: SunsetApiService
     ): SunsetContract =
         SunsetRepository(apiService)
+
+    @Provides
+    fun providesWeatherRepository(
+        apiService: WeatherApiService
+    ): WeatherContract =
+        WeatherRepository(apiService)
 }

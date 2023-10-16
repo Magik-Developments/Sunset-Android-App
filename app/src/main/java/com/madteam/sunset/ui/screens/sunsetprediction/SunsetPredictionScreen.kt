@@ -1,9 +1,14 @@
 package com.madteam.sunset.ui.screens.sunsetprediction
 
+import android.Manifest
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,7 +22,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandMore
-import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -33,27 +37,41 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
+import com.google.android.gms.maps.model.LatLng
 import com.madteam.sunset.R
+import com.madteam.sunset.data.model.SunsetTimeResponse
 import com.madteam.sunset.ui.common.CustomSpacer
+import com.madteam.sunset.ui.common.LocationPermissionDialog
 import com.madteam.sunset.ui.common.SunsetBottomNavigation
+import com.madteam.sunset.ui.common.SunsetPhasesInfoDialog
+import com.madteam.sunset.ui.common.SunsetQualityInfoDialog
 import com.madteam.sunset.ui.theme.primaryBoldDisplayM
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineM
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineS
+import com.madteam.sunset.ui.theme.primaryBoldHeadlineXS
 import com.madteam.sunset.ui.theme.primaryMediumHeadlineXS
 import com.madteam.sunset.ui.theme.secondaryRegularBodyM
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
+import com.madteam.sunset.utils.convertHourToMilitaryFormat
+import com.madteam.sunset.utils.getCurrentLocation
+import com.madteam.sunset.utils.hasLocationPermission
+import com.madteam.sunset.utils.obtainDateOnFormat
+import com.madteam.sunset.utils.shimmerBrush
 import kotlinx.coroutines.delay
 
 @Composable
@@ -61,6 +79,15 @@ fun SunsetPredictionScreen(
     viewModel: SunsetPredictionViewModel = hiltViewModel(),
     navController: NavController
 ) {
+
+    val showLocationPermissionDialog by viewModel.showLocationPermissionDialog.collectAsStateWithLifecycle()
+    val userLocality by viewModel.userLocality.collectAsStateWithLifecycle()
+    val sunsetTimeInformation by viewModel.sunsetTimeInformation.collectAsStateWithLifecycle()
+    val phasesInfoDialog by viewModel.phasesInfoDialog.collectAsStateWithLifecycle()
+    val sunsetScore by viewModel.sunsetScore.collectAsStateWithLifecycle()
+    val sunsetTemperature by viewModel.sunsetTemperature.collectAsStateWithLifecycle()
+    val qualityInfoDialog by viewModel.qualityInfoDialog.collectAsStateWithLifecycle()
+
     Scaffold(
         bottomBar = { SunsetBottomNavigation(navController = navController) },
         content = { paddingValues ->
@@ -68,7 +95,19 @@ fun SunsetPredictionScreen(
                 modifier = Modifier.padding(paddingValues),
                 contentAlignment = Alignment.Center
             ) {
-                SunsetPredictionContent()
+                SunsetPredictionContent(
+                    showLocationPermissionDialog = showLocationPermissionDialog,
+                    setShowLocationPermissionDialog = viewModel::showLocationPermissionDialog,
+                    updateUserLocation = viewModel::updateUserLocation,
+                    userLocality = userLocality,
+                    sunsetTimeInformation = sunsetTimeInformation,
+                    setPhasesInfoDialog = viewModel::setPhasesInfoDialog,
+                    phasesInfoDialog = phasesInfoDialog,
+                    sunsetScore = sunsetScore,
+                    sunsetTemperature = sunsetTemperature,
+                    qualityInfoDialog = qualityInfoDialog,
+                    setQualityInfoDialog = viewModel::setQualityInfoDialog
+                )
             }
         }
     )
@@ -76,7 +115,68 @@ fun SunsetPredictionScreen(
 
 @Composable
 fun SunsetPredictionContent(
+    showLocationPermissionDialog: Boolean,
+    setShowLocationPermissionDialog: (Boolean) -> Unit,
+    updateUserLocation: (LatLng) -> Unit,
+    userLocality: String,
+    sunsetTimeInformation: SunsetTimeResponse,
+    setPhasesInfoDialog: (String) -> Unit,
+    phasesInfoDialog: String,
+    sunsetScore: Int,
+    sunsetTemperature: Double,
+    qualityInfoDialog: Int,
+    setQualityInfoDialog: (Int) -> Unit
 ) {
+
+    val context = LocalContext.current
+
+    val requestLocationPermissionLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission(),
+            onResult = { isGranted ->
+                if (isGranted) {
+                    getCurrentLocation(context) { lat, long ->
+                        updateUserLocation(LatLng(lat, long))
+                    }
+                } else {
+                    //TODO: Not granted
+                }
+            })
+
+    LaunchedEffect(Unit) {
+        if (hasLocationPermission(context)) {
+            getCurrentLocation(context) { lat, long ->
+                updateUserLocation(LatLng(lat, long))
+            }
+        } else {
+            setShowLocationPermissionDialog(true)
+        }
+    }
+
+    if (showLocationPermissionDialog) {
+        LocationPermissionDialog {
+            requestLocationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            setShowLocationPermissionDialog(false)
+        }
+    }
+
+    if (phasesInfoDialog.isNotBlank()) {
+        SunsetPhasesInfoDialog(
+            phase = phasesInfoDialog,
+            setShowDialog = {
+                setPhasesInfoDialog("")
+            }
+        )
+    }
+
+    if (qualityInfoDialog != -1) {
+        SunsetQualityInfoDialog(
+            score = sunsetScore,
+            setShowDialog = {
+                setQualityInfoDialog(-1)
+            })
+    }
+
     val scrollState = rememberScrollState()
     var scorePercentage by remember {
         mutableIntStateOf(0)
@@ -94,8 +194,8 @@ fun SunsetPredictionContent(
         label = "Score number animation"
     )
 
-    LaunchedEffect(Unit) {
-        scorePercentage = 88
+    LaunchedEffect(sunsetScore) {
+        scorePercentage = sunsetScore
     }
     LaunchedEffect(Unit) {
         delay(4000)
@@ -114,9 +214,9 @@ fun SunsetPredictionContent(
                 .fillMaxSize()
                 .padding(top = 8.dp)
         ) {
-            val (location, changeLocationButton, reloadInfoButton, date, scoreNumber) = createRefs()
+            val (location, changeLocationButton, date, scoreNumber, qualityTitle) = createRefs()
             Text(
-                text = "Terrassa, BCN",
+                text = userLocality,
                 style = primaryBoldHeadlineM,
                 modifier = Modifier
                     .constrainAs(location) {
@@ -124,9 +224,10 @@ fun SunsetPredictionContent(
                         start.linkTo(parent.start)
                         end.linkTo(parent.end)
                     }
+                    .background(shimmerBrush(showShimmer = userLocality.isEmpty()))
             )
             Text(
-                text = "14 Octubre, Sabado",
+                text = obtainDateOnFormat(),
                 style = primaryMediumHeadlineXS,
                 modifier = Modifier
                     .constrainAs(date) {
@@ -149,20 +250,6 @@ fun SunsetPredictionContent(
                     contentDescription = "Change location"
                 )
             }
-            IconButton(
-                onClick = { /*TODO*/ },
-                modifier = Modifier
-                    .constrainAs(reloadInfoButton) {
-                        top.linkTo(location.top)
-                        bottom.linkTo(location.bottom)
-                        end.linkTo(location.start)
-                    }
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.Refresh,
-                    contentDescription = "Reload sunset info"
-                )
-            }
             Text(
                 text = "$scoreNumberAnimated%",
                 style = primaryBoldDisplayM,
@@ -170,6 +257,16 @@ fun SunsetPredictionContent(
                 modifier = Modifier
                     .constrainAs(scoreNumber) {
                         top.linkTo(date.bottom, 24.dp)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    }
+            )
+            Text(
+                text = "Sunset quality score",
+                style = primaryBoldHeadlineXS,
+                modifier = Modifier
+                    .constrainAs(qualityTitle) {
+                        top.linkTo(scoreNumber.bottom)
                         start.linkTo(parent.start)
                         end.linkTo(parent.end)
                     }
@@ -198,9 +295,42 @@ fun SunsetPredictionContent(
                                 R.raw.globe_sunny_animation
                             )
                         )
+                        val coldIconAnimation by rememberLottieComposition(
+                            spec = LottieCompositionSpec.RawRes(
+                                R.raw.snowman_cat_animation
+                            )
+                        )
+                        val snowingIconAnimation by rememberLottieComposition(
+                            spec = LottieCompositionSpec.RawRes(
+                                R.raw.snowing_animation
+                            )
+                        )
+                        val hotIconAnimation by rememberLottieComposition(
+                            spec = LottieCompositionSpec.RawRes(
+                                R.raw.melting_icecream_animation
+                            )
+                        )
+                        val normalIconAnimation by rememberLottieComposition(
+                            spec = LottieCompositionSpec.RawRes(
+                                R.raw.cycling_animation
+                            )
+                        )
                         val (degreesText, animation) = createRefs()
                         LottieAnimation(
-                            composition = sunnyIconAnimation,
+                            composition =
+                            if (sunsetTemperature <= 0.0) {
+                                snowingIconAnimation
+                            } else if (sunsetTemperature <= 15) {
+                                coldIconAnimation
+                            } else if (sunsetTemperature <= 23) {
+                                normalIconAnimation
+                            } else if (sunsetTemperature <= 30) {
+                                sunnyIconAnimation
+                            } else if (sunsetTemperature > 30) {
+                                hotIconAnimation
+                            } else {
+                                sunnyIconAnimation
+                            },
                             iterations = LottieConstants.IterateForever,
                             modifier = Modifier
                                 .size(80.dp)
@@ -211,7 +341,7 @@ fun SunsetPredictionContent(
                                 }
                         )
                         Text(
-                            text = "23º",
+                            text = "$sunsetTemperature" + "º",
                             style = primaryBoldDisplayM,
                             modifier = Modifier.constrainAs(degreesText) {
                                 bottom.linkTo(parent.bottom)
@@ -230,15 +360,51 @@ fun SunsetPredictionContent(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(16.dp)
+                            .clip(RoundedCornerShape(20.dp))
+                            .clickable {
+                                setQualityInfoDialog(sunsetScore)
+                            }
                     ) {
                         val (qualityText, animation) = createRefs()
+                        val quality = if (scorePercentage <= 25) {
+                            R.string.poor
+                        } else if (scorePercentage <= 50) {
+                            R.string.fair
+                        } else if (scorePercentage <= 75) {
+                            R.string.good
+                        } else {
+                            R.string.great
+                        }
                         val takingPhotosAnimation by rememberLottieComposition(
                             spec = LottieCompositionSpec.RawRes(
-                                R.raw.person_taking_photos_animation
+                                R.raw.guy_photo_animation
+                            )
+                        )
+                        val sadCatAnimation by rememberLottieComposition(
+                            spec = LottieCompositionSpec.RawRes(
+                                R.raw.sad_cat_animation
+                            )
+                        )
+                        val catTvAnimation by rememberLottieComposition(
+                            spec = LottieCompositionSpec.RawRes(
+                                R.raw.cat_tv_animation
+                            )
+                        )
+                        val dogSelfieAnimation by rememberLottieComposition(
+                            spec = LottieCompositionSpec.RawRes(
+                                R.raw.dog_selfie_animation
                             )
                         )
                         LottieAnimation(
-                            composition = takingPhotosAnimation,
+                            composition = if (scorePercentage <= 25) {
+                                sadCatAnimation
+                            } else if (scorePercentage <= 50) {
+                                catTvAnimation
+                            } else if (scorePercentage <= 75) {
+                                dogSelfieAnimation
+                            } else {
+                                takingPhotosAnimation
+                            },
                             iterations = LottieConstants.IterateForever,
                             modifier = Modifier
                                 .size(80.dp)
@@ -249,7 +415,7 @@ fun SunsetPredictionContent(
                                 }
                         )
                         Text(
-                            text = "Excellent quality",
+                            text = "${stringResource(id = quality)} ${stringResource(id = R.string.quality)}",
                             maxLines = 2,
                             textAlign = TextAlign.Center,
                             overflow = TextOverflow.Ellipsis,
@@ -284,6 +450,11 @@ fun SunsetPredictionContent(
                         R.raw.moon_vector_animation
                     )
                 )
+                val goldenHourIconAnimation by rememberLottieComposition(
+                    spec = LottieCompositionSpec.RawRes(
+                        R.raw.golden_hour_animation
+                    )
+                )
                 val (dayLightIcon, dayLightText, dayLightTime) = createRefs()
                 val (goldenHourIcon, goldenHourText, goldenHourTime) = createRefs()
                 val (blueHourIcon, blueHourText, blueHourTime) = createRefs()
@@ -292,6 +463,10 @@ fun SunsetPredictionContent(
                 Box(
                     modifier = Modifier
                         .size(80.dp)
+                        .clip(RoundedCornerShape(20.dp))
+                        .clickable {
+                            setPhasesInfoDialog("daylight")
+                        }
                         .constrainAs(dayLightIcon) {
                             top.linkTo(parent.top)
                             start.linkTo(parent.start, 16.dp)
@@ -304,7 +479,7 @@ fun SunsetPredictionContent(
                     )
                 }
                 Text(
-                    text = "Daylight",
+                    text = stringResource(id = R.string.daylight),
                     style = secondaryRegularBodyM,
                     modifier = Modifier.constrainAs(dayLightText) {
                         top.linkTo(dayLightIcon.bottom)
@@ -313,7 +488,7 @@ fun SunsetPredictionContent(
                     }
                 )
                 Text(
-                    text = "18:56",
+                    text = convertHourToMilitaryFormat(sunsetTimeInformation.results.sunset),
                     style = secondarySemiBoldHeadLineS,
                     modifier = Modifier
                         .padding(bottom = 16.dp)
@@ -327,21 +502,28 @@ fun SunsetPredictionContent(
                 //Golden hour
                 Box(
                     modifier = Modifier
+                        .clip(RoundedCornerShape(20.dp))
+                        .clickable {
+                            setPhasesInfoDialog("golden_hour")
+                        }
                         .size(80.dp)
                         .constrainAs(goldenHourIcon) {
                             top.linkTo(parent.top)
                             start.linkTo(parent.start)
                             end.linkTo(parent.end)
-                        }
+                        },
+                    contentAlignment = Alignment.Center
                 ) {
                     LottieAnimation(
-                        composition = dayLightIconAnimation,
+                        composition = goldenHourIconAnimation,
                         iterations = LottieConstants.IterateForever,
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier.size(50.dp),
+                        alignment = Alignment.Center,
+                        reverseOnRepeat = true
                     )
                 }
                 Text(
-                    text = "Golden hour",
+                    text = stringResource(id = R.string.golden_hour),
                     style = secondaryRegularBodyM,
                     modifier = Modifier.constrainAs(goldenHourText) {
                         top.linkTo(goldenHourIcon.bottom)
@@ -350,7 +532,7 @@ fun SunsetPredictionContent(
                     }
                 )
                 Text(
-                    text = "19:24",
+                    text = convertHourToMilitaryFormat(sunsetTimeInformation.results.golden_hour),
                     style = secondarySemiBoldHeadLineS,
                     modifier = Modifier
                         .padding(bottom = 16.dp)
@@ -364,6 +546,10 @@ fun SunsetPredictionContent(
                 //Blue hour
                 Box(
                     modifier = Modifier
+                        .clip(RoundedCornerShape(20.dp))
+                        .clickable {
+                            setPhasesInfoDialog("blue_hour")
+                        }
                         .size(80.dp)
                         .constrainAs(blueHourIcon) {
                             top.linkTo(parent.top)
@@ -377,7 +563,7 @@ fun SunsetPredictionContent(
                     )
                 }
                 Text(
-                    text = "Blue hour",
+                    text = stringResource(id = R.string.blue_hour),
                     style = secondaryRegularBodyM,
                     modifier = Modifier.constrainAs(blueHourText) {
                         top.linkTo(blueHourIcon.bottom)
@@ -386,7 +572,7 @@ fun SunsetPredictionContent(
                     }
                 )
                 Text(
-                    text = "19:53",
+                    text = convertHourToMilitaryFormat(sunsetTimeInformation.results.dusk),
                     style = secondarySemiBoldHeadLineS,
                     modifier = Modifier
                         .padding(bottom = 16.dp)
@@ -399,10 +585,4 @@ fun SunsetPredictionContent(
             }
         }
     }
-}
-
-@Preview(showSystemUi = true)
-@Composable
-fun SunsetPredictionContentPreview() {
-    SunsetPredictionContent()
 }

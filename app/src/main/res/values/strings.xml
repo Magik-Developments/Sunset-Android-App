@@ -114,4 +114,23 @@
     <string name="rules_publish_spot">Complete the following information to publish the Spot: \n 1. Minimum 1 image \n 2. Add Name and Description \n 3. Add location \n 4. Add some attributes \n 5. Score it!</string>
     <string name="rules_publish_post">Add some images to post</string>
     <string name="rules_publish_review">Complete the following information to add the review: \n 1. Add a title and description \n 2. Add some attributes \n 3. Score it! </string>
+    <string name="enable_location_description">We need to know where you are in order to offer you the correct information about the Sunsets</string>
+    <string name="enable_location_title">Your location is needed</string>
+    <string name="credits_sunrisesunsetio">"Information provided by sunrisesunset.io "</string>
+    <string name="daylight">Daylight</string>
+    <string name="golden_hour">Golden hour</string>
+    <string name="blue_hour">Blue hour</string>
+    <string name="daylight_description">It is the time when the sun is still visible and offers a bright and clear light. It is a good phase to photograph landscapes, portraits or any other subject that requires a uniform and natural lighting.</string>
+    <string name="golden_hour_description">It is the phase that starts when the sun is about 6 degrees above the horizon and ends when the sun sets. During this phase, the light becomes warmer and softer, creating golden and orange tones in the sky and shadows. It is an ideal phase to capture the color and atmosphere of the sunset, as well as to highlight textures and contrasts.</string>
+    <string name="blue_hour_description">It is the phase that starts when the sun has set and is about 6 degrees below the horizon, and ends when the sun is about 18 degrees below the horizon. During this phase, the light becomes cooler and darker, creating blue and violet tones in the sky and artificial lights. It is a perfect phase to photograph night scenes, urban landscapes or stars.</string>
+    <string name="poor">Poor</string>
+    <string name="fair">Fair</string>
+    <string name="good">Good</string>
+    <string name="great">Great</string>
+    <string name="quality">quality</string>
+    <string name="poor_description">Little to no color, with precipitation or a thick cloud layer often blocking a direct view of the sun.</string>
+    <string name="fair_description">Some color for a short time, with conditions ranging from mostly cloudy, or hazy, to clear, with little to no clouds at all levels.</string>
+    <string name="good_description">A fair amount of color, often multi-colored, lasting a considerable amount of time. Often caused by scattered clouds at multiple levels.</string>
+    <string name="great_description">Extremely vibrant color lasting 30 minutes or more. Often caused by multiple arrangements of clouds at multiple levels, transitioning through multiple stages of vivid color.</string>
+    <string name="credits_weatherapi">Information provided by weatherapi.com</string>
 </resources>

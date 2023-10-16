@@ -191,14 +191,15 @@ fun SmallButtonDark(
 
 @Composable
 fun SmallButtonSunset(
+    modifier: Modifier = Modifier,
     onClick: () -> Unit,
     @StringRes text: Int,
-    enabled: Boolean
+    enabled: Boolean = true
 ) {
     Button(
         onClick = onClick,
         shape = RoundedCornerShape(16.dp),
-        modifier = Modifier
+        modifier = modifier
             .width(150.dp)
             .height(48.dp),
         colors = ButtonDefaults.buttonColors(

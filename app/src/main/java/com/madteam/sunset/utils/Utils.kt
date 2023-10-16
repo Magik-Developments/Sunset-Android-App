@@ -20,10 +20,12 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import com.google.firebase.firestore.GeoPoint
+import com.madteam.sunset.data.model.WeatherResponse
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
+import kotlin.math.abs
 
 fun openDirectionsOnGoogleMaps(context: Context, location: GeoPoint) {
     val uri = Uri.parse("google.navigation:q=${location.latitude},${location.longitude}")
@@ -184,4 +186,92 @@ fun BackPressHandler(
             backCallback.remove()
         }
     }
+}
+
+fun calculateSunsetScore(weatherInfo: WeatherResponse): Int {
+    //Ponderations
+    val temperatureWeight = 0.3
+    val conditionWeight = 0.3
+    val visibilityWeight = 0.2
+    val humidityWeight = 0.2
+
+    val desiredTemperature = 21
+    val conditionsValues = mapOf(
+        1000 to 100,   // Sunny
+        1003 to 85,    // Partly cloudy
+        1006 to 70,    // Cloudy
+        1009 to 60,    // Overcast
+        1030 to 75,    // Mist
+        1063 to 40,    // Patchy rain possible
+        1066 to 40,    // Patchy snow possible
+        1069 to 40,    // Patchy sleet possible
+        1072 to 40,    // Patchy freezing drizzle possible
+        1087 to 30,    // Thundery outbreaks possible
+        1114 to 20,    // Blowing snow
+        1117 to 10,    // Blizzard
+        1135 to 50,    // Fog
+        1147 to 50,    // Freezing fog
+        1150 to 30,    // Patchy light drizzle
+        1153 to 30,    // Light drizzle
+        1168 to 20,    // Freezing drizzle
+        1171 to 10,    // Heavy freezing drizzle
+        1180 to 40,    // Patchy light rain
+        1183 to 30,    // Light rain
+        1186 to 20,    // Moderate rain at times
+        1189 to 15,    // Moderate rain
+        1192 to 10,    // Heavy rain at times
+        1195 to 0,     // Heavy rain
+        1198 to 20,    // Light freezing rain
+        1201 to 10,    // Moderate or heavy freezing rain
+        1204 to 20,    // Light sleet
+        1207 to 10,    // Moderate or heavy sleet
+        1210 to 30,    // Patchy light snow
+        1213 to 20,    // Light snow
+        1216 to 15,    // Patchy moderate snow
+        1219 to 10,    // Moderate snow
+        1222 to 5,     // Patchy heavy snow
+        1225 to 0,     // Heavy snow
+        1237 to 25,    // Ice pellets
+        1240 to 30,    // Light rain shower
+        1243 to 20,    // Moderate or heavy rain shower
+        1246 to 10,    // Torrential rain shower
+        1249 to 20,    // Light sleet showers
+        1252 to 10,    // Moderate or heavy sleet showers
+        1255 to 30,    // Light snow showers
+        1258 to 20,    // Moderate or heavy snow showers
+        1261 to 25,    // Light showers of ice pellets
+        1264 to 15,    // Moderate or heavy showers of ice pellets
+        1273 to 30,    // Patchy light rain with thunder
+        1276 to 15,    // Moderate or heavy rain with thunder
+        1279 to 20,    // Patchy light snow with thunder
+        1282 to 10     // Moderate or heavy snow with thunder
+    )
+
+    var sunsetTemperature = 0.0
+    var weatherCondition = 0
+
+    var temperatureScore = 0.0
+    var conditionScore = 0
+    var visibilityScore = 0.0
+    var humidityScore = 0.0
+
+    if (weatherInfo.forecast?.forecastDay?.first()?.hour?.first() != null) {
+        with(weatherInfo.forecast!!.forecastDay.first().hour.first()) {
+            sunsetTemperature = tempC!!
+            temperatureScore = 100 - abs(sunsetTemperature - desiredTemperature)
+            weatherCondition = condition?.code ?: 0
+            conditionScore = conditionsValues.getOrDefault(weatherCondition, 0)
+            visibilityScore = (visKm!! / 10.0 * 100)
+            humidityScore = ((100 - humidity!!) * 0.5)
+        }
+    }
+
+    val finalScore = (
+            temperatureWeight * temperatureScore
+                    + conditionWeight * conditionScore
+                    + visibilityWeight * visibilityScore
+                    + humidityWeight * humidityScore
+            ).toInt()
+
+    return finalScore.coerceIn(0, 100)
 }

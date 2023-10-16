@@ -83,6 +83,8 @@ fun SunsetPredictionScreen(
     val userLocality by viewModel.userLocality.collectAsStateWithLifecycle()
     val sunsetTimeInformation by viewModel.sunsetTimeInformation.collectAsStateWithLifecycle()
     val phasesInfoDialog by viewModel.phasesInfoDialog.collectAsStateWithLifecycle()
+    val sunsetScore by viewModel.sunsetScore.collectAsStateWithLifecycle()
+    val sunsetTemperature by viewModel.sunsetTemperature.collectAsStateWithLifecycle()
 
     Scaffold(
         bottomBar = { SunsetBottomNavigation(navController = navController) },
@@ -98,7 +100,9 @@ fun SunsetPredictionScreen(
                     userLocality = userLocality,
                     sunsetTimeInformation = sunsetTimeInformation,
                     setPhasesInfoDialog = viewModel::setPhasesInfoDialog,
-                    phasesInfoDialog = phasesInfoDialog
+                    phasesInfoDialog = phasesInfoDialog,
+                    sunsetScore = sunsetScore,
+                    sunsetTemperature = sunsetTemperature
                 )
             }
         }
@@ -113,7 +117,9 @@ fun SunsetPredictionContent(
     userLocality: String,
     sunsetTimeInformation: SunsetTimeResponse,
     setPhasesInfoDialog: (String) -> Unit,
-    phasesInfoDialog: String
+    phasesInfoDialog: String,
+    sunsetScore: Int,
+    sunsetTemperature: Double
 ) {
 
     val context = LocalContext.current
@@ -175,7 +181,7 @@ fun SunsetPredictionContent(
     )
 
     LaunchedEffect(Unit) {
-        scorePercentage = 88
+        scorePercentage = sunsetScore
     }
     LaunchedEffect(Unit) {
         delay(4000)
@@ -302,7 +308,7 @@ fun SunsetPredictionContent(
                                 }
                         )
                         Text(
-                            text = "23º",
+                            text = "$sunsetTemperature" + "º",
                             style = primaryBoldDisplayM,
                             modifier = Modifier.constrainAs(degreesText) {
                                 bottom.linkTo(parent.bottom)

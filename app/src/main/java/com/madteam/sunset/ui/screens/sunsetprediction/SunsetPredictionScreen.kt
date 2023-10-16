@@ -71,6 +71,7 @@ import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
 import com.madteam.sunset.utils.convertHourToMilitaryFormat
 import com.madteam.sunset.utils.getCurrentLocation
 import com.madteam.sunset.utils.hasLocationPermission
+import com.madteam.sunset.utils.obtainDateOnFormat
 import com.madteam.sunset.utils.shimmerBrush
 import kotlinx.coroutines.delay
 
@@ -227,7 +228,7 @@ fun SunsetPredictionContent(
                     .background(shimmerBrush(showShimmer = userLocality.isEmpty()))
             )
             Text(
-                text = "14 Octubre, Sabado",
+                text = obtainDateOnFormat(),
                 style = primaryMediumHeadlineXS,
                 modifier = Modifier
                     .constrainAs(date) {

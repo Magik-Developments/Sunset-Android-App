@@ -275,3 +275,9 @@ fun calculateSunsetScore(weatherInfo: WeatherResponse): Int {
 
     return finalScore.coerceIn(0, 100)
 }
+
+fun obtainDateOnFormat(): String {
+    val actualDate = Date()
+    val format = SimpleDateFormat("dd MMMM, EEEE", Locale.getDefault())
+    return format.format(actualDate)
+}

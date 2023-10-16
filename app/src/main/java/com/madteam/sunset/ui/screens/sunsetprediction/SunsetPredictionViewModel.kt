@@ -56,7 +56,6 @@ class SunsetPredictionViewModel @Inject constructor(
 
     fun updateUserLocation(location: LatLng) {
         _userLocation.value = location
-        getUserLocality()
         getSunsetTimeBasedOnLocation()
         getWeatherBasedOnLocationAndHour()
     }
@@ -92,6 +91,7 @@ class SunsetPredictionViewModel @Inject constructor(
                         _weatherInfo.value = it.data!!
                         _sunsetTemperature.value =
                             _weatherInfo.value.forecast!!.forecastDay.first().hour.first().tempC!!
+                        _userLocality.value = _weatherInfo.value.location!!.name!!
                         _sunsetScore.value = calculateSunsetScore(_weatherInfo.value)
                     }
 
@@ -103,14 +103,6 @@ class SunsetPredictionViewModel @Inject constructor(
                         println("loading")
                     }
                 }
-            }
-        }
-    }
-
-    private fun getUserLocality() {
-        viewModelScope.launch {
-            locationRepository.obtainLocalityFromLatLng(_userLocation.value).collectLatest {
-                _userLocality.value = it
             }
         }
     }

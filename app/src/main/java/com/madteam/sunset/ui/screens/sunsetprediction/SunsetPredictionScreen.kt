@@ -362,13 +362,45 @@ fun SunsetPredictionContent(
                             .padding(16.dp)
                     ) {
                         val (qualityText, animation) = createRefs()
+                        val quality = if (scorePercentage <= 25) {
+                            R.string.poor
+                        } else if (scorePercentage <= 50) {
+                            R.string.fair
+                        } else if (scorePercentage <= 75) {
+                            R.string.good
+                        } else {
+                            R.string.great
+                        }
                         val takingPhotosAnimation by rememberLottieComposition(
                             spec = LottieCompositionSpec.RawRes(
-                                R.raw.person_taking_photos_animation
+                                R.raw.guy_photo_animation
+                            )
+                        )
+                        val sadCatAnimation by rememberLottieComposition(
+                            spec = LottieCompositionSpec.RawRes(
+                                R.raw.sad_cat_animation
+                            )
+                        )
+                        val catTvAnimation by rememberLottieComposition(
+                            spec = LottieCompositionSpec.RawRes(
+                                R.raw.cat_tv_animation
+                            )
+                        )
+                        val dogSelfieAnimation by rememberLottieComposition(
+                            spec = LottieCompositionSpec.RawRes(
+                                R.raw.dog_selfie_animation
                             )
                         )
                         LottieAnimation(
-                            composition = takingPhotosAnimation,
+                            composition = if (scorePercentage <= 25) {
+                                sadCatAnimation
+                            } else if (scorePercentage <= 50) {
+                                catTvAnimation
+                            } else if (scorePercentage <= 75) {
+                                dogSelfieAnimation
+                            } else {
+                                takingPhotosAnimation
+                            },
                             iterations = LottieConstants.IterateForever,
                             modifier = Modifier
                                 .size(80.dp)
@@ -379,7 +411,7 @@ fun SunsetPredictionContent(
                                 }
                         )
                         Text(
-                            text = "Excellent quality",
+                            text = "${stringResource(id = quality)} ${stringResource(id = R.string.quality)}",
                             maxLines = 2,
                             textAlign = TextAlign.Center,
                             overflow = TextOverflow.Ellipsis,

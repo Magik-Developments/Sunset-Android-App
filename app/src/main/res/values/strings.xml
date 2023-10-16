@@ -123,4 +123,9 @@
     <string name="daylight_description">It is the time when the sun is still visible and offers a bright and clear light. It is a good phase to photograph landscapes, portraits or any other subject that requires a uniform and natural lighting.</string>
     <string name="golden_hour_description">It is the phase that starts when the sun is about 6 degrees above the horizon and ends when the sun sets. During this phase, the light becomes warmer and softer, creating golden and orange tones in the sky and shadows. It is an ideal phase to capture the color and atmosphere of the sunset, as well as to highlight textures and contrasts.</string>
     <string name="blue_hour_description">It is the phase that starts when the sun has set and is about 6 degrees below the horizon, and ends when the sun is about 18 degrees below the horizon. During this phase, the light becomes cooler and darker, creating blue and violet tones in the sky and artificial lights. It is a perfect phase to photograph night scenes, urban landscapes or stars.</string>
+    <string name="poor">Poor</string>
+    <string name="fair">Fair</string>
+    <string name="good">Good</string>
+    <string name="great">Great</string>
+    <string name="quality">quality</string>
 </resources>

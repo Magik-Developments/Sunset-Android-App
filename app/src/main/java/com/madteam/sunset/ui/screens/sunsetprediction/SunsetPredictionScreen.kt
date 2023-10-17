@@ -87,6 +87,7 @@ fun SunsetPredictionScreen(
     val sunsetScore by viewModel.sunsetScore.collectAsStateWithLifecycle()
     val sunsetTemperature by viewModel.sunsetTemperature.collectAsStateWithLifecycle()
     val qualityInfoDialog by viewModel.qualityInfoDialog.collectAsStateWithLifecycle()
+    val userLocation by viewModel.userLocation.collectAsStateWithLifecycle()
 
     Scaffold(
         bottomBar = { SunsetBottomNavigation(navController = navController) },
@@ -106,7 +107,9 @@ fun SunsetPredictionScreen(
                     sunsetScore = sunsetScore,
                     sunsetTemperature = sunsetTemperature,
                     qualityInfoDialog = qualityInfoDialog,
-                    setQualityInfoDialog = viewModel::setQualityInfoDialog
+                    setQualityInfoDialog = viewModel::setQualityInfoDialog,
+                    navigateTo = navController::navigate,
+                    selectedLocation = userLocation
                 )
             }
         }
@@ -125,7 +128,9 @@ fun SunsetPredictionContent(
     sunsetScore: Int,
     sunsetTemperature: Double,
     qualityInfoDialog: Int,
-    setQualityInfoDialog: (Int) -> Unit
+    setQualityInfoDialog: (Int) -> Unit,
+    navigateTo: (String) -> Unit,
+    selectedLocation: LatLng
 ) {
 
     val context = LocalContext.current
@@ -237,7 +242,9 @@ fun SunsetPredictionContent(
                     }
             )
             IconButton(
-                onClick = { /*TODO*/ },
+                onClick = {
+                    navigateTo("select_location_screen/lat=${selectedLocation.latitude}long=${selectedLocation.longitude}")
+                },
                 modifier = Modifier
                     .constrainAs(changeLocationButton) {
                         top.linkTo(location.top)

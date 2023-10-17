@@ -267,8 +267,17 @@ fun SunsetNavigation(
             SeeReportsScreen(navController)
         }
 
-        composable(SunsetRoutes.SunsetPredictionScreen.route) {
-            SunsetPredictionScreen(navController = navController)
+        composable(SunsetRoutes.SunsetPredictionScreen.route) { entry ->
+            val selectedLocation = entry.savedStateHandle.get<LatLng>("location")
+            if (selectedLocation != null) {
+                SunsetPredictionScreen(
+                    navController = navController,
+                    selectedLocation = selectedLocation
+                )
+            } else {
+                SunsetPredictionScreen(navController = navController)
+            }
+
         }
 
     }

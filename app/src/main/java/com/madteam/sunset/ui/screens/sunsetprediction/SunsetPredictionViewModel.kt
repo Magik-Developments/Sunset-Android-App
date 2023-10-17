@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
 import com.madteam.sunset.data.model.SunsetTimeResponse
 import com.madteam.sunset.data.model.WeatherResponse
-import com.madteam.sunset.data.repositories.LocationRepository
 import com.madteam.sunset.data.repositories.SunsetRepository
 import com.madteam.sunset.data.repositories.WeatherRepository
 import com.madteam.sunset.utils.Resource
@@ -20,7 +19,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SunsetPredictionViewModel @Inject constructor(
-    private val locationRepository: LocationRepository,
     private val sunsetRepository: SunsetRepository,
     private val weatherRepository: WeatherRepository
 ) : ViewModel() {

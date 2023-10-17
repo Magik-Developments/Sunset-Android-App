@@ -183,6 +183,7 @@ fun SetupListenersAndMapView(
     MapEffect(key1 = selectedLocation, key2 = goToUserLocation) { map ->
         map.setOnMapClickListener { clickedLatLng ->
             updateSelectedLocation(clickedLatLng)
+            map.updateCameraLocation(scope, cameraPositionState, clickedLatLng, 10f)
         }
         if (selectedLocation.latitude != 0.0 && selectedLocation.longitude != 0.0) {
             map.clear()

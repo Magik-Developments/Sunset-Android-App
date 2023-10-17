@@ -77,7 +77,8 @@ import kotlinx.coroutines.delay
 @Composable
 fun SunsetPredictionScreen(
     viewModel: SunsetPredictionViewModel = hiltViewModel(),
-    navController: NavController
+    navController: NavController,
+    selectedLocation: LatLng = LatLng(0.0, 0.0)
 ) {
 
     val showLocationPermissionDialog by viewModel.showLocationPermissionDialog.collectAsStateWithLifecycle()
@@ -87,6 +88,11 @@ fun SunsetPredictionScreen(
     val sunsetScore by viewModel.sunsetScore.collectAsStateWithLifecycle()
     val sunsetTemperature by viewModel.sunsetTemperature.collectAsStateWithLifecycle()
     val qualityInfoDialog by viewModel.qualityInfoDialog.collectAsStateWithLifecycle()
+    val userLocation by viewModel.userLocation.collectAsStateWithLifecycle()
+
+    LaunchedEffect(selectedLocation) {
+        viewModel.updateUserLocation(selectedLocation)
+    }
 
     Scaffold(
         bottomBar = { SunsetBottomNavigation(navController = navController) },
@@ -106,7 +112,10 @@ fun SunsetPredictionScreen(
                     sunsetScore = sunsetScore,
                     sunsetTemperature = sunsetTemperature,
                     qualityInfoDialog = qualityInfoDialog,
-                    setQualityInfoDialog = viewModel::setQualityInfoDialog
+                    setQualityInfoDialog = viewModel::setQualityInfoDialog,
+                    navigateTo = navController::navigate,
+                    userLocation = userLocation,
+                    selectedLocation = selectedLocation
                 )
             }
         }
@@ -125,7 +134,10 @@ fun SunsetPredictionContent(
     sunsetScore: Int,
     sunsetTemperature: Double,
     qualityInfoDialog: Int,
-    setQualityInfoDialog: (Int) -> Unit
+    setQualityInfoDialog: (Int) -> Unit,
+    navigateTo: (String) -> Unit,
+    userLocation: LatLng,
+    selectedLocation: LatLng
 ) {
 
     val context = LocalContext.current
@@ -134,7 +146,7 @@ fun SunsetPredictionContent(
         rememberLauncherForActivityResult(
             contract = ActivityResultContracts.RequestPermission(),
             onResult = { isGranted ->
-                if (isGranted) {
+                if (isGranted && selectedLocation == LatLng(0.0, 0.0)) {
                     getCurrentLocation(context) { lat, long ->
                         updateUserLocation(LatLng(lat, long))
                     }
@@ -145,8 +157,10 @@ fun SunsetPredictionContent(
 
     LaunchedEffect(Unit) {
         if (hasLocationPermission(context)) {
-            getCurrentLocation(context) { lat, long ->
-                updateUserLocation(LatLng(lat, long))
+            if (selectedLocation == LatLng(0.0, 0.0)) {
+                getCurrentLocation(context) { lat, long ->
+                    updateUserLocation(LatLng(lat, long))
+                }
             }
         } else {
             setShowLocationPermissionDialog(true)
@@ -237,7 +251,9 @@ fun SunsetPredictionContent(
                     }
             )
             IconButton(
-                onClick = { /*TODO*/ },
+                onClick = {
+                    navigateTo("select_location_screen/lat=${userLocation.latitude}long=${userLocation.longitude}")
+                },
                 modifier = Modifier
                     .constrainAs(changeLocationButton) {
                         top.linkTo(location.top)

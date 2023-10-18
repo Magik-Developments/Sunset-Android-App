@@ -21,6 +21,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ChevronLeft
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -228,7 +230,7 @@ fun SunsetPredictionContent(
                 .fillMaxSize()
                 .padding(top = 8.dp)
         ) {
-            val (location, changeLocationButton, date, scoreNumber, qualityTitle) = createRefs()
+            val (location, changeLocationButton, date, scoreNumber, qualityTitle, previousDay, nextDay) = createRefs()
             Text(
                 text = userLocality,
                 style = primaryBoldHeadlineM,
@@ -250,6 +252,38 @@ fun SunsetPredictionContent(
                         end.linkTo(parent.end)
                     }
             )
+            IconButton(
+                onClick = {
+                    //todo: previous day
+                },
+                modifier = Modifier
+                    .constrainAs(previousDay) {
+                        top.linkTo(date.top)
+                        bottom.linkTo(date.bottom)
+                        end.linkTo(date.start)
+                    }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ChevronLeft,
+                    contentDescription = "Previous day"
+                )
+            }
+            IconButton(
+                onClick = {
+                    //todo: next day
+                },
+                modifier = Modifier
+                    .constrainAs(nextDay) {
+                        top.linkTo(date.top)
+                        bottom.linkTo(date.bottom)
+                        start.linkTo(date.end)
+                    }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ChevronRight,
+                    contentDescription = "Next day"
+                )
+            }
             IconButton(
                 onClick = {
                     navigateTo("select_location_screen/lat=${userLocation.latitude}long=${userLocation.longitude}")

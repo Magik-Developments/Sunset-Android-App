@@ -44,7 +44,7 @@ class SunsetPredictionViewModel @Inject constructor(
     private val _phasesInfoDialog: MutableStateFlow<String> = MutableStateFlow("")
     val phasesInfoDialog: StateFlow<String> = _phasesInfoDialog
 
-    private val _sunsetScore: MutableStateFlow<Int> = MutableStateFlow(0)
+    private val _sunsetScore: MutableStateFlow<Int> = MutableStateFlow(-1)
     val sunsetScore: StateFlow<Int> = _sunsetScore
 
     private val _weatherInfo: MutableStateFlow<WeatherResponse> =
@@ -58,6 +58,9 @@ class SunsetPredictionViewModel @Inject constructor(
 
     private val _informationDate: MutableStateFlow<String> = MutableStateFlow("")
     val informationDate: StateFlow<String> = _informationDate
+
+    private val _connectionError: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val connectionError: StateFlow<Boolean> = _connectionError
 
     init {
         obtainActualDate()
@@ -89,6 +92,7 @@ class SunsetPredictionViewModel @Inject constructor(
                 when (it) {
                     is Resource.Success -> {
                         _sunsetTimeInformation.value = it.data!!
+                        _connectionError.value = false
                     }
 
                     else -> {}
@@ -117,14 +121,15 @@ class SunsetPredictionViewModel @Inject constructor(
                             _userLocality.value = _weatherInfo.value.location!!.name!!
                             _sunsetScore.value =
                                 calculateSunsetScore(_weatherInfo.value, _informationDate.value)
+                            _connectionError.value = false
                         }
 
                         is Resource.Error -> {
-                            println(it.message)
+                            _connectionError.value = true
                         }
 
                         is Resource.Loading -> {
-                            println("loading")
+                            _connectionError.value = false
                         }
                     }
                 }

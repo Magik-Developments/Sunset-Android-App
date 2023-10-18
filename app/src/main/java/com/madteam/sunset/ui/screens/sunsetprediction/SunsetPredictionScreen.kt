@@ -65,6 +65,7 @@ import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.LargeDarkButton
 import com.madteam.sunset.ui.common.LocationPermissionDialog
 import com.madteam.sunset.ui.common.SunsetBottomNavigation
+import com.madteam.sunset.ui.common.SunsetButton
 import com.madteam.sunset.ui.common.SunsetPhasesInfoDialog
 import com.madteam.sunset.ui.common.SunsetQualityInfoDialog
 import com.madteam.sunset.ui.theme.primaryBoldDisplayM
@@ -97,6 +98,7 @@ fun SunsetPredictionScreen(
     val qualityInfoDialog by viewModel.qualityInfoDialog.collectAsStateWithLifecycle()
     val userLocation by viewModel.userLocation.collectAsStateWithLifecycle()
     val informationDate by viewModel.informationDate.collectAsStateWithLifecycle()
+    val connectionError by viewModel.connectionError.collectAsStateWithLifecycle()
 
     LaunchedEffect(selectedLocation) {
         viewModel.updateUserLocation(selectedLocation)
@@ -126,7 +128,9 @@ fun SunsetPredictionScreen(
                     selectedLocation = selectedLocation,
                     setPreviousDayPrediction = viewModel::setPreviousDayPrediction,
                     setNextDayPrediction = viewModel::setNextDayPrediction,
-                    informationDate = informationDate
+                    informationDate = informationDate,
+                    connectionError = connectionError,
+                    retryCall = viewModel::updateUserLocation
                 )
             }
         }
@@ -151,7 +155,9 @@ fun SunsetPredictionContent(
     selectedLocation: LatLng,
     setPreviousDayPrediction: () -> Unit,
     setNextDayPrediction: () -> Unit,
-    informationDate: String
+    informationDate: String,
+    connectionError: Boolean,
+    retryCall: (LatLng) -> Unit
 ) {
 
     val context = LocalContext.current
@@ -355,7 +361,11 @@ fun SunsetPredictionContent(
                     }
                 }
                 Text(
-                    text = "$scoreNumberAnimated%",
+                    text = if (scorePercentage != -1) {
+                        "$scoreNumberAnimated%"
+                    } else {
+                        " "
+                    },
                     style = primaryBoldDisplayM,
                     fontSize = 60.sp,
                     modifier = Modifier
@@ -364,6 +374,8 @@ fun SunsetPredictionContent(
                             start.linkTo(parent.start)
                             end.linkTo(parent.end)
                         }
+                        .defaultMinSize(minWidth = 60.dp)
+                        .background(shimmerBrush(showShimmer = scorePercentage == -1))
                 )
                 Text(
                     text = "Sunset quality score",
@@ -389,7 +401,7 @@ fun SunsetPredictionContent(
                 }, text = R.string.enable_location
             )
         } else {
-            AnimatedVisibility(visible = isQualityModuleVisible) {
+            AnimatedVisibility(visible = isQualityModuleVisible && scorePercentage != -1) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
@@ -612,6 +624,8 @@ fun SunsetPredictionContent(
                                 start.linkTo(dayLightIcon.start)
                                 end.linkTo(dayLightIcon.end)
                             }
+                            .defaultMinSize(minWidth = 30.dp)
+                            .background(shimmerBrush(showShimmer = sunsetTimeInformation.results.sunset.isBlank()))
                     )
 
                     //Golden hour
@@ -656,6 +670,8 @@ fun SunsetPredictionContent(
                                 start.linkTo(goldenHourIcon.start)
                                 end.linkTo(goldenHourIcon.end)
                             }
+                            .defaultMinSize(minWidth = 30.dp)
+                            .background(shimmerBrush(showShimmer = sunsetTimeInformation.results.golden_hour.isBlank()))
                     )
 
                     //Blue hour
@@ -696,9 +712,15 @@ fun SunsetPredictionContent(
                                 start.linkTo(blueHourIcon.start)
                                 end.linkTo(blueHourIcon.end)
                             }
+                            .defaultMinSize(minWidth = 30.dp)
+                            .background(shimmerBrush(showShimmer = sunsetTimeInformation.results.dusk.isBlank()))
                     )
                 }
             }
+        }
+        if (connectionError) {
+            CustomSpacer(size = 24.dp)
+            SunsetButton(text = R.string.reload, onClick = { retryCall(selectedLocation) })
         }
     }
 }

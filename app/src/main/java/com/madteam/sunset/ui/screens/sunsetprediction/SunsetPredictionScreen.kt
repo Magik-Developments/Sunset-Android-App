@@ -1,6 +1,9 @@
 package com.madteam.sunset.ui.screens.sunsetprediction
 
 import android.Manifest
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -13,6 +16,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -58,8 +62,10 @@ import com.google.android.gms.maps.model.LatLng
 import com.madteam.sunset.R
 import com.madteam.sunset.data.model.SunsetTimeResponse
 import com.madteam.sunset.ui.common.CustomSpacer
+import com.madteam.sunset.ui.common.LargeDarkButton
 import com.madteam.sunset.ui.common.LocationPermissionDialog
 import com.madteam.sunset.ui.common.SunsetBottomNavigation
+import com.madteam.sunset.ui.common.SunsetButton
 import com.madteam.sunset.ui.common.SunsetPhasesInfoDialog
 import com.madteam.sunset.ui.common.SunsetQualityInfoDialog
 import com.madteam.sunset.ui.theme.primaryBoldDisplayM
@@ -92,6 +98,7 @@ fun SunsetPredictionScreen(
     val qualityInfoDialog by viewModel.qualityInfoDialog.collectAsStateWithLifecycle()
     val userLocation by viewModel.userLocation.collectAsStateWithLifecycle()
     val informationDate by viewModel.informationDate.collectAsStateWithLifecycle()
+    val connectionError by viewModel.connectionError.collectAsStateWithLifecycle()
 
     LaunchedEffect(selectedLocation) {
         viewModel.updateUserLocation(selectedLocation)
@@ -121,7 +128,9 @@ fun SunsetPredictionScreen(
                     selectedLocation = selectedLocation,
                     setPreviousDayPrediction = viewModel::setPreviousDayPrediction,
                     setNextDayPrediction = viewModel::setNextDayPrediction,
-                    informationDate = informationDate
+                    informationDate = informationDate,
+                    connectionError = connectionError,
+                    retryCall = viewModel::updateUserLocation
                 )
             }
         }
@@ -146,10 +155,16 @@ fun SunsetPredictionContent(
     selectedLocation: LatLng,
     setPreviousDayPrediction: () -> Unit,
     setNextDayPrediction: () -> Unit,
-    informationDate: String
+    informationDate: String,
+    connectionError: Boolean,
+    retryCall: (LatLng) -> Unit
 ) {
 
     val context = LocalContext.current
+
+    var permissionNotGranted by remember {
+        mutableStateOf(false)
+    }
 
     val requestLocationPermissionLauncher =
         rememberLauncherForActivityResult(
@@ -160,7 +175,7 @@ fun SunsetPredictionContent(
                         updateUserLocation(LatLng(lat, long))
                     }
                 } else {
-                    //TODO: Not granted
+                    permissionNotGranted = true
                 }
             })
 
@@ -238,417 +253,474 @@ fun SunsetPredictionContent(
                 .padding(top = 8.dp)
         ) {
             val (location, changeLocationButton, date, scoreNumber, qualityTitle, previousDay, nextDay) = createRefs()
-            Text(
-                text = userLocality,
-                style = primaryBoldHeadlineM,
-                modifier = Modifier
-                    .constrainAs(location) {
-                        top.linkTo(parent.top)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                    }
-                    .background(shimmerBrush(showShimmer = userLocality.isEmpty()))
-            )
-            Text(
-                text = obtainDateOnFormat(informationDate),
-                style = primaryMediumHeadlineXS,
-                modifier = Modifier
-                    .constrainAs(date) {
-                        top.linkTo(location.bottom, 8.dp)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                    }
-            )
-            var previsionDay by remember {
-                mutableIntStateOf(0)
-            }
-            if (previsionDay > 0) {
-                IconButton(
-                    onClick = {
-                        setPreviousDayPrediction()
-                        previsionDay--
-                    },
-                    modifier = Modifier
-                        .constrainAs(previousDay) {
-                            top.linkTo(date.top)
-                            bottom.linkTo(date.bottom)
-                            end.linkTo(date.start)
-                        }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.ChevronLeft,
-                        contentDescription = "Previous day"
-                    )
-                }
-            }
-            if (previsionDay < 2) {
-                IconButton(
-                    onClick = {
-                        setNextDayPrediction()
-                        previsionDay++
-                    },
-                    modifier = Modifier
-                        .constrainAs(nextDay) {
-                            top.linkTo(date.top)
-                            bottom.linkTo(date.bottom)
-                            start.linkTo(date.end)
-                        }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.ChevronRight,
-                        contentDescription = "Next day"
-                    )
-                }
-            }
-            IconButton(
-                onClick = {
-                    navigateTo("select_location_screen/lat=${userLocation.latitude}long=${userLocation.longitude}")
-                },
-                modifier = Modifier
-                    .constrainAs(changeLocationButton) {
-                        top.linkTo(location.top)
-                        bottom.linkTo(location.bottom)
-                        start.linkTo(location.end)
-                    }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.ExpandMore,
-                    contentDescription = "Change location"
-                )
-            }
-            Text(
-                text = "$scoreNumberAnimated%",
-                style = primaryBoldDisplayM,
-                fontSize = 60.sp,
-                modifier = Modifier
-                    .constrainAs(scoreNumber) {
-                        top.linkTo(date.bottom, 24.dp)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                    }
-            )
-            Text(
-                text = "Sunset quality score",
-                style = primaryBoldHeadlineXS,
-                modifier = Modifier
-                    .constrainAs(qualityTitle) {
-                        top.linkTo(scoreNumber.bottom)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                    }
-            )
-        }
-        CustomSpacer(size = 24.dp)
-        //Temperature and quality sunset module
-        AnimatedVisibility(visible = isQualityModuleVisible) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Card(
-                    elevation = CardDefaults.cardElevation(8.dp),
-                    shape = RoundedCornerShape(20.dp),
-                    modifier = Modifier
-                        .size(150.dp)
-                ) {
-                    ConstraintLayout(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp)
-                    ) {
-                        val sunnyIconAnimation by rememberLottieComposition(
-                            spec = LottieCompositionSpec.RawRes(
-                                R.raw.globe_sunny_animation
-                            )
-                        )
-                        val coldIconAnimation by rememberLottieComposition(
-                            spec = LottieCompositionSpec.RawRes(
-                                R.raw.snowman_cat_animation
-                            )
-                        )
-                        val snowingIconAnimation by rememberLottieComposition(
-                            spec = LottieCompositionSpec.RawRes(
-                                R.raw.snowing_animation
-                            )
-                        )
-                        val hotIconAnimation by rememberLottieComposition(
-                            spec = LottieCompositionSpec.RawRes(
-                                R.raw.melting_icecream_animation
-                            )
-                        )
-                        val normalIconAnimation by rememberLottieComposition(
-                            spec = LottieCompositionSpec.RawRes(
-                                R.raw.cycling_animation
-                            )
-                        )
-                        val (degreesText, animation) = createRefs()
-                        LottieAnimation(
-                            composition =
-                            if (sunsetTemperature <= 0.0) {
-                                snowingIconAnimation
-                            } else if (sunsetTemperature <= 15) {
-                                coldIconAnimation
-                            } else if (sunsetTemperature <= 23) {
-                                normalIconAnimation
-                            } else if (sunsetTemperature <= 30) {
-                                sunnyIconAnimation
-                            } else if (sunsetTemperature > 30) {
-                                hotIconAnimation
-                            } else {
-                                sunnyIconAnimation
-                            },
-                            iterations = LottieConstants.IterateForever,
-                            modifier = Modifier
-                                .size(80.dp)
-                                .constrainAs(animation) {
-                                    top.linkTo(parent.top)
-                                    start.linkTo(parent.start)
-                                    end.linkTo(parent.end)
-                                }
-                        )
-                        Text(
-                            text = "$sunsetTemperature" + "º",
-                            style = primaryBoldDisplayM,
-                            modifier = Modifier.constrainAs(degreesText) {
-                                bottom.linkTo(parent.bottom)
-                                start.linkTo(parent.start)
-                                end.linkTo(parent.end)
-                            })
-                    }
-                }
-                Card(
-                    elevation = CardDefaults.cardElevation(8.dp),
-                    shape = RoundedCornerShape(20.dp),
-                    modifier = Modifier
-                        .size(150.dp)
-                ) {
-                    ConstraintLayout(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp)
-                            .clip(RoundedCornerShape(20.dp))
-                            .clickable {
-                                setQualityInfoDialog(sunsetScore)
-                            }
-                    ) {
-                        val (qualityText, animation) = createRefs()
-                        val quality = if (scorePercentage <= 25) {
-                            R.string.poor
-                        } else if (scorePercentage <= 50) {
-                            R.string.fair
-                        } else if (scorePercentage <= 75) {
-                            R.string.good
-                        } else {
-                            R.string.great
-                        }
-                        val takingPhotosAnimation by rememberLottieComposition(
-                            spec = LottieCompositionSpec.RawRes(
-                                R.raw.guy_photo_animation
-                            )
-                        )
-                        val sadCatAnimation by rememberLottieComposition(
-                            spec = LottieCompositionSpec.RawRes(
-                                R.raw.sad_cat_animation
-                            )
-                        )
-                        val catTvAnimation by rememberLottieComposition(
-                            spec = LottieCompositionSpec.RawRes(
-                                R.raw.cat_tv_animation
-                            )
-                        )
-                        val dogSelfieAnimation by rememberLottieComposition(
-                            spec = LottieCompositionSpec.RawRes(
-                                R.raw.dog_selfie_animation
-                            )
-                        )
-                        LottieAnimation(
-                            composition = if (scorePercentage <= 25) {
-                                sadCatAnimation
-                            } else if (scorePercentage <= 50) {
-                                catTvAnimation
-                            } else if (scorePercentage <= 75) {
-                                dogSelfieAnimation
-                            } else {
-                                takingPhotosAnimation
-                            },
-                            iterations = LottieConstants.IterateForever,
-                            modifier = Modifier
-                                .size(80.dp)
-                                .constrainAs(animation) {
-                                    top.linkTo(parent.top)
-                                    start.linkTo(parent.start)
-                                    end.linkTo(parent.end)
-                                }
-                        )
-                        Text(
-                            text = "${stringResource(id = quality)} ${stringResource(id = R.string.quality)}",
-                            maxLines = 2,
-                            textAlign = TextAlign.Center,
-                            overflow = TextOverflow.Ellipsis,
-                            style = primaryBoldHeadlineS,
-                            modifier = Modifier.constrainAs(qualityText) {
-                                bottom.linkTo(parent.bottom)
-                                start.linkTo(parent.start)
-                                end.linkTo(parent.end)
-                            })
-                    }
-                }
-            }
-        }
-        CustomSpacer(size = 24.dp)
-        //Sunset phases times module
-        Card(
-            elevation = CardDefaults.cardElevation(8.dp),
-            shape = RoundedCornerShape(20.dp),
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
-            ConstraintLayout(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                val dayLightIconAnimation by rememberLottieComposition(
-                    spec = LottieCompositionSpec.RawRes(
-                        R.raw.sun_vector_animation
-                    )
-                )
-                val blueHourIconAnimation by rememberLottieComposition(
-                    spec = LottieCompositionSpec.RawRes(
-                        R.raw.moon_vector_animation
-                    )
-                )
-                val goldenHourIconAnimation by rememberLottieComposition(
-                    spec = LottieCompositionSpec.RawRes(
-                        R.raw.golden_hour_animation
-                    )
-                )
-                val (dayLightIcon, dayLightText, dayLightTime) = createRefs()
-                val (goldenHourIcon, goldenHourText, goldenHourTime) = createRefs()
-                val (blueHourIcon, blueHourText, blueHourTime) = createRefs()
-
-                //Daylight
-                Box(
-                    modifier = Modifier
-                        .size(80.dp)
-                        .clip(RoundedCornerShape(20.dp))
-                        .clickable {
-                            setPhasesInfoDialog("daylight")
-                        }
-                        .constrainAs(dayLightIcon) {
-                            top.linkTo(parent.top)
-                            start.linkTo(parent.start, 16.dp)
-                        }
-                ) {
-                    LottieAnimation(
-                        composition = dayLightIconAnimation,
-                        iterations = LottieConstants.IterateForever,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
+            if (permissionNotGranted && selectedLocation.longitude == 0.0 && selectedLocation.latitude == 0.0) {
                 Text(
-                    text = stringResource(id = R.string.daylight),
-                    style = secondaryRegularBodyM,
-                    modifier = Modifier.constrainAs(dayLightText) {
-                        top.linkTo(dayLightIcon.bottom)
-                        start.linkTo(dayLightIcon.start)
-                        end.linkTo(dayLightIcon.end)
-                    }
-                )
-                Text(
-                    text = convertHourToMilitaryFormat(sunsetTimeInformation.results.sunset),
-                    style = secondarySemiBoldHeadLineS,
+                    text = stringResource(id = R.string.select_location),
+                    style = primaryBoldHeadlineM,
                     modifier = Modifier
-                        .padding(bottom = 16.dp)
-                        .constrainAs(dayLightTime) {
-                            top.linkTo(dayLightText.bottom)
-                            start.linkTo(dayLightIcon.start)
-                            end.linkTo(dayLightIcon.end)
-                        }
-                )
-
-                //Golden hour
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(20.dp))
-                        .clickable {
-                            setPhasesInfoDialog("golden_hour")
-                        }
-                        .size(80.dp)
-                        .constrainAs(goldenHourIcon) {
+                        .constrainAs(location) {
                             top.linkTo(parent.top)
                             start.linkTo(parent.start)
                             end.linkTo(parent.end)
-                        },
-                    contentAlignment = Alignment.Center
+                        }
+                )
+                IconButton(
+                    onClick = {
+                        navigateTo("select_location_screen/lat=${userLocation.latitude}long=${userLocation.longitude}")
+                    },
+                    modifier = Modifier
+                        .constrainAs(changeLocationButton) {
+                            top.linkTo(location.top)
+                            bottom.linkTo(location.bottom)
+                            start.linkTo(location.end)
+                        }
                 ) {
-                    LottieAnimation(
-                        composition = goldenHourIconAnimation,
-                        iterations = LottieConstants.IterateForever,
-                        modifier = Modifier.size(50.dp),
-                        alignment = Alignment.Center,
-                        reverseOnRepeat = true
+                    Icon(
+                        imageVector = Icons.Default.ExpandMore,
+                        contentDescription = "Change location"
                     )
                 }
+            } else {
                 Text(
-                    text = stringResource(id = R.string.golden_hour),
-                    style = secondaryRegularBodyM,
-                    modifier = Modifier.constrainAs(goldenHourText) {
-                        top.linkTo(goldenHourIcon.bottom)
-                        start.linkTo(goldenHourIcon.start)
-                        end.linkTo(goldenHourIcon.end)
-                    }
-                )
-                Text(
-                    text = convertHourToMilitaryFormat(sunsetTimeInformation.results.golden_hour),
-                    style = secondarySemiBoldHeadLineS,
+                    text = userLocality,
+                    style = primaryBoldHeadlineM,
                     modifier = Modifier
-                        .padding(bottom = 16.dp)
-                        .constrainAs(goldenHourTime) {
-                            top.linkTo(goldenHourText.bottom)
-                            start.linkTo(goldenHourIcon.start)
-                            end.linkTo(goldenHourIcon.end)
-                        }
-                )
-
-                //Blue hour
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(20.dp))
-                        .clickable {
-                            setPhasesInfoDialog("blue_hour")
-                        }
-                        .size(80.dp)
-                        .constrainAs(blueHourIcon) {
+                        .constrainAs(location) {
                             top.linkTo(parent.top)
-                            end.linkTo(parent.end, 16.dp)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                        }
+                        .defaultMinSize(minWidth = 100.dp)
+                        .background(shimmerBrush(showShimmer = userLocality.isEmpty()))
+                )
+                IconButton(
+                    onClick = {
+                        navigateTo("select_location_screen/lat=${userLocation.latitude}long=${userLocation.longitude}")
+                    },
+                    modifier = Modifier
+                        .constrainAs(changeLocationButton) {
+                            top.linkTo(location.top)
+                            bottom.linkTo(location.bottom)
+                            start.linkTo(location.end)
                         }
                 ) {
-                    LottieAnimation(
-                        composition = blueHourIconAnimation,
-                        iterations = LottieConstants.IterateForever,
-                        modifier = Modifier.fillMaxSize()
+                    Icon(
+                        imageVector = Icons.Default.ExpandMore,
+                        contentDescription = "Change location"
                     )
                 }
                 Text(
-                    text = stringResource(id = R.string.blue_hour),
-                    style = secondaryRegularBodyM,
-                    modifier = Modifier.constrainAs(blueHourText) {
-                        top.linkTo(blueHourIcon.bottom)
-                        start.linkTo(blueHourIcon.start)
-                        end.linkTo(blueHourIcon.end)
+                    text = obtainDateOnFormat(informationDate),
+                    style = primaryMediumHeadlineXS,
+                    modifier = Modifier
+                        .constrainAs(date) {
+                            top.linkTo(location.bottom, 8.dp)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                        }
+                )
+                var previsionDay by remember {
+                    mutableIntStateOf(0)
+                }
+                if (previsionDay > 0) {
+                    IconButton(
+                        onClick = {
+                            setPreviousDayPrediction()
+                            previsionDay--
+                        },
+                        modifier = Modifier
+                            .constrainAs(previousDay) {
+                                top.linkTo(date.top)
+                                bottom.linkTo(date.bottom)
+                                end.linkTo(date.start)
+                            }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ChevronLeft,
+                            contentDescription = "Previous day"
+                        )
                     }
+                }
+                if (previsionDay < 2) {
+                    IconButton(
+                        onClick = {
+                            setNextDayPrediction()
+                            previsionDay++
+                        },
+                        modifier = Modifier
+                            .constrainAs(nextDay) {
+                                top.linkTo(date.top)
+                                bottom.linkTo(date.bottom)
+                                start.linkTo(date.end)
+                            }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ChevronRight,
+                            contentDescription = "Next day"
+                        )
+                    }
+                }
+                Text(
+                    text = if (scorePercentage != -1) {
+                        "$scoreNumberAnimated%"
+                    } else {
+                        " "
+                    },
+                    style = primaryBoldDisplayM,
+                    fontSize = 60.sp,
+                    modifier = Modifier
+                        .constrainAs(scoreNumber) {
+                            top.linkTo(date.bottom, 24.dp)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                        }
+                        .defaultMinSize(minWidth = 60.dp)
+                        .background(shimmerBrush(showShimmer = scorePercentage == -1))
                 )
                 Text(
-                    text = convertHourToMilitaryFormat(sunsetTimeInformation.results.dusk),
-                    style = secondarySemiBoldHeadLineS,
+                    text = "Sunset quality score",
+                    style = primaryBoldHeadlineXS,
                     modifier = Modifier
-                        .padding(bottom = 16.dp)
-                        .constrainAs(blueHourTime) {
-                            top.linkTo(blueHourText.bottom)
-                            start.linkTo(blueHourIcon.start)
-                            end.linkTo(blueHourIcon.end)
+                        .constrainAs(qualityTitle) {
+                            top.linkTo(scoreNumber.bottom)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
                         }
                 )
             }
+        }
+        CustomSpacer(size = 24.dp)
+        //Temperature and quality sunset module
+        if (permissionNotGranted && selectedLocation.longitude == 0.0 && selectedLocation.latitude == 0.0) {
+            LargeDarkButton(
+                onClick = {
+                    val intent = Intent(ACTION_APPLICATION_DETAILS_SETTINGS)
+                    val uri = Uri.fromParts("package", context.packageName, null)
+                    intent.data = uri
+                    context.startActivity(intent)
+                }, text = R.string.enable_location
+            )
+        } else {
+            AnimatedVisibility(visible = isQualityModuleVisible && scorePercentage != -1) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Card(
+                        elevation = CardDefaults.cardElevation(8.dp),
+                        shape = RoundedCornerShape(20.dp),
+                        modifier = Modifier
+                            .size(150.dp)
+                    ) {
+                        ConstraintLayout(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp)
+                        ) {
+                            val sunnyIconAnimation by rememberLottieComposition(
+                                spec = LottieCompositionSpec.RawRes(
+                                    R.raw.globe_sunny_animation
+                                )
+                            )
+                            val coldIconAnimation by rememberLottieComposition(
+                                spec = LottieCompositionSpec.RawRes(
+                                    R.raw.snowman_cat_animation
+                                )
+                            )
+                            val snowingIconAnimation by rememberLottieComposition(
+                                spec = LottieCompositionSpec.RawRes(
+                                    R.raw.snowing_animation
+                                )
+                            )
+                            val hotIconAnimation by rememberLottieComposition(
+                                spec = LottieCompositionSpec.RawRes(
+                                    R.raw.melting_icecream_animation
+                                )
+                            )
+                            val normalIconAnimation by rememberLottieComposition(
+                                spec = LottieCompositionSpec.RawRes(
+                                    R.raw.cycling_animation
+                                )
+                            )
+                            val (degreesText, animation) = createRefs()
+                            LottieAnimation(
+                                composition =
+                                if (sunsetTemperature <= 0.0) {
+                                    snowingIconAnimation
+                                } else if (sunsetTemperature <= 15) {
+                                    coldIconAnimation
+                                } else if (sunsetTemperature <= 23) {
+                                    normalIconAnimation
+                                } else if (sunsetTemperature <= 30) {
+                                    sunnyIconAnimation
+                                } else if (sunsetTemperature > 30) {
+                                    hotIconAnimation
+                                } else {
+                                    sunnyIconAnimation
+                                },
+                                iterations = LottieConstants.IterateForever,
+                                modifier = Modifier
+                                    .size(80.dp)
+                                    .constrainAs(animation) {
+                                        top.linkTo(parent.top)
+                                        start.linkTo(parent.start)
+                                        end.linkTo(parent.end)
+                                    }
+                            )
+                            Text(
+                                text = "$sunsetTemperature" + "º",
+                                style = primaryBoldDisplayM,
+                                modifier = Modifier.constrainAs(degreesText) {
+                                    bottom.linkTo(parent.bottom)
+                                    start.linkTo(parent.start)
+                                    end.linkTo(parent.end)
+                                })
+                        }
+                    }
+                    Card(
+                        elevation = CardDefaults.cardElevation(8.dp),
+                        shape = RoundedCornerShape(20.dp),
+                        modifier = Modifier
+                            .size(150.dp)
+                    ) {
+                        ConstraintLayout(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(16.dp)
+                                .clip(RoundedCornerShape(20.dp))
+                                .clickable {
+                                    setQualityInfoDialog(sunsetScore)
+                                }
+                        ) {
+                            val (qualityText, animation) = createRefs()
+                            val quality = if (scorePercentage <= 25) {
+                                R.string.poor
+                            } else if (scorePercentage <= 50) {
+                                R.string.fair
+                            } else if (scorePercentage <= 75) {
+                                R.string.good
+                            } else {
+                                R.string.great
+                            }
+                            val takingPhotosAnimation by rememberLottieComposition(
+                                spec = LottieCompositionSpec.RawRes(
+                                    R.raw.guy_photo_animation
+                                )
+                            )
+                            val sadCatAnimation by rememberLottieComposition(
+                                spec = LottieCompositionSpec.RawRes(
+                                    R.raw.sad_cat_animation
+                                )
+                            )
+                            val catTvAnimation by rememberLottieComposition(
+                                spec = LottieCompositionSpec.RawRes(
+                                    R.raw.cat_tv_animation
+                                )
+                            )
+                            val dogSelfieAnimation by rememberLottieComposition(
+                                spec = LottieCompositionSpec.RawRes(
+                                    R.raw.dog_selfie_animation
+                                )
+                            )
+                            LottieAnimation(
+                                composition = if (scorePercentage <= 25) {
+                                    sadCatAnimation
+                                } else if (scorePercentage <= 50) {
+                                    catTvAnimation
+                                } else if (scorePercentage <= 75) {
+                                    dogSelfieAnimation
+                                } else {
+                                    takingPhotosAnimation
+                                },
+                                iterations = LottieConstants.IterateForever,
+                                modifier = Modifier
+                                    .size(80.dp)
+                                    .constrainAs(animation) {
+                                        top.linkTo(parent.top)
+                                        start.linkTo(parent.start)
+                                        end.linkTo(parent.end)
+                                    }
+                            )
+                            Text(
+                                text = "${stringResource(id = quality)} ${stringResource(id = R.string.quality)}",
+                                maxLines = 2,
+                                textAlign = TextAlign.Center,
+                                overflow = TextOverflow.Ellipsis,
+                                style = primaryBoldHeadlineS,
+                                modifier = Modifier.constrainAs(qualityText) {
+                                    bottom.linkTo(parent.bottom)
+                                    start.linkTo(parent.start)
+                                    end.linkTo(parent.end)
+                                })
+                        }
+                    }
+                }
+            }
+            CustomSpacer(size = 24.dp)
+            //Sunset phases times module
+            Card(
+                elevation = CardDefaults.cardElevation(8.dp),
+                shape = RoundedCornerShape(20.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                ConstraintLayout(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    val dayLightIconAnimation by rememberLottieComposition(
+                        spec = LottieCompositionSpec.RawRes(
+                            R.raw.sun_vector_animation
+                        )
+                    )
+                    val blueHourIconAnimation by rememberLottieComposition(
+                        spec = LottieCompositionSpec.RawRes(
+                            R.raw.moon_vector_animation
+                        )
+                    )
+                    val goldenHourIconAnimation by rememberLottieComposition(
+                        spec = LottieCompositionSpec.RawRes(
+                            R.raw.golden_hour_animation
+                        )
+                    )
+                    val (dayLightIcon, dayLightText, dayLightTime) = createRefs()
+                    val (goldenHourIcon, goldenHourText, goldenHourTime) = createRefs()
+                    val (blueHourIcon, blueHourText, blueHourTime) = createRefs()
+
+                    //Sunset
+                    Box(
+                        modifier = Modifier
+                            .size(80.dp)
+                            .clip(RoundedCornerShape(20.dp))
+                            .clickable {
+                                setPhasesInfoDialog("sunset")
+                            }
+                            .constrainAs(dayLightIcon) {
+                                top.linkTo(parent.top)
+                                start.linkTo(parent.start, 16.dp)
+                            }
+                    ) {
+                        LottieAnimation(
+                            composition = dayLightIconAnimation,
+                            iterations = LottieConstants.IterateForever,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+                    Text(
+                        text = stringResource(id = R.string.sunset),
+                        style = secondaryRegularBodyM,
+                        modifier = Modifier.constrainAs(dayLightText) {
+                            top.linkTo(dayLightIcon.bottom)
+                            start.linkTo(dayLightIcon.start)
+                            end.linkTo(dayLightIcon.end)
+                        }
+                    )
+                    Text(
+                        text = convertHourToMilitaryFormat(sunsetTimeInformation.results.sunset),
+                        style = secondarySemiBoldHeadLineS,
+                        modifier = Modifier
+                            .padding(bottom = 16.dp)
+                            .constrainAs(dayLightTime) {
+                                top.linkTo(dayLightText.bottom)
+                                start.linkTo(dayLightIcon.start)
+                                end.linkTo(dayLightIcon.end)
+                            }
+                            .defaultMinSize(minWidth = 30.dp)
+                            .background(shimmerBrush(showShimmer = sunsetTimeInformation.results.sunset.isBlank()))
+                    )
+
+                    //Golden hour
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(20.dp))
+                            .clickable {
+                                setPhasesInfoDialog("golden_hour")
+                            }
+                            .size(80.dp)
+                            .constrainAs(goldenHourIcon) {
+                                top.linkTo(parent.top)
+                                start.linkTo(parent.start)
+                                end.linkTo(parent.end)
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        LottieAnimation(
+                            composition = goldenHourIconAnimation,
+                            iterations = LottieConstants.IterateForever,
+                            modifier = Modifier.size(50.dp),
+                            alignment = Alignment.Center,
+                            reverseOnRepeat = true
+                        )
+                    }
+                    Text(
+                        text = stringResource(id = R.string.golden_hour),
+                        style = secondaryRegularBodyM,
+                        modifier = Modifier.constrainAs(goldenHourText) {
+                            top.linkTo(goldenHourIcon.bottom)
+                            start.linkTo(goldenHourIcon.start)
+                            end.linkTo(goldenHourIcon.end)
+                        }
+                    )
+                    Text(
+                        text = convertHourToMilitaryFormat(sunsetTimeInformation.results.golden_hour),
+                        style = secondarySemiBoldHeadLineS,
+                        modifier = Modifier
+                            .padding(bottom = 16.dp)
+                            .constrainAs(goldenHourTime) {
+                                top.linkTo(goldenHourText.bottom)
+                                start.linkTo(goldenHourIcon.start)
+                                end.linkTo(goldenHourIcon.end)
+                            }
+                            .defaultMinSize(minWidth = 30.dp)
+                            .background(shimmerBrush(showShimmer = sunsetTimeInformation.results.golden_hour.isBlank()))
+                    )
+
+                    //Blue hour
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(20.dp))
+                            .clickable {
+                                setPhasesInfoDialog("blue_hour")
+                            }
+                            .size(80.dp)
+                            .constrainAs(blueHourIcon) {
+                                top.linkTo(parent.top)
+                                end.linkTo(parent.end, 16.dp)
+                            }
+                    ) {
+                        LottieAnimation(
+                            composition = blueHourIconAnimation,
+                            iterations = LottieConstants.IterateForever,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+                    Text(
+                        text = stringResource(id = R.string.blue_hour),
+                        style = secondaryRegularBodyM,
+                        modifier = Modifier.constrainAs(blueHourText) {
+                            top.linkTo(blueHourIcon.bottom)
+                            start.linkTo(blueHourIcon.start)
+                            end.linkTo(blueHourIcon.end)
+                        }
+                    )
+                    Text(
+                        text = convertHourToMilitaryFormat(sunsetTimeInformation.results.dusk),
+                        style = secondarySemiBoldHeadLineS,
+                        modifier = Modifier
+                            .padding(bottom = 16.dp)
+                            .constrainAs(blueHourTime) {
+                                top.linkTo(blueHourText.bottom)
+                                start.linkTo(blueHourIcon.start)
+                                end.linkTo(blueHourIcon.end)
+                            }
+                            .defaultMinSize(minWidth = 30.dp)
+                            .background(shimmerBrush(showShimmer = sunsetTimeInformation.results.dusk.isBlank()))
+                    )
+                }
+            }
+        }
+        if (connectionError) {
+            CustomSpacer(size = 24.dp)
+            SunsetButton(text = R.string.reload, onClick = { retryCall(selectedLocation) })
         }
     }
 }

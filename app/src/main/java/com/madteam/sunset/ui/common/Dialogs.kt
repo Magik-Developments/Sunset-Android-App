@@ -443,8 +443,8 @@ fun SunsetPhasesInfoDialog(
     setShowDialog: (Boolean) -> Unit
 ) {
     val phaseTitle: Int = when (phase) {
-        "daylight" -> {
-            R.string.daylight
+        "sunset" -> {
+            R.string.sunset
         }
 
         "golden_hour" -> {
@@ -460,7 +460,7 @@ fun SunsetPhasesInfoDialog(
         }
     }
     val phaseDescription: Int = when (phase) {
-        "daylight" -> {
+        "sunset" -> {
             R.string.daylight_description
         }
 
@@ -477,7 +477,7 @@ fun SunsetPhasesInfoDialog(
         }
     }
     val phaseAnimation: Int = when (phase) {
-        "daylight" -> {
+        "sunset" -> {
             R.raw.sun_vector_animation
         }
 

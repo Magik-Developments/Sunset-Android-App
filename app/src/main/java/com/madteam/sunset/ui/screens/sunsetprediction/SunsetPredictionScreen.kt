@@ -525,13 +525,13 @@ fun SunsetPredictionContent(
                 val (goldenHourIcon, goldenHourText, goldenHourTime) = createRefs()
                 val (blueHourIcon, blueHourText, blueHourTime) = createRefs()
 
-                //Daylight
+                //Sunset
                 Box(
                     modifier = Modifier
                         .size(80.dp)
                         .clip(RoundedCornerShape(20.dp))
                         .clickable {
-                            setPhasesInfoDialog("daylight")
+                            setPhasesInfoDialog("sunset")
                         }
                         .constrainAs(dayLightIcon) {
                             top.linkTo(parent.top)

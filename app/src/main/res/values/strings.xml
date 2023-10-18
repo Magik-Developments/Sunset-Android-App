@@ -133,4 +133,5 @@
     <string name="good_description">A fair amount of color, often multi-colored, lasting a considerable amount of time. Often caused by scattered clouds at multiple levels.</string>
     <string name="great_description">Extremely vibrant color lasting 30 minutes or more. Often caused by multiple arrangements of clouds at multiple levels, transitioning through multiple stages of vivid color.</string>
     <string name="credits_weatherapi">Information provided by weatherapi.com</string>
+    <string name="sunset">Sunset</string>
 </resources>

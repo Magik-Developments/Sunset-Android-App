@@ -134,4 +134,5 @@
     <string name="great_description">Extremely vibrant color lasting 30 minutes or more. Often caused by multiple arrangements of clouds at multiple levels, transitioning through multiple stages of vivid color.</string>
     <string name="credits_weatherapi">Information provided by weatherapi.com</string>
     <string name="sunset">Sunset</string>
+    <string name="select_location">Select a location</string>
 </resources>

@@ -9,12 +9,16 @@ import com.madteam.sunset.data.repositories.SunsetRepository
 import com.madteam.sunset.data.repositories.WeatherRepository
 import com.madteam.sunset.utils.Resource
 import com.madteam.sunset.utils.calculateSunsetScore
+import com.madteam.sunset.utils.calculateSunsetTemperature
 import com.madteam.sunset.utils.getTimezone
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
 import javax.inject.Inject
 
 @HiltViewModel
@@ -52,6 +56,24 @@ class SunsetPredictionViewModel @Inject constructor(
     private val _qualityInfoDialog: MutableStateFlow<Int> = MutableStateFlow(-1)
     val qualityInfoDialog: StateFlow<Int> = _qualityInfoDialog
 
+    private val _informationDate: MutableStateFlow<String> = MutableStateFlow("")
+    val informationDate: StateFlow<String> = _informationDate
+
+    private val _isNextDayAble: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val isNextDayAble: StateFlow<Boolean> = _isNextDayAble
+
+    init {
+        obtainActualDate()
+    }
+
+    private fun obtainActualDate() {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd")
+        val date = Date()
+
+        val formattedDate = dateFormat.format(date)
+        _informationDate.value = formattedDate
+    }
+
     fun updateUserLocation(location: LatLng) {
         _userLocation.value = location
         getSunsetTimeBasedOnLocation()
@@ -63,7 +85,8 @@ class SunsetPredictionViewModel @Inject constructor(
             sunsetRepository.getSunsetTimeBasedOnLocation(
                 latitude = _userLocation.value.latitude,
                 longitude = _userLocation.value.longitude,
-                timezone = getTimezone()
+                timezone = getTimezone(),
+                date = _informationDate.value
             ).collectLatest {
                 when (it) {
                     is Resource.Success -> {
@@ -78,27 +101,33 @@ class SunsetPredictionViewModel @Inject constructor(
 
     private fun getWeatherBasedOnLocationAndHour() {
         viewModelScope.launch {
-            weatherRepository.getWeatherBasedOnLocationAndHour(
-                latitude = _userLocation.value.latitude,
-                longitude = _userLocation.value.longitude,
-                hour = 19,
-                key = "56a43d55a96942d4b3072635231610"
-            ).collectLatest {
-                when (it) {
-                    is Resource.Success -> {
-                        _weatherInfo.value = it.data!!
-                        _sunsetTemperature.value =
-                            _weatherInfo.value.forecast!!.forecastDay.first().hour.first().tempC!!
-                        _userLocality.value = _weatherInfo.value.location!!.name!!
-                        _sunsetScore.value = calculateSunsetScore(_weatherInfo.value)
-                    }
+            if (_userLocation.value.latitude != 0.0 && _userLocation.value.longitude != 0.0) {
+                weatherRepository.getWeatherBasedOnLocationAndHour(
+                    latitude = _userLocation.value.latitude,
+                    longitude = _userLocation.value.longitude,
+                    hour = 19,
+                    key = "56a43d55a96942d4b3072635231610"
+                ).collectLatest {
+                    when (it) {
+                        is Resource.Success -> {
+                            _weatherInfo.value = it.data!!
+                            _sunsetTemperature.value =
+                                calculateSunsetTemperature(
+                                    _weatherInfo.value,
+                                    _informationDate.value
+                                )
+                            _userLocality.value = _weatherInfo.value.location!!.name!!
+                            _sunsetScore.value =
+                                calculateSunsetScore(_weatherInfo.value, _informationDate.value)
+                        }
 
-                    is Resource.Error -> {
-                        println(it.message)
-                    }
+                        is Resource.Error -> {
+                            println(it.message)
+                        }
 
-                    is Resource.Loading -> {
-                        println("loading")
+                        is Resource.Loading -> {
+                            println("loading")
+                        }
                     }
                 }
             }
@@ -115,6 +144,52 @@ class SunsetPredictionViewModel @Inject constructor(
 
     fun setQualityInfoDialog(quality: Int) {
         _qualityInfoDialog.value = quality
+    }
+
+    fun setPreviousDayPrediction() {
+        viewModelScope.launch {
+            val originalDate = _informationDate.value
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd")
+
+            val date = dateFormat.parse(originalDate)
+
+            val calendar = Calendar.getInstance()
+            if (date != null) {
+                calendar.time = date
+            }
+            calendar.add(Calendar.DAY_OF_MONTH, -1)
+
+            val modifiedDate = dateFormat.format(calendar.time)
+
+            _informationDate.value = modifiedDate
+            getSunsetTimeBasedOnLocation()
+            _sunsetScore.value = calculateSunsetScore(_weatherInfo.value, _informationDate.value)
+            _sunsetTemperature.value =
+                calculateSunsetTemperature(_weatherInfo.value, _informationDate.value)
+        }
+    }
+
+    fun setNextDayPrediction() {
+        viewModelScope.launch {
+            val originalDate = _informationDate.value
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd")
+
+            val date = dateFormat.parse(originalDate)
+
+            val calendar = Calendar.getInstance()
+            if (date != null) {
+                calendar.time = date
+            }
+            calendar.add(Calendar.DAY_OF_MONTH, 1) // Sumar un día
+
+            val modifiedDate = dateFormat.format(calendar.time)
+
+            _informationDate.value = modifiedDate
+            getSunsetTimeBasedOnLocation()
+            _sunsetScore.value = calculateSunsetScore(_weatherInfo.value, _informationDate.value)
+            _sunsetTemperature.value =
+                calculateSunsetTemperature(_weatherInfo.value, _informationDate.value)
+        }
     }
 
 }

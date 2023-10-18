@@ -125,7 +125,8 @@ class HomeViewModel @Inject constructor(
             sunsetRepository.getSunsetTimeBasedOnLocation(
                 latitude = _userLocation.value.latitude,
                 longitude = _userLocation.value.longitude,
-                timezone = getTimezone()
+                timezone = getTimezone(),
+                date = "today"
             ).collectLatest {
                 when (it) {
                     is Resource.Success -> {

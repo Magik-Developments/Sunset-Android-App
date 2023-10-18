@@ -91,6 +91,7 @@ fun SunsetPredictionScreen(
     val sunsetTemperature by viewModel.sunsetTemperature.collectAsStateWithLifecycle()
     val qualityInfoDialog by viewModel.qualityInfoDialog.collectAsStateWithLifecycle()
     val userLocation by viewModel.userLocation.collectAsStateWithLifecycle()
+    val informationDate by viewModel.informationDate.collectAsStateWithLifecycle()
 
     LaunchedEffect(selectedLocation) {
         viewModel.updateUserLocation(selectedLocation)
@@ -117,7 +118,10 @@ fun SunsetPredictionScreen(
                     setQualityInfoDialog = viewModel::setQualityInfoDialog,
                     navigateTo = navController::navigate,
                     userLocation = userLocation,
-                    selectedLocation = selectedLocation
+                    selectedLocation = selectedLocation,
+                    setPreviousDayPrediction = viewModel::setPreviousDayPrediction,
+                    setNextDayPrediction = viewModel::setNextDayPrediction,
+                    informationDate = informationDate
                 )
             }
         }
@@ -139,7 +143,10 @@ fun SunsetPredictionContent(
     setQualityInfoDialog: (Int) -> Unit,
     navigateTo: (String) -> Unit,
     userLocation: LatLng,
-    selectedLocation: LatLng
+    selectedLocation: LatLng,
+    setPreviousDayPrediction: () -> Unit,
+    setNextDayPrediction: () -> Unit,
+    informationDate: String
 ) {
 
     val context = LocalContext.current
@@ -243,7 +250,7 @@ fun SunsetPredictionContent(
                     .background(shimmerBrush(showShimmer = userLocality.isEmpty()))
             )
             Text(
-                text = obtainDateOnFormat(),
+                text = obtainDateOnFormat(informationDate),
                 style = primaryMediumHeadlineXS,
                 modifier = Modifier
                     .constrainAs(date) {
@@ -254,7 +261,7 @@ fun SunsetPredictionContent(
             )
             IconButton(
                 onClick = {
-                    //todo: previous day
+                    setPreviousDayPrediction()
                 },
                 modifier = Modifier
                     .constrainAs(previousDay) {
@@ -270,7 +277,7 @@ fun SunsetPredictionContent(
             }
             IconButton(
                 onClick = {
-                    //todo: next day
+                    setNextDayPrediction()
                 },
                 modifier = Modifier
                     .constrainAs(nextDay) {

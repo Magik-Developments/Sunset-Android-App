@@ -59,9 +59,6 @@ class SunsetPredictionViewModel @Inject constructor(
     private val _informationDate: MutableStateFlow<String> = MutableStateFlow("")
     val informationDate: StateFlow<String> = _informationDate
 
-    private val _isNextDayAble: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    val isNextDayAble: StateFlow<Boolean> = _isNextDayAble
-
     init {
         obtainActualDate()
     }
@@ -76,6 +73,7 @@ class SunsetPredictionViewModel @Inject constructor(
 
     fun updateUserLocation(location: LatLng) {
         _userLocation.value = location
+        obtainActualDate()
         getSunsetTimeBasedOnLocation()
         getWeatherBasedOnLocationAndHour()
     }

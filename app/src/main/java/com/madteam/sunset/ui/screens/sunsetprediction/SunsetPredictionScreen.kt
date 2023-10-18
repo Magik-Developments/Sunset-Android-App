@@ -259,37 +259,46 @@ fun SunsetPredictionContent(
                         end.linkTo(parent.end)
                     }
             )
-            IconButton(
-                onClick = {
-                    setPreviousDayPrediction()
-                },
-                modifier = Modifier
-                    .constrainAs(previousDay) {
-                        top.linkTo(date.top)
-                        bottom.linkTo(date.bottom)
-                        end.linkTo(date.start)
-                    }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.ChevronLeft,
-                    contentDescription = "Previous day"
-                )
+            var previsionDay by remember {
+                mutableIntStateOf(0)
             }
-            IconButton(
-                onClick = {
-                    setNextDayPrediction()
-                },
-                modifier = Modifier
-                    .constrainAs(nextDay) {
-                        top.linkTo(date.top)
-                        bottom.linkTo(date.bottom)
-                        start.linkTo(date.end)
-                    }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.ChevronRight,
-                    contentDescription = "Next day"
-                )
+            if (previsionDay > 0) {
+                IconButton(
+                    onClick = {
+                        setPreviousDayPrediction()
+                        previsionDay--
+                    },
+                    modifier = Modifier
+                        .constrainAs(previousDay) {
+                            top.linkTo(date.top)
+                            bottom.linkTo(date.bottom)
+                            end.linkTo(date.start)
+                        }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ChevronLeft,
+                        contentDescription = "Previous day"
+                    )
+                }
+            }
+            if (previsionDay < 2) {
+                IconButton(
+                    onClick = {
+                        setNextDayPrediction()
+                        previsionDay++
+                    },
+                    modifier = Modifier
+                        .constrainAs(nextDay) {
+                            top.linkTo(date.top)
+                            bottom.linkTo(date.bottom)
+                            start.linkTo(date.end)
+                        }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ChevronRight,
+                        contentDescription = "Next day"
+                    )
+                }
             }
             IconButton(
                 onClick = {

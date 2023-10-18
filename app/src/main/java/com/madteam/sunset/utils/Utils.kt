@@ -188,7 +188,7 @@ fun BackPressHandler(
     }
 }
 
-fun calculateSunsetScore(weatherInfo: WeatherResponse): Int {
+fun calculateSunsetScore(weatherInfo: WeatherResponse, targetDay: String): Int {
     //Ponderations
     val temperatureWeight = 0.3
     val conditionWeight = 0.3
@@ -247,25 +247,30 @@ fun calculateSunsetScore(weatherInfo: WeatherResponse): Int {
         1282 to 10     // Moderate or heavy snow with thunder
     )
 
-    var sunsetTemperature = 0.0
-    var weatherCondition = 0
+    var sunsetTemperature: Double
+    var weatherCondition: Int
 
     var temperatureScore = 0.0
     var conditionScore = 0
     var visibilityScore = 0.0
     var humidityScore = 0.0
 
-    if (weatherInfo.forecast?.forecastDay?.first()?.hour?.first() != null) {
-        with(weatherInfo.forecast!!.forecastDay.first().hour.first()) {
-            sunsetTemperature = tempC!!
-            temperatureScore = 100 - abs(sunsetTemperature - desiredTemperature)
-            weatherCondition = condition?.code ?: 0
-            conditionScore = conditionsValues.getOrDefault(weatherCondition, 0)
-            visibilityScore = (visKm!! / 10.0 * 100)
-            humidityScore = ((100 - humidity!!) * 0.5)
+    if (weatherInfo.forecast?.forecastDay != null) {
+        val matchingForecast = weatherInfo.forecast!!.forecastDay.find { it.date == targetDay }
+
+        if (matchingForecast != null && matchingForecast.hour.isNotEmpty()) {
+            val selectedHour = matchingForecast.hour.first()
+
+            with(selectedHour) {
+                sunsetTemperature = tempC!!
+                temperatureScore = 100 - abs(sunsetTemperature - desiredTemperature)
+                weatherCondition = condition?.code ?: 0
+                conditionScore = conditionsValues.getOrDefault(weatherCondition, 0)
+                visibilityScore = (visKm!! / 10.0 * 100)
+                humidityScore = ((100 - humidity!!) * 0.5)
+            }
         }
     }
-
     val finalScore = (
             temperatureWeight * temperatureScore
                     + conditionWeight * conditionScore
@@ -276,8 +281,24 @@ fun calculateSunsetScore(weatherInfo: WeatherResponse): Int {
     return finalScore.coerceIn(0, 100)
 }
 
-fun obtainDateOnFormat(): String {
-    val actualDate = Date()
+fun calculateSunsetTemperature(weatherInfo: WeatherResponse, targetDay: String): Double {
+    val forecastDay = weatherInfo.forecast?.forecastDay
+
+    if (forecastDay != null) {
+        val matchingForecast = forecastDay.find { it.date == targetDay }
+
+        if (matchingForecast != null && matchingForecast.hour.isNotEmpty()) {
+            val selectedHour = matchingForecast.hour.first()
+            return selectedHour.tempC ?: 0.0
+        }
+    }
+
+    return 0.0
+}
+
+fun obtainDateOnFormat(dateString: String): String {
+    val inputFormat = SimpleDateFormat("yyyy-MM-dd")
+    val inputDate = inputFormat.parse(dateString)
     val format = SimpleDateFormat("dd MMMM, EEEE", Locale.getDefault())
-    return format.format(actualDate)
+    return format.format(inputDate ?: "")
 }

@@ -9,6 +9,7 @@ interface WeatherApiService {
     suspend fun getWeatherBasedOnLocationAndHour(
         @Query("key") key: String,
         @Query("q") coordinates: String,
-        @Query("hour") hour: Int
+        @Query("hour") hour: Int,
+        @Query("days") days: Int = 3
     ): WeatherResponse
 }

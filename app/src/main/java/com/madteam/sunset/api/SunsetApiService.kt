@@ -9,6 +9,7 @@ interface SunsetApiService {
     suspend fun getSunsetTimeBasedOnLocation(
         @Query("lat") latitude: Double,
         @Query("lng") longitude: Double,
-        @Query("timezone") timezone: String
+        @Query("timezone") timezone: String,
+        @Query("date") date: String
     ): SunsetTimeResponse
 }

@@ -21,6 +21,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ChevronLeft
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -89,6 +91,7 @@ fun SunsetPredictionScreen(
     val sunsetTemperature by viewModel.sunsetTemperature.collectAsStateWithLifecycle()
     val qualityInfoDialog by viewModel.qualityInfoDialog.collectAsStateWithLifecycle()
     val userLocation by viewModel.userLocation.collectAsStateWithLifecycle()
+    val informationDate by viewModel.informationDate.collectAsStateWithLifecycle()
 
     LaunchedEffect(selectedLocation) {
         viewModel.updateUserLocation(selectedLocation)
@@ -115,7 +118,10 @@ fun SunsetPredictionScreen(
                     setQualityInfoDialog = viewModel::setQualityInfoDialog,
                     navigateTo = navController::navigate,
                     userLocation = userLocation,
-                    selectedLocation = selectedLocation
+                    selectedLocation = selectedLocation,
+                    setPreviousDayPrediction = viewModel::setPreviousDayPrediction,
+                    setNextDayPrediction = viewModel::setNextDayPrediction,
+                    informationDate = informationDate
                 )
             }
         }
@@ -137,7 +143,10 @@ fun SunsetPredictionContent(
     setQualityInfoDialog: (Int) -> Unit,
     navigateTo: (String) -> Unit,
     userLocation: LatLng,
-    selectedLocation: LatLng
+    selectedLocation: LatLng,
+    setPreviousDayPrediction: () -> Unit,
+    setNextDayPrediction: () -> Unit,
+    informationDate: String
 ) {
 
     val context = LocalContext.current
@@ -228,7 +237,7 @@ fun SunsetPredictionContent(
                 .fillMaxSize()
                 .padding(top = 8.dp)
         ) {
-            val (location, changeLocationButton, date, scoreNumber, qualityTitle) = createRefs()
+            val (location, changeLocationButton, date, scoreNumber, qualityTitle, previousDay, nextDay) = createRefs()
             Text(
                 text = userLocality,
                 style = primaryBoldHeadlineM,
@@ -241,7 +250,7 @@ fun SunsetPredictionContent(
                     .background(shimmerBrush(showShimmer = userLocality.isEmpty()))
             )
             Text(
-                text = obtainDateOnFormat(),
+                text = obtainDateOnFormat(informationDate),
                 style = primaryMediumHeadlineXS,
                 modifier = Modifier
                     .constrainAs(date) {
@@ -250,6 +259,47 @@ fun SunsetPredictionContent(
                         end.linkTo(parent.end)
                     }
             )
+            var previsionDay by remember {
+                mutableIntStateOf(0)
+            }
+            if (previsionDay > 0) {
+                IconButton(
+                    onClick = {
+                        setPreviousDayPrediction()
+                        previsionDay--
+                    },
+                    modifier = Modifier
+                        .constrainAs(previousDay) {
+                            top.linkTo(date.top)
+                            bottom.linkTo(date.bottom)
+                            end.linkTo(date.start)
+                        }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ChevronLeft,
+                        contentDescription = "Previous day"
+                    )
+                }
+            }
+            if (previsionDay < 2) {
+                IconButton(
+                    onClick = {
+                        setNextDayPrediction()
+                        previsionDay++
+                    },
+                    modifier = Modifier
+                        .constrainAs(nextDay) {
+                            top.linkTo(date.top)
+                            bottom.linkTo(date.bottom)
+                            start.linkTo(date.end)
+                        }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ChevronRight,
+                        contentDescription = "Next day"
+                    )
+                }
+            }
             IconButton(
                 onClick = {
                     navigateTo("select_location_screen/lat=${userLocation.latitude}long=${userLocation.longitude}")

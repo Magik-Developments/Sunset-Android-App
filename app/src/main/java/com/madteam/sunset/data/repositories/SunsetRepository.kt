@@ -15,9 +15,10 @@ class SunsetRepository @Inject constructor(
     override fun getSunsetTimeBasedOnLocation(
         latitude: Double,
         longitude: Double,
-        timezone: String
+        timezone: String,
+        date: String
     ): Flow<Resource<SunsetTimeResponse>> = flow<Resource<SunsetTimeResponse>> {
-        val response = apiService.getSunsetTimeBasedOnLocation(latitude, longitude, timezone)
+        val response = apiService.getSunsetTimeBasedOnLocation(latitude, longitude, timezone, date)
         emit(Resource.Success(response))
     }.catch { exception ->
         Log.e("SunsetRepository::getSunsetTimeBasedOnLocation", "Error: ${exception.message}")
@@ -30,6 +31,7 @@ interface SunsetContract {
     fun getSunsetTimeBasedOnLocation(
         latitude: Double,
         longitude: Double,
-        timezone: String
+        timezone: String,
+        date: String
     ): Flow<Resource<SunsetTimeResponse>>
 }

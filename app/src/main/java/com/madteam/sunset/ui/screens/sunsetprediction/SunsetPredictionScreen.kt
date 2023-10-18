@@ -1,6 +1,9 @@
 package com.madteam.sunset.ui.screens.sunsetprediction
 
 import android.Manifest
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -59,6 +62,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.madteam.sunset.R
 import com.madteam.sunset.data.model.SunsetTimeResponse
 import com.madteam.sunset.ui.common.CustomSpacer
+import com.madteam.sunset.ui.common.LargeDarkButton
 import com.madteam.sunset.ui.common.LocationPermissionDialog
 import com.madteam.sunset.ui.common.SunsetBottomNavigation
 import com.madteam.sunset.ui.common.SunsetPhasesInfoDialog
@@ -376,7 +380,14 @@ fun SunsetPredictionContent(
         CustomSpacer(size = 24.dp)
         //Temperature and quality sunset module
         if (permissionNotGranted && selectedLocation.longitude == 0.0 && selectedLocation.latitude == 0.0) {
-
+            LargeDarkButton(
+                onClick = {
+                    val intent = Intent(ACTION_APPLICATION_DETAILS_SETTINGS)
+                    val uri = Uri.fromParts("package", context.packageName, null)
+                    intent.data = uri
+                    context.startActivity(intent)
+                }, text = R.string.enable_location
+            )
         } else {
             AnimatedVisibility(visible = isQualityModuleVisible) {
                 Row(
@@ -583,7 +594,7 @@ fun SunsetPredictionContent(
                         )
                     }
                     Text(
-                        text = stringResource(id = R.string.daylight),
+                        text = stringResource(id = R.string.sunset),
                         style = secondaryRegularBodyM,
                         modifier = Modifier.constrainAs(dayLightText) {
                             top.linkTo(dayLightIcon.bottom)

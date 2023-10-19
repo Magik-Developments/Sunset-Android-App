@@ -142,4 +142,7 @@
     <string name="enable_notifications">Enable notifications</string>
     <string name="enable_notifications_title">Don\'t miss a Sunset!</string>
     <string name="enable_notifications_description">Enable notifications permission on your device to get advised of Sunsets, events, recommendations and more! You can manage which notifications want to receive on your profile settings.</string>
+    <string name="sunsets_notifications_channel_id">sunsets_notifications_channel_id</string>
+    <string name="sunsets_notices">Sunsets notices</string>
+    <string name="others">Others</string>
 </resources>

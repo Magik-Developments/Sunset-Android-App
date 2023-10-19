@@ -32,7 +32,10 @@
                 android:resource="@drawable/logo_degrade" />
             <meta-data
                 android:name="com.google.firebase.messaging.default_notification_color"
-                android:resource="#FFFFB600" />
+                android:resource="@color/sunset" />
+            <meta-data
+                android:name="com.google.firebase.messaging.sunsets_notification_channel_id"
+                android:value="@string/sunsets_notifications_channel_id" />
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -54,7 +57,7 @@
         </activity>
 
         <service
-            android:name=".FirebaseMessagingService"
+            android:name=".MyFirebaseMessagingService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

@@ -431,10 +431,86 @@ fun LocationPermissionDialog(
     }
 }
 
+@Composable
+fun NotificationsPermissionDialog(
+    onContinueClick: () -> Unit
+) {
+    Dialog(onDismissRequest = {}) {
+        Card(
+            shape = RoundedCornerShape(20.dp),
+            elevation = 2.dp,
+            modifier = Modifier
+                .padding(8.dp)
+                .wrapContentSize()
+        ) {
+            ConstraintLayout(
+                modifier = Modifier
+                    .padding(24.dp)
+            ) {
+                val (title, animation, description, button) = createRefs()
+                val notificationAnimation by rememberLottieComposition(
+                    spec = LottieCompositionSpec.RawRes(
+                        R.raw.notification_animation
+                    )
+                )
+
+                LottieAnimation(
+                    composition = notificationAnimation,
+                    iterations = LottieConstants.IterateForever,
+                    modifier = Modifier
+                        .size(200.dp)
+                        .constrainAs(animation) {
+                            top.linkTo(parent.top)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                        }
+                )
+                Text(
+                    text = stringResource(id = R.string.enable_notifications_title),
+                    style = primaryBoldHeadlineM,
+                    textAlign = Companion.Center,
+                    modifier = Modifier.constrainAs(title) {
+                        top.linkTo(animation.bottom, 16.dp)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    }
+                )
+                Text(
+                    text = stringResource(id = R.string.enable_notifications_description),
+                    style = secondaryRegularBodyL,
+                    textAlign = Companion.Center,
+                    modifier = Modifier.constrainAs(description) {
+                        top.linkTo(title.bottom, 16.dp)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    }
+                )
+                SmallButtonSunset(
+                    onClick = { onContinueClick() },
+                    text = R.string.enable_notifications,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .constrainAs(button) {
+                            top.linkTo(description.bottom, 24.dp)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                        }
+                )
+            }
+        }
+    }
+}
+
 @Preview(showSystemUi = true)
 @Composable
 fun LocationPermissionDialogPreview() {
     LocationPermissionDialog {}
+}
+
+@Preview(showSystemUi = true)
+@Composable
+fun NotificationsPermissionDialogPreview() {
+    NotificationsPermissionDialog {}
 }
 
 @Composable

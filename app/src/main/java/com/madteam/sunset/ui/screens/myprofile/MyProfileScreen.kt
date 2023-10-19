@@ -80,7 +80,8 @@ fun MyProfileScreen(
             BottomSheetSettingsMenu(
                 onLogOutClick = { viewModel.setShowExitDialog(true) },
                 isUserAdmin = userInfo.admin,
-                onReportsClick = { navController.navigate(SunsetRoutes.SeeReportsScreen.route) }
+                onReportsClick = { navController.navigate(SunsetRoutes.SeeReportsScreen.route) },
+                onNotificationsClick = { navController.navigate(SunsetRoutes.NotificationsScreen.route) }
             )
         },
         sheetShape = RoundedCornerShape(20.dp, 20.dp, 0.dp, 0.dp),

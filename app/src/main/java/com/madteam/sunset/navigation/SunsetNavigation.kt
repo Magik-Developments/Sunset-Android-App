@@ -28,6 +28,7 @@ import com.madteam.sunset.ui.screens.post.PostScreen
 import com.madteam.sunset.ui.screens.review.PostReviewScreen
 import com.madteam.sunset.ui.screens.seereports.SeeReportsScreen
 import com.madteam.sunset.ui.screens.selectLocation.SelectLocationScreen
+import com.madteam.sunset.ui.screens.settings.notifications.NotificationsScreen
 import com.madteam.sunset.ui.screens.spotdetail.SpotDetailScreen
 import com.madteam.sunset.ui.screens.sunsetprediction.SunsetPredictionScreen
 import com.madteam.sunset.ui.screens.verifyaccount.VerifyAccountScreen
@@ -278,6 +279,10 @@ fun SunsetNavigation(
                 SunsetPredictionScreen(navController = navController)
             }
 
+        }
+
+        composable(SunsetRoutes.NotificationsScreen.route) {
+            NotificationsScreen(navController = navController)
         }
 
     }

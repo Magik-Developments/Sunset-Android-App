@@ -136,4 +136,14 @@
     <string name="sunset">Sunset</string>
     <string name="select_location">Select a location</string>
     <string name="reload">Error, try again</string>
+    <string name="notifications">Notifications</string>
+    <string name="sunsets">Sunsets</string>
+    <string name="sunsets_notifications">Never miss a Sunset again! Be notificated when the time approaches.</string>
+    <string name="enable_notifications">Enable notifications</string>
+    <string name="enable_notifications_title">Don\'t miss a Sunset!</string>
+    <string name="enable_notifications_description">Enable notifications permission on your device to get advised of Sunsets, events, recommendations and more! You can manage which notifications want to receive on your profile settings.</string>
+    <string name="sunsets_notifications_channel_id">sunsets_notifications_channel_id</string>
+    <string name="sunsets_notices">Sunsets notices</string>
+    <string name="others">Others</string>
+    <string name="default_notification_channel_id">com.madteam.sunset.sunsetsnotifications</string>
 </resources>

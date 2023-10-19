@@ -26,6 +26,14 @@
             android:exported="true"
             android:windowSoftInputMode="adjustResize"
             android:theme="@style/Theme.Sunset">
+
+            <meta-data
+                android:name="com.google.firebase.messaging.default_notification_icon"
+                android:resource="@drawable/logo_degrade" />
+            <meta-data
+                android:name="com.google.firebase.messaging.default_notification_color"
+                android:resource="#FFFFB600" />
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -46,7 +54,7 @@
         </activity>
 
         <service
-            android:name=".java.FirebaseMessagingService"
+            android:name=".FirebaseMessagingService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

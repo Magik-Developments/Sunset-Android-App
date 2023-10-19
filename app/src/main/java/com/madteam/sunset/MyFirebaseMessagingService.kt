@@ -71,7 +71,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     companion object {
         private const val TAG = "MyFirebaseMsgService"
         private val CHANNELS_NAMES = hashMapOf(
-            "sunsets_notifications_channel_id" to R.string.sunsets_notices
+            "com.madteam.sunset.sunsetsnotifications" to R.string.sunsets_notices
         )
     }
 

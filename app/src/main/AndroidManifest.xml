@@ -34,8 +34,8 @@
                 android:name="com.google.firebase.messaging.default_notification_color"
                 android:resource="@color/sunset" />
             <meta-data
-                android:name="com.google.firebase.messaging.sunsets_notification_channel_id"
-                android:value="@string/sunsets_notifications_channel_id" />
+                android:name="com.google.firebase.messaging.default_notification_channel_id"
+                android:value="@string/default_notification_channel_id" />
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

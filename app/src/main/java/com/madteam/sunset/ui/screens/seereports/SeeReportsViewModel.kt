@@ -35,9 +35,7 @@ class SeeReportsViewModel @Inject constructor(
     private fun getUserUsername() {
         viewModelScope.launch {
             authRepository.getCurrentUser()?.let { user ->
-                databaseRepository.getUserByEmail(user.email!!) {
-                    username = it.username
-                }
+                username = databaseRepository.getUserByEmail(user.email!!).username
             }
         }
     }

@@ -7,6 +7,7 @@ import com.madteam.sunset.data.model.SpotPost
 import com.madteam.sunset.data.model.UserProfile
 import com.madteam.sunset.data.repositories.AuthContract
 import com.madteam.sunset.data.repositories.DatabaseContract
+import com.madteam.sunset.domain.usecases.GetMyUserProfileInfoUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,7 +18,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MyProfileViewModel @Inject constructor(
     private val authRepository: AuthContract,
-    private val databaseRepository: DatabaseContract
+    private val databaseRepository: DatabaseContract,
+    private val getMyUserProfileInfoUseCase: GetMyUserProfileInfoUseCase
 ) : ViewModel() {
 
     private val _selectedTab: MutableStateFlow<Int> = MutableStateFlow(0)
@@ -40,8 +42,8 @@ class MyProfileViewModel @Inject constructor(
     }
 
     private fun initUI() {
-        authRepository.getCurrentUser()?.let { user ->
-            databaseRepository.getUserByEmail(user.email!!) {
+        viewModelScope.launch {
+            getMyUserProfileInfoUseCase().let {
                 _userInfo.value = it
                 getUserPosts()
                 getUserSpots()

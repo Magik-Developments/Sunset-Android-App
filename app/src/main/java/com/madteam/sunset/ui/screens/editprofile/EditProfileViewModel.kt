@@ -45,18 +45,21 @@ class EditProfileViewModel @Inject constructor(
     }
 
     private fun setInitialValues() {
-        authRepository.getCurrentUser()?.let { user ->
-            databaseRepository.getUserByEmail(user.email!!) {
-                _originalName.value = it.name
-                _originalLocation.value = it.location
-                _originalEmail.value = it.email
-                _originalUserImage.value = it.image
-                username.value = it.username
-                email.value = it.email
-                name.value = it.name
-                location.value = it.location
-                userImage.value = it.image
-                userIsAdmin.value = it.admin
+        viewModelScope.launch {
+            authRepository.getCurrentUser()?.let { user ->
+                val userInfo = databaseRepository.getUserByEmail(user.email!!)
+                userInfo.let {
+                    _originalName.value = it.name
+                    _originalLocation.value = it.location
+                    _originalEmail.value = it.email
+                    _originalUserImage.value = it.image
+                    username.value = it.username
+                    email.value = it.email
+                    name.value = it.name
+                    location.value = it.location
+                    userImage.value = it.image
+                    userIsAdmin.value = it.admin
+                }
             }
         }
     }

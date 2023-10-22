@@ -39,10 +39,11 @@ class CommentsViewModel @Inject constructor(
     }
 
     private fun getUserInfo() {
-        authRepository.getCurrentUser()?.let { user ->
-            databaseRepository.getUserByEmail(user.email!!) {
-                username = it.username
-                userImage = it.image
+        viewModelScope.launch {
+            authRepository.getCurrentUser()?.let { user ->
+                val userInfo = databaseRepository.getUserByEmail(user.email!!)
+                username = userInfo.username
+                userImage = userInfo.image
             }
         }
     }

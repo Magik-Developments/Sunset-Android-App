@@ -73,10 +73,9 @@ class SpotDetailViewModel @Inject constructor(
     private fun getUserUsername() {
         viewModelScope.launch {
             authRepository.getCurrentUser()?.let { user ->
-                databaseRepository.getUserByEmail(user.email!!) {
-                    username = it.username
-                    _userIsAbleToEditOrRemoveSpot.value = it.admin
-                }
+                val userInfo = databaseRepository.getUserByEmail(user.email!!)
+                username = userInfo.username
+                _userIsAbleToEditOrRemoveSpot.value = userInfo.admin
             }
         }
     }

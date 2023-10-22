@@ -118,9 +118,9 @@ class EditSpotViewModel @Inject constructor(
     }
 
     private fun getUserInfo() {
-        authRepository.getCurrentUser()?.let { user ->
-            databaseRepository.getUserByEmail(user.email!!) {
-                _username.value = it.username
+        viewModelScope.launch {
+            authRepository.getCurrentUser()?.let { user ->
+                _username.value = databaseRepository.getUserByEmail(user.email!!).username
             }
         }
     }

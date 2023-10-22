@@ -80,9 +80,9 @@ class AddPostViewModel @Inject constructor(
     }
 
     private fun getUserInfo() {
-        authRepository.getCurrentUser()?.let { user ->
-            databaseRepository.getUserByEmail(user.email!!) {
-                username = it.username
+        viewModelScope.launch {
+            authRepository.getCurrentUser()?.let { user ->
+                username = databaseRepository.getUserByEmail(user.email!!).username
             }
         }
     }

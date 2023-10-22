@@ -235,16 +235,16 @@ class DatabaseRepository @Inject constructor(
             firebaseFirestore.collection(USERS_COLLECTION_PATH).whereEqualTo("email", email)
                 .get()
                 .await()
-        with(userProfileSnapshot) {
+        with(userProfileSnapshot.first()) {
             return UserProfile(
-                username = documents[0].getString("username") ?: "",
-                email = documents[0].getString("email") ?: "",
-                provider = documents[0].getString("provider") ?: "",
-                creation_date = documents[0].getString("creation_date") ?: "",
-                name = documents[0].getString("name") ?: "",
-                location = documents[0].getString("location") ?: "",
-                image = documents[0].getString("image") ?: "",
-                admin = documents[0].getBoolean("admin") ?: false
+                username = getString("username") ?: "",
+                email = getString("email") ?: "",
+                provider = getString("provider") ?: "",
+                creation_date = getString("creation_date") ?: "",
+                name = getString("name") ?: "",
+                location = getString("location") ?: "",
+                image = getString("image") ?: "",
+                admin = getBoolean("admin") ?: false
             )
         }
     }
@@ -276,14 +276,28 @@ class DatabaseRepository @Inject constructor(
             firebaseFirestore.collection(USERS_COLLECTION_PATH).document(userDocumentId)
                 .update(updateMap)
                 .await()
-            val currentImages =
-                getImagesInStoragePath("$IMAGES_STORAGE_PROFILE_IMAGES_PATH${userDocumentId}/")
-            currentImages.collectLatest { imageUrls ->
-                imageUrls.forEach { imageUrl ->
-                    if (imageUrl != profileImage) {
-                        deleteImage(imageUrl).collectLatest {
-                            if (it.data != null && it.data.contains("Error")) {
-                                emit(Resource.Error("Error deleting image"))
+            userProfileDao.updateNonEmptyUserProfileFields(
+                UserProfileEntity(
+                    username = user.username,
+                    email = user.email,
+                    provider = user.provider,
+                    creationDate = user.creation_date,
+                    name = user.name,
+                    location = user.location,
+                    image = user.image,
+                    admin = user.admin
+                )
+            )
+            if (user.image.isNotBlank()) {
+                val currentImages =
+                    getImagesInStoragePath("$IMAGES_STORAGE_PROFILE_IMAGES_PATH${userDocumentId}/")
+                currentImages.collectLatest { imageUrls ->
+                    imageUrls.forEach { imageUrl ->
+                        if (imageUrl != profileImage) {
+                            deleteImage(imageUrl).collectLatest {
+                                if (it.data != null && it.data.contains("Error")) {
+                                    emit(Resource.Error("Error deleting image"))
+                                }
                             }
                         }
                     }

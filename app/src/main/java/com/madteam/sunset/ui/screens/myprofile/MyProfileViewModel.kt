@@ -7,7 +7,7 @@ import com.madteam.sunset.data.model.SpotPost
 import com.madteam.sunset.data.model.UserProfile
 import com.madteam.sunset.data.repositories.AuthContract
 import com.madteam.sunset.data.repositories.DatabaseContract
-import com.madteam.sunset.domain.usecases.GetMyUserProfileInfoUseCase
+import com.madteam.sunset.domain.usecases.userprofile.GetMyUserProfileInfoUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

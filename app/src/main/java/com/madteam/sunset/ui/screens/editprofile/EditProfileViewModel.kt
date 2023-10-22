@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.madteam.sunset.data.model.UserProfile
 import com.madteam.sunset.data.repositories.AuthContract
 import com.madteam.sunset.data.repositories.DatabaseRepository
+import com.madteam.sunset.domain.usecases.userprofile.GetMyUserProfileInfoUseCase
 import com.madteam.sunset.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +18,8 @@ import javax.inject.Inject
 @HiltViewModel
 class EditProfileViewModel @Inject constructor(
     private val authRepository: AuthContract,
-    private val databaseRepository: DatabaseRepository
+    private val databaseRepository: DatabaseRepository,
+    private val getMyUserProfileInfoUseCase: GetMyUserProfileInfoUseCase
 ) : ViewModel() {
 
     val username = MutableStateFlow("")
@@ -46,20 +48,18 @@ class EditProfileViewModel @Inject constructor(
 
     private fun setInitialValues() {
         viewModelScope.launch {
-            authRepository.getCurrentUser()?.let { user ->
-                val userInfo = databaseRepository.getUserByEmail(user.email!!)
-                userInfo.let {
-                    _originalName.value = it.name
-                    _originalLocation.value = it.location
-                    _originalEmail.value = it.email
-                    _originalUserImage.value = it.image
-                    username.value = it.username
-                    email.value = it.email
-                    name.value = it.name
-                    location.value = it.location
-                    userImage.value = it.image
-                    userIsAdmin.value = it.admin
-                }
+            getMyUserProfileInfoUseCase().let {
+                _originalUsername.value = it.username
+                _originalEmail.value = it.email
+                _originalName.value = it.name
+                _originalLocation.value = it.location
+                _originalUserImage.value = it.image
+                username.value = it.username
+                email.value = it.email
+                name.value = it.name
+                location.value = it.location
+                userImage.value = it.image
+                userIsAdmin.value = it.admin
             }
         }
     }

@@ -1,4 +1,4 @@
-package com.madteam.sunset.domain.usecases
+package com.madteam.sunset.domain.usecases.userprofile
 
 import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore

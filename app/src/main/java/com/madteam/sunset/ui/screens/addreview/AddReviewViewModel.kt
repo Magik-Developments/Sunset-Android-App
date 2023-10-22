@@ -64,9 +64,9 @@ class AddReviewViewModel @Inject constructor(
     }
 
     private fun getUserInfo() {
-        authRepository.getCurrentUser()?.let { user ->
-            databaseRepository.getUserByEmail(user.email!!) {
-                _userInfo.value = it
+        viewModelScope.launch {
+            authRepository.getCurrentUser()?.let { user ->
+                _userInfo.value = databaseRepository.getUserByEmail(user.email!!)
             }
         }
     }

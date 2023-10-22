@@ -7,6 +7,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.madteam.sunset.api.SunsetApiService
 import com.madteam.sunset.api.WeatherApiService
 import com.madteam.sunset.data.database.dao.SpotAttributeDao
+import com.madteam.sunset.data.database.dao.UserProfileDao
 import com.madteam.sunset.data.repositories.AuthContract
 import com.madteam.sunset.data.repositories.AuthRepository
 import com.madteam.sunset.data.repositories.DatabaseContract
@@ -35,9 +36,10 @@ object RepositoryModule {
     fun providesDatabaseRepository(
         firestore: FirebaseFirestore,
         storage: FirebaseStorage,
-        spotAttributeDao: SpotAttributeDao
+        spotAttributeDao: SpotAttributeDao,
+        userProfileDao: UserProfileDao
     ): DatabaseContract =
-        DatabaseRepository(firestore, storage, spotAttributeDao)
+        DatabaseRepository(firestore, storage, spotAttributeDao, userProfileDao)
 
     @Provides
     fun providesLocationRepository(

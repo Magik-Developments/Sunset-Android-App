@@ -15,7 +15,9 @@ import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.Query
 import com.google.firebase.storage.FirebaseStorage
 import com.madteam.sunset.data.database.dao.SpotAttributeDao
+import com.madteam.sunset.data.database.dao.UserProfileDao
 import com.madteam.sunset.data.database.entities.SpotAttributeEntity
+import com.madteam.sunset.data.database.entities.UserProfileEntity
 import com.madteam.sunset.data.model.PostComment
 import com.madteam.sunset.data.model.Report
 import com.madteam.sunset.data.model.Spot
@@ -52,7 +54,8 @@ private const val IMAGES_STORAGE_PROFILE_IMAGES_PATH = "profile_images/"
 class DatabaseRepository @Inject constructor(
     private val firebaseFirestore: FirebaseFirestore,
     private val firebaseStorage: FirebaseStorage,
-    private val spotAttributeDao: SpotAttributeDao
+    private val spotAttributeDao: SpotAttributeDao,
+    private val userProfileDao: UserProfileDao
 ) : DatabaseContract {
 
     private var lastVisibleSpotOnHomeFeed: DocumentSnapshot? = null
@@ -227,13 +230,23 @@ class DatabaseRepository @Inject constructor(
         Log.e("DatabaseRepository::modifyUserPostLike", "Error: ${exception.message}")
     }
 
-    override fun getUserByEmail(email: String, userProfileCallback: (UserProfile) -> Unit) {
-        firebaseFirestore.collection(USERS_COLLECTION_PATH).whereEqualTo("email", email)
-            .limit(1)
-            .get()
-            .addOnSuccessListener { userDocument ->
-                userProfileCallback(userDocument.toObjects(UserProfile::class.java)[0])
-            }
+    override suspend fun getUserByEmail(email: String): UserProfile {
+        val userProfileSnapshot =
+            firebaseFirestore.collection(USERS_COLLECTION_PATH).whereEqualTo("email", email)
+                .get()
+                .await()
+        with(userProfileSnapshot.first()) {
+            return UserProfile(
+                username = getString("username") ?: "",
+                email = getString("email") ?: "",
+                provider = getString("provider") ?: "",
+                creation_date = getString("creation_date") ?: "",
+                name = getString("name") ?: "",
+                location = getString("location") ?: "",
+                image = getString("image") ?: "",
+                admin = getBoolean("admin") ?: false
+            )
+        }
     }
 
     override fun updateUser(user: UserProfile): Flow<Resource<String>> = flow {
@@ -263,14 +276,28 @@ class DatabaseRepository @Inject constructor(
             firebaseFirestore.collection(USERS_COLLECTION_PATH).document(userDocumentId)
                 .update(updateMap)
                 .await()
-            val currentImages =
-                getImagesInStoragePath("$IMAGES_STORAGE_PROFILE_IMAGES_PATH${userDocumentId}/")
-            currentImages.collectLatest { imageUrls ->
-                imageUrls.forEach { imageUrl ->
-                    if (imageUrl != profileImage) {
-                        deleteImage(imageUrl).collectLatest {
-                            if (it.data != null && it.data.contains("Error")) {
-                                emit(Resource.Error("Error deleting image"))
+            userProfileDao.updateNonEmptyUserProfileFields(
+                UserProfileEntity(
+                    username = user.username,
+                    email = user.email,
+                    provider = user.provider,
+                    creationDate = user.creation_date,
+                    name = user.name,
+                    location = user.location,
+                    image = user.image,
+                    admin = user.admin
+                )
+            )
+            if (user.image.isNotBlank()) {
+                val currentImages =
+                    getImagesInStoragePath("$IMAGES_STORAGE_PROFILE_IMAGES_PATH${userDocumentId}/")
+                currentImages.collectLatest { imageUrls ->
+                    imageUrls.forEach { imageUrl ->
+                        if (imageUrl != profileImage) {
+                            deleteImage(imageUrl).collectLatest {
+                                if (it.data != null && it.data.contains("Error")) {
+                                    emit(Resource.Error("Error deleting image"))
+                                }
                             }
                         }
                     }
@@ -386,9 +413,7 @@ class DatabaseRepository @Inject constructor(
             val likedBySnapshot = documentReference.collection("liked_by").get().await()
             val likedByList = likedBySnapshot.documents.map { doc -> doc.id }
             if (spottedByDocRef != null) {
-                getUserProfileByDocRef(spottedByDocRef).collectLatest { profile ->
-                    spottedBy = profile
-                }
+                spottedBy = getUserProfileByDocRef(spottedByDocRef)
             }
             getSpotAttributesByDocRefs(attributeDocRefs).collectLatest { attributes ->
                 spotAttributes = attributes
@@ -426,7 +451,7 @@ class DatabaseRepository @Inject constructor(
         emit(Spot())
     }
 
-    override fun getUserProfileByDocRef(docRef: DocumentReference): Flow<UserProfile> = flow {
+    override suspend fun getUserProfileByDocRef(docRef: DocumentReference): UserProfile {
         val documentReference = firebaseFirestore.document(docRef.path)
         val userSnapshot = documentReference.get().await()
 
@@ -439,7 +464,7 @@ class DatabaseRepository @Inject constructor(
             val userImage = userSnapshot.getString("image")
             val usernameName = userSnapshot.getString("name")
             val isUserAdmin = userSnapshot.getBoolean("admin")
-            val userProfile = UserProfile(
+            return UserProfile(
                 username = username ?: "",
                 email = email ?: "",
                 provider = provider ?: "",
@@ -449,11 +474,13 @@ class DatabaseRepository @Inject constructor(
                 image = userImage ?: "",
                 admin = isUserAdmin ?: false
             )
-            emit(userProfile)
         }
-    }.catch { exception ->
-        Log.e("DatabaseRepository::getUserProfileByDocRef", "Error: ${exception.message}")
-        emit(UserProfile())
+        return UserProfile()
+    }
+
+    override suspend fun getMyUserProfileInfoFromDatabase(): UserProfile {
+        val response: UserProfileEntity = userProfileDao.getAllUserProfileInfo()
+        return response.toDomain()
     }
 
     override fun getSpotAttributesByDocRefs(docRefs: List<DocumentReference>): Flow<List<SpotAttribute>> =
@@ -493,9 +520,7 @@ class DatabaseRepository @Inject constructor(
                 val postedByDocRef = spotReviewSnapshot.getDocumentReference("posted_by")
                 var postedBy = UserProfile()
                 if (postedByDocRef != null) {
-                    getUserProfileByDocRef(postedByDocRef).collectLatest { profile ->
-                        postedBy = profile
-                    }
+                    postedBy = getUserProfileByDocRef(postedByDocRef)
                 }
                 val reviewAttributesRefs =
                     spotReviewSnapshot.get("spot_attr") as List<DocumentReference>
@@ -534,9 +559,7 @@ class DatabaseRepository @Inject constructor(
                 val authorRef = postSnapshot.getDocumentReference("author")
                 var author = UserProfile()
                 if (authorRef != null) {
-                    getUserProfileByDocRef(authorRef).collectLatest { profile ->
-                        author = profile
-                    }
+                    author = getUserProfileByDocRef(authorRef)
                 }
                 var commentsList = listOf<PostComment>()
                 getCommentsFromPostRef(postRef.path).collectLatest { comments ->
@@ -578,9 +601,7 @@ class DatabaseRepository @Inject constructor(
             val authorRef = postSnapshot.getDocumentReference("author")
             var author = UserProfile()
             if (authorRef != null) {
-                getUserProfileByDocRef(authorRef).collectLatest { profile ->
-                    author = profile
-                }
+                author = getUserProfileByDocRef(authorRef)
             }
             var commentsList = listOf<PostComment>()
             getCommentsFromPostRef(documentReference.path).collectLatest { comments ->
@@ -625,9 +646,7 @@ class DatabaseRepository @Inject constructor(
                 val authorRef = commentDoc.getDocumentReference("author")
                 var author = UserProfile()
                 if (authorRef != null) {
-                    getUserProfileByDocRef(authorRef).collectLatest { profile ->
-                        author = profile
-                    }
+                    author = getUserProfileByDocRef(authorRef)
                 }
                 if (commentText != null && creationDate != null) {
                     val comment = PostComment(id, commentText, author, creationDate)
@@ -713,9 +732,7 @@ class DatabaseRepository @Inject constructor(
         val postedByDocRef = reviewSnapshot.getDocumentReference("posted_by")
         var postedBy = UserProfile()
         if (postedByDocRef != null) {
-            getUserProfileByDocRef(postedByDocRef).collectLatest { profile ->
-                postedBy = profile
-            }
+            postedBy = getUserProfileByDocRef(postedByDocRef)
         }
         val reviewAttributesRefs =
             reviewSnapshot.get("spot_attr") as List<DocumentReference>
@@ -877,9 +894,7 @@ class DatabaseRepository @Inject constructor(
             val authorRef = document.getDocumentReference("author")
             var author = UserProfile()
             if (authorRef != null) {
-                getUserProfileByDocRef(authorRef).collectLatest { profile ->
-                    author = profile
-                }
+                author = getUserProfileByDocRef(authorRef)
             }
             val description = document.getString("description")
             val creationDate = document.getString("creation_date")
@@ -911,6 +926,10 @@ class DatabaseRepository @Inject constructor(
     }.catch { exception ->
         Log.e("DatabaseRepository::getLastPosts", "Error: ${exception.message}")
         emit(mutableListOf())
+    }
+
+    override suspend fun insertMyUserProfileInfoOnDatabase(userProfile: UserProfileEntity) {
+        userProfileDao.insertUserProfileInfo(userProfile)
     }
 
     override fun createSpotReview(
@@ -1019,7 +1038,7 @@ class DatabaseRepository @Inject constructor(
         spotLocality: String?,
         spotAttributes: List<SpotAttribute>,
         spotScore: Int
-    ): Flow<Resource<String>> = flow<Resource<String>> {
+    ): Flow<Resource<String>> = flow {
         emit(Resource.Loading())
         val spotDocumentReference = firebaseFirestore.document(spotReference)
         var locationText: String? = null
@@ -1328,11 +1347,12 @@ class DatabaseRepository @Inject constructor(
 interface DatabaseContract {
 
     fun createUser(email: String, username: String, provider: String): Flow<Resource<String>>
-    fun getUserByEmail(email: String, userProfileCallback: (UserProfile) -> Unit)
+    suspend fun getUserByEmail(email: String): UserProfile
     fun updateUser(user: UserProfile): Flow<Resource<String>>
     fun getSpotsLocations(): Flow<List<SpotClusterItem>>
     fun getSpotByDocRef(docRef: String): Flow<Spot>
-    fun getUserProfileByDocRef(docRef: DocumentReference): Flow<UserProfile>
+    suspend fun getUserProfileByDocRef(docRef: DocumentReference): UserProfile
+    suspend fun getMyUserProfileInfoFromDatabase(): UserProfile
     fun getSpotAttributesByDocRefs(docRefs: List<DocumentReference>): Flow<List<SpotAttribute>>
     fun getSpotReviewsByCollectionRef(collectionRef: CollectionReference): Flow<List<SpotReview>>
     fun getSpotPostsByDocRefs(docRefs: List<DocumentReference>): Flow<List<SpotPost>>
@@ -1433,5 +1453,7 @@ interface DatabaseContract {
         itemsPerQuery: Int,
         lastItemId: String?
     ): Flow<List<SpotPost>>
+
+    suspend fun insertMyUserProfileInfoOnDatabase(userProfile: UserProfileEntity)
 
 }

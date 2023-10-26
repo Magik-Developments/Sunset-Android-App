@@ -15,7 +15,7 @@ import com.madteam.sunset.navigation.SunsetRoutes.MyProfileScreen
 import com.madteam.sunset.navigation.SunsetRoutes.SignInCard
 import com.madteam.sunset.navigation.SunsetRoutes.SignUpCard
 import com.madteam.sunset.navigation.SunsetRoutes.WelcomeScreen
-import com.madteam.sunset.ui.screens.addpost.AddPostScreen
+import com.madteam.sunset.ui.screens.addpost.ui.AddPostScreen
 import com.madteam.sunset.ui.screens.addreview.AddReviewScreen
 import com.madteam.sunset.ui.screens.addspot.AddSpotScreen
 import com.madteam.sunset.ui.screens.comments.CommentsScreen

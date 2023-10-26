@@ -1,4 +1,4 @@
-package com.madteam.sunset.ui.screens.addpost
+package com.madteam.sunset.ui.screens.addpost.ui
 
 import android.net.Uri
 import android.widget.Toast
@@ -56,6 +56,9 @@ import com.madteam.sunset.ui.common.CustomTextField
 import com.madteam.sunset.ui.common.DismissAndPositiveDialog
 import com.madteam.sunset.ui.common.GoBackTopAppBar
 import com.madteam.sunset.ui.common.SunsetButton
+import com.madteam.sunset.ui.screens.addpost.state.AddPostUIEvent
+import com.madteam.sunset.ui.screens.addpost.state.AddPostUIState
+import com.madteam.sunset.ui.screens.addpost.viewmodel.AddPostViewModel
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineL
 import com.madteam.sunset.ui.theme.secondaryRegularBodyL
 import com.madteam.sunset.ui.theme.secondaryRegularBodyM
@@ -71,22 +74,14 @@ fun AddPostScreen(
     spotReference: String,
     navController: NavController
 ) {
-
-    val uploadProgress by viewModel.uploadProgress.collectAsStateWithLifecycle()
-    val imageUris by viewModel.imageUris.collectAsStateWithLifecycle()
-    val selectedImageUri by viewModel.selectedImageUri.collectAsStateWithLifecycle()
-    val descriptionText by viewModel.descriptionText.collectAsStateWithLifecycle()
-    val showExitDialog by viewModel.showExitDialog.collectAsStateWithLifecycle()
-    val errorToastText by viewModel.errorToastText.collectAsStateWithLifecycle()
-    val isReadyToPost = imageUris.isNotEmpty()
-
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val multiplePhotoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickMultipleVisualMedia(maxItems = MAX_IMAGES_SELECTED),
-        onResult = { uris -> viewModel.updateSelectedImages(uris) })
+        onResult = { uris -> viewModel.onEvent(AddPostUIEvent.UpdateSelectedImages(uris)) })
 
     BackHandler {
-        if (isReadyToPost) {
-            viewModel.setShowExitDialog(true)
+        if (state.imageUris.isNotEmpty()) {
+            viewModel.onEvent(AddPostUIEvent.ShowExitDialog(true))
         } else {
             navController.popBackStack()
         }
@@ -97,8 +92,8 @@ fun AddPostScreen(
             GoBackTopAppBar(
                 title = R.string.add_post,
                 onClick = {
-                    if (isReadyToPost) {
-                        viewModel.setShowExitDialog(true)
+                    if (state.imageUris.isNotEmpty()) {
+                        viewModel.onEvent(AddPostUIEvent.ShowExitDialog(true))
                     } else {
                         navController.popBackStack()
                     }
@@ -111,65 +106,54 @@ fun AddPostScreen(
                 contentAlignment = Alignment.Center
             ) {
                 AddPostContent(
-                    images = imageUris,
-                    selectedImage = selectedImageUri,
-                    descriptionText = descriptionText,
-                    onImageSelected = viewModel::addSelectedImage,
+                    state = state,
+                    navController = navController,
                     onAddImagesClick = {
                         multiplePhotoPickerLauncher.launch(
                             PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                         )
                     },
-                    onDeleteImagesClick = viewModel::removeSelectedImageFromList,
-                    onUpdateDescriptionText = viewModel::updateDescriptionText,
-                    showExitDialog = showExitDialog,
-                    setShowExitDialog = viewModel::setShowExitDialog,
                     exitAddPost = navController::popBackStack,
-                    errorToast = errorToastText,
-                    clearErrorToast = viewModel::clearErrorToastText,
-                    uploadProgress = uploadProgress,
-                    navController = navController,
-                    clearUploadProgress = viewModel::clearUpdateProgressState,
-                    canContinue = isReadyToPost,
-                    onContinueClick = { viewModel.createNewPost(spotReference) }
+                    onImageSelected = { viewModel.onEvent(AddPostUIEvent.AddSelectedImage(it)) },
+                    onDeleteImagesClick = { viewModel.onEvent(AddPostUIEvent.RemoveSelectedImage) },
+                    onUpdateDescriptionText = {
+                        viewModel.onEvent(AddPostUIEvent.UpdateDescriptionText(it))
+                    },
+                    setShowExitDialog = { viewModel.onEvent(AddPostUIEvent.ShowExitDialog(it)) },
+                    clearErrorToast = { viewModel.onEvent(AddPostUIEvent.ClearErrorToastText) },
+                    clearUploadProgress = { viewModel.onEvent(AddPostUIEvent.ClearUploadProgress) },
+                    onContinueClick = { viewModel.onEvent(AddPostUIEvent.CreateNewPost(spotReference)) }
                 )
             }
         }
     )
-
 }
 
 @OptIn(ExperimentalPagerApi::class, ExperimentalGlideComposeApi::class)
 @Composable
 fun AddPostContent(
-    images: List<Uri>,
-    selectedImage: Uri,
-    descriptionText: String,
-    errorToast: String,
+    state: AddPostUIState,
     onImageSelected: (Uri) -> Unit,
     onAddImagesClick: () -> Unit,
-    showExitDialog: Boolean,
     onDeleteImagesClick: () -> Unit,
     onUpdateDescriptionText: (String) -> Unit,
     setShowExitDialog: (Boolean) -> Unit,
     exitAddPost: () -> Unit,
     clearErrorToast: () -> Unit,
-    uploadProgress: Resource<String>,
     navController: NavController,
     clearUploadProgress: () -> Unit,
-    onContinueClick: () -> Unit,
-    canContinue: Boolean
+    onContinueClick: () -> Unit
 ) {
 
     val context = LocalContext.current
     val scrollState = rememberScrollState()
 
-    if (errorToast.isNotBlank()) {
-        Toast.makeText(context, errorToast, Toast.LENGTH_SHORT).show()
+    if (state.errorToastText != -1) {
+        Toast.makeText(context, stringResource(state.errorToastText), Toast.LENGTH_SHORT).show()
         clearErrorToast()
     }
 
-    if (showExitDialog) {
+    if (state.showExitDialog) {
         DismissAndPositiveDialog(
             setShowDialog = { setShowExitDialog(it) },
             dialogTitle = R.string.are_you_sure,
@@ -192,11 +176,11 @@ fun AddPostContent(
     ) {
         Box {
             AutoSlidingCarousel(
-                itemsCount = images.size,
+                itemsCount = state.imageUris.size,
                 autoSlideDuration = 0,
                 itemContent = { index ->
                     GlideImage(
-                        model = images[index],
+                        model = state.imageUris[index],
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.background(shimmerBrush(targetValue = 2000f))
@@ -206,7 +190,7 @@ fun AddPostContent(
                     .fillMaxWidth()
                     .height(388.dp)
             )
-            if (images.isEmpty()) {
+            if (state.imageUris.isEmpty()) {
                 Text(
                     text = "Add the best photos of this Spot",
                     modifier = Modifier
@@ -219,9 +203,8 @@ fun AddPostContent(
             }
         }
         LazyRow {
-            itemsIndexed(images) { _, image ->
+            itemsIndexed(state.imageUris) { _, image ->
                 Box(Modifier.size(150.dp)) {
-
                     GlideImage(
                         model = image,
                         contentDescription = null,
@@ -232,7 +215,7 @@ fun AddPostContent(
                                 onImageSelected(image)
                             }
                     )
-                    if (image == selectedImage) {
+                    if (image == state.selectedImageUri) {
                         Box(
                             Modifier
                                 .fillMaxSize()
@@ -269,7 +252,7 @@ fun AddPostContent(
         }
         CustomSpacer(size = 8.dp)
         CustomTextField(
-            value = descriptionText,
+            value = state.descriptionText,
             onValueChange = {
                 if (it.length <= MAX_CHAR_LENGTH_DESCRIPTION) {
                     onUpdateDescriptionText(it)
@@ -283,7 +266,7 @@ fun AddPostContent(
             textColor = Color(0xFF999999)
         )
         CustomSpacer(size = 24.dp)
-        if (!canContinue) {
+        if (state.imageUris.isNotEmpty()) {
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -305,7 +288,7 @@ fun AddPostContent(
         }
         SunsetButton(
             text = R.string.continue_text,
-            enabled = canContinue,
+            enabled = state.imageUris.isNotEmpty(),
             onClick = {
                 onContinueClick()
             },
@@ -314,7 +297,7 @@ fun AddPostContent(
         CustomSpacer(size = 24.dp)
     }
 
-    when (uploadProgress) {
+    when (state.uploadProgress) {
         is Resource.Loading -> {
             Column(
                 Modifier
@@ -336,19 +319,25 @@ fun AddPostContent(
         }
 
         is Resource.Success -> {
-            if (uploadProgress.data != "") {
-                LaunchedEffect(key1 = uploadProgress.data) {
+            if (state.uploadProgress.data != "") {
+                LaunchedEffect(key1 = state.uploadProgress.data) {
                     navController.navigate(SunsetRoutes.DiscoverScreen.route) {
                         popUpTo(SunsetRoutes.AddPostScreen.route) { inclusive = true }
                     }
                     clearUploadProgress()
                 }
-            } else if (uploadProgress.data.contains("Error")) {
-                Toast.makeText(context, "Error, try again later.", Toast.LENGTH_SHORT).show()
+            } else if (state.uploadProgress.data.contains("Error")) {
+                Toast.makeText(
+                    context,
+                    stringResource(id = R.string.generic_error),
+                    Toast.LENGTH_SHORT
+                ).show()
                 clearUploadProgress()
             }
         }
 
-        else -> {}
+        else -> {
+            // Not necessary to implement
+        }
     }
 }

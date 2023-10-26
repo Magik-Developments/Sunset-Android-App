@@ -9,7 +9,7 @@ import com.madteam.sunset.data.repositories.AuthRepository
 import com.madteam.sunset.data.repositories.DatabaseRepository
 import com.madteam.sunset.data.repositories.LocationRepository
 import com.madteam.sunset.domain.usecases.GetSpotAttributesUseCase
-import com.madteam.sunset.ui.screens.addpost.MAX_IMAGES_SELECTED
+import com.madteam.sunset.ui.screens.addpost.ui.MAX_IMAGES_SELECTED
 import com.madteam.sunset.utils.Resource
 import com.madteam.sunset.utils.googlemaps.MapState
 import dagger.hilt.android.lifecycle.HiltViewModel

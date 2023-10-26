@@ -146,4 +146,6 @@
     <string name="sunsets_notices">Sunsets notices</string>
     <string name="others">Others</string>
     <string name="default_notification_channel_id">com.madteam.sunset.sunsetsnotifications</string>
+    <string name="max_images_toast">Maximum 8 images</string>
+    <string name="generic_error">Error, try again later</string>
 </resources>

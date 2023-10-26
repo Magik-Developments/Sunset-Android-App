@@ -29,7 +29,7 @@ import com.madteam.sunset.ui.common.FilterAttributesButton
 import com.madteam.sunset.ui.common.FilterScoreButton
 import com.madteam.sunset.ui.common.SmallButtonDark
 import com.madteam.sunset.ui.common.SmallButtonSunset
-import com.madteam.sunset.ui.screens.addreview.SUNSET_ATTRIBUTES
+import com.madteam.sunset.ui.screens.addreview.ui.SUNSET_ATTRIBUTES
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyM
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
 

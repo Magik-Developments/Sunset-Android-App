@@ -1,4 +1,4 @@
-package com.madteam.sunset.ui.screens.addreview
+package com.madteam.sunset.ui.screens.addreview.ui
 
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
@@ -50,6 +50,9 @@ import com.madteam.sunset.ui.common.DismissAndPositiveDialog
 import com.madteam.sunset.ui.common.GoBackTopAppBar
 import com.madteam.sunset.ui.common.ScoreSlider
 import com.madteam.sunset.ui.common.SunsetButton
+import com.madteam.sunset.ui.screens.addreview.state.AddReviewUIEvent
+import com.madteam.sunset.ui.screens.addreview.state.AddReviewUIState
+import com.madteam.sunset.ui.screens.addreview.viewmodel.AddReviewViewModel
 import com.madteam.sunset.ui.theme.primaryBoldDisplayS
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineL
 import com.madteam.sunset.ui.theme.secondaryRegularBodyM
@@ -70,22 +73,15 @@ fun AddReviewScreen(
     viewModel: AddReviewViewModel = hiltViewModel(),
     navController: NavController
 ) {
-
-    val attributesList by viewModel.attributesList.collectAsStateWithLifecycle()
-    val selectedAttributes by viewModel.selectedAttributes.collectAsStateWithLifecycle()
-    val reviewTitle by viewModel.reviewTitle.collectAsStateWithLifecycle()
-    val reviewDescription by viewModel.reviewDescription.collectAsStateWithLifecycle()
-    val reviewScore by viewModel.reviewScore.collectAsStateWithLifecycle()
-    val showExitDialog by viewModel.showExitDialog.collectAsStateWithLifecycle()
-    val showFinishedDialog by viewModel.showFinishedDialog.collectAsStateWithLifecycle()
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val isReadyToPost =
-        selectedAttributes.isNotEmpty() && reviewTitle.isNotEmpty() && reviewDescription.isNotEmpty()
-    val uploadProgress by viewModel.uploadProgress.collectAsStateWithLifecycle()
-    val errorToastText by viewModel.errorToastText.collectAsStateWithLifecycle()
+        state.selectedAttributes.isNotEmpty() &&
+                state.reviewTitle.isNotEmpty() &&
+                state.reviewDescription.isNotEmpty()
 
     BackHandler {
         if (isReadyToPost) {
-            viewModel.setShowExitDialog(true)
+            viewModel.onEvent(AddReviewUIEvent.ShowExitDialog(true))
         } else {
             navController.popBackStack()
         }
@@ -97,7 +93,7 @@ fun AddReviewScreen(
                 title = R.string.add_review,
                 onClick = {
                     if (isReadyToPost) {
-                        viewModel.setShowExitDialog(true)
+                        viewModel.onEvent(AddReviewUIEvent.ShowExitDialog(true))
                     } else {
                         navController.popBackStack()
                     }
@@ -110,28 +106,34 @@ fun AddReviewScreen(
                 contentAlignment = Alignment.Center
             ) {
                 AddReviewContent(
-                    attributesList = attributesList,
-                    onAttributeClicked = viewModel::modifySelectedAttributes,
-                    selectedAttributes = selectedAttributes,
-                    reviewTitle = reviewTitle,
-                    reviewDescription = reviewDescription,
-                    onReviewDescriptionChanged = viewModel::modifyReviewDescription,
-                    onReviewTitleChanged = viewModel::modifyReviewTitle,
-                    onReviewScoreChanged = viewModel::modifyReviewScore,
-                    reviewScore = reviewScore,
-                    showExitDialog = showExitDialog,
-                    spotReference = spotReference,
-                    setShowExitDialog = viewModel::setShowExitDialog,
-                    exitAddReview = navController::popBackStack,
-                    uploadProgress = uploadProgress,
-                    errorToast = errorToastText,
-                    navController = navController,
-                    clearUploadProgress = viewModel::clearUpdateProgressState,
-                    clearErrorToast = viewModel::clearErrorToastText,
-                    showFinishedDialog = showFinishedDialog,
-                    setShowFinishedDialog = viewModel::setShowFinishedDialog,
+                    state = state,
                     canContinue = isReadyToPost,
-                    onContinueClick = { viewModel.createNewReview(spotReference) }
+                    exitAddReview = navController::popBackStack,
+                    navController = navController,
+                    onAttributeClicked = {
+                        viewModel.onEvent(
+                            AddReviewUIEvent.UpdateSelectedAttribute(
+                                it
+                            )
+                        )
+                    },
+                    onReviewDescriptionChanged =
+                    { viewModel.onEvent(AddReviewUIEvent.UpdateReviewDescription(it)) },
+                    onReviewTitleChanged = { viewModel.onEvent(AddReviewUIEvent.UpdateReviewTitle(it)) },
+                    onReviewScoreChanged = { viewModel.onEvent(AddReviewUIEvent.UpdateReviewScore(it)) },
+                    setShowExitDialog = { viewModel.onEvent(AddReviewUIEvent.ShowExitDialog(it)) },
+
+                    clearUploadProgress = { viewModel.onEvent(AddReviewUIEvent.ClearUploadProgress) },
+                    clearErrorToast = { viewModel.onEvent(AddReviewUIEvent.ClearErrorToastText) },
+                    setShowFinishedDialog =
+                    { viewModel.onEvent(AddReviewUIEvent.ShowFinishedDialog(it)) },
+                    onContinueClick = {
+                        viewModel.onEvent(
+                            AddReviewUIEvent.CreateNewReview(
+                                spotReference
+                            )
+                        )
+                    }
                 )
             }
         }
@@ -140,15 +142,7 @@ fun AddReviewScreen(
 
 @Composable
 fun AddReviewContent(
-    attributesList: List<SpotAttribute>,
-    selectedAttributes: List<SpotAttribute>,
-    reviewTitle: String,
-    reviewDescription: String,
-    reviewScore: Int,
-    showExitDialog: Boolean,
-    uploadProgress: Resource<String>,
-    errorToast: String,
-    spotReference: String,
+    state: AddReviewUIState,
     clearUploadProgress: () -> Unit,
     clearErrorToast: () -> Unit,
     onReviewTitleChanged: (String) -> Unit,
@@ -158,7 +152,6 @@ fun AddReviewContent(
     setShowExitDialog: (Boolean) -> Unit,
     navController: NavController,
     exitAddReview: () -> Unit,
-    showFinishedDialog: Boolean,
     setShowFinishedDialog: (Boolean) -> Unit,
     canContinue: Boolean,
     onContinueClick: () -> Unit
@@ -167,12 +160,12 @@ fun AddReviewContent(
     val context = LocalContext.current
     val scrollState = rememberScrollState()
 
-    if (errorToast.isNotBlank()) {
-        Toast.makeText(context, errorToast, Toast.LENGTH_SHORT).show()
+    if (state.errorToastText != -1) {
+        Toast.makeText(context, stringResource(state.errorToastText), Toast.LENGTH_SHORT).show()
         clearErrorToast()
     }
 
-    if (showExitDialog) {
+    if (state.showExitDialog) {
         DismissAndPositiveDialog(
             setShowDialog = { setShowExitDialog(it) },
             dialogTitle = R.string.are_you_sure,
@@ -194,7 +187,7 @@ fun AddReviewContent(
             .verticalScroll(scrollState)
     ) {
         CustomTextField(
-            value = reviewTitle,
+            value = state.reviewTitle,
             onValueChange = {
                 if (it.length <= MAX_CHAR_LENGTH_REVIEW_TITLE) {
                     onReviewTitleChanged(it)
@@ -209,7 +202,7 @@ fun AddReviewContent(
             maxLines = 2
         )
         CustomTextField(
-            value = reviewDescription,
+            value = state.reviewDescription,
             onValueChange = {
                 if (it.length <= MAX_CHAR_LENGTH_REVIEW_DESCRIPTION) {
                     onReviewDescriptionChanged(it)
@@ -251,8 +244,8 @@ fun AddReviewContent(
         )
         CustomSpacer(size = 8.dp)
         AttributesBigListSelectable(
-            attributesList = attributesList,
-            selectedAttributes = selectedAttributes,
+            attributesList = state.attributesList,
+            selectedAttributes = state.selectedAttributes,
             onAttributeClick = { onAttributeClicked(it) },
             filterAttributesBy = FAVORABLE_ATTRIBUTES
         )
@@ -265,8 +258,8 @@ fun AddReviewContent(
         )
         CustomSpacer(size = 8.dp)
         AttributesBigListSelectable(
-            attributesList = attributesList,
-            selectedAttributes = selectedAttributes,
+            attributesList = state.attributesList,
+            selectedAttributes = state.selectedAttributes,
             onAttributeClick = { onAttributeClicked(it) },
             filterAttributesBy = NON_FAVORABLE_ATTRIBUTES
         )
@@ -279,8 +272,8 @@ fun AddReviewContent(
         )
         CustomSpacer(size = 8.dp)
         AttributesBigListSelectable(
-            attributesList = attributesList,
-            selectedAttributes = selectedAttributes,
+            attributesList = state.attributesList,
+            selectedAttributes = state.selectedAttributes,
             onAttributeClick = { onAttributeClicked(it) },
             filterAttributesBy = SUNSET_ATTRIBUTES
         )
@@ -304,7 +297,7 @@ fun AddReviewContent(
             modifier = Modifier.padding(start = 16.dp)
         )
         ScoreSlider(
-            value = reviewScore.toFloat(),
+            value = state.reviewScore.toFloat(),
             onValueChange = { onReviewScoreChanged(it) },
             modifier = Modifier.padding(horizontal = 12.dp)
         )
@@ -314,18 +307,30 @@ fun AddReviewContent(
             horizontalArrangement = Arrangement.Center
         ) {
             Icon(
-                imageVector = if (reviewScore < 3) {
-                    Icons.Outlined.BrightnessLow
-                } else if (reviewScore < 5) {
-                    Icons.Outlined.Brightness4
-                } else if (reviewScore < 7) {
-                    Icons.Outlined.Brightness5
-                } else if (reviewScore < 9) {
-                    Icons.Outlined.Brightness6
-                } else if (reviewScore > 9) {
-                    Icons.Outlined.Brightness7
-                } else {
-                    Icons.Outlined.BrightnessLow
+                imageVector = when {
+                    state.reviewScore < 3 -> {
+                        Icons.Outlined.BrightnessLow
+                    }
+
+                    state.reviewScore < 5 -> {
+                        Icons.Outlined.Brightness4
+                    }
+
+                    state.reviewScore < 7 -> {
+                        Icons.Outlined.Brightness5
+                    }
+
+                    state.reviewScore < 9 -> {
+                        Icons.Outlined.Brightness6
+                    }
+
+                    state.reviewScore > 9 -> {
+                        Icons.Outlined.Brightness7
+                    }
+
+                    else -> {
+                        Icons.Outlined.BrightnessLow
+                    }
                 },
                 contentDescription = "Score icon",
                 modifier = Modifier
@@ -333,7 +338,7 @@ fun AddReviewContent(
                     .size(36.dp)
             )
             CustomSpacer(size = 8.dp)
-            Text(text = reviewScore.toString(), style = primaryBoldDisplayS)
+            Text(text = state.reviewScore.toString(), style = primaryBoldDisplayS)
         }
         CustomSpacer(size = 24.dp)
         if (!canContinue) {
@@ -367,7 +372,7 @@ fun AddReviewContent(
         CustomSpacer(size = 24.dp)
     }
 
-    if (showFinishedDialog) {
+    if (state.showFinishedDialog) {
         DismissAndPositiveDialog(
             setShowDialog = { setShowFinishedDialog(it) },
             dialogTitle = R.string.post_review_finished,
@@ -381,7 +386,7 @@ fun AddReviewContent(
         )
     }
 
-    when (uploadProgress) {
+    when (state.uploadProgress) {
         is Resource.Loading -> {
             Column(
                 Modifier
@@ -403,18 +408,20 @@ fun AddReviewContent(
         }
 
         is Resource.Success -> {
-            if (uploadProgress.data != "") {
-                LaunchedEffect(key1 = uploadProgress.data) {
+            if (state.uploadProgress.data != "") {
+                LaunchedEffect(key1 = state.uploadProgress.data) {
                     setShowFinishedDialog(true)
                     clearUploadProgress()
                 }
-            } else if (uploadProgress.data.contains("Error")) {
+            } else if (state.uploadProgress.data.contains("Error")) {
                 Toast.makeText(context, "Error, try again later.", Toast.LENGTH_SHORT).show()
                 clearUploadProgress()
             }
         }
 
-        else -> {}
+        else -> {
+            //Not necessary
+        }
     }
 
 }

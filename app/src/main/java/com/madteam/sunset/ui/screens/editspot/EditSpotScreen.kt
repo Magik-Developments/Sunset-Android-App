@@ -64,9 +64,9 @@ import com.madteam.sunset.ui.common.DismissAndPositiveDialog
 import com.madteam.sunset.ui.common.GoForwardTopAppBar
 import com.madteam.sunset.ui.common.LargeDangerButton
 import com.madteam.sunset.ui.common.ScoreSlider
-import com.madteam.sunset.ui.screens.addreview.FAVORABLE_ATTRIBUTES
-import com.madteam.sunset.ui.screens.addreview.NON_FAVORABLE_ATTRIBUTES
-import com.madteam.sunset.ui.screens.addreview.SUNSET_ATTRIBUTES
+import com.madteam.sunset.ui.screens.addreview.ui.FAVORABLE_ATTRIBUTES
+import com.madteam.sunset.ui.screens.addreview.ui.NON_FAVORABLE_ATTRIBUTES
+import com.madteam.sunset.ui.screens.addreview.ui.SUNSET_ATTRIBUTES
 import com.madteam.sunset.ui.theme.primaryBoldDisplayS
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineL
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineM

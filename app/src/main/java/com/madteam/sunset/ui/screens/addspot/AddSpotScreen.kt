@@ -78,9 +78,9 @@ import com.madteam.sunset.ui.common.GoBackTopAppBar
 import com.madteam.sunset.ui.common.ScoreSlider
 import com.madteam.sunset.ui.common.SunsetButton
 import com.madteam.sunset.ui.screens.addpost.ui.MAX_IMAGES_SELECTED
-import com.madteam.sunset.ui.screens.addreview.FAVORABLE_ATTRIBUTES
-import com.madteam.sunset.ui.screens.addreview.NON_FAVORABLE_ATTRIBUTES
-import com.madteam.sunset.ui.screens.addreview.SUNSET_ATTRIBUTES
+import com.madteam.sunset.ui.screens.addreview.ui.FAVORABLE_ATTRIBUTES
+import com.madteam.sunset.ui.screens.addreview.ui.NON_FAVORABLE_ATTRIBUTES
+import com.madteam.sunset.ui.screens.addreview.ui.SUNSET_ATTRIBUTES
 import com.madteam.sunset.ui.theme.primaryBoldDisplayS
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineL
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineM

@@ -1,4 +1,4 @@
-package com.madteam.sunset.ui.screens.comments
+package com.madteam.sunset.ui.screens.comments.viewmodel
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -11,8 +11,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.Text
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,7 +21,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -35,6 +34,9 @@ import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.GoBackTopAppBar
 import com.madteam.sunset.ui.common.ProfileImage
 import com.madteam.sunset.ui.common.SelectedCommentTopAppBar
+import com.madteam.sunset.ui.screens.comments.state.CommentsUIEvent
+import com.madteam.sunset.ui.screens.comments.state.CommentsUIState
+import com.madteam.sunset.ui.screens.comments.ui.CommentsViewModel
 import com.madteam.sunset.ui.theme.secondaryRegularBodyL
 import com.madteam.sunset.ui.theme.secondaryRegularBodyM
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyM
@@ -46,14 +48,12 @@ fun CommentsScreen(
     commentsReference: String,
     navController: NavController
 ) {
-
-    viewModel.setPostReference("posts/$commentsReference")
-    val comments by viewModel.comments.collectAsStateWithLifecycle()
-    val selectedComment by viewModel.selectedComment.collectAsStateWithLifecycle()
+    viewModel.onEvent(CommentsUIEvent.SetPostReference("posts/$commentsReference"))
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
-            if (selectedComment == PostComment()) {
+            if (state.selectedComment == PostComment()) {
                 GoBackTopAppBar(title = R.string.comments_title) {
                     navController.popBackStack()
                 }
@@ -61,12 +61,12 @@ fun CommentsScreen(
                 SelectedCommentTopAppBar(
                     title = R.string.selected_comment_title,
                     onQuitClick = {
-                        viewModel.unSelectComment()
+                        viewModel.onEvent(CommentsUIEvent.OnCommentUnselected)
                     },
                     onDeleteClick = {
-                        viewModel.deleteSelectedComment()
+                        viewModel.onEvent(CommentsUIEvent.OnCommentDeleted)
                     },
-                    isCommentAuthor = viewModel.checkIfUserIsCommentAuthor()
+                    isCommentAuthor = state.isCommentAuthor
                 )
             }
         },
@@ -76,10 +76,9 @@ fun CommentsScreen(
                 contentAlignment = Alignment.Center
             ) {
                 CommentsContent(
-                    comments = comments,
-                    onCommentClick = viewModel::addNewComment,
-                    selectedComment = selectedComment,
-                    onSelectedComment = viewModel::onSelectedComment
+                    state = state,
+                    onCommentClick = { viewModel.onEvent(CommentsUIEvent.OnAddComment(it)) },
+                    onSelectedComment = { viewModel.onEvent(CommentsUIEvent.OnCommentClick(it)) }
                 )
             }
         }
@@ -88,9 +87,8 @@ fun CommentsScreen(
 
 @Composable
 fun CommentsContent(
-    comments: List<PostComment>,
+    state: CommentsUIState,
     onCommentClick: (String) -> Unit,
-    selectedComment: PostComment,
     onSelectedComment: (PostComment) -> Unit
 ) {
 
@@ -104,10 +102,10 @@ fun CommentsContent(
             .padding(bottom = 70.dp)
     ) {
         LazyColumn {
-            itemsIndexed(comments.sortedBy {
+            itemsIndexed(state.comments.sortedBy {
                 it.creationDate
             }) { _, comment ->
-                val isSelected = comment == selectedComment
+                val isSelected = comment == state.selectedComment
                 val backgroundColor = if (isSelected) Color(0xCDFFB600) else Color.White
                 ConstraintLayout(
                     modifier = Modifier
@@ -172,9 +170,4 @@ fun CommentsContent(
             })
         CustomSpacer(size = 8.dp)
     }
-}
-
-@Preview(showSystemUi = true)
-@Composable
-fun CommentsContentPreview() {
 }

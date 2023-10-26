@@ -19,7 +19,7 @@ import com.madteam.sunset.ui.screens.addpost.ui.AddPostScreen
 import com.madteam.sunset.ui.screens.addreview.ui.AddReviewScreen
 import com.madteam.sunset.ui.screens.addspot.ui.AddSpotScreen
 import com.madteam.sunset.ui.screens.comments.viewmodel.CommentsScreen
-import com.madteam.sunset.ui.screens.discover.DiscoverScreen
+import com.madteam.sunset.ui.screens.discover.ui.DiscoverScreen
 import com.madteam.sunset.ui.screens.editspot.EditSpotScreen
 import com.madteam.sunset.ui.screens.home.HomeScreen
 import com.madteam.sunset.ui.screens.lostpassword.LostPasswordScreen

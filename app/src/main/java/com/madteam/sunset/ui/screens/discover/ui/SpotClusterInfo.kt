@@ -1,4 +1,4 @@
-package com.madteam.sunset.ui.screens.discover
+package com.madteam.sunset.ui.screens.discover.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

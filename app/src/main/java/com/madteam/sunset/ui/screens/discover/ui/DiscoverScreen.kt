@@ -1,4 +1,4 @@
-package com.madteam.sunset.ui.screens.discover
+package com.madteam.sunset.ui.screens.discover.ui
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -17,13 +17,13 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -43,11 +44,13 @@ import com.google.maps.android.compose.MapEffect
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.MapsComposeExperimentalApi
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.madteam.sunset.data.model.SpotAttribute
 import com.madteam.sunset.data.model.SpotClusterItem
 import com.madteam.sunset.navigation.SunsetRoutes
 import com.madteam.sunset.ui.common.AddSpotFAB
 import com.madteam.sunset.ui.common.SunsetBottomNavigation
+import com.madteam.sunset.ui.screens.discover.state.DiscoverUIEvent
+import com.madteam.sunset.ui.screens.discover.state.DiscoverUIState
+import com.madteam.sunset.ui.screens.discover.viewmodel.DiscoverViewModel
 import com.madteam.sunset.utils.getCurrentLocation
 import com.madteam.sunset.utils.googlemaps.MapState
 import com.madteam.sunset.utils.googlemaps.clusters.CustomClusterRenderer
@@ -68,14 +71,10 @@ fun DiscoverScreen(
     val spotFiltersModalState =
         ModalBottomSheetState(
             initialValue = ModalBottomSheetValue.Hidden,
-            isSkipHalfExpanded = true
+            isSkipHalfExpanded = true,
+            density = LocalDensity.current
         )
-    val mapState by viewModel.mapState.collectAsStateWithLifecycle()
-    val clusterInfo by viewModel.clusterInfo.collectAsStateWithLifecycle()
-    val userLocation by viewModel.userLocation.collectAsStateWithLifecycle()
-    val goToUserLocation by viewModel.goToUserLocation.collectAsStateWithLifecycle()
-    val scoreFilter by viewModel.scoreFilter.collectAsStateWithLifecycle()
-    val locationFilter by viewModel.locationFilter.collectAsStateWithLifecycle()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     ModalBottomSheetLayout(
         sheetState = spotFiltersModalState,
@@ -91,7 +90,7 @@ fun DiscoverScreen(
         Scaffold(
             bottomBar = { SunsetBottomNavigation(navController) },
             floatingActionButton = {
-                if (!clusterInfo.isSelected) {
+                if (!state.clusterInfo.isSelected) {
                     AddSpotFAB {
                         navController.navigate(SunsetRoutes.AddSpotScreen.route)
                     }
@@ -103,32 +102,50 @@ fun DiscoverScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     DiscoverContent(
-                        mapState = mapState,
+                        state = state,
                         selectedCluster = { clusterItem ->
-                            viewModel.clusterVisibility(clusterItem.copy(isSelected = true))
+                            viewModel.onEvent(
+                                event = DiscoverUIEvent.ClusterVisibility(
+                                    clusterItem.copy(
+                                        isSelected = true
+                                    )
+                                )
+                            )
                         },
-                        userLocation = userLocation,
-                        updateUserLocation = viewModel::updateUserLocation,
-                        goToUserLocation = goToUserLocation,
-                        setGoToUserLocation = viewModel::setGoToUserLocation,
+                        updateUserLocation = {
+                            viewModel.onEvent(
+                                event = DiscoverUIEvent.UpdateUserLocation(
+                                    it
+                                )
+                            )
+                        },
+                        setGoToUserLocation = {
+                            viewModel.onEvent(
+                                event = DiscoverUIEvent.GoToUserLocation(
+                                    it
+                                )
+                            )
+                        },
                         onFilterClick = { coroutineScope.launch { spotFiltersModalState.show() } },
-                        scoreFilter = scoreFilter,
-                        locationFilter = locationFilter
                     )
                     AnimatedVisibility(
                         modifier = Modifier
                             .align(Alignment.BottomCenter)
                             .padding(24.dp),
-                        visible = clusterInfo.isSelected,
+                        visible = state.clusterInfo.isSelected,
                         enter = slideInVertically(initialOffsetY = { it }),
                         exit = slideOutVertically(targetOffsetY = { it + 200 })
                     ) {
                         SpotClusterInfo(
-                            clusterInfo,
+                            state.clusterInfo,
                             onClose = { clusterItem ->
-                                viewModel.clusterVisibility(clusterItem.copy(isSelected = false))
+                                viewModel.onEvent(
+                                    event = DiscoverUIEvent.ClusterVisibility(
+                                        clusterItem.copy(isSelected = false)
+                                    )
+                                )
                             },
-                            onItemClicked = { navController.navigate("spot_detail_screen/spotReference=${clusterInfo.spot.id}") })
+                            onItemClicked = { navController.navigate("spot_detail_screen/spotReference=${state.clusterInfo.spot.id}") })
                     }
                 }
             }
@@ -139,15 +156,11 @@ fun DiscoverScreen(
 
 @Composable
 fun DiscoverContent(
-    mapState: MapState,
+    state: DiscoverUIState,
     selectedCluster: (SpotClusterItem) -> Unit,
-    userLocation: LatLng,
     updateUserLocation: (LatLng) -> Unit,
-    goToUserLocation: Boolean,
     setGoToUserLocation: (Boolean) -> Unit,
     onFilterClick: () -> Unit,
-    scoreFilter: Int,
-    locationFilter: List<SpotAttribute>
 ) {
 
     val cameraPositionState = rememberCameraPositionState()
@@ -165,13 +178,13 @@ fun DiscoverContent(
             }
         )
 
-    LaunchedEffect(key1 = goToUserLocation) {
+    LaunchedEffect(key1 = state.goToUserLocation) {
         requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
     }
 
     GoogleMap(
         modifier = Modifier.fillMaxSize(),
-        properties = setMapProperties(mapState),
+        properties = setMapProperties(state.mapState),
         cameraPositionState = cameraPositionState,
         uiSettings = MapUiSettings(
             zoomControlsEnabled = false,
@@ -179,11 +192,11 @@ fun DiscoverContent(
         )
     ) {
         SetupClusterManagerAndRenderers(
-            mapState = mapState,
+            mapState = state.mapState,
             selectedCluster = selectedCluster,
             cameraPositionState = cameraPositionState,
-            userLocation = userLocation,
-            goToUserLocation = goToUserLocation,
+            userLocation = state.userLocation,
+            goToUserLocation = state.goToUserLocation,
             setGoToUserLocation = setGoToUserLocation
         )
     }

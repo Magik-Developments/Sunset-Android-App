@@ -1,4 +1,4 @@
-package com.madteam.sunset.ui.screens.editspot
+package com.madteam.sunset.ui.screens.editspot.ui
 
 import android.annotation.SuppressLint
 import android.widget.Toast
@@ -67,6 +67,9 @@ import com.madteam.sunset.ui.common.ScoreSlider
 import com.madteam.sunset.ui.screens.addreview.ui.FAVORABLE_ATTRIBUTES
 import com.madteam.sunset.ui.screens.addreview.ui.NON_FAVORABLE_ATTRIBUTES
 import com.madteam.sunset.ui.screens.addreview.ui.SUNSET_ATTRIBUTES
+import com.madteam.sunset.ui.screens.editspot.state.EditSpotUIEvent
+import com.madteam.sunset.ui.screens.editspot.state.EditSpotUIState
+import com.madteam.sunset.ui.screens.editspot.viewmodel.EditSpotViewModel
 import com.madteam.sunset.ui.theme.primaryBoldDisplayS
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineL
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineM
@@ -75,7 +78,6 @@ import com.madteam.sunset.ui.theme.secondaryRegularHeadlineS
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyM
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
 import com.madteam.sunset.utils.Resource
-import com.madteam.sunset.utils.googlemaps.MapState
 import com.madteam.sunset.utils.googlemaps.MapStyles
 import com.madteam.sunset.utils.googlemaps.setMapProperties
 import com.madteam.sunset.utils.googlemaps.updateCameraLocation
@@ -92,39 +94,23 @@ fun EditSpotScreen(
     spotReference: String
 ) {
 
-    viewModel.setSpotReference("spots/$spotReference")
+    viewModel.onEvent(EditSpotUIEvent.SetSpotReference("spots/$spotReference"))
+    viewModel.onEvent(EditSpotUIEvent.UpdateLocation(selectedLocation))
+    viewModel.onEvent(EditSpotUIEvent.GetCountryAndLocality)
 
-    val spotInfo by viewModel.spotInfo.collectAsStateWithLifecycle()
-    val imageUris by viewModel.imageUris.collectAsStateWithLifecycle()
-    val spotTitle by viewModel.spotTitle.collectAsStateWithLifecycle()
-    val spotDescription by viewModel.spotDescription.collectAsStateWithLifecycle()
-    val mapState by viewModel.mapState.collectAsStateWithLifecycle()
-    val locationLocality: String? by viewModel.spotLocationLocality.collectAsStateWithLifecycle()
-    val locationCountry: String? by viewModel.spotLocationCountry.collectAsStateWithLifecycle()
-    val attributesList by viewModel.attributesList.collectAsStateWithLifecycle()
-    val selectedAttributes by viewModel.selectedAttributes.collectAsStateWithLifecycle()
-    val spotScore by viewModel.spotScore.collectAsStateWithLifecycle()
-    val uploadProgress by viewModel.uploadProgress.collectAsStateWithLifecycle()
-    val showExitDialog by viewModel.showExitDialog.collectAsStateWithLifecycle()
-    val errorToastText by viewModel.errorToastText.collectAsStateWithLifecycle()
-    val spotLocation by viewModel.spotLocation.collectAsStateWithLifecycle()
-    val showDeleteDialog by viewModel.showDeleteDialog.collectAsStateWithLifecycle()
-
-    viewModel.modifySpotLocation(selectedLocation)
-    viewModel.obtainCountryAndCityFromLatLng()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
             GoForwardTopAppBar(
                 title = R.string.edit_spot,
-                onQuitClick = { navController.popBackStack() /* TODO: showExitDialog if it is ready to post */ },
-                onContinueClick = { viewModel.updateSpotIntent() },
-                canContinue = ((spotScore != spotInfo.score.toInt() &&
-                        spotScore != 0 || selectedAttributes != spotInfo.attributes &&
-                        selectedAttributes.isNotEmpty() || spotTitle != spotInfo.name &&
-                        spotTitle.isNotEmpty() || spotDescription != spotInfo.description &&
-                        spotDescription.isNotEmpty())
-                        )
+                onQuitClick = { navController.popBackStack() },
+                onContinueClick = { viewModel.onEvent(EditSpotUIEvent.UpdateSpot) },
+                canContinue = (state.spotScore != state.spotInfo.score.toInt() &&
+                        state.spotScore != 0 || state.selectedAttributes != state.spotInfo.attributes &&
+                        state.selectedAttributes.isNotEmpty() || state.spotTitle != state.spotInfo.name &&
+                        state.spotTitle.isNotEmpty() || state.spotDescription != state.spotInfo.description &&
+                        state.spotDescription.isNotEmpty())
             )
         },
         content = { paddingValues ->
@@ -133,32 +119,20 @@ fun EditSpotScreen(
                 contentAlignment = Alignment.Center
             ) {
                 AddSpotContent(
-                    images = imageUris,
-                    spotTitle = spotTitle,
-                    spotDescription = spotDescription,
-                    onSpotTitleChanged = viewModel::modifySpotTitle,
-                    onSpotDescriptionChanged = viewModel::modifySpotDescription,
+                    state = state,
+                    onSpotTitleChanged = { viewModel.onEvent(EditSpotUIEvent.UpdateTitle(it)) },
+                    onSpotDescriptionChanged =
+                    { viewModel.onEvent(EditSpotUIEvent.UpdateDescription(it)) },
                     navigateTo = navController::navigate,
-                    selectedLocation = selectedLocation,
-                    mapState = mapState,
-                    locationLocality = locationLocality ?: "",
-                    locationCountry = locationCountry ?: "",
-                    attributesList = attributesList,
-                    selectedAttributes = selectedAttributes,
-                    onAttributeClicked = viewModel::modifySelectedAttributes,
-                    spotScore = spotScore,
-                    onReviewScoreChanged = viewModel::modifyReviewScore,
-                    uploadProgress = uploadProgress,
-                    clearUploadProgress = viewModel::clearUploadProgressState,
-                    clearErrorToast = viewModel::clearErrorToastText,
-                    errorToast = errorToastText,
+                    onAttributeClicked =
+                    { viewModel.onEvent(EditSpotUIEvent.UpdateSelectedAttributes(it)) },
+                    onReviewScoreChanged = { viewModel.onEvent(EditSpotUIEvent.UpdateScore(it)) },
+                    clearUploadProgress = { viewModel.onEvent(EditSpotUIEvent.ClearUploadProgress) },
+                    clearErrorToast = { viewModel.onEvent(EditSpotUIEvent.ClearErrorToastText) },
                     exitAddSpot = navController::popBackStack,
-                    setShowExitDialog = viewModel::setShowExitDialog,
-                    showExitDialog = showExitDialog,
-                    spotLocation = spotLocation,
-                    showDeleteDialog = showDeleteDialog,
-                    setShowDeleteDialog = viewModel::setShowDeleteDialog,
-                    deleteSpot = viewModel::deleteSpotIntent
+                    setShowExitDialog = { viewModel.onEvent(EditSpotUIEvent.ShowExitDialog(it)) },
+                    setShowDeleteDialog = { viewModel.onEvent(EditSpotUIEvent.ShowDeleteDialog(it)) },
+                    deleteSpot = { viewModel.onEvent(EditSpotUIEvent.DeleteSpot) }
                 )
             }
         }
@@ -168,30 +142,16 @@ fun EditSpotScreen(
 @OptIn(ExperimentalPagerApi::class, ExperimentalGlideComposeApi::class)
 @Composable
 fun AddSpotContent(
-    images: List<String>,
-    spotTitle: String,
+    state: EditSpotUIState,
     onSpotTitleChanged: (String) -> Unit,
-    spotDescription: String,
     onSpotDescriptionChanged: (String) -> Unit,
     navigateTo: (String) -> Unit,
-    selectedLocation: LatLng,
-    mapState: MapState,
-    locationLocality: String,
-    locationCountry: String,
-    attributesList: List<SpotAttribute>,
-    selectedAttributes: List<SpotAttribute>,
     onAttributeClicked: (SpotAttribute) -> Unit,
-    spotScore: Int,
     onReviewScoreChanged: (Float) -> Unit,
-    uploadProgress: Resource<String>,
     clearUploadProgress: () -> Unit,
-    errorToast: String,
     clearErrorToast: () -> Unit,
-    showExitDialog: Boolean,
     exitAddSpot: () -> Unit,
     setShowExitDialog: (Boolean) -> Unit,
-    spotLocation: LatLng,
-    showDeleteDialog: Boolean,
     setShowDeleteDialog: (Boolean) -> Unit,
     deleteSpot: () -> Unit
 ) {
@@ -200,12 +160,12 @@ fun AddSpotContent(
     val scrollState = rememberScrollState()
     val cameraPositionState = rememberCameraPositionState()
 
-    if (errorToast.isNotBlank()) {
-        Toast.makeText(context, errorToast, Toast.LENGTH_SHORT).show()
+    if (state.errorToastText != -1) {
+        Toast.makeText(context, state.errorToastText, Toast.LENGTH_SHORT).show()
         clearErrorToast()
     }
 
-    if (showExitDialog) {
+    if (state.showDeleteDialog) {
         DismissAndPositiveDialog(
             setShowDialog = { setShowExitDialog(it) },
             dialogTitle = R.string.are_you_sure,
@@ -220,7 +180,7 @@ fun AddSpotContent(
         )
     }
 
-    if (showDeleteDialog) {
+    if (state.showDeleteDialog) {
         DismissAndPositiveDialog(
             setShowDialog = { setShowDeleteDialog(it) },
             dialogTitle = R.string.are_you_sure,
@@ -246,11 +206,11 @@ fun AddSpotContent(
 
         Box {
             AutoSlidingCarousel(
-                itemsCount = images.size,
+                itemsCount = state.imageUris.size,
                 autoSlideDuration = 0,
                 itemContent = { index ->
                     GlideImage(
-                        model = images[index],
+                        model = state.imageUris[index],
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.background(shimmerBrush(targetValue = 2000f))
@@ -260,9 +220,9 @@ fun AddSpotContent(
                     .fillMaxWidth()
                     .height(388.dp)
             )
-            if (images.isEmpty()) {
+            if (state.imageUris.isEmpty()) {
                 Text(
-                    text = "Add the best photos of this Spot",
+                    text = stringResource(id = R.string.add_images_spot),
                     modifier = Modifier
                         .align(Alignment.Center)
                         .padding(24.dp),
@@ -273,7 +233,7 @@ fun AddSpotContent(
             }
         }
         LazyRow {
-            itemsIndexed(images) { _, image ->
+            itemsIndexed(state.imageUris) { _, image ->
                 Box(Modifier.size(150.dp)) {
                     GlideImage(
                         model = image,
@@ -290,7 +250,7 @@ fun AddSpotContent(
 
         CustomSpacer(size = 16.dp)
         CustomTextField(
-            value = spotTitle,
+            value = state.spotTitle,
             onValueChange = {
                 if (it.length <= MAX_CHAR_LENGTH_SPOT_TITLE) {
                     onSpotTitleChanged(it)
@@ -305,7 +265,7 @@ fun AddSpotContent(
             maxLines = 2
         )
         CustomTextField(
-            value = spotDescription,
+            value = state.spotDescription,
             onValueChange = {
                 if (it.length <= MAX_CHAR_LENGTH_SPOT_DESCRIPTION) {
                     onSpotDescriptionChanged(it)
@@ -333,7 +293,7 @@ fun AddSpotContent(
             GoogleMap(
                 modifier = Modifier
                     .fillMaxSize(),
-                properties = setMapProperties(mapState = mapState, MapStyles.NAKED),
+                properties = setMapProperties(mapState = state.mapState, MapStyles.NAKED),
                 cameraPositionState = cameraPositionState,
                 uiSettings = MapUiSettings(
                     zoomControlsEnabled = false,
@@ -350,7 +310,7 @@ fun AddSpotContent(
             ) {
                 SetupMapView(
                     cameraPositionState = cameraPositionState,
-                    userLocation = spotLocation
+                    userLocation = state.spotLocation
                 )
             }
             Box(
@@ -364,20 +324,6 @@ fun AddSpotContent(
                         )
                     )
             )
-            /* Button(
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .padding(bottom = 20.dp),
-                onClick = {
-                    navigateTo("select_location_screen/lat=${spotLocation.latitude}long=${spotLocation.longitude}")
-                },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFB600))
-            ) {
-                Text(
-                    text = stringResource(id = R.string.modify_location),
-                    color = Color.White
-                )
-            } */
             Column(
                 horizontalAlignment = Alignment.End,
                 verticalArrangement = Arrangement.Bottom,
@@ -385,10 +331,17 @@ fun AddSpotContent(
                     .padding(16.dp)
                     .fillMaxSize()
             ) {
-                Text(text = locationCountry, style = primaryBoldHeadlineM, color = Color.White)
-                Text(text = locationLocality, style = primaryMediumHeadlineS, color = Color.White)
+                Text(
+                    text = state.spotLocationCountry,
+                    style = primaryBoldHeadlineM,
+                    color = Color.White
+                )
+                Text(
+                    text = state.spotLocationLocality,
+                    style = primaryMediumHeadlineS,
+                    color = Color.White
+                )
             }
-
         }
 
         // Add attributes section
@@ -407,8 +360,8 @@ fun AddSpotContent(
         )
         CustomSpacer(size = 8.dp)
         AttributesBigListSelectable(
-            attributesList = attributesList,
-            selectedAttributes = selectedAttributes,
+            attributesList = state.attributesList,
+            selectedAttributes = state.selectedAttributes,
             onAttributeClick = { onAttributeClicked(it) },
             filterAttributesBy = FAVORABLE_ATTRIBUTES
         )
@@ -421,8 +374,8 @@ fun AddSpotContent(
         )
         CustomSpacer(size = 8.dp)
         AttributesBigListSelectable(
-            attributesList = attributesList,
-            selectedAttributes = selectedAttributes,
+            attributesList = state.attributesList,
+            selectedAttributes = state.selectedAttributes,
             onAttributeClick = { onAttributeClicked(it) },
             filterAttributesBy = NON_FAVORABLE_ATTRIBUTES
         )
@@ -435,8 +388,8 @@ fun AddSpotContent(
         )
         CustomSpacer(size = 8.dp)
         AttributesBigListSelectable(
-            attributesList = attributesList,
-            selectedAttributes = selectedAttributes,
+            attributesList = state.attributesList,
+            selectedAttributes = state.selectedAttributes,
             onAttributeClick = { onAttributeClicked(it) },
             filterAttributesBy = SUNSET_ATTRIBUTES
         )
@@ -456,7 +409,7 @@ fun AddSpotContent(
             modifier = Modifier.padding(start = 16.dp)
         )
         ScoreSlider(
-            value = spotScore.toFloat(),
+            value = state.spotScore.toFloat(),
             onValueChange = { onReviewScoreChanged(it) },
             modifier = Modifier.padding(horizontal = 12.dp)
         )
@@ -466,18 +419,30 @@ fun AddSpotContent(
             horizontalArrangement = Arrangement.Center
         ) {
             Icon(
-                imageVector = if (spotScore < 3) {
-                    Icons.Outlined.BrightnessLow
-                } else if (spotScore < 5) {
-                    Icons.Outlined.Brightness4
-                } else if (spotScore < 7) {
-                    Icons.Outlined.Brightness5
-                } else if (spotScore < 9) {
-                    Icons.Outlined.Brightness6
-                } else if (spotScore > 9) {
-                    Icons.Outlined.Brightness7
-                } else {
-                    Icons.Outlined.BrightnessLow
+                imageVector = when {
+                    state.spotScore < 3 -> {
+                        Icons.Outlined.BrightnessLow
+                    }
+
+                    state.spotScore < 5 -> {
+                        Icons.Outlined.Brightness4
+                    }
+
+                    state.spotScore < 7 -> {
+                        Icons.Outlined.Brightness5
+                    }
+
+                    state.spotScore < 9 -> {
+                        Icons.Outlined.Brightness6
+                    }
+
+                    state.spotScore > 9 -> {
+                        Icons.Outlined.Brightness7
+                    }
+
+                    else -> {
+                        Icons.Outlined.BrightnessLow
+                    }
                 },
                 contentDescription = "Score icon",
                 modifier = Modifier
@@ -485,7 +450,7 @@ fun AddSpotContent(
                     .size(36.dp)
             )
             CustomSpacer(size = 8.dp)
-            Text(text = spotScore.toString(), style = primaryBoldDisplayS)
+            Text(text = state.spotScore.toString(), style = primaryBoldDisplayS)
         }
         CustomSpacer(size = 56.dp)
         LargeDangerButton(
@@ -496,7 +461,7 @@ fun AddSpotContent(
         CustomSpacer(size = 24.dp)
     }
 
-    if (images.isEmpty()) {
+    if (state.imageUris.isEmpty()) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
@@ -508,7 +473,7 @@ fun AddSpotContent(
         }
     }
 
-    when (uploadProgress) {
+    when (state.uploadProgress) {
         is Resource.Loading -> {
             Column(
                 Modifier
@@ -527,26 +492,36 @@ fun AddSpotContent(
         }
 
         is Resource.Success -> {
-            if (uploadProgress.data != "" && uploadProgress.data!!.contains("Error")) {
-                LaunchedEffect(key1 = uploadProgress.data) {
-                    Toast.makeText(context, "Error, try again later.", Toast.LENGTH_SHORT).show()
-                    clearUploadProgress()
+            when {
+                state.uploadProgress.data != "" && state.uploadProgress.data!!.contains("Error") -> {
+                    LaunchedEffect(key1 = state.uploadProgress.data) {
+                        Toast.makeText(context, "Error, try again later.", Toast.LENGTH_SHORT)
+                            .show()
+                        clearUploadProgress()
+                    }
                 }
-            } else if (uploadProgress.data != "" && uploadProgress.data.contains("deleted")) {
-                LaunchedEffect(key1 = uploadProgress.data) {
-                    Toast.makeText(context, "Spot deleted successfully.", Toast.LENGTH_SHORT).show()
-                    navigateTo(SunsetRoutes.DiscoverScreen.route)
-                    clearUploadProgress()
+
+                state.uploadProgress.data != "" && state.uploadProgress.data.contains("deleted") -> {
+                    LaunchedEffect(key1 = state.uploadProgress.data) {
+                        Toast.makeText(context, "Spot deleted successfully.", Toast.LENGTH_SHORT)
+                            .show()
+                        navigateTo(SunsetRoutes.DiscoverScreen.route)
+                        clearUploadProgress()
+                    }
                 }
-            } else if (uploadProgress.data != "") {
-                LaunchedEffect(key1 = uploadProgress.data) {
-                    navigateTo("spot_detail_screen/spotReference=${uploadProgress.data}")
-                    clearUploadProgress()
+
+                state.uploadProgress.data != "" -> {
+                    LaunchedEffect(key1 = state.uploadProgress.data) {
+                        navigateTo("spot_detail_screen/spotReference=${state.uploadProgress.data}")
+                        clearUploadProgress()
+                    }
                 }
             }
         }
 
-        else -> {}
+        else -> {
+            //Not implemented yet
+        }
     }
 }
 

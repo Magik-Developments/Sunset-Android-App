@@ -148,4 +148,5 @@
     <string name="default_notification_channel_id">com.madteam.sunset.sunsetsnotifications</string>
     <string name="max_images_toast">Maximum 8 images</string>
     <string name="generic_error">Error, try again later</string>
+    <string name="add_images_spot">Add amazing photos of this Spot</string>
 </resources>

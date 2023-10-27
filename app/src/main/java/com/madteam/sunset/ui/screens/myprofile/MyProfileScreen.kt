@@ -51,7 +51,7 @@ import com.madteam.sunset.ui.common.ProfileImage
 import com.madteam.sunset.ui.common.ProfilePostTypeTab
 import com.madteam.sunset.ui.common.SunsetBottomNavigation
 import com.madteam.sunset.ui.common.ThinButtonLight
-import com.madteam.sunset.ui.screens.editprofile.BottomSheetEditProfileScreen
+import com.madteam.sunset.ui.screens.editprofile.ui.BottomSheetEditProfileScreen
 import com.madteam.sunset.ui.theme.secondaryRegularBodyL
 import com.madteam.sunset.ui.theme.secondaryRegularHeadlineS
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS

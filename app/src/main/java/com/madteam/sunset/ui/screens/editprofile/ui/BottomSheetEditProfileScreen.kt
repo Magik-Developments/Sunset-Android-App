@@ -1,4 +1,4 @@
-package com.madteam.sunset.ui.screens.editprofile
+package com.madteam.sunset.ui.screens.editprofile.ui
 
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -16,7 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
-import androidx.compose.material.Text
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -25,7 +25,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -41,6 +40,9 @@ import com.madteam.sunset.ui.common.ProfileImage
 import com.madteam.sunset.ui.common.RoundedLightChangeImageButton
 import com.madteam.sunset.ui.common.SmallButtonDark
 import com.madteam.sunset.ui.common.UsernameTextField
+import com.madteam.sunset.ui.screens.editprofile.state.EditProfileUIEvent
+import com.madteam.sunset.ui.screens.editprofile.state.EditProfileUIState
+import com.madteam.sunset.ui.screens.editprofile.viewmodel.EditProfileViewModel
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyL
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
 import com.madteam.sunset.utils.BackPressHandler
@@ -53,13 +55,7 @@ fun BottomSheetEditProfileScreen(
     viewModel: EditProfileViewModel = hiltViewModel()
 ) {
 
-    val username by viewModel.username.collectAsStateWithLifecycle()
-    val email by viewModel.email.collectAsStateWithLifecycle()
-    val name by viewModel.name.collectAsStateWithLifecycle()
-    val userImage by viewModel.userImage.collectAsStateWithLifecycle()
-    val location by viewModel.location.collectAsStateWithLifecycle()
-    val dataHasChanged by viewModel.dataHasChanged.collectAsStateWithLifecycle()
-    val uploadProgress by viewModel.updloadProgress.collectAsStateWithLifecycle()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     BackPressHandler {
         onCloseButton()
@@ -69,7 +65,7 @@ fun BottomSheetEditProfileScreen(
         contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { uri ->
             if (uri != null) {
-                viewModel.updateSelectedProfileImage(uri)
+                viewModel.onEvent(EditProfileUIEvent.UpdateProfileImage(uri))
             }
         }
     )
@@ -82,22 +78,16 @@ fun BottomSheetEditProfileScreen(
         shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
     ) {
         BottomSheetEditProfileContent(
-            usernameValue = username,
-            emailValue = email,
-            nameValue = name,
-            locationValue = location,
-            userImage = userImage,
-            updateName = viewModel::updateName,
-            updateLocation = viewModel::updateLocation,
-            saveData = viewModel::updateData,
+            state = state,
+            updateName = { viewModel.onEvent(EditProfileUIEvent.UpdateName(it)) },
+            updateLocation = { viewModel.onEvent(EditProfileUIEvent.UpdateLocation(it)) },
+            saveData = { viewModel.onEvent(EditProfileUIEvent.SaveData) },
             onEditProfileImageClick = {
                 singlePhotoPickerLauncher.launch(
                     PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                 )
             },
-            dataHasChanged = dataHasChanged,
-            uploadProgress = uploadProgress,
-            clearUploadProgress = viewModel::clearUpdateProgressState,
+            clearUploadProgress = { viewModel.onEvent(EditProfileUIEvent.ClearUploadProgress) },
             onCloseButton = onCloseButton,
             onProfileUpdated = onProfileUpdated
         )
@@ -106,17 +96,11 @@ fun BottomSheetEditProfileScreen(
 
 @Composable
 fun BottomSheetEditProfileContent(
-    usernameValue: String,
-    emailValue: String,
-    nameValue: String,
-    locationValue: String,
-    userImage: String,
+    state: EditProfileUIState,
     updateName: (String) -> Unit,
     updateLocation: (String) -> Unit,
     saveData: () -> Unit,
     onEditProfileImageClick: () -> Unit,
-    dataHasChanged: Boolean,
-    uploadProgress: Resource<String>,
     clearUploadProgress: () -> Unit,
     onCloseButton: () -> Unit,
     onProfileUpdated: (UserProfile) -> Unit
@@ -147,7 +131,7 @@ fun BottomSheetEditProfileContent(
         ) {
             val (profileImage, changeImageButton) = createRefs()
             ProfileImage(
-                imageUrl = userImage,
+                imageUrl = state.userImage,
                 size = 150.dp,
                 modifier = Modifier.constrainAs(profileImage) {
                     top.linkTo(parent.top)
@@ -173,19 +157,23 @@ fun BottomSheetEditProfileContent(
             Text(text = "Username", style = secondarySemiBoldBodyL, color = Color(0xFF333333))
             CustomSpacer(size = 8.dp)
             UsernameTextField(
-                usernameValue = usernameValue,
+                usernameValue = state.username,
                 onValueChange = {/* to do */ },
                 enabled = false
             )
             CustomSpacer(size = 16.dp)
             Text(text = "Email address", style = secondarySemiBoldBodyL, color = Color(0xFF333333))
             CustomSpacer(size = 8.dp)
-            EmailTextField(emailValue = emailValue, onValueChange = {/* to do */ }, enabled = false)
+            EmailTextField(
+                emailValue = state.email,
+                onValueChange = {/* to do */ },
+                enabled = false
+            )
             CustomSpacer(size = 16.dp)
             Text(text = "Name", style = secondarySemiBoldBodyL, color = Color(0xFF333333))
             CustomSpacer(size = 8.dp)
             GenericTextField(
-                value = nameValue,
+                value = state.name,
                 onValueChange = {
                     updateName(it)
                 },
@@ -195,7 +183,7 @@ fun BottomSheetEditProfileContent(
             Text(text = "Location", style = secondarySemiBoldBodyL, color = Color(0xFF333333))
             CustomSpacer(size = 8.dp)
             GenericTextField(
-                value = locationValue,
+                value = state.location,
                 onValueChange = {
                     updateLocation(it)
                 },
@@ -213,12 +201,12 @@ fun BottomSheetEditProfileContent(
         ) {
             SmallButtonDark(onClick = {
                 saveData()
-            }, text = R.string.save, enabled = dataHasChanged)
+            }, text = R.string.save, enabled = state.dataHasChanged)
             CustomSpacer(size = 24.dp)
         }
     }
 
-    when (uploadProgress) {
+    when (state.uploadProgress) {
         is Resource.Loading -> {
             Column(
                 Modifier
@@ -237,35 +225,31 @@ fun BottomSheetEditProfileContent(
         }
 
         is Resource.Success -> {
-            if (uploadProgress.data != "") {
-                LaunchedEffect(key1 = uploadProgress.data) {
+            if (state.uploadProgress.data != "") {
+                LaunchedEffect(key1 = state.uploadProgress.data) {
                     Toast.makeText(context, R.string.data_updated, Toast.LENGTH_LONG).show()
                     clearUploadProgress()
                     onProfileUpdated(
                         UserProfile(
-                            username = usernameValue,
-                            email = emailValue,
+                            username = state.username,
+                            email = state.email,
                             provider = "",
                             creation_date = "",
-                            name = nameValue,
-                            location = locationValue,
-                            image = userImage,
+                            name = state.name,
+                            location = state.location,
+                            image = state.userImage,
                             admin = false
                         )
                     )
                 }
-            } else if (uploadProgress.data.contains("Error")) {
+            } else if (state.uploadProgress.data.contains("Error")) {
                 Toast.makeText(context, "Error, try again later.", Toast.LENGTH_SHORT).show()
                 clearUploadProgress()
             }
         }
 
-        else -> {}
+        else -> {
+            // Not implemented yet
+        }
     }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun PreviewBottomSheetEditProfileContent() {
-
 }

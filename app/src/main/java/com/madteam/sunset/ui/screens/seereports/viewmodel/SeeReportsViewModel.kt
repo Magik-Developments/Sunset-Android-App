@@ -1,4 +1,4 @@
-package com.madteam.sunset.ui.screens.seereports
+package com.madteam.sunset.ui.screens.seereports.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

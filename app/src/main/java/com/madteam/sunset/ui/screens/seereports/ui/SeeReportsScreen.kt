@@ -1,4 +1,4 @@
-package com.madteam.sunset.ui.screens.seereports
+package com.madteam.sunset.ui.screens.seereports.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -41,6 +41,7 @@ import com.madteam.sunset.R
 import com.madteam.sunset.ui.common.GoBackTopAppBar
 import com.madteam.sunset.ui.screens.seereports.state.SeeReportsUIEvent
 import com.madteam.sunset.ui.screens.seereports.state.SeeReportsUIState
+import com.madteam.sunset.ui.screens.seereports.viewmodel.SeeReportsViewModel
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineXS
 import com.madteam.sunset.ui.theme.secondaryRegularBodyL
 import com.madteam.sunset.ui.theme.secondaryRegularBodyM

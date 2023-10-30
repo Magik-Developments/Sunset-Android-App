@@ -1,4 +1,4 @@
-package com.madteam.sunset.ui.screens.home
+package com.madteam.sunset.ui.screens.home.ui
 
 import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -15,9 +15,9 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Scaffold
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -28,21 +28,21 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.google.android.gms.maps.model.LatLng
 import com.madteam.sunset.R
-import com.madteam.sunset.data.model.Spot
-import com.madteam.sunset.data.model.SpotPost
-import com.madteam.sunset.data.model.SunsetTimeResponse
-import com.madteam.sunset.data.model.UserProfile
 import com.madteam.sunset.navigation.SunsetRoutes
 import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.SunsetBottomNavigation
 import com.madteam.sunset.ui.common.SunsetInfoModule
+import com.madteam.sunset.ui.screens.home.FeedPostItem
+import com.madteam.sunset.ui.screens.home.FeedSpotItem
+import com.madteam.sunset.ui.screens.home.state.HomeUIEvent
+import com.madteam.sunset.ui.screens.home.state.HomeUIState
+import com.madteam.sunset.ui.screens.home.viewmodel.HomeViewModel
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineS
 import com.madteam.sunset.utils.getCurrentLocation
 import com.madteam.sunset.utils.shimmerBrush
@@ -52,13 +52,7 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     navController: NavController
 ) {
-
-    val sunsetTimeInformation by viewModel.sunsetTimeInformation.collectAsStateWithLifecycle()
-    val userLocality by viewModel.userLocality.collectAsStateWithLifecycle()
-    val remainingTimeToSunset by viewModel.remainingTimeToSunset.collectAsStateWithLifecycle()
-    val spotsList by viewModel.spotsList.collectAsStateWithLifecycle()
-    val postsList by viewModel.postsList.collectAsStateWithLifecycle()
-    val userInfo by viewModel.userInfo.collectAsStateWithLifecycle()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     Scaffold(
         bottomBar = { SunsetBottomNavigation(navController) },
@@ -68,18 +62,13 @@ fun HomeScreen(
                 contentAlignment = Alignment.Center
             ) {
                 HomeContent(
-                    sunsetTimeInformation = sunsetTimeInformation,
+                    state = state,
                     navigateTo = navController::navigate,
-                    remainingTimeToSunset = remainingTimeToSunset,
-                    updateUserLocation = viewModel::updateUserLocation,
-                    userLocality = userLocality,
-                    spotsList = spotsList,
-                    userInfo = userInfo,
-                    spotLikeClick = viewModel::modifyUserSpotLike,
-                    postsList = postsList,
-                    postLikeClick = viewModel::modifyUserPostLike,
-                    loadNextSpotsPage = viewModel::loadNextSpotsPage,
-                    loadNextPostsPage = viewModel::loadNextPostsPage
+                    updateUserLocation = { viewModel.onEvent(HomeUIEvent.UpdateUserLocation(it)) },
+                    spotLikeClick = { viewModel.onEvent(HomeUIEvent.ModifyUserSpotLike(it)) },
+                    postLikeClick = { viewModel.onEvent(HomeUIEvent.ModifyUserPostLike(it)) },
+                    loadNextSpotsPage = { viewModel.onEvent(HomeUIEvent.LoadNextSpotsPage) },
+                    loadNextPostsPage = { viewModel.onEvent(HomeUIEvent.LoadNextPostsPage) }
                 )
             }
         }
@@ -88,15 +77,10 @@ fun HomeScreen(
 
 @Composable
 fun HomeContent(
-    sunsetTimeInformation: SunsetTimeResponse,
+    state: HomeUIState,
     navigateTo: (String) -> Unit,
-    remainingTimeToSunset: String,
     updateUserLocation: (LatLng) -> Unit,
-    userLocality: String,
-    spotsList: List<Spot>,
-    userInfo: UserProfile,
     spotLikeClick: (String) -> Unit,
-    postsList: List<SpotPost>,
     postLikeClick: (String) -> Unit,
     loadNextSpotsPage: () -> Unit,
     loadNextPostsPage: () -> Unit
@@ -117,7 +101,7 @@ fun HomeContent(
             }
         )
 
-    LaunchedEffect(key1 = sunsetTimeInformation) {
+    LaunchedEffect(key1 = state.sunsetTimeInformation) {
         requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
     }
 
@@ -126,7 +110,7 @@ fun HomeContent(
             .fillMaxSize()
             .verticalScroll(scrollState)
     ) {
-        if (remainingTimeToSunset.isNotEmpty()) {
+        if (state.remainingTimeToSunset.isNotEmpty()) {
             CustomSpacer(size = 16.dp)
             Text(
                 text = stringResource(id = R.string.dont_miss_sunset),
@@ -137,9 +121,9 @@ fun HomeContent(
             )
             CustomSpacer(size = 16.dp)
             SunsetInfoModule(
-                sunsetTimeInformation = sunsetTimeInformation,
-                userLocality = userLocality,
-                remainingTimeToSunset = remainingTimeToSunset,
+                sunsetTimeInformation = state.sunsetTimeInformation,
+                userLocality = state.userLocality,
+                remainingTimeToSunset = state.remainingTimeToSunset,
                 clickToExplore = { navigateTo(SunsetRoutes.DiscoverScreen.route) },
                 modifier = Modifier.padding(horizontal = 24.dp)
             )
@@ -159,7 +143,7 @@ fun HomeContent(
             item {
                 CustomSpacer(size = 2.dp)
             }
-            if (spotsList.isEmpty()) {
+            if (state.spotsList.isEmpty()) {
                 item {
                     Card(
                         modifier = Modifier
@@ -173,14 +157,14 @@ fun HomeContent(
                     ) {}
                 }
             }
-            itemsIndexed(spotsList) { index, item ->
+            itemsIndexed(state.spotsList) { index, item ->
                 FeedSpotItem(
                     spotInfo = item,
-                    userInfo = userInfo,
+                    userInfo = state.userInfo,
                     spotLikeClick = { spotLikeClick(item.id) },
                     onSpotClicked = { navigateTo("spot_detail_screen/spotReference=${item.id}") }
                 )
-                if (index == spotsList.size - 1) {
+                if (index == state.spotsList.size - 1) {
                     loadNextSpotsPage()
                 }
             }
@@ -200,7 +184,7 @@ fun HomeContent(
             item {
                 CustomSpacer(size = 2.dp)
             }
-            if (postsList.isEmpty()) {
+            if (state.postsList.isEmpty()) {
                 item {
                     Card(
                         modifier = Modifier
@@ -214,24 +198,18 @@ fun HomeContent(
                     ) {}
                 }
             }
-            itemsIndexed(postsList) { index, item ->
+            itemsIndexed(state.postsList) { index, item ->
                 FeedPostItem(
                     postInfo = item,
-                    userInfo = userInfo,
+                    userInfo = state.userInfo,
                     postLikeClick = { postLikeClick(item.id) },
                     onPostClicked = { navigateTo("post_screen/postReference=${item.id}") }
                 )
-                if (index == postsList.size - 1) {
+                if (index == state.postsList.size - 1) {
                     loadNextPostsPage()
                 }
             }
         }
         CustomSpacer(size = 24.dp)
     }
-}
-
-@Composable
-@Preview
-fun MyProfileScreenPreview() {
-
 }

@@ -1,4 +1,4 @@
-package com.madteam.sunset.ui.screens.home
+package com.madteam.sunset.ui.screens.home.ui
 
 import android.view.LayoutInflater
 import android.widget.Button
@@ -16,7 +16,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdLoader
 import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.nativead.MediaView
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdView

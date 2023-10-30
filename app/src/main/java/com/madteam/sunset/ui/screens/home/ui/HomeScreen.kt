@@ -38,8 +38,6 @@ import com.madteam.sunset.navigation.SunsetRoutes
 import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.SunsetBottomNavigation
 import com.madteam.sunset.ui.common.SunsetInfoModule
-import com.madteam.sunset.ui.screens.home.FeedPostItem
-import com.madteam.sunset.ui.screens.home.FeedSpotItem
 import com.madteam.sunset.ui.screens.home.state.HomeUIEvent
 import com.madteam.sunset.ui.screens.home.state.HomeUIState
 import com.madteam.sunset.ui.screens.home.viewmodel.HomeViewModel

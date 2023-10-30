@@ -1,4 +1,4 @@
-package com.madteam.sunset.ui.screens.home
+package com.madteam.sunset.ui.screens.home.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -24,55 +24,104 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.madteam.sunset.R
-import com.madteam.sunset.data.model.Spot
+import com.madteam.sunset.data.model.SpotPost
 import com.madteam.sunset.data.model.UserProfile
+import com.madteam.sunset.ui.common.ProfileImage
 import com.madteam.sunset.ui.common.RoundedLightLikeButton
 import com.madteam.sunset.ui.common.RoundedLightSaveButton
 import com.madteam.sunset.ui.common.RoundedLightSendButton
 import com.madteam.sunset.ui.theme.secondaryRegularBodyM
-import com.madteam.sunset.ui.theme.secondarySemiBoldBodyL
+import com.madteam.sunset.ui.theme.secondarySemiBoldBodyM
+import com.madteam.sunset.utils.formatDate
 import com.madteam.sunset.utils.generateDeepLink
 import com.madteam.sunset.utils.getShareIntent
 
 @OptIn(ExperimentalGlideComposeApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun FeedSpotItem(
-    spotInfo: Spot,
+fun FeedPostItem(
+    postInfo: SpotPost,
     userInfo: UserProfile,
-    spotLikeClick: () -> Unit,
-    onSpotClicked: () -> Unit
+    postLikeClick: () -> Unit,
+    onPostClicked: () -> Unit
 ) {
 
     val context = LocalContext.current
 
-    val deepLinkToShare = generateDeepLink(screen = "spot", spotInfo.id)
-    val shareText = stringResource(id = R.string.share_spot_text) + " $deepLinkToShare"
+    val deepLinkToShare = generateDeepLink(screen = "post", postInfo.id)
+    val shareText = stringResource(
+        id = R.string.share_post_text,
+        postInfo.author.username
+    ) + " $deepLinkToShare"
 
     Card(
         elevation = CardDefaults.cardElevation(8.dp),
         shape = RoundedCornerShape(20.dp),
         modifier = Modifier
             .size(370.dp),
-        onClick = { onSpotClicked() }
+        onClick = { onPostClicked() }
     ) {
         ConstraintLayout(
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            val (saveButton, sendButton, likeButton, clickDetailsText, clickDetailsIcon, titleInformation, subtitleInformation) = createRefs()
+            val (saveButton, sendButton, likeButton, clickDetailsText, clickDetailsIcon, userInformation) = createRefs()
             GlideImage(
-                model = spotInfo.featuredImages.first(),
+                model = postInfo.images.first(),
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxSize(),
                 contentScale = ContentScale.Crop
             )
+            Card(
+                modifier = Modifier
+                    .size(width = 150.dp, height = 46.dp)
+                    .constrainAs(userInformation) {
+                        top.linkTo(parent.top, 16.dp)
+                        start.linkTo(parent.start, 24.dp)
+                    },
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                shape = RoundedCornerShape(50.dp),
+                elevation = CardDefaults.cardElevation(4.dp)
+            ) {
+                ConstraintLayout(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    val (profileImage, username, postDate) = createRefs()
+                    ProfileImage(
+                        imageUrl = postInfo.author.image,
+                        size = 38.dp,
+                        modifier = Modifier
+                            .constrainAs(profileImage) {
+                                top.linkTo(parent.top)
+                                bottom.linkTo(parent.bottom)
+                                start.linkTo(parent.start, 4.dp)
+                            }
+                    )
+                    Text(
+                        text = postInfo.author.username,
+                        style = secondarySemiBoldBodyM,
+                        modifier = Modifier
+                            .constrainAs(username) {
+                                start.linkTo(profileImage.end, 8.dp)
+                                top.linkTo(parent.top, 8.dp)
+                            }
+                    )
+                    Text(
+                        text = formatDate(postInfo.creation_date),
+                        style = secondaryRegularBodyM,
+                        modifier = Modifier
+                            .constrainAs(postDate) {
+                                start.linkTo(profileImage.end, 8.dp)
+                                bottom.linkTo(parent.bottom, 8.dp)
+                            }
+                    )
+                }
+            }
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -97,14 +146,14 @@ fun FeedSpotItem(
                     }
             )
             RoundedLightLikeButton(
-                onClick = { spotLikeClick() },
+                onClick = { postLikeClick() },
                 modifier = Modifier
                     .shadow(4.dp, RoundedCornerShape(20.dp))
                     .constrainAs(likeButton) {
                         bottom.linkTo(parent.bottom, 16.dp)
                         end.linkTo(parent.end, 24.dp)
                     },
-                isLiked = spotInfo.likedBy.contains(userInfo.username.lowercase())
+                isLiked = postInfo.likedBy.contains(userInfo.username.lowercase())
             )
             RoundedLightSendButton(
                 onClick = {
@@ -144,31 +193,6 @@ fun FeedSpotItem(
                         end.linkTo(clickDetailsText.end)
                     }
             )
-            Text(
-                text = spotInfo.location,
-                style = secondaryRegularBodyM,
-                color = Color.White,
-                modifier = Modifier
-                    .constrainAs(subtitleInformation) {
-                        bottom.linkTo(sendButton.top, 24.dp)
-                        start.linkTo(parent.start, 24.dp)
-                    }
-            )
-            Text(
-                text = spotInfo.name,
-                style = secondarySemiBoldBodyL,
-                color = Color.White,
-                modifier = Modifier
-                    .constrainAs(titleInformation) {
-                        bottom.linkTo(subtitleInformation.top, 4.dp)
-                        start.linkTo(parent.start, 24.dp)
-                    }
-            )
         }
     }
-}
-
-@Preview
-@Composable
-fun FeedPostItemPreview() {
 }

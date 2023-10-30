@@ -15,6 +15,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -36,7 +37,11 @@ fun WelcomeScreen(
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
-    val modalState = ModalBottomSheetState(initialValue = Hidden, isSkipHalfExpanded = true)
+    val modalState = ModalBottomSheetState(
+        initialValue = Hidden,
+        isSkipHalfExpanded = true,
+        density = LocalDensity.current
+    )
 
     BackPressHandler {}
 

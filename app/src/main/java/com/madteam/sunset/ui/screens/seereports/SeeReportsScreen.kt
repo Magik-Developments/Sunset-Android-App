@@ -29,18 +29,18 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.google.firebase.firestore.FirebaseFirestore
 import com.madteam.sunset.R
-import com.madteam.sunset.data.model.Report
 import com.madteam.sunset.ui.common.GoBackTopAppBar
+import com.madteam.sunset.ui.screens.seereports.state.SeeReportsUIEvent
+import com.madteam.sunset.ui.screens.seereports.state.SeeReportsUIState
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineXS
 import com.madteam.sunset.ui.theme.secondaryRegularBodyL
 import com.madteam.sunset.ui.theme.secondaryRegularBodyM
@@ -53,7 +53,7 @@ fun SeeReportsScreen(
     viewModel: SeeReportsViewModel = hiltViewModel()
 ) {
 
-    val reportsList by viewModel.reportsList.collectAsStateWithLifecycle()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
@@ -65,10 +65,10 @@ fun SeeReportsScreen(
                 contentAlignment = Alignment.Center
             ) {
                 SeeReportsContent(
-                    reports = reportsList,
-                    clickOnAssignReport = viewModel::assignReport,
-                    clickOnDeleteReport = viewModel::deleteReport,
-                    clickOnResolveReport = viewModel::deleteReport,
+                    state = state,
+                    clickOnAssignReport = { viewModel.onEvent(SeeReportsUIEvent.AssignReport(it)) },
+                    clickOnDeleteReport = { viewModel.onEvent(SeeReportsUIEvent.DeleteReport(it)) },
+                    clickOnResolveReport = { viewModel.onEvent(SeeReportsUIEvent.DeleteReport(it)) },
                     navigateTo = navController::navigate
                 )
             }
@@ -78,7 +78,7 @@ fun SeeReportsScreen(
 
 @Composable
 fun SeeReportsContent(
-    reports: List<Report>,
+    state: SeeReportsUIState,
     clickOnAssignReport: (String) -> Unit,
     clickOnDeleteReport: (String) -> Unit,
     clickOnResolveReport: (String) -> Unit,
@@ -93,7 +93,7 @@ fun SeeReportsContent(
             .padding(8.dp)
     ) {
         LazyColumn {
-            itemsIndexed(reports.sortedBy {
+            itemsIndexed(state.reportsList.sortedBy {
                 it.date
             }) { _, report ->
                 ConstraintLayout(
@@ -110,7 +110,7 @@ fun SeeReportsContent(
                             }
                         }
                 ) {
-                    val (reportId, reportType, reportDescription, reportedByUsername, reportedDate, assignedBy, assignButton, deleteButton, resolveButton, copyToClipboard, priority) = createRefs()
+                    val (reportId, reportType, reportDescription, reportedByUsername, reportedDate, assignedBy, assignButton, deleteButton, resolveButton, copyToClipboard) = createRefs()
                     Text(
                         modifier = Modifier
                             .padding(start = 16.dp)
@@ -140,19 +140,6 @@ fun SeeReportsContent(
                             tint = Color(0xFFD9D9D9)
                         )
                     }
-                    /*
-                    TODO: Change bulb color depending on the hours since the report was opened
-                    Icon(
-                        modifier = Modifier
-                            .size(32.dp)
-                            .constrainAs(priority) {
-                            top.linkTo(parent.top, 8.dp)
-                            end.linkTo(parent.end, 8.dp)
-                        },
-                        imageVector = Icons.Filled.Lightbulb,
-                        contentDescription = "State priority",
-                        tint = Color.Green
-                    ) */
                     Text(
                         modifier = Modifier
                             .padding(horizontal = 16.dp)
@@ -181,7 +168,7 @@ fun SeeReportsContent(
                                 top.linkTo(reportDescription.bottom, 8.dp)
                                 start.linkTo(parent.start)
                             },
-                        text = "Reported by ${report.reporter}",
+                        text = stringResource(id = R.string.reported_by) + " ${report.reporter}",
                         style = secondarySemiBoldBodyM
                     )
                     Text(
@@ -203,7 +190,7 @@ fun SeeReportsContent(
                                     bottom.linkTo(resolveButton.bottom)
                                     start.linkTo(parent.start)
                                 },
-                            text = "Assigned by: ${report.assignedBy}",
+                            text = stringResource(id = R.string.assigned_by) + ": ${report.assignedBy}",
                             style = secondarySemiBoldBodyM
                         )
                         IconButton(
@@ -228,7 +215,7 @@ fun SeeReportsContent(
                                     top.linkTo(assignButton.top)
                                     bottom.linkTo(assignButton.bottom)
                                 },
-                            text = "NO ASSIGNED YET",
+                            text = stringResource(id = R.string.unnasigned_report).uppercase(),
                             style = secondarySemiBoldBodyM
                         )
                         IconButton(
@@ -268,29 +255,4 @@ fun SeeReportsContent(
 
     }
 
-}
-
-@Preview
-@Composable
-fun SeeReportsContentPreview(
-
-) {
-    SeeReportsContent(
-        reports = listOf(
-            Report(
-                id = "a3r53g5gs3",
-                date = "Fri Sep 01 15:53:18 GMT+02:00 2023",
-                description = "I think vallparadadirs hasn't no one giving cupcakes on the sun",
-                docReference = FirebaseFirestore.getInstance().document(""),
-                issue = "Other",
-                reporter = "adriaa12",
-                type = "Spot",
-                assignedBy = "SunsetOfficial"
-            )
-        ),
-        clickOnAssignReport = {},
-        clickOnDeleteReport = {},
-        clickOnResolveReport = {},
-        navigateTo = {}
-    )
 }

@@ -2,9 +2,10 @@ package com.madteam.sunset.ui.screens.seereports
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.madteam.sunset.data.model.Report
 import com.madteam.sunset.data.repositories.AuthRepository
 import com.madteam.sunset.data.repositories.DatabaseRepository
+import com.madteam.sunset.ui.screens.seereports.state.SeeReportsUIEvent
+import com.madteam.sunset.ui.screens.seereports.state.SeeReportsUIState
 import com.madteam.sunset.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,9 +20,8 @@ class SeeReportsViewModel @Inject constructor(
     private val authRepository: AuthRepository
 ) : ViewModel() {
 
-    private val _reportsList: MutableStateFlow<List<Report>> =
-        MutableStateFlow(mutableListOf())
-    val reportsList: StateFlow<List<Report>> = _reportsList
+    private val _state: MutableStateFlow<SeeReportsUIState> = MutableStateFlow(SeeReportsUIState())
+    val state: StateFlow<SeeReportsUIState> = _state
 
     private lateinit var username: String
 
@@ -29,6 +29,18 @@ class SeeReportsViewModel @Inject constructor(
         getReportList()
         viewModelScope.launch {
             getUserUsername()
+        }
+    }
+
+    fun onEvent(event: SeeReportsUIEvent) {
+        when (event) {
+            is SeeReportsUIEvent.AssignReport -> {
+                assignReport(event.reportId)
+            }
+
+            is SeeReportsUIEvent.DeleteReport -> {
+                deleteReport(event.reportId)
+            }
         }
     }
 
@@ -43,12 +55,12 @@ class SeeReportsViewModel @Inject constructor(
     private fun getReportList() {
         viewModelScope.launch {
             databaseRepository.getReportsList().collectLatest {
-                _reportsList.value = it
+                _state.value = _state.value.copy(reportsList = it)
             }
         }
     }
 
-    fun assignReport(clickedReport: String) {
+    private fun assignReport(clickedReport: String) {
         viewModelScope.launch {
             databaseRepository.assignReport(
                 reportId = clickedReport,
@@ -59,13 +71,15 @@ class SeeReportsViewModel @Inject constructor(
                         getReportList()
                     }
 
-                    else -> {}
+                    else -> {
+                        //Not necessary
+                    }
                 }
             }
         }
     }
 
-    fun deleteReport(clickedReport: String) {
+    private fun deleteReport(clickedReport: String) {
         viewModelScope.launch {
             databaseRepository.deleteReport(
                 reportId = clickedReport
@@ -75,7 +89,9 @@ class SeeReportsViewModel @Inject constructor(
                         getReportList()
                     }
 
-                    else -> {}
+                    else -> {
+                        //Not necessary
+                    }
                 }
             }
         }

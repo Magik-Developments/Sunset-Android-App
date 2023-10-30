@@ -150,14 +150,17 @@
   <string name="generic_error">Error, try again later</string>
   <string name="add_images_spot">Add amazing photos of this Spot</string>
   <string name="lost_password_email_sent">Email sent 🥳 Follow the instructions to reset your password</string>
-  <string name="lost_password_enter_email">Enter the email address below and receive a link to reset your password</string>
-  <string name="lost_password">Lost your password?</string>
-  <string name="posted_by">Posted by</string>
-  <string name="created">"Created "</string>
-  <string name="likes">likes</string>
-  <string name="view_all">View all</string>
-  <string name="comments">comments</string>
-  <string name="be_the_first_to_comment">Be the first to comment</string>
-  <string name="review">Review</string>
-  <string name="reviewed_by">Reviewed by</string>
+    <string name="lost_password_enter_email">Enter the email address below and receive a link to reset your password</string>
+    <string name="lost_password">Lost your password?</string>
+    <string name="posted_by">Posted by</string>
+    <string name="created">"Created "</string>
+    <string name="likes">likes</string>
+    <string name="view_all">View all</string>
+    <string name="comments">comments</string>
+    <string name="be_the_first_to_comment">Be the first to comment</string>
+    <string name="review">Review</string>
+    <string name="reviewed_by">Reviewed by</string>
+    <string name="reported_by">Reported by</string>
+    <string name="assigned_by">Assigned by</string>
+    <string name="unnasigned_report">No assigned yet</string>
 </resources>

@@ -163,4 +163,7 @@
     <string name="reported_by">Reported by</string>
     <string name="assigned_by">Assigned by</string>
     <string name="unnasigned_report">No assigned yet</string>
+    <string name="spotted_by">Spotted by</string>
+    <string name="kms_away">Kms away</string>
+    <string name="reviews">reviews</string>
 </resources>

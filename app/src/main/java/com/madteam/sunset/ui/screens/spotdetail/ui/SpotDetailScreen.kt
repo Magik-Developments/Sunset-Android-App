@@ -1,5 +1,6 @@
-package com.madteam.sunset.ui.screens.spotdetail
+package com.madteam.sunset.ui.screens.spotdetail.ui
 
+import android.annotation.SuppressLint
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -8,7 +9,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
@@ -28,7 +28,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Brightness7
 import androidx.compose.material.icons.filled.Directions
 import androidx.compose.material.icons.outlined.Brightness5
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -74,6 +74,9 @@ import com.madteam.sunset.ui.common.RoundedLightLikeButton
 import com.madteam.sunset.ui.common.RoundedLightReportButton
 import com.madteam.sunset.ui.common.RoundedLightSaveButton
 import com.madteam.sunset.ui.common.RoundedLightSendButton
+import com.madteam.sunset.ui.screens.spotdetail.state.SpotDetailUIEvent
+import com.madteam.sunset.ui.screens.spotdetail.state.SpotDetailUIState
+import com.madteam.sunset.ui.screens.spotdetail.viewmodel.SpotDetailViewModel
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineXS
 import com.madteam.sunset.ui.theme.primaryMediumDisplayS
 import com.madteam.sunset.ui.theme.secondaryRegularBodyL
@@ -90,7 +93,7 @@ import com.madteam.sunset.utils.openDirectionsOnGoogleMaps
 import com.madteam.sunset.utils.shimmerBrush
 import kotlin.math.roundToInt
 
-@OptIn(ExperimentalLayoutApi::class)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun SpotDetailScreen(
     navController: NavController,
@@ -98,19 +101,8 @@ fun SpotDetailScreen(
     spotReference: String
 ) {
 
-    viewModel.setSpotReference("spots/$spotReference")
-    val spotInfo by viewModel.spotInfo.collectAsStateWithLifecycle()
-    val isSpotLikedByUser by viewModel.spotIsLiked.collectAsStateWithLifecycle()
-    val spotLikes by viewModel.spotLikes.collectAsStateWithLifecycle()
-    val userLocation by viewModel.userLocation.collectAsStateWithLifecycle()
-    val isUserAdmin by viewModel.userIsAbleToEditOrRemoveSpot.collectAsStateWithLifecycle()
-    val showReportDialog by viewModel.showReportDialog.collectAsStateWithLifecycle()
-    val availableOptionsToReport by viewModel.availableOptionsToReport.collectAsStateWithLifecycle()
-    val selectedReportOption by viewModel.selectedReportOption.collectAsStateWithLifecycle()
-    val additionalReportInformation by viewModel.additionalReportInformation.collectAsStateWithLifecycle()
-    val reportSentDialog by viewModel.showReportSentDialog.collectAsStateWithLifecycle()
-    val showAttrInfoDialog by viewModel.showAttrInfoDialog.collectAsStateWithLifecycle()
-    val selectedAttributeDialog by viewModel.attrSelectedDialog.collectAsStateWithLifecycle()
+    viewModel.onEvent(SpotDetailUIEvent.SetSpotReference("spots/$spotReference"))
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     Scaffold(
         content = { _ ->
@@ -118,29 +110,48 @@ fun SpotDetailScreen(
                 modifier = Modifier.padding(0.dp)
             ) {
                 SpotDetailContent(
-                    spotInfo = spotInfo,
+                    state = state,
                     navController = navController,
                     navigateTo = navController::navigate,
-                    spotLikeClick = viewModel::modifyUserSpotLike,
-                    spotLikedByUser = isSpotLikedByUser,
-                    spotLikes = spotLikes,
-                    updateUserLocation = viewModel::updateUserLocation,
-                    userLocation = userLocation,
-                    isUserAdmin = isUserAdmin,
-                    showReportDialog = showReportDialog,
-                    setShowReportDialog = viewModel::setShowReportDialog,
-                    availableOptionsToReport = availableOptionsToReport,
-                    setSelectedReportOption = viewModel::selectedReportOption,
-                    selectedReportOption = selectedReportOption,
-                    additionalReportInformation = additionalReportInformation,
-                    setAdditionalReportInformation = viewModel::setAdditionalReportInformation,
-                    sendReportButton = viewModel::sendReportIntent,
-                    setReportSentDialog = viewModel::setReportSentDialog,
-                    reportSentDialog = reportSentDialog,
-                    setShowAttrInfoDialog = viewModel::setShowAttrInfoDialog,
-                    setAttrSelectedDialog = viewModel::setAttrSelectedDialog,
-                    showAttrInfoDialog = showAttrInfoDialog,
-                    selectedAttributeDialog = selectedAttributeDialog
+                    spotLikeClick = { viewModel.onEvent(SpotDetailUIEvent.ModifyUserSpotLike) },
+                    updateUserLocation = { viewModel.onEvent(SpotDetailUIEvent.UpdateUserLocation(it)) },
+                    setShowReportDialog = {
+                        viewModel.onEvent(
+                            SpotDetailUIEvent.SetShowReportDialog(
+                                it
+                            )
+                        )
+                    },
+                    setSelectedReportOption = {
+                        viewModel.onEvent(
+                            SpotDetailUIEvent.SetSelectedReportOption(
+                                it
+                            )
+                        )
+                    },
+                    setAdditionalReportInformation = {
+                        viewModel.onEvent(
+                            SpotDetailUIEvent.SetAdditionalReportInformation(
+                                it
+                            )
+                        )
+                    },
+                    sendReportButton = { viewModel.onEvent(SpotDetailUIEvent.SendReport) },
+                    setReportSentDialog = { viewModel.onEvent(SpotDetailUIEvent.SetReportSent(it)) },
+                    setShowAttrInfoDialog = {
+                        viewModel.onEvent(
+                            SpotDetailUIEvent.SetShowAttrInfoDialog(
+                                it
+                            )
+                        )
+                    },
+                    setAttrSelectedDialog = {
+                        viewModel.onEvent(
+                            SpotDetailUIEvent.SetAttrSelectedDialog(
+                                it
+                            )
+                        )
+                    },
                 )
             }
         }
@@ -150,35 +161,24 @@ fun SpotDetailScreen(
 @OptIn(ExperimentalPagerApi::class, ExperimentalGlideComposeApi::class)
 @Composable
 fun SpotDetailContent(
-    spotInfo: Spot,
+    state: SpotDetailUIState,
     navController: NavController,
     navigateTo: (String) -> Unit,
     spotLikeClick: () -> Unit,
-    spotLikedByUser: Boolean,
-    spotLikes: Int,
     updateUserLocation: (LatLng) -> Unit,
-    userLocation: LatLng,
-    isUserAdmin: Boolean,
-    showReportDialog: Boolean,
     setShowReportDialog: (Boolean) -> Unit,
-    availableOptionsToReport: List<String>,
     setSelectedReportOption: (String) -> Unit,
-    selectedReportOption: String,
-    additionalReportInformation: String,
     setAdditionalReportInformation: (String) -> Unit,
     sendReportButton: () -> Unit,
     setReportSentDialog: (Boolean) -> Unit,
-    reportSentDialog: Boolean,
     setShowAttrInfoDialog: (Boolean) -> Unit,
     setAttrSelectedDialog: (SpotAttribute) -> Unit,
-    showAttrInfoDialog: Boolean,
-    selectedAttributeDialog: SpotAttribute
 ) {
     val scrollState = rememberScrollState()
     val showShimmer = remember { mutableStateOf(true) }
     val context = LocalContext.current
 
-    val deepLinkToShare = generateDeepLink(screen = "spot", spotInfo.id)
+    val deepLinkToShare = generateDeepLink(screen = "spot", state.spotInfo.id)
     val shareText = stringResource(id = R.string.share_spot_text) + " $deepLinkToShare"
 
     val requestPermissionLauncher =
@@ -193,36 +193,36 @@ fun SpotDetailContent(
             }
         )
 
-    LaunchedEffect(key1 = spotInfo) {
-        if (spotInfo != Spot()) {
+    LaunchedEffect(key1 = state.spotInfo) {
+        if (state.spotInfo != Spot()) {
             showShimmer.value = false
             requestPermissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
         }
     }
 
-    if (showAttrInfoDialog) {
+    if (state.showAttrInfoDialog) {
         AttributeInfoDialog(
-            attribute = selectedAttributeDialog,
+            attribute = state.attrSelectedDialog,
             setShowDialog = { setShowAttrInfoDialog(it) }
         )
     }
 
-    if (showReportDialog) {
+    if (state.showReportDialog) {
         ReportDialog(
             setShowDialog = { setShowReportDialog(it) },
             dialogTitle = R.string.inform_about_spot,
             dialogDescription = R.string.inform_about_spot_description,
-            availableOptions = availableOptionsToReport,
+            availableOptions = state.availableOptionsToReport,
             setSelectedOption = { setSelectedReportOption(it) },
-            selectedOptionText = selectedReportOption,
-            additionalInformation = additionalReportInformation,
+            selectedOptionText = state.selectedReportOption,
+            additionalInformation = state.additionalReportInformation,
             setAdditionalInformation = { setAdditionalReportInformation(it) },
             buttonText = R.string.send_report,
             buttonClickedAction = {
                 sendReportButton()
                 setReportSentDialog(true)
             },
-            reportSent = reportSentDialog,
+            reportSent = state.reportSent,
             setShowReportSent = {
                 setReportSentDialog(it)
             }
@@ -238,10 +238,10 @@ fun SpotDetailContent(
         ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
             val (spotImage, backIconButton, saveIconButton, sendIconButton, editIconButton, likeIconButton, reportIconButton) = createRefs()
             AutoSlidingCarousel(
-                itemsCount = spotInfo.featuredImages.size,
+                itemsCount = state.spotInfo.featuredImages.size,
                 itemContent = { index ->
                     GlideImage(
-                        model = spotInfo.featuredImages[index],
+                        model = state.spotInfo.featuredImages[index],
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.background(shimmerBrush(targetValue = 2000f))
@@ -279,11 +279,11 @@ fun SpotDetailContent(
                     )
                 )
             })
-            if (isUserAdmin) {
+            if (state.userIsAbleToEditOrRemoveSpot) {
                 RoundedLightEditButton(modifier = Modifier.constrainAs(editIconButton) {
                     top.linkTo(parent.top, 16.dp)
                     end.linkTo(sendIconButton.start, 16.dp)
-                }, onClick = { navigateTo("edit_spot_screen/spotReference=${spotInfo.id}") })
+                }, onClick = { navigateTo("edit_spot_screen/spotReference=${state.spotInfo.id}") })
             }
             RoundedLightReportButton(modifier = Modifier.constrainAs(reportIconButton) {
                 top.linkTo(saveIconButton.bottom, 16.dp)
@@ -295,21 +295,21 @@ fun SpotDetailContent(
                     end.linkTo(parent.end, 24.dp)
                     bottom.linkTo(parent.bottom, 16.dp)
                 },
-                isLiked = spotLikedByUser
+                isLiked = state.isSpotLikedByUser
             )
         }
         //Spotter user information
         ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
             val (spotterImage, spottedByTitle, spottedByUsername, createdDate) = createRefs()
             ProfileImage(
-                imageUrl = spotInfo.spottedBy.image,
+                imageUrl = state.spotInfo.spottedBy.image,
                 size = 56.dp,
                 modifier = Modifier.constrainAs(spotterImage) {
                     start.linkTo(parent.start, 24.dp)
                     top.linkTo(parent.top, (-16).dp)
                 })
             Text(
-                text = "Spotted by",
+                text = stringResource(id = R.string.spotted_by),
                 style = secondaryRegularBodyS,
                 modifier = Modifier.constrainAs(spottedByTitle) {
                     top.linkTo(parent.top, 4.dp)
@@ -319,7 +319,7 @@ fun SpotDetailContent(
                 text = if (showShimmer.value) {
                     ""
                 } else {
-                    "@${spotInfo.spottedBy.username}"
+                    "@${state.spotInfo.spottedBy.username}"
                 },
                 style = primaryBoldHeadlineXS,
                 modifier = Modifier
@@ -333,7 +333,7 @@ fun SpotDetailContent(
                 text = if (showShimmer.value) {
                     ""
                 } else {
-                    "created ${formatDate(spotInfo.creationDate)}"
+                    "created ${formatDate(state.spotInfo.creationDate)}"
                 },
                 style = secondaryRegularBodyS,
                 color = Color(0xFF333333),
@@ -355,7 +355,7 @@ fun SpotDetailContent(
         ) {
             val (spotTitle, spotDescription) = createRefs()
             Text(
-                text = spotInfo.name,
+                text = state.spotInfo.name,
                 style = primaryMediumDisplayS,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
@@ -367,7 +367,7 @@ fun SpotDetailContent(
                     .defaultMinSize(minWidth = 200.dp)
             )
             Text(
-                text = spotInfo.description,
+                text = state.spotInfo.description,
                 maxLines = 10,
                 overflow = TextOverflow.Ellipsis,
                 style = secondaryRegularBodyM,
@@ -395,21 +395,24 @@ fun SpotDetailContent(
                 CustomSpacer(size = 16.dp)
                 Icon(imageVector = Icons.Outlined.Brightness5, contentDescription = "")
                 CustomSpacer(size = 4.dp)
-                Text(text = "${spotInfo.score}", style = secondaryRegularBodyM)
+                Text(text = "${state.spotInfo.score}", style = secondaryRegularBodyM)
                 CustomSpacer(size = 8.dp)
                 Text(text = "·", style = secondarySemiBoldBodyM)
                 CustomSpacer(size = 8.dp)
                 Text(text = "Visited ", style = secondaryRegularBodyM)
-                Text(text = "${spotInfo.visitedTimes} times", style = secondarySemiBoldBodyM)
+                Text(text = "${state.spotInfo.visitedTimes} times", style = secondarySemiBoldBodyM)
                 CustomSpacer(size = 8.dp)
                 Text(text = "·", style = secondarySemiBoldBodyM)
                 CustomSpacer(size = 8.dp)
-                Text(text = "$spotLikes likes", style = secondarySemiBoldBodyM)
+                Text(
+                    text = "${state.spotLikes} " + stringResource(id = R.string.likes),
+                    style = secondarySemiBoldBodyM
+                )
             }
         }
         CustomSpacer(size = 8.dp)
         Text(
-            text = spotInfo.location,
+            text = state.spotInfo.location,
             style = secondaryRegularBodyL,
             modifier = Modifier.padding(horizontal = 24.dp),
             maxLines = 1,
@@ -418,7 +421,7 @@ fun SpotDetailContent(
         CustomSpacer(size = 16.dp)
         //Take me there section
         if (!showShimmer.value) {
-            Divider(
+            HorizontalDivider(
                 modifier = Modifier.padding(horizontal = 24.dp),
                 thickness = 1.dp,
                 color = Color(0xFF999999)
@@ -439,13 +442,13 @@ fun SpotDetailContent(
                     })
                 Text(
                     text = "${
-                        (userLocation.sphericalDistance(
+                        (state.userLocation.sphericalDistance(
                             LatLng(
-                                spotInfo.locationInLatLng.latitude,
-                                spotInfo.locationInLatLng.longitude
+                                state.spotInfo.locationInLatLng.latitude,
+                                state.spotInfo.locationInLatLng.longitude
                             )
                         ) / 1000).roundToInt()
-                    } kms away",
+                    } " + stringResource(id = R.string.kms_away),
                     style = secondarySemiBoldBodyL,
                     modifier = Modifier.constrainAs(distance) {
                         start.linkTo(distanceText.end)
@@ -461,14 +464,14 @@ fun SpotDetailContent(
                         }
                         .size(48.dp)
                         .clickable {
-                            openDirectionsOnGoogleMaps(context, spotInfo.locationInLatLng)
+                            openDirectionsOnGoogleMaps(context, state.spotInfo.locationInLatLng)
                         },
                     imageVector = Icons.Filled.Directions,
                     contentDescription = "",
                     tint = Color(0xFFFFB600)
                 )
             }
-            Divider(
+            HorizontalDivider(
                 modifier = Modifier.padding(horizontal = 24.dp),
                 thickness = 1.dp,
                 color = Color(0xFF999999)
@@ -482,14 +485,14 @@ fun SpotDetailContent(
             )
             CustomSpacer(size = 16.dp)
             AttributesBigListRow(
-                attributesList = spotInfo.attributes,
+                attributesList = state.spotInfo.attributes,
                 onAttributeClick = {
                     setAttrSelectedDialog(it)
                     setShowAttrInfoDialog(true)
                 }
             )
             CustomSpacer(size = 24.dp)
-            Divider(
+            HorizontalDivider(
                 modifier = Modifier.padding(horizontal = 24.dp),
                 thickness = 1.dp,
                 color = Color(0xFF999999)
@@ -501,10 +504,10 @@ fun SpotDetailContent(
             ) {
                 Icon(imageVector = Icons.Filled.Brightness7, contentDescription = null)
                 CustomSpacer(size = 8.dp)
-                Text(text = spotInfo.score.toString(), style = secondarySemiBoldHeadLineM)
+                Text(text = state.spotInfo.score.toString(), style = secondarySemiBoldHeadLineM)
                 Text(text = " · ", style = secondarySemiBoldHeadLineM)
                 Text(
-                    text = "${spotInfo.spotReviews.size} reviews",
+                    text = "${state.spotInfo.spotReviews.size} " + stringResource(id = R.string.reviews),
                     style = secondarySemiBoldHeadLineM
                 )
             }
@@ -514,13 +517,13 @@ fun SpotDetailContent(
                 contentPadding = PaddingValues(horizontal = 24.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                itemsIndexed(spotInfo.spotReviews) { _, review ->
+                itemsIndexed(state.spotInfo.spotReviews) { _, review ->
                     Box(
                         modifier = Modifier
                             .size(300.dp)
                             .border(1.dp, Color(0xFF999999), RoundedCornerShape(20.dp))
                             .clip(RoundedCornerShape(20.dp))
-                            .clickable { navigateTo("spot_review_screen/spotReference=${spotInfo.id}reviewReference=${review.id}") }
+                            .clickable { navigateTo("spot_review_screen/spotReference=${state.spotInfo.id}reviewReference=${review.id}") }
                     ) {
                         ConstraintLayout(
                             modifier = Modifier
@@ -605,9 +608,9 @@ fun SpotDetailContent(
                     .padding(horizontal = 24.dp)
                     .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround
             ) {
-                if (spotInfo.spotReviews.isEmpty()) {
+                if (state.spotInfo.spotReviews.isEmpty()) {
                     LargeLightButton(
-                        onClick = { navigateTo("add_spot_review_screen/spotReference=${spotInfo.id}") },
+                        onClick = { navigateTo("add_spot_review_screen/spotReference=${state.spotInfo.id}") },
                         text = R.string.be_first_to_review,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -622,13 +625,13 @@ fun SpotDetailContent(
                     IconButtonDark(
                         buttonIcon = Icons.Filled.Add,
                         description = R.string.add,
-                        onClick = { navigateTo("add_spot_review_screen/spotReference=${spotInfo.id}") },
+                        onClick = { navigateTo("add_spot_review_screen/spotReference=${state.spotInfo.id}") },
                         iconTint = Color.White
                     )
                 }
             }
             CustomSpacer(size = 24.dp)
-            Divider(
+            HorizontalDivider(
                 modifier = Modifier.padding(horizontal = 24.dp),
                 thickness = 1.dp,
                 color = Color(0xFF999999)
@@ -644,7 +647,7 @@ fun SpotDetailContent(
                 modifier = Modifier.padding(horizontal = 24.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                itemsIndexed(spotInfo.spotPosts) { _, post ->
+                itemsIndexed(state.spotInfo.spotPosts) { _, post ->
                     ImagePostCard(
                         cardSize = 250.dp,
                         postInfo = post,
@@ -658,9 +661,9 @@ fun SpotDetailContent(
                     .padding(horizontal = 24.dp)
                     .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround
             ) {
-                if (spotInfo.spotPosts.isEmpty()) {
+                if (state.spotInfo.spotPosts.isEmpty()) {
                     LargeLightButton(
-                        onClick = { navigateTo("add_post_screen/spotReference=${spotInfo.id}") },
+                        onClick = { navigateTo("add_post_screen/spotReference=${state.spotInfo.id}") },
                         text = R.string.be_first_to_post,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -675,7 +678,7 @@ fun SpotDetailContent(
                     IconButtonDark(
                         buttonIcon = Icons.Filled.Add,
                         description = R.string.add,
-                        onClick = { navigateTo("add_post_screen/spotReference=${spotInfo.id}") },
+                        onClick = { navigateTo("add_post_screen/spotReference=${state.spotInfo.id}") },
                         iconTint = Color.White
                     )
                 }
@@ -699,6 +702,5 @@ fun SpotDetailContent(
             )
         }
     }
-
 
 }

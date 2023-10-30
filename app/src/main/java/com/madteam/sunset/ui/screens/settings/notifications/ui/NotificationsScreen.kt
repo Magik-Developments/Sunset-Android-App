@@ -1,4 +1,4 @@
-package com.madteam.sunset.ui.screens.settings.notifications
+package com.madteam.sunset.ui.screens.settings.notifications.ui
 
 import android.Manifest
 import android.os.Build
@@ -35,6 +35,9 @@ import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.GoBackTopAppBar
 import com.madteam.sunset.ui.common.NotificationsPermissionDialog
 import com.madteam.sunset.ui.common.SunsetButton
+import com.madteam.sunset.ui.screens.settings.notifications.state.NotificationsUIEvent
+import com.madteam.sunset.ui.screens.settings.notifications.state.NotificationsUIState
+import com.madteam.sunset.ui.screens.settings.notifications.viewmodel.NotificationsViewModel
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineS
 import com.madteam.sunset.ui.theme.secondaryRegularBodyM
 import com.madteam.sunset.utils.hasNotificationsPermission
@@ -45,7 +48,7 @@ fun NotificationsScreen(
     viewModel: NotificationsViewModel = hiltViewModel()
 ) {
 
-    val showNotificationsPermissionDialog by viewModel.showNotificationsPermissionDialog.collectAsStateWithLifecycle()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
@@ -59,8 +62,14 @@ fun NotificationsScreen(
                 contentAlignment = Alignment.Center
             ) {
                 NotificationsContent(
-                    showNotificationsPermissionDialog = showNotificationsPermissionDialog,
-                    setShowNotificationsPermissionDialog = viewModel::setShowNotificationsPermissionDialog
+                    state = state,
+                    setShowNotificationsPermissionDialog = {
+                        viewModel.onEvent(
+                            NotificationsUIEvent.SetShowNotificationsPermissionDialog(
+                                it
+                            )
+                        )
+                    }
                 )
             }
         }
@@ -68,10 +77,9 @@ fun NotificationsScreen(
 
 }
 
-
 @Composable
 fun NotificationsContent(
-    showNotificationsPermissionDialog: Boolean,
+    state: NotificationsUIState,
     setShowNotificationsPermissionDialog: (Boolean) -> Unit
 ) {
 
@@ -96,7 +104,7 @@ fun NotificationsContent(
         }
     }
 
-    if (showNotificationsPermissionDialog && Build.VERSION.SDK_INT >= 33) {
+    if (state.showNotificationsPermissionDialog && Build.VERSION.SDK_INT >= 33) {
         NotificationsPermissionDialog {
             requestLocationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             setShowNotificationsPermissionDialog(false)

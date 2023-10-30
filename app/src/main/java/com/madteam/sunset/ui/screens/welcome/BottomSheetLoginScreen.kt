@@ -6,7 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.navigation.NavController
-import com.madteam.sunset.ui.screens.signin.BottomSheetSignInScreen
+import com.madteam.sunset.ui.screens.signin.ui.BottomSheetSignInScreen
 import com.madteam.sunset.ui.screens.signup.BottomSheetSignUpScreen
 import com.madteam.sunset.ui.screens.welcome.WelcomeScreenModalOptions.SIGN_IN
 import com.madteam.sunset.ui.screens.welcome.WelcomeScreenModalOptions.SIGN_UP

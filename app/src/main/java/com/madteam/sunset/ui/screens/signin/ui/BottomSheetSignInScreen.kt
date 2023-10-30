@@ -1,4 +1,4 @@
-package com.madteam.sunset.ui.screens.signin
+package com.madteam.sunset.ui.screens.signin.ui
 
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -9,13 +9,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,8 +24,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.google.firebase.auth.AuthResult
-import com.madteam.sunset.BuildConfig
 import com.madteam.sunset.R.string
 import com.madteam.sunset.navigation.SunsetRoutes
 import com.madteam.sunset.ui.common.CardHandler
@@ -41,6 +37,9 @@ import com.madteam.sunset.ui.common.OtherLoginIconButtons
 import com.madteam.sunset.ui.common.OtherLoginMethodsSection
 import com.madteam.sunset.ui.common.PasswordTextField
 import com.madteam.sunset.ui.common.SmallButtonDark
+import com.madteam.sunset.ui.screens.signin.state.SignInUIEvent
+import com.madteam.sunset.ui.screens.signin.state.SignInUIState
+import com.madteam.sunset.ui.screens.signin.viewmodel.SignInViewModel
 import com.madteam.sunset.utils.BackPressHandler
 import com.madteam.sunset.utils.Resource
 
@@ -54,8 +53,7 @@ fun BottomSheetSignInScreen(
     hideModal: () -> Unit
 ) {
 
-    val signInState by viewModel.signInState.collectAsStateWithLifecycle()
-    val isValidForm by viewModel.isValidForm.collectAsStateWithLifecycle()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     BackPressHandler {
         hideModal()
@@ -65,18 +63,17 @@ fun BottomSheetSignInScreen(
         modifier = Modifier
             .fillMaxWidth()
             .height((LocalConfiguration.current.screenHeightDp * CARD_HEIGHT).dp),
-        backgroundColor = Color(0xFFFFB600),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFB600)),
         shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp)
     ) {
         BottomSheetSignInContent(
-            signInState,
-            isValidForm,
-            isValidEmail = viewModel::isValidEmail,
+            state = state,
             modalOptions = modalOptions,
             navigateTo = navController::navigate,
-            validateForm = viewModel::isValidForm,
-            signInButton = viewModel::signInWithEmailAndPasswordIntent,
-            clearSignInState = viewModel::clearSignInState,
+            updateEmail = { viewModel.onEvent(SignInUIEvent.UpdateEmail(it)) },
+            updatePassword = { viewModel.onEvent(SignInUIEvent.UpdatePassword(it)) },
+            signInButton = { viewModel.onEvent(SignInUIEvent.SignInIntent) },
+            clearSignInState = { viewModel.onEvent(SignInUIEvent.ClearSignInState) },
             navController = navController
         )
     }
@@ -84,34 +81,16 @@ fun BottomSheetSignInScreen(
 
 @Composable
 fun BottomSheetSignInContent(
-    signInState: Resource<AuthResult?>,
-    isValidForm: Boolean,
-    isValidEmail: (String) -> Boolean,
+    state: SignInUIState,
+    updateEmail: (String) -> Unit,
+    updatePassword: (String) -> Unit,
     modalOptions: () -> Unit,
     navigateTo: (String) -> Unit,
-    validateForm: (String, String) -> Unit,
-    signInButton: (String, String) -> Unit,
+    signInButton: () -> Unit,
     clearSignInState: () -> Unit,
     navController: NavController
 ) {
     val context = LocalContext.current
-
-    var userValueText by remember { mutableStateOf("") }
-    var passwordTValueText by remember { mutableStateOf("") }
-    var invalidCredentials by remember { mutableStateOf(false) }
-
-    if (BuildConfig.DEBUG) {
-        userValueText = "adriafernandez14@gmail.com"
-        passwordTValueText = "abc.12345"
-
-        //userValueText = "adrifernandevs@gmail.com"
-        //passwordTValueText = "Abc.1234"
-
-        // userValueText = "oscarnav01@gmail.com"
-        // passwordTValueText = "1234abcd"
-
-        validateForm(userValueText, passwordTValueText)
-    }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -124,14 +103,12 @@ fun BottomSheetSignInContent(
         CardSubtitle(string.enter_details_below)
         CustomSpacer(size = 16.dp)
         EmailTextField(
-            emailValue = userValueText,
+            emailValue = state.email,
             onValueChange = { user ->
-                userValueText = user
-                validateForm(userValueText, passwordTValueText)
-                invalidCredentials = false
+                updateEmail(user)
             },
-            isError = (!isValidEmail(userValueText) && userValueText.isNotBlank() || invalidCredentials),
-            errorMessage = if (invalidCredentials) {
+            isError = !state.isValidEmail && state.email.isNotBlank() || state.invalidCredentials,
+            errorMessage = if (state.invalidCredentials) {
                 null
             } else {
                 string.not_valid_email_error
@@ -139,13 +116,11 @@ fun BottomSheetSignInContent(
         )
         CustomSpacer(size = 16.dp)
         PasswordTextField(
-            passwordValue = passwordTValueText, onValueChange = { password ->
-                passwordTValueText = password
-                validateForm(userValueText, passwordTValueText)
-                invalidCredentials = false
+            passwordValue = state.password, onValueChange = { password ->
+                updatePassword(password)
             },
-            isError = invalidCredentials,
-            errorMessage = if (invalidCredentials) {
+            isError = state.invalidCredentials,
+            errorMessage = if (state.invalidCredentials) {
                 string.invalid_email_or_password
             } else {
                 null
@@ -153,9 +128,9 @@ fun BottomSheetSignInContent(
         )
         CustomSpacer(size = 24.dp)
         SmallButtonDark(
-            onClick = { signInButton(userValueText, passwordTValueText) },
+            onClick = { signInButton() },
             text = string.sign_in,
-            enabled = isValidForm
+            enabled = state.isValidForm
         )
         CustomSpacer(size = 16.dp)
         ForgotPasswordText(onClick = { navigateTo(SunsetRoutes.LostPasswordScreen.route) })
@@ -172,7 +147,7 @@ fun BottomSheetSignInContent(
             secondMethod = { modalOptions() })
     }
 
-    when (signInState) {
+    when (state.signInState) {
         is Resource.Loading -> {
             Box(
                 contentAlignment = Alignment.TopCenter,
@@ -186,8 +161,8 @@ fun BottomSheetSignInContent(
         }
 
         is Resource.Success -> {
-            if (signInState.data != null && signInState.data.user!!.isEmailVerified) {
-                LaunchedEffect(key1 = signInState.data) {
+            if (state.signInState.data != null && state.signInState.data.user!!.isEmailVerified) {
+                LaunchedEffect(key1 = state.signInState.data) {
                     navController.navigate(SunsetRoutes.MyProfileScreen.route) {
                         popUpTo(navController.graph.id) {
                             inclusive = true
@@ -195,10 +170,10 @@ fun BottomSheetSignInContent(
                     }
                 }
                 clearSignInState()
-            } else if (signInState.data != null && !signInState.data.user!!.isEmailVerified) {
-                LaunchedEffect(key1 = signInState.data) {
+            } else if (state.signInState.data != null && !state.signInState.data.user!!.isEmailVerified) {
+                LaunchedEffect(key1 = state.signInState.data) {
                     navigateTo(
-                        "verify_account_screen/pass=${passwordTValueText}"
+                        "verify_account_screen/pass=${state.password}"
                     )
                 }
                 clearSignInState()
@@ -206,12 +181,9 @@ fun BottomSheetSignInContent(
         }
 
         is Resource.Error -> {
-            if (signInState.message == "The password is invalid or the user does not have a password.") {
-                invalidCredentials = true
-            } else {
-                Box(contentAlignment = Alignment.Center) {
-                    Toast.makeText(context, "${signInState.message}", Toast.LENGTH_SHORT).show()
-                }
+            Box(contentAlignment = Alignment.Center) {
+                Toast.makeText(context, "${state.signInState.message}", Toast.LENGTH_SHORT)
+                    .show()
             }
             clearSignInState()
         }

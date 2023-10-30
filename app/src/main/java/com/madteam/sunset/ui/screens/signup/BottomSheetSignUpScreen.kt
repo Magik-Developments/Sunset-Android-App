@@ -46,7 +46,7 @@ import com.madteam.sunset.ui.common.PasswordVisibilityOffIcon
 import com.madteam.sunset.ui.common.SmallButtonDark
 import com.madteam.sunset.ui.common.SuccessIcon
 import com.madteam.sunset.ui.common.UsernameTextField
-import com.madteam.sunset.ui.screens.signin.CARD_HEIGHT
+import com.madteam.sunset.ui.screens.signin.ui.CARD_HEIGHT
 import com.madteam.sunset.utils.BackPressHandler
 import com.madteam.sunset.utils.Resource
 

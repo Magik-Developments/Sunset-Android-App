@@ -1,4 +1,4 @@
-package com.madteam.sunset.ui.screens.myprofile
+package com.madteam.sunset.ui.screens.myprofile.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -15,31 +15,29 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue.Hidden
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CameraAlt
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.EditLocationAlt
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.madteam.sunset.R
-import com.madteam.sunset.data.model.Spot
-import com.madteam.sunset.data.model.SpotPost
-import com.madteam.sunset.data.model.UserProfile
 import com.madteam.sunset.navigation.SunsetRoutes
 import com.madteam.sunset.ui.common.BottomSheetSettingsMenu
 import com.madteam.sunset.ui.common.CustomSpacer
@@ -52,6 +50,9 @@ import com.madteam.sunset.ui.common.ProfilePostTypeTab
 import com.madteam.sunset.ui.common.SunsetBottomNavigation
 import com.madteam.sunset.ui.common.ThinButtonLight
 import com.madteam.sunset.ui.screens.editprofile.ui.BottomSheetEditProfileScreen
+import com.madteam.sunset.ui.screens.myprofile.state.MyProfileUIEvent
+import com.madteam.sunset.ui.screens.myprofile.state.MyProfileUIState
+import com.madteam.sunset.ui.screens.myprofile.viewmodel.MyProfileViewModel
 import com.madteam.sunset.ui.theme.secondaryRegularBodyL
 import com.madteam.sunset.ui.theme.secondaryRegularHeadlineS
 import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
@@ -66,20 +67,24 @@ fun MyProfileScreen(
 
     val coroutineScope = rememberCoroutineScope()
     val editProfileModalState =
-        ModalBottomSheetState(initialValue = Hidden, isSkipHalfExpanded = true)
+        ModalBottomSheetState(
+            initialValue = Hidden,
+            isSkipHalfExpanded = true,
+            density = LocalDensity.current
+        )
     val settingsModalState =
-        ModalBottomSheetState(initialValue = Hidden, isSkipHalfExpanded = true)
-    val userInfo by viewModel.userInfo.collectAsStateWithLifecycle()
-    val selectedTab by viewModel.selectedTab.collectAsStateWithLifecycle()
-    val userPosts by viewModel.userPosts.collectAsStateWithLifecycle()
-    val userSpots by viewModel.userSpots.collectAsStateWithLifecycle()
-    val showLogoutDialog by viewModel.showLogoutDialog.collectAsStateWithLifecycle()
+        ModalBottomSheetState(
+            initialValue = Hidden,
+            isSkipHalfExpanded = true,
+            density = LocalDensity.current
+        )
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     ModalBottomSheetLayout(
         sheetContent = {
             BottomSheetSettingsMenu(
-                onLogOutClick = { viewModel.setShowExitDialog(true) },
-                isUserAdmin = userInfo.admin,
+                onLogOutClick = { viewModel.onEvent(MyProfileUIEvent.ShowExitDialog(true)) },
+                isUserAdmin = state.userInfo.admin,
                 onReportsClick = { navController.navigate(SunsetRoutes.SeeReportsScreen.route) },
                 onNotificationsClick = { navController.navigate(SunsetRoutes.NotificationsScreen.route) }
             )
@@ -95,7 +100,7 @@ fun MyProfileScreen(
             sheetContent = {
                 BottomSheetEditProfileScreen(
                     onCloseButton = { coroutineScope.launch { editProfileModalState.hide() } },
-                    onProfileUpdated = viewModel::updateUserInfo
+                    onProfileUpdated = { viewModel.onEvent(MyProfileUIEvent.UpdateUserInfo(it)) }
                 )
             }
         ) {
@@ -103,7 +108,7 @@ fun MyProfileScreen(
                 bottomBar = { SunsetBottomNavigation(navController) },
                 topBar = {
                     MyProfileTopAppBar(
-                        username = userInfo.username,
+                        username = state.userInfo.username,
                         openMenuClick = { coroutineScope.launch { settingsModalState.show() } }
                     )
                 },
@@ -113,16 +118,18 @@ fun MyProfileScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         MyProfileContent(
-                            userInfo = userInfo,
+                            state = state,
                             onEditProfileClick = { coroutineScope.launch { editProfileModalState.show() } },
-                            selectedTab = selectedTab,
-                            onTabClicked = viewModel::onTabClicked,
-                            userPosts = userPosts,
-                            userSpots = userSpots,
+                            onTabClicked = { viewModel.onEvent(MyProfileUIEvent.TabClicked(it)) },
                             navigateTo = navController::navigate,
-                            showLogoutDialog = showLogoutDialog,
-                            setShowLogoutDialog = viewModel::setShowExitDialog,
-                            logOut = viewModel::logOut
+                            setShowLogoutDialog = {
+                                viewModel.onEvent(
+                                    MyProfileUIEvent.ShowExitDialog(
+                                        it
+                                    )
+                                )
+                            },
+                            logOut = { viewModel.onEvent(MyProfileUIEvent.LogOut) }
                         )
                     }
                 }
@@ -134,19 +141,15 @@ fun MyProfileScreen(
 
 @Composable
 fun MyProfileContent(
-    userInfo: UserProfile,
+    state: MyProfileUIState,
     onEditProfileClick: () -> Unit,
-    selectedTab: Int,
     onTabClicked: (Int) -> Unit,
-    userPosts: List<SpotPost>,
-    userSpots: List<Spot>,
     navigateTo: (String) -> Unit,
-    showLogoutDialog: Boolean,
     setShowLogoutDialog: (Boolean) -> Unit,
     logOut: () -> Unit
 ) {
 
-    if (showLogoutDialog) {
+    if (state.showLogoutDialog) {
         DismissAndPositiveDialog(
             setShowDialog = { setShowLogoutDialog(it) },
             dialogTitle = R.string.log_out,
@@ -170,11 +173,11 @@ fun MyProfileContent(
             .background(Color.White)
     ) {
         CustomSpacer(size = 16.dp)
-        ProfileImage(imageUrl = userInfo.image, size = 80.dp)
+        ProfileImage(imageUrl = state.userInfo.image, size = 80.dp)
         CustomSpacer(size = 16.dp)
-        if (userInfo.name.isNotBlank()) {
+        if (state.userInfo.name.isNotBlank()) {
             Text(
-                text = userInfo.name,
+                text = state.userInfo.name,
                 style = secondarySemiBoldHeadLineS,
                 color = Color(0xFF333333)
             )
@@ -203,9 +206,9 @@ fun MyProfileContent(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            if (userInfo.location.isNotBlank()) {
+            if (state.userInfo.location.isNotBlank()) {
                 Text(
-                    text = userInfo.location,
+                    text = state.userInfo.location,
                     style = secondaryRegularHeadlineS,
                     color = Color(0xFF333333)
                 )
@@ -232,21 +235,20 @@ fun MyProfileContent(
             ThinButtonLight(onClick = onEditProfileClick, text = R.string.edit_profile)
         }
         CustomSpacer(size = 8.dp)
-        // FollowsUserStates() TODO: User states won't be displayed until it has been developed
         CustomSpacer(size = 24.dp)
         ProfilePostTypeTab(
             tabOptions = listOf("Posts", "Spots"),
-            selectedTab = selectedTab,
+            selectedTab = state.selectedTab,
             tabOnClick = { onTabClicked(it) }
         )
         CustomSpacer(size = 8.dp)
-        when (selectedTab) {
+        when (state.selectedTab) {
             0 -> {
-                if (userPosts.isNotEmpty()) {
+                if (state.userPosts.isNotEmpty()) {
                     LazyVerticalGrid(
                         columns = GridCells.Fixed(2),
                         content = {
-                            itemsIndexed(userPosts) { _, post ->
+                            itemsIndexed(state.userPosts) { _, post ->
                                 ImagePostCardProfile(
                                     postInfo = post,
                                     onItemClicked = {
@@ -282,11 +284,11 @@ fun MyProfileContent(
             }
 
             1 -> {
-                if (userSpots.isNotEmpty()) {
+                if (state.userSpots.isNotEmpty()) {
                     LazyVerticalGrid(
                         columns = GridCells.Fixed(2),
                         content = {
-                            itemsIndexed(userSpots) { _, spot ->
+                            itemsIndexed(state.userSpots) { _, spot ->
                                 ImageSpotCardProfile(
                                     spotInfo = spot,
                                     onItemClicked = {

@@ -1,4 +1,4 @@
-package com.madteam.sunset.ui.screens.signup
+package com.madteam.sunset.ui.screens.signup.ui
 
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -13,9 +13,6 @@ import androidx.compose.material.Card
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,12 +20,10 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.google.firebase.auth.AuthResult
 import com.madteam.sunset.R
 import com.madteam.sunset.R.string
 import com.madteam.sunset.ui.common.CardHandler
@@ -47,6 +42,9 @@ import com.madteam.sunset.ui.common.SmallButtonDark
 import com.madteam.sunset.ui.common.SuccessIcon
 import com.madteam.sunset.ui.common.UsernameTextField
 import com.madteam.sunset.ui.screens.signin.ui.CARD_HEIGHT
+import com.madteam.sunset.ui.screens.signup.state.SignUpUIEvent
+import com.madteam.sunset.ui.screens.signup.state.SignUpUIState
+import com.madteam.sunset.ui.screens.signup.viewmodel.SignUpViewModel
 import com.madteam.sunset.utils.BackPressHandler
 import com.madteam.sunset.utils.Resource
 
@@ -60,8 +58,7 @@ fun BottomSheetSignUpScreen(
     hideModal: () -> Unit
 ) {
 
-    val signUpState by viewModel.signUpState.collectAsStateWithLifecycle()
-    val isValidForm by viewModel.isValidForm.collectAsStateWithLifecycle()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     BackPressHandler {
         hideModal()
@@ -75,47 +72,41 @@ fun BottomSheetSignUpScreen(
         shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp)
     ) {
         BottomSheetSignUpContent(
-            signUpState = signUpState,
-            isValidForm = isValidForm,
+            state = state,
             modalOptions = modalOptions,
-            isValidEmail = viewModel::isEmailValid,
-            isValidUsername = viewModel::isUsernameValid,
-            acceptDialogClicked = viewModel::signUpIntent,
-            validateForm = viewModel::isValidForm,
-            navigateTo = navController::navigate,
-            clearSignUpState = viewModel::clearSignUpState
+            setShowDialog = { viewModel.onEvent(SignUpUIEvent.SetShowDialog(it)) },
+            updateEmail = { viewModel.onEvent(SignUpUIEvent.UpdateEmail(it)) },
+            updatePassword = { viewModel.onEvent(SignUpUIEvent.UpdatePassword(it)) },
+            updateUsername = { viewModel.onEvent(SignUpUIEvent.UpdateUsername(it)) },
+            acceptDialogClicked = { viewModel.onEvent(SignUpUIEvent.SignUpIntent) },
+            clearSignUpState = { viewModel.onEvent(SignUpUIEvent.ClearSignUpState) },
+            navigateTo = navController::navigate
         )
     }
 }
 
 @Composable
 fun BottomSheetSignUpContent(
-    signUpState: Resource<AuthResult?>,
-    isValidForm: Boolean,
+    state: SignUpUIState,
+    updateEmail: (String) -> Unit,
+    updatePassword: (String) -> Unit,
+    updateUsername: (String) -> Unit,
     modalOptions: () -> Unit,
-    isValidEmail: (String) -> Boolean,
-    isValidUsername: (String) -> Boolean,
-    acceptDialogClicked: (String, String, String) -> Unit,
-    validateForm: (String, String, String) -> Unit,
+    acceptDialogClicked: () -> Unit,
     navigateTo: (String) -> Unit,
-    clearSignUpState: () -> Unit
+    clearSignUpState: () -> Unit,
+    setShowDialog: (Boolean) -> Unit,
 ) {
 
     val context = LocalContext.current
     val uriHandler = LocalUriHandler.current
-    var showDialog by remember { mutableStateOf(false) }
-    var usernameValueText by remember { mutableStateOf("") }
-    var passwordValueText by remember { mutableStateOf("") }
-    var emailValueText by remember { mutableStateOf("") }
-    var userAlreadyExists by remember { mutableStateOf(false) }
-    var emailAlreadyInUse by remember { mutableStateOf(false) }
 
-    if (showDialog) {
+    if (state.showDialog) {
         DismissAndPositiveDialog(
-            setShowDialog = { showDialog = it },
+            setShowDialog = { setShowDialog(it) },
             dismissClickedAction = {
                 uriHandler.openUri(POLICIES_URL)
-                showDialog = false
+                setShowDialog(false)
             },
             dismissButtonText = string.read_policies,
             positiveButtonText = string.sign_up,
@@ -123,8 +114,8 @@ fun BottomSheetSignUpContent(
             dialogDescription = string.privacy_dialog_description,
             image = R.drawable.sunset_vectorial_art_01,
             positiveClickedAction = {
-                acceptDialogClicked(emailValueText, passwordValueText, usernameValueText)
-                showDialog = false
+                acceptDialogClicked()
+                setShowDialog(false)
             })
     }
 
@@ -139,60 +130,55 @@ fun BottomSheetSignUpContent(
         CardSubtitle(string.no_day_without_sunset)
         CustomSpacer(size = 8.dp)
         EmailTextField(
-            emailValue = emailValueText,
+            emailValue = state.email,
             onValueChange = { email ->
-                emailValueText = email
-                validateForm(emailValueText, passwordValueText, usernameValueText)
-                emailAlreadyInUse = false
+                updateEmail(email)
             },
-            isError = (!isValidEmail(emailValueText) && emailValueText.isNotBlank() || emailAlreadyInUse),
-            errorMessage = if (emailAlreadyInUse) {
+            isError = (!state.isEmailValid && state.email.isNotBlank() || state.emailAlreadyInUse),
+            errorMessage = if (state.emailAlreadyInUse) {
                 string.email_already_used
             } else {
                 string.not_valid_email_error
             },
             endIcon = {
-                if (isValidEmail(emailValueText) && !emailAlreadyInUse) SuccessIcon() else if (emailValueText.isNotBlank()) {
+                if (state.isEmailValid && !state.emailAlreadyInUse) SuccessIcon() else if (state.email.isNotBlank()) {
                     ErrorIcon()
                 }
             }
         )
         CustomSpacer(size = 16.dp)
         PasswordTextField(
-            passwordValue = passwordValueText,
+            passwordValue = state.password,
             onValueChange = { password ->
-                passwordValueText = password
-                validateForm(emailValueText, passwordValueText, usernameValueText)
+                updatePassword(password)
             },
-            isError = (passwordValueText.length < 7 && passwordValueText.isNotBlank()),
+            isError = (state.password.length < 7 && state.password.isNotBlank()),
             errorMessage = string.not_valid_password,
             endIcon = { PasswordVisibilityOffIcon() }
         )
         CustomSpacer(size = 16.dp)
         UsernameTextField(
-            usernameValue = usernameValueText,
+            usernameValue = state.username,
             onValueChange = { username ->
-                usernameValueText = username
-                validateForm(emailValueText, passwordValueText, usernameValueText)
-                userAlreadyExists = false
+                updateUsername(username)
             },
-            isError = (!isValidUsername(usernameValueText) && usernameValueText.isNotBlank() || userAlreadyExists),
-            errorMessage = if (userAlreadyExists) {
+            isError = (!state.isUsernameValid && state.username.isNotBlank() || state.usernameAlreadyInUse),
+            errorMessage = if (state.usernameAlreadyInUse) {
                 string.user_already_exists
             } else {
                 string.not_valid_username
             },
             endIcon = {
-                if (isValidUsername(usernameValueText) && !userAlreadyExists) SuccessIcon() else if (usernameValueText.isNotBlank()) {
+                if (state.isUsernameValid && !state.usernameAlreadyInUse) SuccessIcon() else if (state.username.isNotBlank()) {
                     ErrorIcon()
                 }
             }
         )
         CustomSpacer(size = 24.dp)
         SmallButtonDark(
-            onClick = { showDialog = true },
+            onClick = { setShowDialog(true) },
             text = string.sign_up,
-            enabled = isValidForm && !userAlreadyExists && !emailAlreadyInUse
+            enabled = state.isValidForm && !state.usernameAlreadyInUse && !state.emailAlreadyInUse
         )
         CustomSpacer(size = 16.dp)
         OtherLoginMethodsSection(string.already_have_an_account)
@@ -203,7 +189,7 @@ fun BottomSheetSignUpContent(
         )
     }
 
-    when (signUpState) {
+    when (state.signUpState) {
         is Resource.Loading -> {
             Box(
                 contentAlignment = Alignment.TopCenter,
@@ -217,28 +203,18 @@ fun BottomSheetSignUpContent(
         }
 
         is Resource.Success -> {
-            if (signUpState.data != null) {
-                LaunchedEffect(key1 = signUpState.data) {
+            if (state.signUpState.data != null) {
+                LaunchedEffect(key1 = state.signUpState.data) {
                     navigateTo(
-                        "verify_account_screen/pass=${passwordValueText}"
+                        "verify_account_screen/pass=${state.password}"
                     )
                     clearSignUpState()
                 }
             }
         }
 
-        is Resource.Error -> {
-            if (signUpState.message == "e_user_already_exists") {
-                userAlreadyExists = true
-            } else if (signUpState.message == "The email address is already in use by another account.") {
-                emailAlreadyInUse = true
-            }
-            clearSignUpState()
+        else -> {
+            // Do nothing
         }
     }
-}
-
-@Preview(showSystemUi = true)
-@Composable
-fun BottomSheetSignUpPreview() {
 }

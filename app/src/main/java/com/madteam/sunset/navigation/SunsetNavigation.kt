@@ -25,7 +25,7 @@ import com.madteam.sunset.ui.screens.home.ui.HomeScreen
 import com.madteam.sunset.ui.screens.lostpassword.ui.LostPasswordScreen
 import com.madteam.sunset.ui.screens.myprofile.ui.MyProfileScreen
 import com.madteam.sunset.ui.screens.post.ui.PostScreen
-import com.madteam.sunset.ui.screens.review.PostReviewScreen
+import com.madteam.sunset.ui.screens.review.ui.PostReviewScreen
 import com.madteam.sunset.ui.screens.seereports.SeeReportsScreen
 import com.madteam.sunset.ui.screens.selectLocation.SelectLocationScreen
 import com.madteam.sunset.ui.screens.settings.notifications.NotificationsScreen

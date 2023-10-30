@@ -31,7 +31,7 @@ import com.madteam.sunset.ui.screens.selectLocation.ui.SelectLocationScreen
 import com.madteam.sunset.ui.screens.settings.notifications.ui.NotificationsScreen
 import com.madteam.sunset.ui.screens.spotdetail.ui.SpotDetailScreen
 import com.madteam.sunset.ui.screens.sunsetprediction.ui.SunsetPredictionScreen
-import com.madteam.sunset.ui.screens.verifyaccount.VerifyAccountScreen
+import com.madteam.sunset.ui.screens.verifyaccount.ui.VerifyAccountScreen
 import com.madteam.sunset.ui.screens.welcome.WelcomeScreen
 
 @Composable

@@ -1,4 +1,4 @@
-package com.madteam.sunset.ui.screens.lostpassword
+package com.madteam.sunset.ui.screens.lostpassword.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -7,12 +7,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Snackbar
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,6 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -37,6 +38,8 @@ import com.madteam.sunset.ui.common.EmailTextField
 import com.madteam.sunset.ui.common.ErrorIcon
 import com.madteam.sunset.ui.common.SmallButtonDark
 import com.madteam.sunset.ui.common.SuccessIcon
+import com.madteam.sunset.ui.screens.lostpassword.state.LostPasswordUIEvent
+import com.madteam.sunset.ui.screens.lostpassword.viewmodel.LostPasswordViewModel
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineL
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineS
 import com.madteam.sunset.ui.theme.primaryMediumHeadlineXS
@@ -47,12 +50,12 @@ fun LostPasswordScreen(
     viewModel: LostPasswordViewModel = hiltViewModel()
 ) {
 
-    val isValidForm by viewModel.isValidForm.collectAsStateWithLifecycle()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     LostPasswordContent(
-        isValidForm = isValidForm,
-        validateForm = viewModel::validateForm,
-        sendButton = viewModel::resetPasswordWithEmailIntent,
+        isValidForm = state.isValidForm,
+        validateForm = { viewModel.onEvent(LostPasswordUIEvent.ValidateForm(it)) },
+        sendButton = { viewModel.onEvent(LostPasswordUIEvent.ResetPasswordWithEmailIntent(it)) },
         navigateTo = navController::navigate
     )
 }
@@ -82,7 +85,7 @@ fun LostPasswordContent(
             onClick = { navigateTo(SunsetRoutes.WelcomeScreen.route) }
         ) {
             Icon(
-                imageVector = Icons.Outlined.ArrowBack,
+                imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
                 contentDescription = "Arrow back icon",
                 modifier = Modifier
                     .width(32.dp)
@@ -93,13 +96,19 @@ fun LostPasswordContent(
         LottieAnimation(
             modifier = Modifier
                 .height(250.dp)
-                .width(250.dp), composition = animComposition, iterations = LottieConstants.IterateForever
+                .width(250.dp),
+            composition = animComposition,
+            iterations = LottieConstants.IterateForever
         )
         CustomSpacer(size = 80.dp)
-        Text(text = "Lost your password?", style = primaryBoldHeadlineL, color = Color(0xFF333333))
+        Text(
+            text = stringResource(id = R.string.lost_password),
+            style = primaryBoldHeadlineL,
+            color = Color(0xFF333333)
+        )
         CustomSpacer(size = 24.dp)
         Text(
-            text = "Enter the email address below and receive a link to reset your password",
+            text = stringResource(id = R.string.lost_password_enter_email),
             style = primaryBoldHeadlineS,
             color = Color(0xFF999999),
             textAlign = TextAlign.Center
@@ -125,9 +134,9 @@ fun LostPasswordContent(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             if (emailSent) {
-                Snackbar(backgroundColor = Color(0xFFFFB600)) {
+                Snackbar(containerColor = Color(0xFFFFB600)) {
                     Text(
-                        text = "Email sent 🥳 Follow the instructions to reset your password",
+                        text = stringResource(id = R.string.lost_password_email_sent),
                         style = primaryMediumHeadlineXS,
                         color = Color.White
                     )
@@ -136,7 +145,7 @@ fun LostPasswordContent(
                 SmallButtonDark(onClick = {
                     sendButton(emailValueText)
                     emailSent = true
-                }, text = R.string.send_link, enabled = isValidForm && !emailSent)
+                }, text = R.string.send_link, enabled = isValidForm)
             }
             CustomSpacer(size = 24.dp)
         }

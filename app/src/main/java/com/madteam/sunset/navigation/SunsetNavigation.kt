@@ -22,7 +22,7 @@ import com.madteam.sunset.ui.screens.comments.viewmodel.CommentsScreen
 import com.madteam.sunset.ui.screens.discover.ui.DiscoverScreen
 import com.madteam.sunset.ui.screens.editspot.ui.EditSpotScreen
 import com.madteam.sunset.ui.screens.home.ui.HomeScreen
-import com.madteam.sunset.ui.screens.lostpassword.LostPasswordScreen
+import com.madteam.sunset.ui.screens.lostpassword.ui.LostPasswordScreen
 import com.madteam.sunset.ui.screens.myprofile.MyProfileScreen
 import com.madteam.sunset.ui.screens.post.PostScreen
 import com.madteam.sunset.ui.screens.review.PostReviewScreen

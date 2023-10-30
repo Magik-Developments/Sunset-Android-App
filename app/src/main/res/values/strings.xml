@@ -139,14 +139,17 @@
     <string name="notifications">Notifications</string>
     <string name="sunsets">Sunsets</string>
     <string name="sunsets_notifications">Never miss a Sunset again! Be notificated when the time approaches.</string>
-    <string name="enable_notifications">Enable notifications</string>
-    <string name="enable_notifications_title">Don\'t miss a Sunset!</string>
-    <string name="enable_notifications_description">Enable notifications permission on your device to get advised of Sunsets, events, recommendations and more! You can manage which notifications want to receive on your profile settings.</string>
-    <string name="sunsets_notifications_channel_id">sunsets_notifications_channel_id</string>
-    <string name="sunsets_notices">Sunsets notices</string>
-    <string name="others">Others</string>
-    <string name="default_notification_channel_id">com.madteam.sunset.sunsetsnotifications</string>
-    <string name="max_images_toast">Maximum 8 images</string>
-    <string name="generic_error">Error, try again later</string>
-    <string name="add_images_spot">Add amazing photos of this Spot</string>
+  <string name="enable_notifications">Enable notifications</string>
+  <string name="enable_notifications_title">Don\'t miss a Sunset!</string>
+  <string name="enable_notifications_description">Enable notifications permission on your device to get advised of Sunsets, events, recommendations and more! You can manage which notifications want to receive on your profile settings.</string>
+  <string name="sunsets_notifications_channel_id">sunsets_notifications_channel_id</string>
+  <string name="sunsets_notices">Sunsets notices</string>
+  <string name="others">Others</string>
+  <string name="default_notification_channel_id">com.madteam.sunset.sunsetsnotifications</string>
+  <string name="max_images_toast">Maximum 8 images</string>
+  <string name="generic_error">Error, try again later</string>
+  <string name="add_images_spot">Add amazing photos of this Spot</string>
+  <string name="lost_password_email_sent">Email sent 🥳 Follow the instructions to reset your password</string>
+  <string name="lost_password_enter_email">Enter the email address below and receive a link to reset your password</string>
+  <string name="lost_password">Lost your password?</string>
 </resources>

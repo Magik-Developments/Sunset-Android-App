@@ -1,4 +1,4 @@
-package com.madteam.sunset.ui.screens.post
+package com.madteam.sunset.ui.screens.post.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -13,7 +13,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,10 +23,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
@@ -42,6 +41,9 @@ import com.madteam.sunset.ui.common.RoundedLightGoToSpotButton
 import com.madteam.sunset.ui.common.RoundedLightLikeButton
 import com.madteam.sunset.ui.common.RoundedLightSaveButton
 import com.madteam.sunset.ui.common.RoundedLightSendButton
+import com.madteam.sunset.ui.screens.post.state.PostUIEvent
+import com.madteam.sunset.ui.screens.post.state.PostUIState
+import com.madteam.sunset.ui.screens.post.viewmodel.PostViewModel
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineXS
 import com.madteam.sunset.ui.theme.secondaryRegularBodyM
 import com.madteam.sunset.ui.theme.secondaryRegularBodyS
@@ -58,10 +60,8 @@ fun PostScreen(
     navController: NavController
 ) {
 
-    viewModel.setPostReference("posts/$postReference")
-    val postInfo by viewModel.postInfo.collectAsState()
-    val isPostLikedByUser by viewModel.postIsLiked.collectAsState()
-    val postLikes by viewModel.postLikes.collectAsState()
+    viewModel.onEvent(PostUIEvent.SetPostReference("posts/$postReference"))
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
@@ -75,12 +75,9 @@ fun PostScreen(
                 contentAlignment = Alignment.Center
             ) {
                 PostContent(
-                    postInfo = postInfo,
+                    state = state,
                     navigateTo = navController::navigate,
-                    navController = navController,
-                    postLikeClick = viewModel::modifyUserPostLike,
-                    postLikedByUser = isPostLikedByUser,
-                    postLikes = postLikes
+                    postLikeClick = { viewModel.onEvent(PostUIEvent.ModifyUserPostLike) }
                 )
             }
         }
@@ -90,24 +87,21 @@ fun PostScreen(
 @OptIn(ExperimentalPagerApi::class, ExperimentalGlideComposeApi::class)
 @Composable
 fun PostContent(
-    postInfo: SpotPost,
-    postLikedByUser: Boolean,
-    navController: NavController,
+    state: PostUIState,
     navigateTo: (String) -> Unit,
     postLikeClick: () -> Unit,
-    postLikes: Int
 ) {
     val scrollState = rememberScrollState()
     val showShimmer = remember { mutableStateOf(true) }
     val context = LocalContext.current
 
-    val deepLinkToShare = generateDeepLink(screen = "post", postInfo.id)
+    val deepLinkToShare = generateDeepLink(screen = "post", state.postInfo.id)
     val shareText = stringResource(
         id = R.string.share_post_text,
-        postInfo.author.username
+        state.postInfo.author.username
     ) + " $deepLinkToShare"
 
-    if (postInfo != SpotPost()) {
+    if (state.postInfo != SpotPost()) {
         showShimmer.value = false
     }
 
@@ -120,10 +114,10 @@ fun PostContent(
         ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
             val (spotImage, saveIconButton, sendIconButton, likeIconButton, spotIconButton) = createRefs()
             AutoSlidingCarousel(
-                itemsCount = postInfo.images.size,
+                itemsCount = state.postInfo.images.size,
                 itemContent = { index ->
                     GlideImage(
-                        model = postInfo.images[index],
+                        model = state.postInfo.images[index],
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.background(shimmerBrush(targetValue = 2000f))
@@ -144,7 +138,7 @@ fun PostContent(
                 onClick = {
                     navigateTo(
                         "spot_detail_screen/spotReference=${
-                            postInfo.spotRef.substringAfter(
+                            state.postInfo.spotRef.substringAfter(
                                 "/"
                             )
                         }"
@@ -174,21 +168,21 @@ fun PostContent(
             }, modifier = Modifier.constrainAs(likeIconButton) {
                 end.linkTo(parent.end, 24.dp)
                 bottom.linkTo(parent.bottom, 16.dp)
-            }, isLiked = postLikedByUser)
+            }, isLiked = state.postIsLiked)
         }
 
         //Post author user information
         ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
             val (spotterImage, postedByTitle, postedByUsername, createdDate) = createRefs()
             ProfileImage(
-                imageUrl = postInfo.author.image,
+                imageUrl = state.postInfo.author.image,
                 size = 56.dp,
                 modifier = Modifier.constrainAs(spotterImage) {
                     start.linkTo(parent.start, 24.dp)
                     top.linkTo(parent.top, (-16).dp)
                 })
             Text(
-                text = "Posted by",
+                text = stringResource(id = R.string.posted_by),
                 style = secondaryRegularBodyS,
                 modifier = Modifier.constrainAs(postedByTitle) {
                     top.linkTo(parent.top, 4.dp)
@@ -198,7 +192,7 @@ fun PostContent(
                 text = if (showShimmer.value) {
                     ""
                 } else {
-                    "@${postInfo.author.username}"
+                    "@${state.postInfo.author.username}"
                 },
                 style = primaryBoldHeadlineXS,
                 modifier = Modifier
@@ -212,7 +206,7 @@ fun PostContent(
                 text = if (showShimmer.value) {
                     ""
                 } else {
-                    "created " + formatDate(postInfo.creation_date)
+                    stringResource(id = R.string.created) + formatDate(state.postInfo.creation_date)
                 },
                 style = secondaryRegularBodyS,
                 color = Color(0xFF333333),
@@ -227,9 +221,9 @@ fun PostContent(
         }
         CustomSpacer(size = 24.dp)
         //Post description
-        if (postInfo.description.isNotBlank()) {
+        if (state.postInfo.description.isNotBlank()) {
             Text(
-                text = postInfo.description,
+                text = state.postInfo.description,
                 maxLines = 10,
                 overflow = TextOverflow.Ellipsis,
                 style = secondaryRegularBodyM,
@@ -242,27 +236,24 @@ fun PostContent(
         }
 
         Text(
-            text = "$postLikes likes",
+            text = "${state.postLikes}" + stringResource(id = R.string.likes),
             style = secondarySemiBoldBodyM,
             modifier = Modifier.padding(horizontal = 24.dp)
         )
         CustomSpacer(size = 4.dp)
         Text(
-            text = if (postInfo.comments.isNotEmpty()) {
-                "View all ${postInfo.comments.size} comments"
+            text = if (state.postInfo.comments.isNotEmpty()) {
+                stringResource(id = R.string.view_all) + "${state.postInfo.comments.size}" + stringResource(
+                    id = R.string.comments
+                )
             } else {
-                "Be the first to comment"
+                stringResource(id = R.string.be_the_first_to_comment)
             },
             modifier = Modifier
                 .padding(horizontal = 24.dp)
-                .clickable { navigateTo("comments_screen/postReference=${postInfo.id}") },
+                .clickable { navigateTo("comments_screen/postReference=${state.postInfo.id}") },
             color = Color(0xFF999999)
         )
 
     }
-}
-
-@Preview(showSystemUi = true)
-@Composable
-fun PostContentPreview() {
 }

@@ -1,4 +1,4 @@
-package com.madteam.sunset.ui.screens.sunsetprediction
+package com.madteam.sunset.ui.screens.sunsetprediction.ui
 
 import android.Manifest
 import android.content.Intent
@@ -60,7 +60,6 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.google.android.gms.maps.model.LatLng
 import com.madteam.sunset.R
-import com.madteam.sunset.data.model.SunsetTimeResponse
 import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.LargeDarkButton
 import com.madteam.sunset.ui.common.LocationPermissionDialog
@@ -68,6 +67,9 @@ import com.madteam.sunset.ui.common.SunsetBottomNavigation
 import com.madteam.sunset.ui.common.SunsetButton
 import com.madteam.sunset.ui.common.SunsetPhasesInfoDialog
 import com.madteam.sunset.ui.common.SunsetQualityInfoDialog
+import com.madteam.sunset.ui.screens.sunsetprediction.state.SunsetPredictionUIEvent
+import com.madteam.sunset.ui.screens.sunsetprediction.state.SunsetPredictionUIState
+import com.madteam.sunset.ui.screens.sunsetprediction.viewmodel.SunsetPredictionViewModel
 import com.madteam.sunset.ui.theme.primaryBoldDisplayM
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineM
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineS
@@ -89,16 +91,7 @@ fun SunsetPredictionScreen(
     selectedLocation: LatLng = LatLng(0.0, 0.0)
 ) {
 
-    val showLocationPermissionDialog by viewModel.showLocationPermissionDialog.collectAsStateWithLifecycle()
-    val userLocality by viewModel.userLocality.collectAsStateWithLifecycle()
-    val sunsetTimeInformation by viewModel.sunsetTimeInformation.collectAsStateWithLifecycle()
-    val phasesInfoDialog by viewModel.phasesInfoDialog.collectAsStateWithLifecycle()
-    val sunsetScore by viewModel.sunsetScore.collectAsStateWithLifecycle()
-    val sunsetTemperature by viewModel.sunsetTemperature.collectAsStateWithLifecycle()
-    val qualityInfoDialog by viewModel.qualityInfoDialog.collectAsStateWithLifecycle()
-    val userLocation by viewModel.userLocation.collectAsStateWithLifecycle()
-    val informationDate by viewModel.informationDate.collectAsStateWithLifecycle()
-    val connectionError by viewModel.connectionError.collectAsStateWithLifecycle()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(selectedLocation) {
         viewModel.updateUserLocation(selectedLocation)
@@ -112,25 +105,30 @@ fun SunsetPredictionScreen(
                 contentAlignment = Alignment.Center
             ) {
                 SunsetPredictionContent(
-                    showLocationPermissionDialog = showLocationPermissionDialog,
-                    setShowLocationPermissionDialog = viewModel::showLocationPermissionDialog,
-                    updateUserLocation = viewModel::updateUserLocation,
-                    userLocality = userLocality,
-                    sunsetTimeInformation = sunsetTimeInformation,
-                    setPhasesInfoDialog = viewModel::setPhasesInfoDialog,
-                    phasesInfoDialog = phasesInfoDialog,
-                    sunsetScore = sunsetScore,
-                    sunsetTemperature = sunsetTemperature,
-                    qualityInfoDialog = qualityInfoDialog,
-                    setQualityInfoDialog = viewModel::setQualityInfoDialog,
+                    state = state,
                     navigateTo = navController::navigate,
-                    userLocation = userLocation,
                     selectedLocation = selectedLocation,
-                    setPreviousDayPrediction = viewModel::setPreviousDayPrediction,
-                    setNextDayPrediction = viewModel::setNextDayPrediction,
-                    informationDate = informationDate,
-                    connectionError = connectionError,
-                    retryCall = viewModel::updateUserLocation
+                    setShowLocationPermissionDialog = {
+                        viewModel.onEvent(
+                            SunsetPredictionUIEvent.ShowLocationPermissionDialog(
+                                it
+                            )
+                        )
+                    },
+                    updateUserLocation = { location ->
+                        viewModel.onEvent(SunsetPredictionUIEvent.UpdateUserLocation(location))
+                    },
+                    setPhasesInfoDialog = { phasesInfo ->
+                        viewModel.onEvent(SunsetPredictionUIEvent.SetPhasesInfoDialog(phasesInfo))
+                    },
+                    setQualityInfoDialog = { qualityInfo ->
+                        viewModel.onEvent(SunsetPredictionUIEvent.SetQualityInfoDialog(qualityInfo))
+                    },
+                    setPreviousDayPrediction = { viewModel.onEvent(SunsetPredictionUIEvent.SetPreviousDayPrediction) },
+                    setNextDayPrediction = { viewModel.onEvent(SunsetPredictionUIEvent.SetNextDayPrediction) },
+                    retryCall = { location ->
+                        viewModel.onEvent(SunsetPredictionUIEvent.UpdateUserLocation(location))
+                    }
                 )
             }
         }
@@ -139,24 +137,15 @@ fun SunsetPredictionScreen(
 
 @Composable
 fun SunsetPredictionContent(
-    showLocationPermissionDialog: Boolean,
+    state: SunsetPredictionUIState,
+    selectedLocation: LatLng,
     setShowLocationPermissionDialog: (Boolean) -> Unit,
     updateUserLocation: (LatLng) -> Unit,
-    userLocality: String,
-    sunsetTimeInformation: SunsetTimeResponse,
     setPhasesInfoDialog: (String) -> Unit,
-    phasesInfoDialog: String,
-    sunsetScore: Int,
-    sunsetTemperature: Double,
-    qualityInfoDialog: Int,
     setQualityInfoDialog: (Int) -> Unit,
     navigateTo: (String) -> Unit,
-    userLocation: LatLng,
-    selectedLocation: LatLng,
     setPreviousDayPrediction: () -> Unit,
     setNextDayPrediction: () -> Unit,
-    informationDate: String,
-    connectionError: Boolean,
     retryCall: (LatLng) -> Unit
 ) {
 
@@ -191,25 +180,25 @@ fun SunsetPredictionContent(
         }
     }
 
-    if (showLocationPermissionDialog) {
+    if (state.showLocationPermissionDialog) {
         LocationPermissionDialog {
             requestLocationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
             setShowLocationPermissionDialog(false)
         }
     }
 
-    if (phasesInfoDialog.isNotBlank()) {
+    if (state.phasesInfoDialog.isNotBlank()) {
         SunsetPhasesInfoDialog(
-            phase = phasesInfoDialog,
+            phase = state.phasesInfoDialog,
             setShowDialog = {
                 setPhasesInfoDialog("")
             }
         )
     }
 
-    if (qualityInfoDialog != -1) {
+    if (state.qualityInfoDialog != -1) {
         SunsetQualityInfoDialog(
-            score = sunsetScore,
+            score = state.sunsetScore,
             setShowDialog = {
                 setQualityInfoDialog(-1)
             })
@@ -232,8 +221,8 @@ fun SunsetPredictionContent(
         label = "Score number animation"
     )
 
-    LaunchedEffect(sunsetScore) {
-        scorePercentage = sunsetScore
+    LaunchedEffect(state.sunsetScore) {
+        scorePercentage = state.sunsetScore
     }
     LaunchedEffect(Unit) {
         delay(4000)
@@ -266,7 +255,7 @@ fun SunsetPredictionContent(
                 )
                 IconButton(
                     onClick = {
-                        navigateTo("select_location_screen/lat=${userLocation.latitude}long=${userLocation.longitude}")
+                        navigateTo("select_location_screen/lat=${state.userLocation.latitude}long=${state.userLocation.longitude}")
                     },
                     modifier = Modifier
                         .constrainAs(changeLocationButton) {
@@ -282,7 +271,7 @@ fun SunsetPredictionContent(
                 }
             } else {
                 Text(
-                    text = userLocality,
+                    text = state.userLocality,
                     style = primaryBoldHeadlineM,
                     modifier = Modifier
                         .constrainAs(location) {
@@ -291,11 +280,11 @@ fun SunsetPredictionContent(
                             end.linkTo(parent.end)
                         }
                         .defaultMinSize(minWidth = 100.dp)
-                        .background(shimmerBrush(showShimmer = userLocality.isEmpty()))
+                        .background(shimmerBrush(showShimmer = state.userLocality.isEmpty()))
                 )
                 IconButton(
                     onClick = {
-                        navigateTo("select_location_screen/lat=${userLocation.latitude}long=${userLocation.longitude}")
+                        navigateTo("select_location_screen/lat=${state.userLocation.latitude}long=${state.userLocation.longitude}")
                     },
                     modifier = Modifier
                         .constrainAs(changeLocationButton) {
@@ -310,7 +299,7 @@ fun SunsetPredictionContent(
                     )
                 }
                 Text(
-                    text = obtainDateOnFormat(informationDate),
+                    text = obtainDateOnFormat(state.informationDate),
                     style = primaryMediumHeadlineXS,
                     modifier = Modifier
                         .constrainAs(date) {
@@ -445,18 +434,30 @@ fun SunsetPredictionContent(
                             val (degreesText, animation) = createRefs()
                             LottieAnimation(
                                 composition =
-                                if (sunsetTemperature <= 0.0) {
-                                    snowingIconAnimation
-                                } else if (sunsetTemperature <= 15) {
-                                    coldIconAnimation
-                                } else if (sunsetTemperature <= 23) {
-                                    normalIconAnimation
-                                } else if (sunsetTemperature <= 30) {
-                                    sunnyIconAnimation
-                                } else if (sunsetTemperature > 30) {
-                                    hotIconAnimation
-                                } else {
-                                    sunnyIconAnimation
+                                when {
+                                    state.sunsetTemperature <= 0.0 -> {
+                                        snowingIconAnimation
+                                    }
+
+                                    state.sunsetTemperature <= 15 -> {
+                                        coldIconAnimation
+                                    }
+
+                                    state.sunsetTemperature <= 23 -> {
+                                        normalIconAnimation
+                                    }
+
+                                    state.sunsetTemperature <= 30 -> {
+                                        sunnyIconAnimation
+                                    }
+
+                                    state.sunsetTemperature > 30 -> {
+                                        hotIconAnimation
+                                    }
+
+                                    else -> {
+                                        sunnyIconAnimation
+                                    }
                                 },
                                 iterations = LottieConstants.IterateForever,
                                 modifier = Modifier
@@ -468,7 +469,7 @@ fun SunsetPredictionContent(
                                     }
                             )
                             Text(
-                                text = "$sunsetTemperature" + "º",
+                                text = "${state.sunsetTemperature}" + "º",
                                 style = primaryBoldDisplayM,
                                 modifier = Modifier.constrainAs(degreesText) {
                                     bottom.linkTo(parent.bottom)
@@ -489,18 +490,26 @@ fun SunsetPredictionContent(
                                 .padding(16.dp)
                                 .clip(RoundedCornerShape(20.dp))
                                 .clickable {
-                                    setQualityInfoDialog(sunsetScore)
+                                    setQualityInfoDialog(state.sunsetScore)
                                 }
                         ) {
                             val (qualityText, animation) = createRefs()
-                            val quality = if (scorePercentage <= 25) {
-                                R.string.poor
-                            } else if (scorePercentage <= 50) {
-                                R.string.fair
-                            } else if (scorePercentage <= 75) {
-                                R.string.good
-                            } else {
-                                R.string.great
+                            val quality = when {
+                                scorePercentage <= 25 -> {
+                                    R.string.poor
+                                }
+
+                                scorePercentage <= 50 -> {
+                                    R.string.fair
+                                }
+
+                                scorePercentage <= 75 -> {
+                                    R.string.good
+                                }
+
+                                else -> {
+                                    R.string.great
+                                }
                             }
                             val takingPhotosAnimation by rememberLottieComposition(
                                 spec = LottieCompositionSpec.RawRes(
@@ -523,14 +532,22 @@ fun SunsetPredictionContent(
                                 )
                             )
                             LottieAnimation(
-                                composition = if (scorePercentage <= 25) {
-                                    sadCatAnimation
-                                } else if (scorePercentage <= 50) {
-                                    catTvAnimation
-                                } else if (scorePercentage <= 75) {
-                                    dogSelfieAnimation
-                                } else {
-                                    takingPhotosAnimation
+                                composition = when {
+                                    scorePercentage <= 25 -> {
+                                        sadCatAnimation
+                                    }
+
+                                    scorePercentage <= 50 -> {
+                                        catTvAnimation
+                                    }
+
+                                    scorePercentage <= 75 -> {
+                                        dogSelfieAnimation
+                                    }
+
+                                    else -> {
+                                        takingPhotosAnimation
+                                    }
                                 },
                                 iterations = LottieConstants.IterateForever,
                                 modifier = Modifier
@@ -615,7 +632,7 @@ fun SunsetPredictionContent(
                         }
                     )
                     Text(
-                        text = convertHourToMilitaryFormat(sunsetTimeInformation.results.sunset),
+                        text = convertHourToMilitaryFormat(state.sunsetTimeInformation.results.sunset),
                         style = secondarySemiBoldHeadLineS,
                         modifier = Modifier
                             .padding(bottom = 16.dp)
@@ -625,7 +642,7 @@ fun SunsetPredictionContent(
                                 end.linkTo(dayLightIcon.end)
                             }
                             .defaultMinSize(minWidth = 30.dp)
-                            .background(shimmerBrush(showShimmer = sunsetTimeInformation.results.sunset.isBlank()))
+                            .background(shimmerBrush(showShimmer = state.sunsetTimeInformation.results.sunset.isBlank()))
                     )
 
                     //Golden hour
@@ -661,7 +678,7 @@ fun SunsetPredictionContent(
                         }
                     )
                     Text(
-                        text = convertHourToMilitaryFormat(sunsetTimeInformation.results.golden_hour),
+                        text = convertHourToMilitaryFormat(state.sunsetTimeInformation.results.golden_hour),
                         style = secondarySemiBoldHeadLineS,
                         modifier = Modifier
                             .padding(bottom = 16.dp)
@@ -671,7 +688,7 @@ fun SunsetPredictionContent(
                                 end.linkTo(goldenHourIcon.end)
                             }
                             .defaultMinSize(minWidth = 30.dp)
-                            .background(shimmerBrush(showShimmer = sunsetTimeInformation.results.golden_hour.isBlank()))
+                            .background(shimmerBrush(showShimmer = state.sunsetTimeInformation.results.golden_hour.isBlank()))
                     )
 
                     //Blue hour
@@ -703,7 +720,7 @@ fun SunsetPredictionContent(
                         }
                     )
                     Text(
-                        text = convertHourToMilitaryFormat(sunsetTimeInformation.results.dusk),
+                        text = convertHourToMilitaryFormat(state.sunsetTimeInformation.results.dusk),
                         style = secondarySemiBoldHeadLineS,
                         modifier = Modifier
                             .padding(bottom = 16.dp)
@@ -713,12 +730,12 @@ fun SunsetPredictionContent(
                                 end.linkTo(blueHourIcon.end)
                             }
                             .defaultMinSize(minWidth = 30.dp)
-                            .background(shimmerBrush(showShimmer = sunsetTimeInformation.results.dusk.isBlank()))
+                            .background(shimmerBrush(showShimmer = state.sunsetTimeInformation.results.dusk.isBlank()))
                     )
                 }
             }
         }
-        if (connectionError) {
+        if (state.connectionError) {
             CustomSpacer(size = 24.dp)
             SunsetButton(text = R.string.reload, onClick = { retryCall(selectedLocation) })
         }

@@ -1,4 +1,4 @@
-package com.madteam.sunset.ui.screens.selectLocation
+package com.madteam.sunset.ui.screens.selectLocation.ui
 
 import android.annotation.SuppressLint
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -36,8 +36,10 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import com.madteam.sunset.R
 import com.madteam.sunset.ui.common.ContinueFAB
 import com.madteam.sunset.ui.common.GoBackTopAppBar
+import com.madteam.sunset.ui.screens.selectLocation.state.SelectLocationUIEvent
+import com.madteam.sunset.ui.screens.selectLocation.state.SelectLocationUIState
+import com.madteam.sunset.ui.screens.selectLocation.viewmodel.SelectLocationViewModel
 import com.madteam.sunset.utils.getCurrentLocation
-import com.madteam.sunset.utils.googlemaps.MapState
 import com.madteam.sunset.utils.googlemaps.MapStyles
 import com.madteam.sunset.utils.googlemaps.setMapProperties
 import com.madteam.sunset.utils.googlemaps.updateCameraLocation
@@ -51,12 +53,16 @@ fun SelectLocationScreen(
     long: Float = 0f
 ) {
 
-    val mapState by viewModel.mapState.collectAsStateWithLifecycle()
-    val selectedLocation by viewModel.selectedLocation.collectAsStateWithLifecycle()
-    val userLocation by viewModel.userLocation.collectAsStateWithLifecycle()
-    val goToUserLocation by viewModel.goToUserLocation.collectAsStateWithLifecycle()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
-    viewModel.updateSelectedLocation(LatLng(lat.toDouble(), long.toDouble()))
+    viewModel.onEvent(
+        SelectLocationUIEvent.UpdateSelectedLocation(
+            LatLng(
+                lat.toDouble(),
+                long.toDouble()
+            )
+        )
+    )
 
     Scaffold(
         topBar = {
@@ -66,11 +72,11 @@ fun SelectLocationScreen(
             )
         },
         floatingActionButton = {
-            if (selectedLocation.latitude != 0.0 && selectedLocation.longitude != 0.0) {
+            if (state.selectedLocation.latitude != 0.0 && state.selectedLocation.longitude != 0.0) {
                 ContinueFAB {
                     navController.previousBackStackEntry
                         ?.savedStateHandle
-                        ?.set("location", selectedLocation)
+                        ?.set("location", state.selectedLocation)
                     navController.popBackStack()
                 }
             }
@@ -81,13 +87,28 @@ fun SelectLocationScreen(
                 contentAlignment = Alignment.Center
             ) {
                 SelectLocationContent(
-                    mapState = mapState,
-                    selectedLocation = selectedLocation,
-                    userLocation = userLocation,
-                    goToUserLocation = goToUserLocation,
-                    updateSelectedLocation = viewModel::updateSelectedLocation,
-                    updateUserLocation = viewModel::updateUserLocation,
-                    setGoToUserLocation = viewModel::setGoToUserLocation
+                    state = state,
+                    updateSelectedLocation = {
+                        viewModel.onEvent(
+                            SelectLocationUIEvent.UpdateSelectedLocation(
+                                it
+                            )
+                        )
+                    },
+                    updateUserLocation = {
+                        viewModel.onEvent(
+                            SelectLocationUIEvent.UpdateUserLocation(
+                                it
+                            )
+                        )
+                    },
+                    setGoToUserLocation = {
+                        viewModel.onEvent(
+                            SelectLocationUIEvent.SetGoToUserLocation(
+                                it
+                            )
+                        )
+                    }
                 )
             }
         }
@@ -96,10 +117,7 @@ fun SelectLocationScreen(
 
 @Composable
 fun SelectLocationContent(
-    mapState: MapState,
-    selectedLocation: LatLng,
-    userLocation: LatLng,
-    goToUserLocation: Boolean,
+    state: SelectLocationUIState,
     updateSelectedLocation: (LatLng) -> Unit,
     updateUserLocation: (LatLng) -> Unit,
     setGoToUserLocation: (Boolean) -> Unit
@@ -121,7 +139,7 @@ fun SelectLocationContent(
 
     GoogleMap(
         modifier = Modifier.fillMaxSize(),
-        properties = setMapProperties(mapState = mapState, mapStyle = MapStyles.DETAILED),
+        properties = setMapProperties(mapState = state.mapState, mapStyle = MapStyles.DETAILED),
         cameraPositionState = cameraPositionState,
         uiSettings = MapUiSettings(
             zoomControlsEnabled = false,
@@ -130,10 +148,10 @@ fun SelectLocationContent(
     ) {
         SetupListenersAndMapView(
             cameraPositionState = cameraPositionState,
-            userLocation = userLocation,
-            selectedLocation = selectedLocation,
+            userLocation = state.userLocation,
+            selectedLocation = state.selectedLocation,
             updateSelectedLocation = updateSelectedLocation,
-            goToUserLocation = goToUserLocation,
+            goToUserLocation = state.goToUserLocation,
             setGoToUserLocation = setGoToUserLocation
         )
     }

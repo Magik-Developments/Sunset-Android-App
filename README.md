@@ -59,3 +59,13 @@ ViewModel: The ViewModel acts as an intermediary between the Model and the View.
 Android mobile development has been Kotlin-first since Google I/O in 2019. A modern programming language that makes developers happier.
 
 Kotlin is a modern but already mature programming language aimed to make developers happier. It’s concise, safe, interoperable with Java and other languages, and provides many ways to reuse code between multiple platforms for productive programming.
+
+## Jetpack Compose
+
+<img src="https://developer.android.com/static/codelabs/jetpack-compose-animation/img/5bb2e531a22c7de0.png?hl=es-419" width="280" height="200">
+
+Sunset app leverages 100% Jetpack Compose for creating our user interfaces, and here's why it's a significant advantage:
+
+Jetpack Compose is a modern Android UI toolkit developed by Google, designed to simplify and enhance the process of building user interfaces for Android apps. It replaces the traditional XML-based layouts with a declarative approach, which means that we describe what our UI should look like based on its current state, rather than manually manipulating the UI elements.
+
+The advantages of using Jetpack Compose are numerous. Firstly, it greatly improves developer productivity by providing a more intuitive and concise way to define UI elements, reducing boilerplate code and making the UI codebase easier to read and maintain. This declarative approach also helps in building responsive and dynamic UIs.

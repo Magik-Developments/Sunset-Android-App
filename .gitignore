@@ -120,6 +120,7 @@ proguard/
 
 # Keystore files
 apikey.properties
+*/secrets.xml
 
 # Google Services (e.g. APIs or Firebase)
 # google-services.json

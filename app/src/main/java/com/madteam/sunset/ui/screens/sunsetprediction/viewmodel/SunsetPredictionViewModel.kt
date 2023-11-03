@@ -3,6 +3,7 @@ package com.madteam.sunset.ui.screens.sunsetprediction.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
+import com.madteam.sunset.BuildConfig
 import com.madteam.sunset.data.model.WeatherResponse
 import com.madteam.sunset.data.repositories.SunsetRepository
 import com.madteam.sunset.data.repositories.WeatherRepository
@@ -115,7 +116,7 @@ class SunsetPredictionViewModel @Inject constructor(
                     latitude = _state.value.userLocation.latitude,
                     longitude = _state.value.userLocation.longitude,
                     hour = 19,
-                    key = "56a43d55a96942d4b3072635231610" //TODO: Handle key on secrets
+                    key = BuildConfig.WEATHER_API_KEY
                 ).collectLatest {
                     when (it) {
                         is Resource.Success -> {

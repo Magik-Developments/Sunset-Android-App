@@ -1,6 +1,10 @@
-package com.madteam.sunset.ui.screens.welcome
+package com.madteam.sunset.ui.screens.welcome.ui
 
+import android.app.Activity
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,6 +15,7 @@ import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue.Hidden
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,7 +23,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.tasks.Task
 import com.madteam.sunset.R
 import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.FacebookButton
@@ -27,14 +37,19 @@ import com.madteam.sunset.ui.common.MainTitle
 import com.madteam.sunset.ui.common.SubTitle
 import com.madteam.sunset.ui.common.SunsetButton
 import com.madteam.sunset.ui.common.SunsetLogoImage
+import com.madteam.sunset.ui.screens.welcome.state.WelcomeUIEvent
+import com.madteam.sunset.ui.screens.welcome.viewmodel.WelcomeViewModel
 import com.madteam.sunset.utils.BackPressHandler
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun WelcomeScreen(
-    navController: NavController
+    navController: NavController,
+    viewModel: WelcomeViewModel = hiltViewModel()
 ) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val modalState = ModalBottomSheetState(
@@ -42,6 +57,17 @@ fun WelcomeScreen(
         isSkipHalfExpanded = true,
         density = LocalDensity.current
     )
+    val startForResult =
+        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val intent = result.data
+                if (intent != null) {
+                    val task: Task<GoogleSignInAccount> =
+                        GoogleSignIn.getSignedInAccountFromIntent(intent)
+                    viewModel.onEvent(WelcomeUIEvent.HandleGoogleSignInResult(task.result as GoogleSignInAccount))
+                }
+            }
+        }
 
     BackPressHandler {}
 
@@ -71,7 +97,7 @@ fun WelcomeScreen(
                 }
             },
             onGoogleClick = {
-                Toast.makeText(context, "Do Google Login", Toast.LENGTH_SHORT).show()
+                startForResult.launch(viewModel.googleSignInClient.signInIntent)
             },
             onFacebookClick = {
                 Toast.makeText(context, "Do Facebook Login", Toast.LENGTH_SHORT).show()

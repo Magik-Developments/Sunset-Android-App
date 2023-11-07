@@ -32,7 +32,7 @@ import com.madteam.sunset.ui.screens.settings.notifications.ui.NotificationsScre
 import com.madteam.sunset.ui.screens.spotdetail.ui.SpotDetailScreen
 import com.madteam.sunset.ui.screens.sunsetprediction.ui.SunsetPredictionScreen
 import com.madteam.sunset.ui.screens.verifyaccount.ui.VerifyAccountScreen
-import com.madteam.sunset.ui.screens.welcome.WelcomeScreen
+import com.madteam.sunset.ui.screens.welcome.ui.WelcomeScreen
 
 @Composable
 fun SunsetNavigation(

@@ -83,6 +83,7 @@ android {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
+        resources.excludes.add("google/protobuf/*.proto")
     }
 }
 

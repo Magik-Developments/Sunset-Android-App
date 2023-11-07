@@ -21,6 +21,7 @@ import com.madteam.sunset.ui.screens.addspot.ui.AddSpotScreen
 import com.madteam.sunset.ui.screens.comments.viewmodel.CommentsScreen
 import com.madteam.sunset.ui.screens.discover.ui.DiscoverScreen
 import com.madteam.sunset.ui.screens.editspot.ui.EditSpotScreen
+import com.madteam.sunset.ui.screens.enterusername.ui.EnterUsernameScreen
 import com.madteam.sunset.ui.screens.home.ui.HomeScreen
 import com.madteam.sunset.ui.screens.lostpassword.ui.LostPasswordScreen
 import com.madteam.sunset.ui.screens.myprofile.ui.MyProfileScreen
@@ -103,6 +104,10 @@ fun SunsetNavigation(
 
         composable(SunsetRoutes.SelectLocationScreen.route) {
             SelectLocationScreen(navController)
+        }
+
+        composable(SunsetRoutes.EnterUsernameScreen.route) {
+            EnterUsernameScreen(navController)
         }
 
         composable(

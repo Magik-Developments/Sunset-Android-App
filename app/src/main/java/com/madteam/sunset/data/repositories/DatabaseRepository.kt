@@ -235,6 +235,9 @@ class DatabaseRepository @Inject constructor(
             firebaseFirestore.collection(USERS_COLLECTION_PATH).whereEqualTo("email", email)
                 .get()
                 .await()
+        if (userProfileSnapshot.isEmpty) {
+            return UserProfile()
+        }
         with(userProfileSnapshot.first()) {
             return UserProfile(
                 username = getString("username") ?: "",

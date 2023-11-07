@@ -34,9 +34,27 @@ class WelcomeViewModel @Inject constructor(
     private fun handleGoogleSignInResult(result: GoogleSignInAccount) {
         viewModelScope.launch {
             signInWithGoogleUseCase(result.idToken ?: "").collectLatest { result ->
-                _state.value = _state.value.copy(
-                    signInState = Resource.Success(result.data)
-                )
+                when (result) {
+                    is Resource.Error -> {
+                        if (result.message!! == "e_google_user_first_time") {
+                            _state.value = _state.value.copy(
+                                signInState = Resource.Error("e_google_user_first_time")
+                            )
+                        } else {
+                            _state.value = _state.value.copy(
+                                signInState = Resource.Error("Error, try again later")
+                            )
+                        }
+                    }
+
+                    is Resource.Loading -> TODO()
+                    is Resource.Success -> {
+                        _state.value = _state.value.copy(
+                            signInState = Resource.Success(result.data)
+                        )
+                    }
+                }
+
             }
         }
     }

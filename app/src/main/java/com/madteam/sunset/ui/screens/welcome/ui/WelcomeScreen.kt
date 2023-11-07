@@ -139,6 +139,15 @@ fun WelcomeScreen(
         }
 
         is Resource.Error -> {
+            if (state.signInState.message == "e_google_user_first_time") {
+                LaunchedEffect(key1 = state.signInState.message) {
+                    navController.navigate(SunsetRoutes.EnterUsernameScreen.route) {
+                        popUpTo(navController.graph.id) {
+                            inclusive = true
+                        }
+                    }
+                }
+            }
             Box(contentAlignment = Alignment.Center) {
                 Toast.makeText(context, "${state.signInState.message}", Toast.LENGTH_SHORT)
                     .show()

@@ -48,7 +48,7 @@ import com.madteam.sunset.ui.screens.signup.viewmodel.SignUpViewModel
 import com.madteam.sunset.utils.BackPressHandler
 import com.madteam.sunset.utils.Resource
 
-private const val POLICIES_URL = "https://sunsetapp.es/index.php/privacy-policy/"
+const val POLICIES_URL = "https://sunsetapp.es/index.php/privacy-policy/"
 
 @Composable
 fun BottomSheetSignUpScreen(

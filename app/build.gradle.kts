@@ -45,6 +45,11 @@ android {
             "WEATHER_API_KEY",
             apikeyProperties["WEATHER_API_KEY"].toString()
         )
+        buildConfigField(
+            "String",
+            "WEB_ID_CLIENT",
+            apikeyProperties["WEB_ID_CLIENT"].toString()
+        )
     }
 
     buildTypes {
@@ -87,6 +92,7 @@ dependencies {
 
     // Google
     implementation(libs.google.services)
+    implementation(libs.play.services.auth)
 
     // Retrofit
     implementation(libs.retrofit)

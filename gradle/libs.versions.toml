@@ -9,7 +9,7 @@ constraintlayoutCompose = "1.0.1"
 core-ktx = "1.12.0"
 datastorePreferences = "1.0.0"
 espressoCore = "3.5.1"
-google-services = "4.3.15"
+google-services = "4.4.0"
 hilt-android = "2.48.1"
 hiltNavigationCompose = "1.0.0"
 junit = "4.13.2"
@@ -29,6 +29,8 @@ firebaseBom = "32.4.0"
 composeBom = "2023.04.01"
 glide = "1.0.0-alpha.1"
 roomKtx = "2.6.0"
+play-services-auth = "20.7.0"
+secretsGradlePlugin = "2.0.1"
 
 
 [libraries]
@@ -80,3 +82,5 @@ compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview"
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 compose-material = { module = "androidx.compose.material:material" }
 compose-material-icons = { module = "androidx.compose.material:material-icons-extended" }
+secrets-gradle-plugin = { module = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin", version.ref = "secretsGradlePlugin" }
+play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "play-services-auth" }

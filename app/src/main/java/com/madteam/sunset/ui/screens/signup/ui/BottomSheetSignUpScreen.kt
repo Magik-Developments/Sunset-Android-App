@@ -1,6 +1,5 @@
 package com.madteam.sunset.ui.screens.signup.ui
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -80,6 +79,7 @@ fun BottomSheetSignUpScreen(
             updateUsername = { viewModel.onEvent(SignUpUIEvent.UpdateUsername(it)) },
             acceptDialogClicked = { viewModel.onEvent(SignUpUIEvent.SignUpIntent) },
             clearSignUpState = { viewModel.onEvent(SignUpUIEvent.ClearSignUpState) },
+            hideModal = { hideModal() },
             navigateTo = navController::navigate
         )
     }
@@ -96,6 +96,7 @@ fun BottomSheetSignUpContent(
     navigateTo: (String) -> Unit,
     clearSignUpState: () -> Unit,
     setShowDialog: (Boolean) -> Unit,
+    hideModal: () -> Unit
 ) {
 
     val context = LocalContext.current
@@ -184,7 +185,7 @@ fun BottomSheetSignUpContent(
         OtherLoginMethodsSection(string.already_have_an_account)
         CustomSpacer(size = 8.dp)
         OtherLoginIconButtons(
-            firstMethod = { Toast.makeText(context, "Do Google Login", Toast.LENGTH_SHORT).show() },
+            firstMethod = { hideModal() },
             secondMethod = { modalOptions() }
         )
     }

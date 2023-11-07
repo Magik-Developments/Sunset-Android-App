@@ -70,11 +70,12 @@ fun BottomSheetSignInScreen(
             state = state,
             modalOptions = modalOptions,
             navigateTo = navController::navigate,
+            navController = navController,
             updateEmail = { viewModel.onEvent(SignInUIEvent.UpdateEmail(it)) },
             updatePassword = { viewModel.onEvent(SignInUIEvent.UpdatePassword(it)) },
             signInButton = { viewModel.onEvent(SignInUIEvent.SignInIntent) },
             clearSignInState = { viewModel.onEvent(SignInUIEvent.ClearSignInState) },
-            navController = navController
+            hideModal = { hideModal() }
         )
     }
 }
@@ -88,6 +89,7 @@ fun BottomSheetSignInContent(
     navigateTo: (String) -> Unit,
     signInButton: () -> Unit,
     clearSignInState: () -> Unit,
+    hideModal: () -> Unit,
     navController: NavController
 ) {
     val context = LocalContext.current
@@ -138,11 +140,7 @@ fun BottomSheetSignInContent(
         OtherLoginMethodsSection(string.not_registered_yet_signup_with)
         CustomSpacer(size = 24.dp)
         OtherLoginIconButtons(firstMethod = {
-            Toast.makeText(
-                context,
-                "Do Google Login",
-                Toast.LENGTH_SHORT
-            ).show()
+            hideModal()
         },
             secondMethod = { modalOptions() })
     }

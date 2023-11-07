@@ -38,7 +38,6 @@ import com.madteam.sunset.R
 import com.madteam.sunset.navigation.SunsetRoutes
 import com.madteam.sunset.ui.common.CircularLoadingDialog
 import com.madteam.sunset.ui.common.CustomSpacer
-import com.madteam.sunset.ui.common.FacebookButton
 import com.madteam.sunset.ui.common.GoogleButton
 import com.madteam.sunset.ui.common.MainTitle
 import com.madteam.sunset.ui.common.SubTitle
@@ -106,10 +105,8 @@ fun WelcomeScreen(
             },
             onGoogleClick = {
                 startForResult.launch(viewModel.googleSignInClient.signInIntent)
-            },
-            onFacebookClick = {
-                Toast.makeText(context, "Do Facebook Login", Toast.LENGTH_SHORT).show()
-            })
+            }
+        )
     }
 
     when (state.signInState) {
@@ -160,8 +157,7 @@ fun WelcomeScreen(
 @Composable
 fun WelcomeContent(
     onEmailClick: () -> Unit,
-    onGoogleClick: () -> Unit,
-    onFacebookClick: () -> Unit,
+    onGoogleClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -179,13 +175,11 @@ fun WelcomeContent(
         SunsetButton(text = R.string.btn_continue_email, onClick = onEmailClick)
         CustomSpacer(size = 16.dp)
         GoogleButton(onClick = onGoogleClick)
-        CustomSpacer(size = 16.dp)
-        FacebookButton(onClick = onFacebookClick)
     }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun WelcomeScreenPrev() {
-    WelcomeContent({}, {}, {})
+    WelcomeContent({}, {})
 }

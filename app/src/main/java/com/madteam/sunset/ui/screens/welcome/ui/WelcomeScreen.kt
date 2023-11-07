@@ -5,7 +5,9 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -15,10 +17,13 @@ import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue.Hidden
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
@@ -30,6 +35,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.tasks.Task
 import com.madteam.sunset.R
+import com.madteam.sunset.navigation.SunsetRoutes
+import com.madteam.sunset.ui.common.CircularLoadingDialog
 import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.FacebookButton
 import com.madteam.sunset.ui.common.GoogleButton
@@ -40,6 +47,7 @@ import com.madteam.sunset.ui.common.SunsetLogoImage
 import com.madteam.sunset.ui.screens.welcome.state.WelcomeUIEvent
 import com.madteam.sunset.ui.screens.welcome.viewmodel.WelcomeViewModel
 import com.madteam.sunset.utils.BackPressHandler
+import com.madteam.sunset.utils.Resource
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -102,6 +110,41 @@ fun WelcomeScreen(
             onFacebookClick = {
                 Toast.makeText(context, "Do Facebook Login", Toast.LENGTH_SHORT).show()
             })
+    }
+
+    when (state.signInState) {
+        is Resource.Loading -> {
+            Box(
+                contentAlignment = Alignment.TopCenter,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.3f))
+                    .pointerInput(Unit) {}
+            ) {
+                CircularLoadingDialog()
+            }
+        }
+
+        is Resource.Success -> {
+            if (state.signInState.data != null) {
+                LaunchedEffect(key1 = state.signInState.data) {
+                    navController.navigate(SunsetRoutes.MyProfileScreen.route) {
+                        popUpTo(navController.graph.id) {
+                            inclusive = true
+                        }
+                    }
+                }
+                viewModel.onEvent(WelcomeUIEvent.ClearSignInState)
+            }
+        }
+
+        is Resource.Error -> {
+            Box(contentAlignment = Alignment.Center) {
+                Toast.makeText(context, "${state.signInState.message}", Toast.LENGTH_SHORT)
+                    .show()
+            }
+            viewModel.onEvent(WelcomeUIEvent.ClearSignInState)
+        }
     }
 }
 

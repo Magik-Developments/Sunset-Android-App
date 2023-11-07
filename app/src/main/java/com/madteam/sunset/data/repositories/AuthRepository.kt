@@ -4,10 +4,14 @@ import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.GoogleAuthProvider
 import com.madteam.sunset.utils.Resource
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
@@ -85,6 +89,36 @@ class AuthRepository @Inject constructor(
         .getCredential(userEmail, credential)
       firebaseAuth.currentUser?.reauthenticate(emailCredential)?.await()
     }
+
+  override fun checkIfUserEmailExistsInDatabase(email: String): Flow<Resource<Boolean>> =
+    flow {
+      emit(Resource.Loading())
+      val user = firebaseAuth.fetchSignInMethodsForEmail(email).await()
+      if (user.signInMethods?.isNotEmpty() == true) {
+        emit(Resource.Success(true))
+      } else {
+        emit(Resource.Success(false))
+      }
+    }.catch {
+      emit(Resource.Error(it.message.toString()))
+    }
+
+  override fun signInWithGoogle(tokenId: String): Flow<Resource<AuthResult>> =
+    channelFlow {
+      val credential = GoogleAuthProvider.getCredential(tokenId, null)
+      firebaseAuth.signInWithCredential(credential)
+        .addOnSuccessListener {
+          launch {
+            send(Resource.Success(it))
+          }
+        }
+        .addOnFailureListener {
+          launch {
+            send(Resource.Error(it.message.toString()))
+          }
+        }
+      awaitClose()
+    }
 }
 
 interface AuthContract {
@@ -98,4 +132,6 @@ interface AuthContract {
   fun sendVerifyEmailIntent()
   fun checkIfUserEmailIsVerified(credential: String): Flow<Resource<Boolean>>
   fun reauthenticateUser(credential: String): Flow<Resource<Unit>>
+  fun signInWithGoogle(tokenId: String): Flow<Resource<AuthResult>>
+  fun checkIfUserEmailExistsInDatabase(email: String): Flow<Resource<Boolean>>
 }

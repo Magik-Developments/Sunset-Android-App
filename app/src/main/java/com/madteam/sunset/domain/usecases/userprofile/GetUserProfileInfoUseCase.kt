@@ -6,6 +6,7 @@ import com.madteam.sunset.data.model.UserProfile
 import com.madteam.sunset.data.model.toEntity
 import com.madteam.sunset.data.repositories.AuthRepository
 import com.madteam.sunset.data.repositories.DatabaseRepository
+import com.madteam.sunset.utils.Resource
 import javax.inject.Inject
 
 class GetMyUserProfileInfoUseCase @Inject constructor(
@@ -17,9 +18,9 @@ class GetMyUserProfileInfoUseCase @Inject constructor(
 
     private var username: String = ""
 
-    suspend operator fun invoke(): UserProfile {
+    suspend operator fun invoke(): Resource<UserProfile> {
         try {
-            return repository.getMyUserProfileInfoFromDatabase()
+            return Resource.Success(repository.getMyUserProfileInfoFromDatabase())
         } catch (e: Exception) {
             Log.d("GetUserProfileInfoUseCase", "Error: ${e.message}")
         }
@@ -30,10 +31,10 @@ class GetMyUserProfileInfoUseCase @Inject constructor(
             val usernameDocRef = firestore.collection("users").document(username)
             val myUserInfo = repository.getUserProfileByDocRef(usernameDocRef)
             repository.insertMyUserProfileInfoOnDatabase(myUserInfo.toEntity())
-            return myUserInfo
+            return Resource.Success(myUserInfo)
         } catch (e: Exception) {
             Log.d("GetUserProfileInfoUseCase", "Error: ${e.message}")
         }
-        return UserProfile()
+        return Resource.Error("Error")
     }
 }

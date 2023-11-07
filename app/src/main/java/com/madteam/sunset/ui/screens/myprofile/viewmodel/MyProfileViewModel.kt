@@ -8,6 +8,7 @@ import com.madteam.sunset.data.repositories.DatabaseContract
 import com.madteam.sunset.domain.usecases.userprofile.GetMyUserProfileInfoUseCase
 import com.madteam.sunset.ui.screens.myprofile.state.MyProfileUIEvent
 import com.madteam.sunset.ui.screens.myprofile.state.MyProfileUIState
+import com.madteam.sunset.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -52,7 +53,20 @@ class MyProfileViewModel @Inject constructor(
     private fun initUI() {
         viewModelScope.launch {
             getMyUserProfileInfoUseCase().let {
-                _state.value = _state.value.copy(userInfo = it)
+                when (it) {
+                    is Resource.Error -> {
+                        _state.value = _state.value.copy(hasToLogOut = true)
+                    }
+
+                    is Resource.Loading -> {
+                        //Not implemented
+                    }
+
+                    is Resource.Success -> {
+                        _state.value = _state.value.copy(userInfo = it.data!!)
+                    }
+                }
+
                 getUserPosts()
                 getUserSpots()
             }
@@ -100,6 +114,7 @@ class MyProfileViewModel @Inject constructor(
     }
 
     private fun logOut() {
+        _state.value = _state.value.copy(hasToLogOut = false)
         authRepository.logout()
     }
 }

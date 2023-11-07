@@ -170,4 +170,5 @@
     <string name="not_arriving">Not arriving?</string>
     <string name="choose_username">Choose an username</string>
     <string name="choose_username_subtitle">It is unique and it can\'t be changed</string>
+    <string name="log_out_need_error">An error ocurred during recovering your user information, log out and try again.</string>
 </resources>

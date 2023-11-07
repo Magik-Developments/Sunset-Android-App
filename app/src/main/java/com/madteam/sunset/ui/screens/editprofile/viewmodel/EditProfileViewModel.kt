@@ -63,18 +63,32 @@ class EditProfileViewModel @Inject constructor(
     private fun setInitialValues() {
         viewModelScope.launch {
             getMyUserProfileInfoUseCase().let {
-                _originalUsername.value = it.username
-                _originalEmail.value = it.email
-                _originalName.value = it.name
-                _originalLocation.value = it.location
-                _originalUserImage.value = it.image
-                _state.value = _state.value.copy(
-                    email = it.email,
-                    name = it.name,
-                    location = it.location,
-                    userImage = it.image,
-                    userIsAdmin = it.admin
-                )
+                when (it) {
+                    is Resource.Error -> {
+
+                    }
+
+                    is Resource.Loading -> {
+
+                    }
+
+                    is Resource.Success -> {
+                        with(it.data!!) {
+                            _originalUsername.value = username
+                            _originalEmail.value = email
+                            _originalName.value = name
+                            _originalLocation.value = location
+                            _originalUserImage.value = image
+                            _state.value = _state.value.copy(
+                                email = email,
+                                name = name,
+                                location = location,
+                                userImage = image,
+                                userIsAdmin = admin
+                            )
+                        }
+                    }
+                }
             }
         }
     }

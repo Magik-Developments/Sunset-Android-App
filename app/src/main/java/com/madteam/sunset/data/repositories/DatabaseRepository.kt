@@ -935,6 +935,10 @@ class DatabaseRepository @Inject constructor(
         userProfileDao.insertUserProfileInfo(userProfile)
     }
 
+    override suspend fun deleteMyUserProfileInfoFromDatabase() {
+        userProfileDao.deleteAllUserProfileInfo()
+    }
+
     override fun createSpotReview(
         spotReference: String,
         title: String,
@@ -1458,5 +1462,6 @@ interface DatabaseContract {
     ): Flow<List<SpotPost>>
 
     suspend fun insertMyUserProfileInfoOnDatabase(userProfile: UserProfileEntity)
+    suspend fun deleteMyUserProfileInfoFromDatabase()
 
 }

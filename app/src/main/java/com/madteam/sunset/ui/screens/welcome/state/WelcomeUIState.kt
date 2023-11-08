@@ -4,5 +4,6 @@ import com.google.firebase.auth.AuthResult
 import com.madteam.sunset.utils.Resource
 
 data class WelcomeUIState(
-    val signInState: Resource<AuthResult?> = Resource.Success(null)
+    val signInState: Resource<AuthResult?> = Resource.Success(null),
+    val isLoading: Boolean = false
 )

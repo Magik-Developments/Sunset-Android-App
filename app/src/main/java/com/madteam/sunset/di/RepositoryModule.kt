@@ -1,6 +1,7 @@
 package com.madteam.sunset.di
 
 import android.location.Geocoder
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
@@ -29,8 +30,9 @@ object RepositoryModule {
 
     @Provides
     fun providesFirebaseAuthRepository(
-        firebaseAuth: FirebaseAuth
-    ): AuthContract = AuthRepository(firebaseAuth)
+        firebaseAuth: FirebaseAuth,
+        googleSignInClient: GoogleSignInClient
+    ): AuthContract = AuthRepository(firebaseAuth, googleSignInClient)
 
     @Provides
     fun providesDatabaseRepository(

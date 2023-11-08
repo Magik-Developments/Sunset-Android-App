@@ -104,15 +104,22 @@ fun WelcomeScreen(
                 }
             },
             onGoogleClick = {
+                viewModel.onEvent(WelcomeUIEvent.ShowLoading(true))
                 startForResult.launch(viewModel.googleSignInClient.signInIntent)
             }
         )
     }
 
-    when (state.signInState) {
-        is Resource.Loading -> {
+    if (state.isLoading) {
+        Column(
+            Modifier
+                .fillMaxSize()
+                .background(Color.Transparent),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             Box(
-                contentAlignment = Alignment.TopCenter,
+                contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .fillMaxSize()
                     .background(Color.Black.copy(alpha = 0.3f))
@@ -120,6 +127,12 @@ fun WelcomeScreen(
             ) {
                 CircularLoadingDialog()
             }
+        }
+    }
+
+    when (state.signInState) {
+        is Resource.Loading -> {
+            //Not implemented
         }
 
         is Resource.Success -> {
@@ -144,10 +157,11 @@ fun WelcomeScreen(
                         }
                     }
                 }
-            }
-            Box(contentAlignment = Alignment.Center) {
-                Toast.makeText(context, "${state.signInState.message}", Toast.LENGTH_SHORT)
-                    .show()
+            } else {
+                Box(contentAlignment = Alignment.Center) {
+                    Toast.makeText(context, "${state.signInState.message}", Toast.LENGTH_SHORT)
+                        .show()
+                }
             }
             viewModel.onEvent(WelcomeUIEvent.ClearSignInState)
         }

@@ -28,6 +28,11 @@ class WelcomeViewModel @Inject constructor(
         when (event) {
             is WelcomeUIEvent.HandleGoogleSignInResult -> handleGoogleSignInResult(event.result)
             is WelcomeUIEvent.ClearSignInState -> clearSignInState()
+            is WelcomeUIEvent.ShowLoading -> {
+                _state.value = _state.value.copy(
+                    isLoading = event.show
+                )
+            }
         }
     }
 
@@ -47,14 +52,21 @@ class WelcomeViewModel @Inject constructor(
                         }
                     }
 
-                    is Resource.Loading -> TODO()
+                    is Resource.Loading -> {
+                        _state.value = _state.value.copy(
+                            signInState = Resource.Loading()
+                        )
+                    }
+
                     is Resource.Success -> {
                         _state.value = _state.value.copy(
                             signInState = Resource.Success(result.data)
                         )
                     }
                 }
-
+                _state.value = _state.value.copy(
+                    isLoading = false
+                )
             }
         }
     }

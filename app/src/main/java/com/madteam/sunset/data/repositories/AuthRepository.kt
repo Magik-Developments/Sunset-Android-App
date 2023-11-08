@@ -1,5 +1,6 @@
 package com.madteam.sunset.data.repositories
 
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
@@ -16,7 +17,8 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class AuthRepository @Inject constructor(
-  private val firebaseAuth: FirebaseAuth
+  private val firebaseAuth: FirebaseAuth,
+  private val googleSignInClient: GoogleSignInClient
 ) : AuthContract {
 
   override fun doSignUpWithPasswordAndEmail(
@@ -59,7 +61,10 @@ class AuthRepository @Inject constructor(
   override fun getCurrentUser(): FirebaseUser? =
     firebaseAuth.currentUser
 
-  override fun logout() = firebaseAuth.signOut()
+  override fun logout() {
+    firebaseAuth.signOut()
+    googleSignInClient.signOut()
+  }
 
   override fun resetPasswordWithEmailIntent(email: String) {
     firebaseAuth.sendPasswordResetEmail(email)

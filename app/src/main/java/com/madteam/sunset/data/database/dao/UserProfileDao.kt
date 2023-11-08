@@ -36,4 +36,7 @@ interface UserProfileDao {
         updateUserProfileInfo(updatedInfo)
     }
 
+    @Query("DELETE FROM user_profile_table")
+    suspend fun deleteAllUserProfileInfo()
+
 }

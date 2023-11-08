@@ -115,6 +115,9 @@ class MyProfileViewModel @Inject constructor(
 
     private fun logOut() {
         _state.value = _state.value.copy(hasToLogOut = false)
+        viewModelScope.launch {
+            databaseRepository.deleteMyUserProfileInfoFromDatabase()
+        }
         authRepository.logout()
     }
 }

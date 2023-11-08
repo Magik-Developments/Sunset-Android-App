@@ -1,6 +1,5 @@
 package com.madteam.sunset.ui.screens.enterusername.ui
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -116,7 +115,9 @@ fun EnterUsernameScreen(
                 if (state.usernameIsValid) SuccessIcon() else if (state.username.isNotBlank()) {
                     ErrorIcon()
                 }
-            }
+            },
+            isError = state.usernameAlreadyExists,
+            errorMessage = R.string.user_already_exists
         )
         CustomSpacer(size = 24.dp)
         SmallButtonDark(onClick = {
@@ -126,11 +127,7 @@ fun EnterUsernameScreen(
 
     when (state.signUpState) {
         is Resource.Error -> {
-            Box(contentAlignment = Alignment.Center) {
-                Toast.makeText(context, "${state.signUpState.message}", Toast.LENGTH_SHORT)
-                    .show()
-            }
-            viewModel.onEvent(EnterUsernameUIEvent.ClearState)
+            //Not implemented
         }
 
         is Resource.Loading -> {

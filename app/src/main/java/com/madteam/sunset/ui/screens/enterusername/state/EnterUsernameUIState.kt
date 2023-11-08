@@ -7,5 +7,6 @@ data class EnterUsernameUIState(
     val usernameIsValid: Boolean = false,
     val formEnabled: Boolean = true,
     val showDialog: Boolean = false,
-    val signUpState: Resource<String> = Resource.Success("")
+    val signUpState: Resource<String> = Resource.Success(""),
+    val usernameAlreadyExists: Boolean = false
 )

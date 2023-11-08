@@ -1,4 +1,4 @@
-package com.madteam.sunset.ui.screens.welcome
+package com.madteam.sunset.ui.screens.welcome.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -8,8 +8,8 @@ import androidx.compose.runtime.setValue
 import androidx.navigation.NavController
 import com.madteam.sunset.ui.screens.signin.ui.BottomSheetSignInScreen
 import com.madteam.sunset.ui.screens.signup.ui.BottomSheetSignUpScreen
-import com.madteam.sunset.ui.screens.welcome.WelcomeScreenModalOptions.SIGN_IN
-import com.madteam.sunset.ui.screens.welcome.WelcomeScreenModalOptions.SIGN_UP
+import com.madteam.sunset.ui.screens.welcome.ui.WelcomeScreenModalOptions.SIGN_IN
+import com.madteam.sunset.ui.screens.welcome.ui.WelcomeScreenModalOptions.SIGN_UP
 
 @Composable
 fun BottomSheetLoginScreen(

@@ -235,6 +235,9 @@ class DatabaseRepository @Inject constructor(
             firebaseFirestore.collection(USERS_COLLECTION_PATH).whereEqualTo("email", email)
                 .get()
                 .await()
+        if (userProfileSnapshot.isEmpty) {
+            return UserProfile()
+        }
         with(userProfileSnapshot.first()) {
             return UserProfile(
                 username = getString("username") ?: "",
@@ -932,6 +935,10 @@ class DatabaseRepository @Inject constructor(
         userProfileDao.insertUserProfileInfo(userProfile)
     }
 
+    override suspend fun deleteMyUserProfileInfoFromDatabase() {
+        userProfileDao.deleteAllUserProfileInfo()
+    }
+
     override fun createSpotReview(
         spotReference: String,
         title: String,
@@ -1455,5 +1462,6 @@ interface DatabaseContract {
     ): Flow<List<SpotPost>>
 
     suspend fun insertMyUserProfileInfoOnDatabase(userProfile: UserProfileEntity)
+    suspend fun deleteMyUserProfileInfoFromDatabase()
 
 }

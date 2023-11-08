@@ -45,6 +45,11 @@ android {
             "WEATHER_API_KEY",
             apikeyProperties["WEATHER_API_KEY"].toString()
         )
+        buildConfigField(
+            "String",
+            "WEB_ID_CLIENT",
+            apikeyProperties["WEB_ID_CLIENT"].toString()
+        )
     }
 
     buildTypes {
@@ -78,6 +83,7 @@ android {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
+        resources.excludes.add("google/protobuf/*.proto")
     }
 }
 
@@ -87,6 +93,7 @@ dependencies {
 
     // Google
     implementation(libs.google.services)
+    implementation(libs.play.services.auth)
 
     // Retrofit
     implementation(libs.retrofit)

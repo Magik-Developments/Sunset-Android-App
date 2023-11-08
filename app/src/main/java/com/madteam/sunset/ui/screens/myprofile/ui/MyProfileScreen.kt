@@ -165,6 +165,20 @@ fun MyProfileContent(
         )
     }
 
+    if (state.hasToLogOut) {
+        DismissAndPositiveDialog(
+            setShowDialog = {
+                //Cannot dismiss dialog
+            },
+            dialogTitle = R.string.generic_error,
+            dialogDescription = R.string.log_out_need_error,
+            dismissButtonText = R.string.log_out,
+            dismissClickedAction = {
+                logOut()
+                navigateTo(SunsetRoutes.WelcomeScreen.route)
+            })
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()

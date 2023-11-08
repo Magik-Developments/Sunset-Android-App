@@ -69,7 +69,7 @@ class EnterUsernameViewModel @Inject constructor(
                 when (it) {
                     is Resource.Error -> {
                         _state.value = _state.value.copy(signUpState = Resource.Error(it.message!!))
-                        if (it.message == "e_username_already_exists") {
+                        if (it.message == "e_user_already_exists") {
                             _state.value = _state.value.copy(
                                 usernameIsValid = false,
                                 formEnabled = true,

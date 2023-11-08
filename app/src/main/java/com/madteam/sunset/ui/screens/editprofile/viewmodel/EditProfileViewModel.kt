@@ -84,7 +84,8 @@ class EditProfileViewModel @Inject constructor(
                                 name = name,
                                 location = location,
                                 userImage = image,
-                                userIsAdmin = admin
+                                userIsAdmin = admin,
+                                username = username
                             )
                         }
                     }

@@ -13,7 +13,7 @@
     <string name="password">Contraseña</string>
     <string name="visibility_password_icon_description">Icono visibilidad contraseña</string>
     <string name="sign_in">Inicia sesión</string>
-    <string name="not_registered_yet">Aún no estás registrado?</string>
+    <string name="not_registered_yet">¿Aún no estás registrado?</string>
     <string name="sign_up_with">Regístrate con</string>
     <string name="forgot_your_password">¿Has olvidado tu contraseña?</string>
     <string name="google_icon_description">Icono de Google</string>

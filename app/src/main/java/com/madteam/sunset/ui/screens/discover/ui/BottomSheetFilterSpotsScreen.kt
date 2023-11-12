@@ -107,7 +107,10 @@ fun BottomSheetFilterSpotsContent(
         ) {
             CloseIconButton { onCloseClicked() }
             CustomSpacer(size = 16.dp)
-            Text(text = "Filter Spots", style = secondarySemiBoldHeadLineS)
+            Text(
+                text = stringResource(id = R.string.filter_spots),
+                style = secondarySemiBoldHeadLineS
+            )
         }
         CustomSpacer(size = 24.dp)
         Text(text = stringResource(id = R.string.score), style = secondarySemiBoldBodyM)

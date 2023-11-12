@@ -192,7 +192,7 @@ fun AddPostContent(
             )
             if (state.imageUris.isEmpty()) {
                 Text(
-                    text = "Add the best photos of this Spot",
+                    text = stringResource(id = R.string.add_images_spot),
                     modifier = Modifier
                         .align(Alignment.Center)
                         .padding(24.dp),

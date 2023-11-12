@@ -367,7 +367,7 @@ fun SunsetPredictionContent(
                         .background(shimmerBrush(showShimmer = scorePercentage == -1))
                 )
                 Text(
-                    text = "Sunset quality score",
+                    text = stringResource(id = R.string.sunset_quality),
                     style = primaryBoldHeadlineXS,
                     modifier = Modifier
                         .constrainAs(qualityTitle) {

@@ -8,7 +8,7 @@
     <string name="btn_continue_google">Inicia amb Google</string>
     <string name="welcome_back">¡Benvingut de nou!</string>
     <string name="enter_details_below">Omple les dades</string>
-    <string name="email_address">Correo electrónico</string>
+    <string name="email_address">Correu electrònic</string>
     <string name="circle_check_icon_description">Icona de verificació arrodonida</string>
     <string name="password">Contrasenya</string>
     <string name="visibility_password_icon_description">Icona visibilitat contrasenya</string>
@@ -153,7 +153,7 @@
     <string name="lost_password_enter_email">Introdueix el teu email per restablir la contrasenya</string>
     <string name="lost_password">Heu oblidat la contrasenya?</string>
     <string name="posted_by">Publicat per </string>
-    <string name="created">Creat el </string>
+    <string name="created">Creat el</string>
     <string name="likes">likes</string>
     <string name="view_all">Veure tots</string>
     <string name="comments">comentaris</string>
@@ -171,4 +171,9 @@
     <string name="choose_username">Escull un usuari</string>
     <string name="choose_username_subtitle">És únic i no es pot modificar</string>
     <string name="log_out_need_error">S\'ha produït un error mentre intentàvem recuperar la informació del teu usuari, tanca sessió i torna a intentar-ho.</string>
+    <string name="you_are_only_distance">A només</string>
+    <string name="about_spot">Sobre aquest Spot</string>
+    <string name="filter_spots">Filtrar Spots</string>
+    <string name="sunset_quality">Puntuació qualitat del Sunset</string>
+    <string name="remaining_time_sunset">Restants pel Sunset</string>
 </resources>

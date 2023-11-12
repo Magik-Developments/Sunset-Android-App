@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -121,7 +122,10 @@ fun BottomSheetEditProfileContent(
         ) {
             CloseIconButton { onCloseButton() }
             CustomSpacer(size = 16.dp)
-            Text(text = "Edit profile", style = secondarySemiBoldHeadLineS)
+            Text(
+                text = stringResource(id = R.string.edit_profile),
+                style = secondarySemiBoldHeadLineS
+            )
         }
         CustomSpacer(size = 36.dp)
         ConstraintLayout(
@@ -154,7 +158,11 @@ fun BottomSheetEditProfileContent(
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.Start
         ) {
-            Text(text = "Username", style = secondarySemiBoldBodyL, color = Color(0xFF333333))
+            Text(
+                text = stringResource(id = R.string.username),
+                style = secondarySemiBoldBodyL,
+                color = Color(0xFF333333)
+            )
             CustomSpacer(size = 8.dp)
             UsernameTextField(
                 usernameValue = state.username,
@@ -162,7 +170,11 @@ fun BottomSheetEditProfileContent(
                 enabled = false
             )
             CustomSpacer(size = 16.dp)
-            Text(text = "Email address", style = secondarySemiBoldBodyL, color = Color(0xFF333333))
+            Text(
+                text = stringResource(id = R.string.email_address),
+                style = secondarySemiBoldBodyL,
+                color = Color(0xFF333333)
+            )
             CustomSpacer(size = 8.dp)
             EmailTextField(
                 emailValue = state.email,
@@ -170,7 +182,11 @@ fun BottomSheetEditProfileContent(
                 enabled = false
             )
             CustomSpacer(size = 16.dp)
-            Text(text = "Name", style = secondarySemiBoldBodyL, color = Color(0xFF333333))
+            Text(
+                text = stringResource(R.string.name),
+                style = secondarySemiBoldBodyL,
+                color = Color(0xFF333333)
+            )
             CustomSpacer(size = 8.dp)
             GenericTextField(
                 value = state.name,
@@ -180,7 +196,11 @@ fun BottomSheetEditProfileContent(
                 hint = R.string.name
             )
             CustomSpacer(size = 16.dp)
-            Text(text = "Location", style = secondarySemiBoldBodyL, color = Color(0xFF333333))
+            Text(
+                text = stringResource(R.string.location),
+                style = secondarySemiBoldBodyL,
+                color = Color(0xFF333333)
+            )
             CustomSpacer(size = 8.dp)
             GenericTextField(
                 value = state.location,

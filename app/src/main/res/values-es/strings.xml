@@ -153,7 +153,7 @@
     <string name="lost_password_enter_email">Introdúce tu email para restablecer la contraseña</string>
     <string name="lost_password">¿Has olvidado la contraseña?</string>
     <string name="posted_by">Publicado por </string>
-    <string name="created">Creado el </string>
+    <string name="created">Creado el</string>
     <string name="likes">likes</string>
     <string name="view_all">Ver todos</string>
     <string name="comments">comentarios</string>
@@ -171,4 +171,9 @@
     <string name="choose_username">Escoge un usuario</string>
     <string name="choose_username_subtitle">Es único y no se puede modificar</string>
     <string name="log_out_need_error">Ha ocurrido un error mientras intentabamos recuperar la información de tu usuario, cierra sesión y vuelve a intentarlo.</string>
+    <string name="you_are_only_distance">A tan solo</string>
+    <string name="about_spot">Sobre este Spot</string>
+    <string name="filter_spots">Filtrar Spots</string>
+    <string name="sunset_quality">Puntuación calidad del atardecer</string>
+    <string name="remaining_time_sunset">Restantes para el Sunset</string>
 </resources>

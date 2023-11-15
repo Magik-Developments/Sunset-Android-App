@@ -176,4 +176,5 @@
     <string name="filter_spots">Filtrar Spots</string>
     <string name="sunset_quality">Puntuación calidad del atardecer</string>
     <string name="remaining_time_sunset">Restantes para el Sunset</string>
+    <string name="about_us">Sobre nosotros</string>
 </resources>

@@ -86,7 +86,8 @@ fun MyProfileScreen(
                 onLogOutClick = { viewModel.onEvent(MyProfileUIEvent.ShowExitDialog(true)) },
                 isUserAdmin = state.userInfo.admin,
                 onReportsClick = { navController.navigate(SunsetRoutes.SeeReportsScreen.route) },
-                onNotificationsClick = { navController.navigate(SunsetRoutes.NotificationsScreen.route) }
+                onNotificationsClick = { navController.navigate(SunsetRoutes.NotificationsScreen.route) },
+                onAboutUsClick = { navController.navigate(SunsetRoutes.AboutScreen.route) }
             )
         },
         sheetShape = RoundedCornerShape(20.dp, 20.dp, 0.dp, 0.dp),

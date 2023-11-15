@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -224,7 +225,8 @@ fun BottomSheetSettingsMenu(
     isUserAdmin: Boolean,
     onReportsClick: () -> Unit,
     onLogOutClick: () -> Unit,
-    onNotificationsClick: () -> Unit
+    onNotificationsClick: () -> Unit,
+    onAboutUsClick: () -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -249,12 +251,21 @@ fun BottomSheetSettingsMenu(
                 )
             }
 
-            //Add more options
+            //Manage notifications screen
             SettingsMenuItem(
                 icon = Icons.Outlined.Notifications,
                 text = R.string.notifications,
                 onClick = { onNotificationsClick() }
             )
+
+            //About us screen
+            SettingsMenuItem(
+                icon = Icons.Outlined.Info,
+                text = R.string.about_us,
+                onClick = { onAboutUsClick() }
+            )
+
+            //Add more options here
 
             //Log out option (Always the last option)
             SettingsMenuItem(

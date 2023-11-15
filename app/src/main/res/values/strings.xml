@@ -176,4 +176,10 @@
   <string name="filter_spots">Filter Spots</string>
   <string name="sunset_quality">Sunset quality score</string>
   <string name="remaining_time_sunset">Remaining to Sunset</string>
+  <string name="about_us">About us</string>
+  <string name="go_to_instagram">Go to instagram</string>
+  <string name="go_to_tiktok">Go to tiktok</string>
+  <string name="go_to_web">Go to web</string>
+  <string name="go_to_github">Go to Github</string>
+  <string name="made_with_love_from_bcn">Made with ❤️ from Barcelona</string>
 </resources>

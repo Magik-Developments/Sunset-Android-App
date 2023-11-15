@@ -15,6 +15,7 @@ import com.madteam.sunset.navigation.SunsetRoutes.MyProfileScreen
 import com.madteam.sunset.navigation.SunsetRoutes.SignInCard
 import com.madteam.sunset.navigation.SunsetRoutes.SignUpCard
 import com.madteam.sunset.navigation.SunsetRoutes.WelcomeScreen
+import com.madteam.sunset.ui.screens.about.ui.AboutScreen
 import com.madteam.sunset.ui.screens.addpost.ui.AddPostScreen
 import com.madteam.sunset.ui.screens.addreview.ui.AddReviewScreen
 import com.madteam.sunset.ui.screens.addspot.ui.AddSpotScreen
@@ -288,6 +289,10 @@ fun SunsetNavigation(
 
         composable(SunsetRoutes.NotificationsScreen.route) {
             NotificationsScreen(navController = navController)
+        }
+
+        composable(SunsetRoutes.AboutScreen.route) {
+            AboutScreen(navController = navController)
         }
 
     }

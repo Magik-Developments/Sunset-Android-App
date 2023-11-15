@@ -22,4 +22,5 @@ sealed class SunsetRoutes(val route: String) {
     object SunsetPredictionScreen : SunsetRoutes(route = "sunset_prediction_screen")
     object NotificationsScreen : SunsetRoutes(route = "notifications_screen")
     object EnterUsernameScreen : SunsetRoutes(route = "enter_username_screen")
+    object AboutScreen : SunsetRoutes(route = "about_screen")
 }

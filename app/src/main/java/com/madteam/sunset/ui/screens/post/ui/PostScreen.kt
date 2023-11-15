@@ -206,7 +206,7 @@ fun PostContent(
                 text = if (showShimmer.value) {
                     ""
                 } else {
-                    stringResource(id = R.string.created) + formatDate(state.postInfo.creation_date)
+                    stringResource(id = R.string.created) + " " + formatDate(state.postInfo.creation_date)
                 },
                 style = secondaryRegularBodyS,
                 color = Color(0xFF333333),
@@ -236,14 +236,14 @@ fun PostContent(
         }
 
         Text(
-            text = "${state.postLikes}" + stringResource(id = R.string.likes),
+            text = "${state.postLikes}" + " " + stringResource(id = R.string.likes),
             style = secondarySemiBoldBodyM,
             modifier = Modifier.padding(horizontal = 24.dp)
         )
         CustomSpacer(size = 4.dp)
         Text(
             text = if (state.postInfo.comments.isNotEmpty()) {
-                stringResource(id = R.string.view_all) + "${state.postInfo.comments.size}" + stringResource(
+                stringResource(id = R.string.view_all) + " ${state.postInfo.comments.size} " + stringResource(
                     id = R.string.comments
                 )
             } else {

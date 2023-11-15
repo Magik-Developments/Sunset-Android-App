@@ -333,7 +333,7 @@ fun SpotDetailContent(
                 text = if (showShimmer.value) {
                     ""
                 } else {
-                    "created ${formatDate(state.spotInfo.creationDate)}"
+                    stringResource(id = R.string.created) + " ${formatDate(state.spotInfo.creationDate)}"
                 },
                 style = secondaryRegularBodyS,
                 color = Color(0xFF333333),
@@ -399,11 +399,6 @@ fun SpotDetailContent(
                 CustomSpacer(size = 8.dp)
                 Text(text = "·", style = secondarySemiBoldBodyM)
                 CustomSpacer(size = 8.dp)
-                Text(text = "Visited ", style = secondaryRegularBodyM)
-                Text(text = "${state.spotInfo.visitedTimes} times", style = secondarySemiBoldBodyM)
-                CustomSpacer(size = 8.dp)
-                Text(text = "·", style = secondarySemiBoldBodyM)
-                CustomSpacer(size = 8.dp)
                 Text(
                     text = "${state.spotLikes} " + stringResource(id = R.string.likes),
                     style = secondarySemiBoldBodyM
@@ -433,7 +428,7 @@ fun SpotDetailContent(
             ) {
                 val (distanceText, distance, directions) = createRefs()
                 Text(
-                    text = "You are only ",
+                    text = stringResource(id = R.string.you_are_only_distance) + " ",
                     style = secondaryRegularBodyL,
                     modifier = Modifier.constrainAs(distanceText) {
                         start.linkTo(parent.start)
@@ -479,7 +474,7 @@ fun SpotDetailContent(
             //About this spot section
             CustomSpacer(size = 16.dp)
             Text(
-                text = "About this spot",
+                text = stringResource(id = R.string.about_spot),
                 style = secondarySemiBoldHeadLineM,
                 modifier = Modifier.padding(horizontal = 24.dp)
             )
@@ -591,7 +586,7 @@ fun SpotDetailContent(
                             }) {
                                 Column {
                                     Text(
-                                        text = "How it was?",
+                                        text = stringResource(id = R.string.how_it_was),
                                         style = secondarySemiBoldBodyM
                                     )
                                     AttributesSmallListRow(attributesList = review.spotAttributes)

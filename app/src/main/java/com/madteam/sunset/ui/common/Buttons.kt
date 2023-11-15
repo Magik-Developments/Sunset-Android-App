@@ -185,7 +185,9 @@ fun SmallButtonDark(
         Text(
             text = stringResource(id = text),
             style = secondarySemiBoldHeadLineS,
-            color = Color.White
+            color = Color.White,
+            maxLines = 1,
+            textAlign = TextAlign.Center,
         )
     }
 }

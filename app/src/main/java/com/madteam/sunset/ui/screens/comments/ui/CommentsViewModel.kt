@@ -114,7 +114,10 @@ class CommentsViewModel @Inject constructor(
     }
 
     private fun onSelectedComment(selectedComment: PostComment) {
-        _state.value = _state.value.copy(selectedComment = selectedComment)
+        _state.value = _state.value.copy(
+            selectedComment = selectedComment,
+            isCommentAuthor = checkIfUserIsCommentAuthor()
+        )
     }
 
     private fun unSelectComment() {

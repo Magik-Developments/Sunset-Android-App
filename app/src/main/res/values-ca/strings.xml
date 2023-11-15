@@ -177,4 +177,9 @@
     <string name="sunset_quality">Puntuació qualitat del Sunset</string>
     <string name="remaining_time_sunset">Restants pel Sunset</string>
     <string name="about_us">Sobre nosaltres</string>
+    <string name="go_to_instagram">Anar a instagram</string>
+    <string name="go_to_tiktok">Anar a tiktok</string>
+    <string name="go_to_web">Anar a la web</string>
+    <string name="go_to_github">Anar a Github</string>
+    <string name="made_with_love_from_bcn">Fet amb ❤️ des de Barcelona</string>
 </resources>

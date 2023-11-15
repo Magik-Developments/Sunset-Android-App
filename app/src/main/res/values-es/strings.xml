@@ -177,4 +177,9 @@
     <string name="sunset_quality">Puntuación calidad del atardecer</string>
     <string name="remaining_time_sunset">Restantes para el Sunset</string>
     <string name="about_us">Sobre nosotros</string>
+    <string name="go_to_instagram">Ir a instagram</string>
+    <string name="go_to_tiktok">Ir a tiktok</string>
+    <string name="go_to_web">Ir a la web</string>
+    <string name="go_to_github">Ir a Github</string>
+    <string name="made_with_love_from_bcn">Hecho con ❤️ desde Barcelona</string>
 </resources>

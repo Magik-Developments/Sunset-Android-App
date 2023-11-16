@@ -8,7 +8,11 @@ import androidx.room.PrimaryKey
 data class SpotAttributeEntity(
     @PrimaryKey @ColumnInfo(name = "id") val id: String,
     @ColumnInfo(name = "description") val description: String,
+    @ColumnInfo(name = "descriptionES") val descriptionES: String,
+    @ColumnInfo(name = "descriptionCAT") val descriptionCAT: String,
     @ColumnInfo(name = "title") val title: String,
+    @ColumnInfo(name = "titleES") val titleES: String,
+    @ColumnInfo(name = "titleCAT") val titleCAT: String,
     @ColumnInfo(name = "icon") val icon: String,
     @ColumnInfo(name = "type") val type: String
 )

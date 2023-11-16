@@ -493,16 +493,33 @@ class DatabaseRepository @Inject constructor(
                 val attributeSnapshot = attributeRef.get().await()
                 val id = attributeSnapshot.id
                 val title = attributeSnapshot.getString("title")
+                val titleES = attributeSnapshot.getString("title_es")
+                val titleCAT = attributeSnapshot.getString("title_cat")
                 val description = attributeSnapshot.getString("description")
+                val descriptionES = attributeSnapshot.getString("description_es")
+                val descriptionCAT = attributeSnapshot.getString("description_cat")
                 val icon = attributeSnapshot.getString("icon")
                 val type = attributeSnapshot.getString("type")
-                if (description != null && title != null && icon != null && type != null) {
+                if (
+                    description != null &&
+                    title != null &&
+                    icon != null &&
+                    type != null &&
+                    descriptionES != null &&
+                    descriptionCAT != null &&
+                    titleES != null &&
+                    titleCAT != null
+                ) {
                     val attributeData = SpotAttribute(
-                        id,
-                        description,
-                        title,
-                        icon,
-                        type
+                        id = id,
+                        description = description,
+                        descriptionES = descriptionES,
+                        descriptionCAT = descriptionCAT,
+                        title = title,
+                        titleES = titleES,
+                        titleCAT = titleCAT,
+                        icon = icon,
+                        type = type
                     )
                     attributesList.add(attributeData)
                 }
@@ -769,17 +786,34 @@ class DatabaseRepository @Inject constructor(
         for (spotAttributeDoc in spotAttributesSnapshot.documents) {
             val id = spotAttributeDoc.id
             val title = spotAttributeDoc.getString("title")
+            val titleES = spotAttributeDoc.getString("title_es")
+            val titleCAT = spotAttributeDoc.getString("title_cat")
             val description = spotAttributeDoc.getString("description")
+            val descriptionES = spotAttributeDoc.getString("description_es")
+            val descriptionCAT = spotAttributeDoc.getString("description_cat")
             val icon = spotAttributeDoc.getString("icon")
             val type = spotAttributeDoc.getString("type")
 
-            if (description != null && title != null && icon != null && type != null) {
+            if (
+                description != null &&
+                title != null &&
+                icon != null &&
+                type != null &&
+                descriptionES != null &&
+                descriptionCAT != null &&
+                titleES != null &&
+                titleCAT != null
+            ) {
                 val spotAttribute = SpotAttribute(
-                    id,
-                    description,
-                    title,
-                    icon,
-                    type
+                    id = id,
+                    description = description,
+                    descriptionES = descriptionES,
+                    descriptionCAT = descriptionCAT,
+                    title = title,
+                    titleES = titleES,
+                    titleCAT = titleCAT,
+                    icon = icon,
+                    type = type
                 )
                 spotAttributesList.add(spotAttribute)
             }

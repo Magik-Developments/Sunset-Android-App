@@ -59,6 +59,7 @@ import com.madteam.sunset.ui.theme.secondaryRegularBodyM
 import com.madteam.sunset.ui.theme.secondaryRegularBodyS
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyL
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyM
+import java.util.Locale
 
 val fieldToIconMap = mapOf(
     "Beach" to Icons.Outlined.BeachAccess,
@@ -123,6 +124,11 @@ fun AttributesBigListRow(
                     .clickable { onAttributeClick(attribute) }
                     .border(1.dp, Color(0xFF999999), RoundedCornerShape(20.dp))
             ) {
+                val title = when (Locale.getDefault().language.toString()) {
+                    "es" -> attribute.titleES
+                    "ca" -> attribute.titleCAT
+                    else -> attribute.title
+                }
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center,
@@ -137,7 +143,7 @@ fun AttributesBigListRow(
                         )
                     }
                     Text(
-                        text = attribute.title,
+                        text = title,
                         style = secondaryRegularBodyS,
                         textAlign = TextAlign.Center,
                         maxLines = 2,
@@ -218,6 +224,11 @@ fun AttributesBigListSelectable(
             val isSelected = selectedAttributes.contains(attribute)
             val customBackgroundColor = if (isSelected) Color(0x80FFB600) else Color.White
             val icon = fieldToIconMap[attribute.icon]
+            val title = when (Locale.getDefault().language.toString()) {
+                "es" -> attribute.titleES
+                "ca" -> attribute.titleCAT
+                else -> attribute.title
+            }
             Box(
                 modifier = Modifier
                     .size(100.dp)
@@ -240,7 +251,7 @@ fun AttributesBigListSelectable(
                         )
                     }
                     Text(
-                        text = attribute.title,
+                        text = title,
                         style = secondaryRegularBodyS,
                         textAlign = TextAlign.Center,
                         maxLines = 2,
@@ -268,6 +279,11 @@ fun FilterAttributesButton(
             val customBackgroundColor = if (isSelected) Color(0xFFFFE094) else Color.White
             val customBorderColor = if (isSelected) Color(0xFFFFB600) else Color(0xFF999999)
             val customTextColor = if (isSelected) Color.Black else Color(0xFF333333)
+            val title = when (Locale.getDefault().language.toString()) {
+                "es" -> option.titleES
+                "ca" -> option.titleCAT
+                else -> option.title
+            }
             Box(
                 modifier = Modifier
                     .size(80.dp)
@@ -293,7 +309,7 @@ fun FilterAttributesButton(
                     }
                     CustomSpacer(size = 4.dp)
                     androidx.compose.material.Text(
-                        text = option.title,
+                        text = title,
                         style = secondarySemiBoldBodyM,
                         color = customTextColor,
                         textAlign = TextAlign.Center,
@@ -329,6 +345,17 @@ fun AttributeInfoDialog(
             Color.Black
         }
     }
+    val language = Locale.getDefault().language.toString()
+    val title = when (language) {
+        "es" -> attribute.titleES
+        "ca" -> attribute.titleCAT
+        else -> attribute.title
+    }
+    val description = when (language) {
+        "es" -> attribute.descriptionES
+        "ca" -> attribute.descriptionCAT
+        else -> attribute.description
+    }
     Dialog(onDismissRequest = { setShowDialog(false) }) {
         Card(
             shape = RoundedCornerShape(20.dp),
@@ -348,13 +375,13 @@ fun AttributeInfoDialog(
                 }
                 CustomSpacer(size = 8.dp)
                 Text(
-                    text = attribute.title,
+                    text = title,
                     style = secondarySemiBoldBodyL,
                     textAlign = TextAlign.Center
                 )
                 CustomSpacer(size = 8.dp)
                 Text(
-                    text = attribute.description,
+                    text = description,
                     style = secondaryRegularBodyM,
                     textAlign = TextAlign.Center
                 )

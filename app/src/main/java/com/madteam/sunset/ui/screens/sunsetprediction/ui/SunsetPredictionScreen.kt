@@ -1,8 +1,13 @@
 package com.madteam.sunset.ui.screens.sunsetprediction.ui
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -221,6 +226,19 @@ fun SunsetPredictionContent(
         label = "Score number animation"
     )
 
+    //Implementation of haptic feedback when the score number is updated
+    LaunchedEffect(scoreNumberAnimated) {
+        val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val vibratorManager =
+                context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+            vibratorManager.defaultVibrator
+        } else {
+            @Suppress("DEPRECATION")
+            context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        }
+        val vibrationEffect = VibrationEffect.createOneShot(30, VibrationEffect.DEFAULT_AMPLITUDE)
+        vibrator.vibrate(vibrationEffect)
+    }
     LaunchedEffect(state.sunsetScore) {
         scorePercentage = state.sunsetScore
     }

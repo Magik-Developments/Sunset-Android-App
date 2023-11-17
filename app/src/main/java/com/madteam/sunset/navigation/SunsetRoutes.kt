@@ -19,4 +19,8 @@ sealed class SunsetRoutes(val route: String) {
     object SelectLocationScreen : SunsetRoutes(route = "select_location_screen")
     object EditSpotScreen : SunsetRoutes(route = "edit_spot_screen")
     object SeeReportsScreen : SunsetRoutes(route = "see_reports_screen")
+    object SunsetPredictionScreen : SunsetRoutes(route = "sunset_prediction_screen")
+    object NotificationsScreen : SunsetRoutes(route = "notifications_screen")
+    object EnterUsernameScreen : SunsetRoutes(route = "enter_username_screen")
+    object AboutScreen : SunsetRoutes(route = "about_screen")
 }

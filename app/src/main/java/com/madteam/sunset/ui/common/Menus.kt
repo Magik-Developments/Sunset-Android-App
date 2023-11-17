@@ -18,13 +18,15 @@ import androidx.compose.material.LocalContentColor
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Flag
-import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -52,6 +54,7 @@ fun SunsetBottomNavigation(navController: NavController) {
 
     val items = listOf(
         SunsetBottomNavItem.Home,
+        SunsetBottomNavItem.SunsetPrediction,
         SunsetBottomNavItem.Discover,
         SunsetBottomNavItem.Profile
     )
@@ -109,7 +112,7 @@ fun GoBackTopAppBar(
         backgroundColor = Color.White,
         navigationIcon = {
             IconButton(onClick = { onClick() }) {
-                Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Go back")
+                Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Go back")
             }
         },
         title = { Text(text = stringResource(id = title)) }
@@ -125,7 +128,7 @@ fun GoBackVariantTitleTopAppBar(
         backgroundColor = Color.White,
         navigationIcon = {
             IconButton(onClick = { onClick() }) {
-                Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Go back")
+                Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Go back")
             }
         },
         title = { Text(text = title) }
@@ -187,7 +190,7 @@ fun GoForwardTopAppBar(
             if (canContinue) {
                 IconButton(onClick = { onContinueClick() }) {
                     Icon(
-                        imageVector = Icons.Filled.ArrowForward,
+                        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                         contentDescription = "Continue",
                         tint = Color(0xFFFFB600)
                     )
@@ -221,7 +224,9 @@ fun MyProfileTopAppBar(
 fun BottomSheetSettingsMenu(
     isUserAdmin: Boolean,
     onReportsClick: () -> Unit,
-    onLogOutClick: () -> Unit
+    onLogOutClick: () -> Unit,
+    onNotificationsClick: () -> Unit,
+    onAboutUsClick: () -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -237,14 +242,6 @@ fun BottomSheetSettingsMenu(
             CustomSpacer(size = 8.dp)
             CardHandler(modifier = Modifier.align(Alignment.CenterHorizontally))
 
-            //Log out option
-            SettingsMenuItem(
-                icon = Icons.Filled.Logout,
-                tint = Color(0xFFFF4444),
-                onClick = { onLogOutClick() },
-                text = R.string.log_out
-            )
-
             //Reports screen [admins only]
             if (isUserAdmin) {
                 SettingsMenuItem(
@@ -254,7 +251,29 @@ fun BottomSheetSettingsMenu(
                 )
             }
 
-            //Add more options
+            //Manage notifications screen
+            SettingsMenuItem(
+                icon = Icons.Outlined.Notifications,
+                text = R.string.notifications,
+                onClick = { onNotificationsClick() }
+            )
+
+            //About us screen
+            SettingsMenuItem(
+                icon = Icons.Outlined.Info,
+                text = R.string.about_us,
+                onClick = { onAboutUsClick() }
+            )
+
+            //Add more options here
+
+            //Log out option (Always the last option)
+            SettingsMenuItem(
+                icon = Icons.AutoMirrored.Outlined.Logout,
+                tint = Color(0xFFFF4444),
+                onClick = { onLogOutClick() },
+                text = R.string.log_out
+            )
         }
     }
 }

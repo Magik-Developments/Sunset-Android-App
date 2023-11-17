@@ -1,6 +1,6 @@
 package com.madteam.sunset.api
 
-import com.madteam.sunset.model.SunsetTimeResponse
+import com.madteam.sunset.data.model.SunsetTimeResponse
 import retrofit2.http.GET
 import retrofit2.http.Query
 
@@ -9,6 +9,7 @@ interface SunsetApiService {
     suspend fun getSunsetTimeBasedOnLocation(
         @Query("lat") latitude: Double,
         @Query("lng") longitude: Double,
-        @Query("timezone") timezone: String
+        @Query("timezone") timezone: String,
+        @Query("date") date: String
     ): SunsetTimeResponse
 }

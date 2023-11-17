@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -42,9 +43,17 @@ import androidx.compose.ui.text.style.TextAlign.Companion
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.constraintlayout.compose.ConstraintLayout
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.madteam.sunset.R
+import com.madteam.sunset.ui.theme.primaryBoldHeadlineM
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineS
 import com.madteam.sunset.ui.theme.secondaryRegularBodyL
+import com.madteam.sunset.ui.theme.secondaryRegularBodyM
+import com.madteam.sunset.ui.theme.secondaryRegularBodyS
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyL
 
 @Composable
@@ -58,7 +67,7 @@ fun DismissAndPositiveDialog(
     dismissClickedAction: () -> Unit,
     positiveClickedAction: () -> Unit = {}
 ) {
-    Dialog(onDismissRequest = { setShowDialog(false) }) {
+    Dialog(onDismissRequest = { }) {
         Card(
             shape = RoundedCornerShape(20.dp),
             elevation = 2.dp,
@@ -350,5 +359,333 @@ fun PreviewReportDialog() {
         reportSent = false,
         setShowReportSent = {}
     )
+}
+
+@Composable
+fun LocationPermissionDialog(
+    onContinueClick: () -> Unit
+) {
+    Dialog(onDismissRequest = {}) {
+        Card(
+            shape = RoundedCornerShape(20.dp),
+            elevation = 2.dp,
+            modifier = Modifier
+                .padding(24.dp)
+                .wrapContentSize()
+        ) {
+            ConstraintLayout(
+                modifier = Modifier
+                    .padding(24.dp)
+            ) {
+                val (title, animation, description, button) = createRefs()
+                val locationAnimation by rememberLottieComposition(
+                    spec = LottieCompositionSpec.RawRes(
+                        R.raw.location_animation
+                    )
+                )
+
+                LottieAnimation(
+                    composition = locationAnimation,
+                    iterations = LottieConstants.IterateForever,
+                    modifier = Modifier
+                        .size(200.dp)
+                        .constrainAs(animation) {
+                            top.linkTo(parent.top)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                        }
+                )
+                Text(
+                    text = stringResource(id = R.string.enable_location_title),
+                    style = primaryBoldHeadlineM,
+                    textAlign = Companion.Center,
+                    modifier = Modifier.constrainAs(title) {
+                        top.linkTo(animation.bottom, 16.dp)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    }
+                )
+                Text(
+                    text = stringResource(id = R.string.enable_location_description),
+                    style = secondaryRegularBodyL,
+                    textAlign = Companion.Center,
+                    modifier = Modifier.constrainAs(description) {
+                        top.linkTo(title.bottom, 16.dp)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    }
+                )
+                SmallButtonSunset(
+                    onClick = { onContinueClick() },
+                    text = R.string.enable_location,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .constrainAs(button) {
+                            top.linkTo(description.bottom, 24.dp)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                        }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun NotificationsPermissionDialog(
+    onContinueClick: () -> Unit
+) {
+    Dialog(onDismissRequest = {}) {
+        Card(
+            shape = RoundedCornerShape(20.dp),
+            elevation = 2.dp,
+            modifier = Modifier
+                .padding(8.dp)
+                .wrapContentSize()
+        ) {
+            ConstraintLayout(
+                modifier = Modifier
+                    .padding(24.dp)
+            ) {
+                val (title, animation, description, button) = createRefs()
+                val notificationAnimation by rememberLottieComposition(
+                    spec = LottieCompositionSpec.RawRes(
+                        R.raw.notification_animation
+                    )
+                )
+
+                LottieAnimation(
+                    composition = notificationAnimation,
+                    iterations = LottieConstants.IterateForever,
+                    modifier = Modifier
+                        .size(200.dp)
+                        .constrainAs(animation) {
+                            top.linkTo(parent.top)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                        }
+                )
+                Text(
+                    text = stringResource(id = R.string.enable_notifications_title),
+                    style = primaryBoldHeadlineM,
+                    textAlign = Companion.Center,
+                    modifier = Modifier.constrainAs(title) {
+                        top.linkTo(animation.bottom, 16.dp)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    }
+                )
+                Text(
+                    text = stringResource(id = R.string.enable_notifications_description),
+                    style = secondaryRegularBodyL,
+                    textAlign = Companion.Center,
+                    modifier = Modifier.constrainAs(description) {
+                        top.linkTo(title.bottom, 16.dp)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    }
+                )
+                SmallButtonSunset(
+                    onClick = { onContinueClick() },
+                    text = R.string.enable_notifications,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .constrainAs(button) {
+                            top.linkTo(description.bottom, 24.dp)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                        }
+                )
+            }
+        }
+    }
+}
+
+@Preview(showSystemUi = true)
+@Composable
+fun LocationPermissionDialogPreview() {
+    LocationPermissionDialog {}
+}
+
+@Preview(showSystemUi = true)
+@Composable
+fun NotificationsPermissionDialogPreview() {
+    NotificationsPermissionDialog {}
+}
+
+@Composable
+fun SunsetPhasesInfoDialog(
+    phase: String,
+    setShowDialog: (Boolean) -> Unit
+) {
+    val phaseTitle: Int = when (phase) {
+        "sunset" -> {
+            R.string.sunset
+        }
+
+        "golden_hour" -> {
+            R.string.golden_hour
+        }
+
+        "blue_hour" -> {
+            R.string.blue_hour
+        }
+
+        else -> {
+            R.string.daylight
+        }
+    }
+    val phaseDescription: Int = when (phase) {
+        "sunset" -> {
+            R.string.daylight_description
+        }
+
+        "golden_hour" -> {
+            R.string.golden_hour_description
+        }
+
+        "blue_hour" -> {
+            R.string.blue_hour_description
+        }
+
+        else -> {
+            R.string.daylight_description
+        }
+    }
+    val phaseAnimation: Int = when (phase) {
+        "sunset" -> {
+            R.raw.sun_vector_animation
+        }
+
+        "golden_hour" -> {
+            R.raw.golden_hour_animation
+        }
+
+        "blue_hour" -> {
+            R.raw.moon_vector_animation
+        }
+
+        else -> {
+            R.raw.sun_vector_animation
+        }
+    }
+    val iconAnimation by rememberLottieComposition(
+        spec = LottieCompositionSpec.RawRes(
+            phaseAnimation
+        )
+    )
+    Dialog(onDismissRequest = { setShowDialog(false) }) {
+        Card(
+            shape = RoundedCornerShape(20.dp),
+            elevation = 2.dp
+        ) {
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.padding(24.dp)
+            ) {
+                LottieAnimation(
+                    composition = iconAnimation,
+                    iterations = LottieConstants.IterateForever,
+                    modifier = Modifier.size(80.dp),
+                    alignment = Alignment.Center
+                )
+                CustomSpacer(size = 8.dp)
+                androidx.compose.material3.Text(
+                    text = stringResource(id = phaseTitle),
+                    style = secondarySemiBoldBodyL,
+                    textAlign = TextAlign.Center
+                )
+                CustomSpacer(size = 8.dp)
+                androidx.compose.material3.Text(
+                    text = stringResource(id = phaseDescription),
+                    style = secondaryRegularBodyM,
+                    textAlign = TextAlign.Center
+                )
+                CustomSpacer(size = 16.dp)
+                androidx.compose.material3.Text(
+                    text = stringResource(id = R.string.credits_sunrisesunsetio),
+                    style = secondaryRegularBodyS,
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun SunsetQualityInfoDialog(
+    score: Int,
+    setShowDialog: (Boolean) -> Unit
+) {
+    val qualityTitle = if (score <= 25) {
+        R.string.poor
+    } else if (score <= 50) {
+        R.string.fair
+    } else if (score <= 75) {
+        R.string.good
+    } else {
+        R.string.great
+    }
+    val qualityDescription = if (score <= 25) {
+        R.string.poor_description
+    } else if (score <= 50) {
+        R.string.fair_description
+    } else if (score <= 75) {
+        R.string.good_description
+    } else {
+        R.string.great_description
+    }
+    val qualityAnimation = if (score <= 25) {
+        R.raw.sad_cat_animation
+    } else if (score <= 50) {
+        R.raw.cat_tv_animation
+    } else if (score <= 75) {
+        R.raw.dog_selfie_animation
+    } else {
+        R.raw.guy_photo_animation
+    }
+    val iconAnimation by rememberLottieComposition(
+        spec = LottieCompositionSpec.RawRes(
+            qualityAnimation
+        )
+    )
+    Dialog(onDismissRequest = { setShowDialog(false) }) {
+        Card(
+            shape = RoundedCornerShape(20.dp),
+            elevation = 2.dp
+        ) {
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.padding(24.dp)
+            ) {
+                LottieAnimation(
+                    composition = iconAnimation,
+                    iterations = LottieConstants.IterateForever,
+                    modifier = Modifier.size(80.dp),
+                    alignment = Alignment.Center
+                )
+                CustomSpacer(size = 8.dp)
+                androidx.compose.material3.Text(
+                    text = stringResource(id = qualityTitle),
+                    style = secondarySemiBoldBodyL,
+                    textAlign = TextAlign.Center
+                )
+                CustomSpacer(size = 8.dp)
+                androidx.compose.material3.Text(
+                    text = stringResource(id = qualityDescription),
+                    style = secondaryRegularBodyM,
+                    textAlign = TextAlign.Center
+                )
+                CustomSpacer(size = 16.dp)
+                androidx.compose.material3.Text(
+                    text = stringResource(id = R.string.credits_weatherapi),
+                    style = secondaryRegularBodyS,
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+    }
 }
 

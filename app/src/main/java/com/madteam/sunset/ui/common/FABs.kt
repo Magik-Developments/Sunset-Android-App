@@ -2,6 +2,7 @@ package com.madteam.sunset.ui.common
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddLocationAlt
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
@@ -18,7 +19,26 @@ fun AddSpotFAB(
         containerColor = Color(0xFFFFB600),
         contentColor = Color.White
     ) {
-        Icon(imageVector = Icons.Default.AddLocationAlt, contentDescription = "")
+        Icon(
+            imageVector = Icons.Default.AddLocationAlt,
+            contentDescription = "Add Spot floating action button"
+        )
+    }
+}
+
+@Composable
+fun ContinueFAB(
+    onClick: () -> Unit
+) {
+    FloatingActionButton(
+        onClick = onClick,
+        containerColor = Color(0xFFFFB600),
+        contentColor = Color.White
+    ) {
+        Icon(
+            imageVector = Icons.Default.Check,
+            contentDescription = "Continue floating action button"
+        )
     }
 }
 

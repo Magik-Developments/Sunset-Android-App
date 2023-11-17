@@ -6,7 +6,6 @@ import android.net.Uri
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.OnBackPressedDispatcher
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
-import androidx.annotation.DrawableRes
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -21,15 +20,11 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import com.google.firebase.firestore.GeoPoint
+import com.madteam.sunset.data.model.WeatherResponse
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
-
-@DrawableRes
-fun getResourceId(icon: String, context: Context): Int {
-    return context.resources.getIdentifier(icon, "drawable", context.packageName)
-}
 
 fun openDirectionsOnGoogleMaps(context: Context, location: GeoPoint) {
     val uri = Uri.parse("google.navigation:q=${location.latitude},${location.longitude}")
@@ -190,4 +185,26 @@ fun BackPressHandler(
             backCallback.remove()
         }
     }
+}
+
+fun calculateSunsetTemperature(weatherInfo: WeatherResponse, targetDay: String): Double {
+    val forecastDay = weatherInfo.forecast?.forecastDay
+
+    if (forecastDay != null) {
+        val matchingForecast = forecastDay.find { it.date == targetDay }
+
+        if (matchingForecast != null && matchingForecast.hour.isNotEmpty()) {
+            val selectedHour = matchingForecast.hour.first()
+            return selectedHour.tempC ?: 0.0
+        }
+    }
+
+    return 0.0
+}
+
+fun obtainDateOnFormat(dateString: String): String {
+    val inputFormat = SimpleDateFormat("yyyy-MM-dd")
+    val inputDate = inputFormat.parse(dateString)
+    val format = SimpleDateFormat("dd MMMM, EEEE", Locale.getDefault())
+    return format.format(inputDate ?: "")
 }

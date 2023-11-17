@@ -15,13 +15,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.madteam.sunset.R
-import com.madteam.sunset.model.SunsetTimeResponse
+import com.madteam.sunset.data.model.SunsetTimeResponse
 import com.madteam.sunset.ui.theme.primaryBoldDisplayM
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineXS
 import com.madteam.sunset.ui.theme.secondaryRegularBodyS
@@ -68,7 +69,7 @@ fun SunsetInfoModule(
             )
             Text(
                 text = if (userLocality.isNotEmpty()) {
-                    "Remaining to Sunset in $userLocality"
+                    stringResource(id = R.string.remaining_time_sunset) + " $userLocality"
                 } else {
                     "Remaining to Sunset"
                 },
@@ -108,7 +109,7 @@ fun SunsetInfoModule(
                 tint = Color.White
             )
             Text(
-                text = "Powered by SunriseSunset.io",
+                text = stringResource(id = R.string.credits_sunrisesunsetio),
                 style = secondaryRegularBodyS,
                 modifier = Modifier
                     .constrainAs(poweredBy) {

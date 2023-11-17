@@ -15,22 +15,26 @@ import com.madteam.sunset.navigation.SunsetRoutes.MyProfileScreen
 import com.madteam.sunset.navigation.SunsetRoutes.SignInCard
 import com.madteam.sunset.navigation.SunsetRoutes.SignUpCard
 import com.madteam.sunset.navigation.SunsetRoutes.WelcomeScreen
-import com.madteam.sunset.ui.screens.addpost.AddPostScreen
-import com.madteam.sunset.ui.screens.addreview.AddReviewScreen
-import com.madteam.sunset.ui.screens.addspot.AddSpotScreen
-import com.madteam.sunset.ui.screens.comments.CommentsScreen
-import com.madteam.sunset.ui.screens.discover.DiscoverScreen
-import com.madteam.sunset.ui.screens.editspot.EditSpotScreen
-import com.madteam.sunset.ui.screens.home.HomeScreen
-import com.madteam.sunset.ui.screens.lostpassword.LostPasswordScreen
-import com.madteam.sunset.ui.screens.myprofile.MyProfileScreen
-import com.madteam.sunset.ui.screens.post.PostScreen
-import com.madteam.sunset.ui.screens.review.PostReviewScreen
-import com.madteam.sunset.ui.screens.seereports.SeeReportsScreen
-import com.madteam.sunset.ui.screens.selectLocation.SelectLocationScreen
-import com.madteam.sunset.ui.screens.spotdetail.SpotDetailScreen
-import com.madteam.sunset.ui.screens.verifyaccount.VerifyAccountScreen
-import com.madteam.sunset.ui.screens.welcome.WelcomeScreen
+import com.madteam.sunset.ui.screens.about.ui.AboutScreen
+import com.madteam.sunset.ui.screens.addpost.ui.AddPostScreen
+import com.madteam.sunset.ui.screens.addreview.ui.AddReviewScreen
+import com.madteam.sunset.ui.screens.addspot.ui.AddSpotScreen
+import com.madteam.sunset.ui.screens.comments.viewmodel.CommentsScreen
+import com.madteam.sunset.ui.screens.discover.ui.DiscoverScreen
+import com.madteam.sunset.ui.screens.editspot.ui.EditSpotScreen
+import com.madteam.sunset.ui.screens.enterusername.ui.EnterUsernameScreen
+import com.madteam.sunset.ui.screens.home.ui.HomeScreen
+import com.madteam.sunset.ui.screens.lostpassword.ui.LostPasswordScreen
+import com.madteam.sunset.ui.screens.myprofile.ui.MyProfileScreen
+import com.madteam.sunset.ui.screens.post.ui.PostScreen
+import com.madteam.sunset.ui.screens.review.ui.PostReviewScreen
+import com.madteam.sunset.ui.screens.seereports.ui.SeeReportsScreen
+import com.madteam.sunset.ui.screens.selectLocation.ui.SelectLocationScreen
+import com.madteam.sunset.ui.screens.settings.notifications.ui.NotificationsScreen
+import com.madteam.sunset.ui.screens.spotdetail.ui.SpotDetailScreen
+import com.madteam.sunset.ui.screens.sunsetprediction.ui.SunsetPredictionScreen
+import com.madteam.sunset.ui.screens.verifyaccount.ui.VerifyAccountScreen
+import com.madteam.sunset.ui.screens.welcome.ui.WelcomeScreen
 
 @Composable
 fun SunsetNavigation(
@@ -101,6 +105,10 @@ fun SunsetNavigation(
 
         composable(SunsetRoutes.SelectLocationScreen.route) {
             SelectLocationScreen(navController)
+        }
+
+        composable(SunsetRoutes.EnterUsernameScreen.route) {
+            EnterUsernameScreen(navController)
         }
 
         composable(
@@ -264,6 +272,27 @@ fun SunsetNavigation(
 
         composable(SunsetRoutes.SeeReportsScreen.route) {
             SeeReportsScreen(navController)
+        }
+
+        composable(SunsetRoutes.SunsetPredictionScreen.route) { entry ->
+            val selectedLocation = entry.savedStateHandle.get<LatLng>("location")
+            if (selectedLocation != null) {
+                SunsetPredictionScreen(
+                    navController = navController,
+                    selectedLocation = selectedLocation
+                )
+            } else {
+                SunsetPredictionScreen(navController = navController)
+            }
+
+        }
+
+        composable(SunsetRoutes.NotificationsScreen.route) {
+            NotificationsScreen(navController = navController)
+        }
+
+        composable(SunsetRoutes.AboutScreen.route) {
+            AboutScreen(navController = navController)
         }
 
     }

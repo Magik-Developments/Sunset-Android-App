@@ -73,6 +73,8 @@ fun WelcomeScreen(
                         GoogleSignIn.getSignedInAccountFromIntent(intent)
                     viewModel.onEvent(WelcomeUIEvent.HandleGoogleSignInResult(task.result as GoogleSignInAccount))
                 }
+            } else {
+                viewModel.onEvent(WelcomeUIEvent.ShowLoading(false))
             }
         }
 

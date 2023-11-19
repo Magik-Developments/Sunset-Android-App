@@ -36,8 +36,8 @@ import com.google.android.gms.maps.model.LatLng
 import com.madteam.sunset.R
 import com.madteam.sunset.navigation.SunsetRoutes
 import com.madteam.sunset.ui.common.CustomSpacer
-import com.madteam.sunset.ui.common.LargeLightButton
 import com.madteam.sunset.ui.common.SunsetBottomNavigation
+import com.madteam.sunset.ui.common.SunsetButton
 import com.madteam.sunset.ui.common.SunsetInfoModule
 import com.madteam.sunset.ui.screens.home.state.HomeUIEvent
 import com.madteam.sunset.ui.screens.home.state.HomeUIState
@@ -131,12 +131,13 @@ fun HomeContent(
             )
         }
         CustomSpacer(size = 16.dp)
-        LargeLightButton(
+        SunsetButton(
             modifier = Modifier.padding(horizontal = 24.dp),
             onClick = {
                 navigateToSunsetPrediction()
             },
-            text = R.string.know_spot_quality
+            text = R.string.know_spot_quality,
+            maxLines = 2
         )
         CustomSpacer(size = 16.dp)
         Text(

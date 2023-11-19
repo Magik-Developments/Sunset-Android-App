@@ -19,8 +19,8 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.NavHostController
 import com.google.firebase.firestore.GeoPoint
 import com.madteam.sunset.data.model.WeatherResponse
 import java.text.SimpleDateFormat
@@ -211,7 +211,7 @@ fun obtainDateOnFormat(dateString: String): String {
     return format.format(inputDate ?: "")
 }
 
-fun NavHostController.switchTab(route: String) {
+fun NavController.switchTab(route: String) {
     navigate(route) {
         popUpTo(graph.findStartDestination().id) {
             saveState = true

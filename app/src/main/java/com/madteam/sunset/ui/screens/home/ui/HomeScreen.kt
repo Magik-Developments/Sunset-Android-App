@@ -37,6 +37,7 @@ import com.madteam.sunset.R
 import com.madteam.sunset.navigation.SunsetRoutes
 import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.SunsetBottomNavigation
+import com.madteam.sunset.ui.common.SunsetButton
 import com.madteam.sunset.ui.common.SunsetInfoModule
 import com.madteam.sunset.ui.screens.home.state.HomeUIEvent
 import com.madteam.sunset.ui.screens.home.state.HomeUIState
@@ -44,6 +45,7 @@ import com.madteam.sunset.ui.screens.home.viewmodel.HomeViewModel
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineS
 import com.madteam.sunset.utils.getCurrentLocation
 import com.madteam.sunset.utils.shimmerBrush
+import com.madteam.sunset.utils.switchTab
 
 @Composable
 fun HomeScreen(
@@ -66,7 +68,8 @@ fun HomeScreen(
                     spotLikeClick = { viewModel.onEvent(HomeUIEvent.ModifyUserSpotLike(it)) },
                     postLikeClick = { viewModel.onEvent(HomeUIEvent.ModifyUserPostLike(it)) },
                     loadNextSpotsPage = { viewModel.onEvent(HomeUIEvent.LoadNextSpotsPage) },
-                    loadNextPostsPage = { viewModel.onEvent(HomeUIEvent.LoadNextPostsPage) }
+                    loadNextPostsPage = { viewModel.onEvent(HomeUIEvent.LoadNextPostsPage) },
+                    navigateToSunsetPrediction = { navController.switchTab(SunsetRoutes.SunsetPredictionScreen.route) }
                 )
             }
         }
@@ -81,7 +84,8 @@ fun HomeContent(
     spotLikeClick: (String) -> Unit,
     postLikeClick: (String) -> Unit,
     loadNextSpotsPage: () -> Unit,
-    loadNextPostsPage: () -> Unit
+    loadNextPostsPage: () -> Unit,
+    navigateToSunsetPrediction: () -> Unit
 ) {
 
     val context = LocalContext.current
@@ -126,6 +130,15 @@ fun HomeContent(
                 modifier = Modifier.padding(horizontal = 24.dp)
             )
         }
+        CustomSpacer(size = 16.dp)
+        SunsetButton(
+            modifier = Modifier.padding(horizontal = 24.dp),
+            onClick = {
+                navigateToSunsetPrediction()
+            },
+            text = R.string.know_spot_quality,
+            maxLines = 2
+        )
         CustomSpacer(size = 16.dp)
         Text(
             text = stringResource(id = R.string.last_spots_posted),

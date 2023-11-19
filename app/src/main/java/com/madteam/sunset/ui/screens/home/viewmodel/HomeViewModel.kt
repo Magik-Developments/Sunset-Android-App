@@ -59,6 +59,10 @@ class HomeViewModel @Inject constructor(
             is HomeUIEvent.UpdateUserLocation -> {
                 updateUserLocation(event.location)
             }
+
+            is HomeUIEvent.ShowLocationPermissionDialog -> {
+                updateLocationPermissionDialog(event.show)
+            }
         }
     }
 
@@ -219,6 +223,10 @@ class HomeViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun updateLocationPermissionDialog(show: Boolean) {
+        _state.value = _state.value.copy(showLocationPermissionDialog = show)
     }
 
 }

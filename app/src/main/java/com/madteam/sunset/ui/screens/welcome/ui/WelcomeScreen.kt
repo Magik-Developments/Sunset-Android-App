@@ -140,7 +140,7 @@ fun WelcomeScreen(
         is Resource.Success -> {
             if (state.signInState.data != null) {
                 LaunchedEffect(key1 = state.signInState.data) {
-                    navController.navigate(SunsetRoutes.MyProfileScreen.route) {
+                    navController.navigate(SunsetRoutes.HomeScreen.route) {
                         popUpTo(navController.graph.id) {
                             inclusive = true
                         }

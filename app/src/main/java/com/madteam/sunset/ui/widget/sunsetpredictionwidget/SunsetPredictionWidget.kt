@@ -3,6 +3,7 @@ package com.madteam.sunset.ui.widget.sunsetpredictionwidget
 import android.content.Context
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.Image
@@ -16,14 +17,17 @@ import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
-import androidx.glance.layout.fillMaxHeight
+import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.size
 import androidx.glance.state.GlanceStateDefinition
 import androidx.glance.state.PreferencesGlanceStateDefinition
+import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
+import androidx.glance.text.TextStyle
+import androidx.glance.unit.ColorProvider
 import com.madteam.sunset.R
 
 class SunsetPredictionWidget : GlanceAppWidget() {
@@ -35,15 +39,40 @@ class SunsetPredictionWidget : GlanceAppWidget() {
                 modifier = GlanceModifier
                     .fillMaxWidth()
                     .height(225.dp)
-                    .background(Color.White)
+                    .background(Color(0xFFFFB600))
                     .cornerRadius(20.dp)
-                    .padding(16.dp),
-                contentAlignment = Alignment.Center
+                    .padding(16.dp)
             ) {
                 Row(
                     modifier = GlanceModifier
-                        .fillMaxWidth()
-                        .fillMaxHeight(),
+                        .fillMaxSize(),
+                    verticalAlignment = Alignment.Top,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "86%",
+                            style = TextStyle(
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 50.sp,
+                                color = ColorProvider(Color.White)
+                            )
+                        )
+                        Text(
+                            text = "Sunset quality",
+                            style = TextStyle(
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp,
+                                color = ColorProvider(Color.White)
+                            )
+                        )
+                    }
+                }
+                Row(
+                    modifier = GlanceModifier
+                        .fillMaxSize(),
                     verticalAlignment = Alignment.Bottom,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -58,10 +87,20 @@ class SunsetPredictionWidget : GlanceAppWidget() {
                             modifier = GlanceModifier.size(50.dp)
                         )
                         Text(
-                            text = "Sunset"
+                            text = "Sunset",
+                            style = TextStyle(
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 16.sp,
+                                color = ColorProvider(Color.White)
+                            )
                         )
                         Text(
-                            text = "15:34"
+                            text = "15:34",
+                            style = TextStyle(
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 20.sp,
+                                color = ColorProvider(Color.White)
+                            )
                         )
                     }
                     Column(
@@ -75,10 +114,20 @@ class SunsetPredictionWidget : GlanceAppWidget() {
                             modifier = GlanceModifier.size(50.dp)
                         )
                         Text(
-                            text = "Golden hour"
+                            text = "Golden hour",
+                            style = TextStyle(
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 16.sp,
+                                color = ColorProvider(Color.White)
+                            )
                         )
                         Text(
-                            text = "15:34"
+                            text = "15:34",
+                            style = TextStyle(
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 20.sp,
+                                color = ColorProvider(Color.White)
+                            )
                         )
                     }
                     Column(
@@ -92,10 +141,20 @@ class SunsetPredictionWidget : GlanceAppWidget() {
                             modifier = GlanceModifier.size(50.dp)
                         )
                         Text(
-                            text = "Blue hour"
+                            text = "Blue hour",
+                            style = TextStyle(
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 16.sp,
+                                color = ColorProvider(Color.White)
+                            )
                         )
                         Text(
-                            text = "15:34"
+                            text = "15:34",
+                            style = TextStyle(
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 20.sp,
+                                color = ColorProvider(Color.White)
+                            )
                         )
                     }
                 }

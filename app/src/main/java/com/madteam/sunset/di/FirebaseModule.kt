@@ -9,6 +9,8 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.firebase.remoteconfig.ktx.remoteConfig
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
 import dagger.Module
@@ -41,5 +43,9 @@ object FirebaseModule {
     @Singleton
     @Provides
     fun providesFirebaseDatabase(): FirebaseDatabase = Firebase.database
+
+    @Singleton
+    @Provides
+    fun providesFirebaseConfig(): FirebaseRemoteConfig = Firebase.remoteConfig
 
 }

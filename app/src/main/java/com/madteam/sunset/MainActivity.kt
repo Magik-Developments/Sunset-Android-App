@@ -19,6 +19,7 @@ import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.UpdateAvailability
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.madteam.sunset.data.repositories.AuthRepository
 import com.madteam.sunset.navigation.SunsetNavigation
 import com.madteam.sunset.ui.theme.SunsetTheme
@@ -33,6 +34,9 @@ class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var authRepository: AuthRepository
+
+    @Inject
+    lateinit var remoteConfig: FirebaseRemoteConfig
 
     private lateinit var appUpdateManager: AppUpdateManager
 
@@ -60,17 +64,32 @@ class MainActivity : ComponentActivity() {
         //Init AdMob
         MobileAds.initialize(this) {}
 
+        //Set remoteConfig defaults
+        getRemoteConfig()
+
         //Init In-App Update
         appUpdateManager = AppUpdateManagerFactory.create(this)
         checkIfUpdateIsAvailable()
     }
 
+    private fun getRemoteConfig() {
+        remoteConfig.setDefaultsAsync(
+            mapOf(
+                "forceVersion" to false,
+                "minVersion" to BuildConfig.VERSION_NAME
+            )
+        )
+    }
+
     private fun checkIfUpdateIsAvailable() {
+        val isVersionForced = remoteConfig.getBoolean("forceVersion")
+        val minVersion = remoteConfig.getString("minVersion")
         val appUpdateInfoTask = appUpdateManager.appUpdateInfo
         appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
             if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
                 && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)
-                && appUpdateInfo.updatePriority() >= 4
+                && isVersionForced
+                && BuildConfig.VERSION_NAME < minVersion
             ) {
                 startAppUpdate(
                     appUpdateInfo,

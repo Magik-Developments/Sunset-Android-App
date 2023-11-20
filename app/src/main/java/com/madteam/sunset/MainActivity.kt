@@ -79,6 +79,7 @@ class MainActivity : ComponentActivity() {
                 "minVersion" to BuildConfig.VERSION_NAME
             )
         )
+        remoteConfig.fetchAndActivate()
     }
 
     private fun checkIfUpdateIsAvailable() {

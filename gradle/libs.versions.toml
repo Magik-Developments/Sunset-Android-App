@@ -31,6 +31,7 @@ glide = "1.0.0-alpha.1"
 roomKtx = "2.6.0"
 play-services-auth = "20.7.0"
 secretsGradlePlugin = "2.0.1"
+play-app-updates = "2.0.1"
 
 
 [libraries]
@@ -84,3 +85,5 @@ compose-material = { module = "androidx.compose.material:material" }
 compose-material-icons = { module = "androidx.compose.material:material-icons-extended" }
 secrets-gradle-plugin = { module = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin", version.ref = "secretsGradlePlugin" }
 play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "play-services-auth" }
+play-app-updates = { group = "com.google.android.play", name = "app-update", version.ref = "play-app-updates" }
+play-app-updates-ktx = { group = "com.google.android.play", name = "app-update-ktx", version.ref = "play-app-updates" }

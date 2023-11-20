@@ -120,6 +120,10 @@ dependencies {
     // Google AdMob
     implementation(libs.play.services.ads)
 
+    //Google Play App Updates
+    implementation(libs.play.app.updates)
+    implementation(libs.play.app.updates.ktx)
+
     // Compose
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.ui)

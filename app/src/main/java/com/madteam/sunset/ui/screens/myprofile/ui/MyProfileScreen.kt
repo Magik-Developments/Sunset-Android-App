@@ -1,5 +1,6 @@
 package com.madteam.sunset.ui.screens.myprofile.ui
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -13,6 +14,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetLayout
@@ -38,15 +41,17 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.madteam.sunset.R
+import com.madteam.sunset.data.model.Spot
+import com.madteam.sunset.data.model.SpotPost
 import com.madteam.sunset.navigation.SunsetRoutes
 import com.madteam.sunset.ui.common.BottomSheetSettingsMenu
 import com.madteam.sunset.ui.common.CustomSpacer
+import com.madteam.sunset.ui.common.CustomTabRow
 import com.madteam.sunset.ui.common.DismissAndPositiveDialog
 import com.madteam.sunset.ui.common.ImagePostCardProfile
 import com.madteam.sunset.ui.common.ImageSpotCardProfile
 import com.madteam.sunset.ui.common.MyProfileTopAppBar
 import com.madteam.sunset.ui.common.ProfileImage
-import com.madteam.sunset.ui.common.ProfilePostTypeTab
 import com.madteam.sunset.ui.common.SunsetBottomNavigation
 import com.madteam.sunset.ui.common.ThinButtonLight
 import com.madteam.sunset.ui.screens.editprofile.ui.BottomSheetEditProfileScreen
@@ -121,7 +126,6 @@ fun MyProfileScreen(
                         MyProfileContent(
                             state = state,
                             onEditProfileClick = { coroutineScope.launch { editProfileModalState.show() } },
-                            onTabClicked = { viewModel.onEvent(MyProfileUIEvent.TabClicked(it)) },
                             navigateTo = navController::navigate,
                             setShowLogoutDialog = {
                                 viewModel.onEvent(
@@ -140,15 +144,18 @@ fun MyProfileScreen(
 
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MyProfileContent(
     state: MyProfileUIState,
     onEditProfileClick: () -> Unit,
-    onTabClicked: (Int) -> Unit,
     navigateTo: (String) -> Unit,
     setShowLogoutDialog: (Boolean) -> Unit,
     logOut: () -> Unit
 ) {
+
+    val pagerState = rememberPagerState { 2 }
+    val coroutineScope = rememberCoroutineScope()
 
     if (state.showLogoutDialog) {
         DismissAndPositiveDialog(
@@ -251,99 +258,143 @@ fun MyProfileContent(
         }
         CustomSpacer(size = 8.dp)
         CustomSpacer(size = 24.dp)
-        ProfilePostTypeTab(
-            tabOptions = listOf("Posts", "Spots"),
-            selectedTab = state.selectedTab,
-            tabOnClick = { onTabClicked(it) }
+        CustomTabRow(
+            tabs = listOf("Posts", "Spots"),
+            selectedTabIndex = pagerState.currentPage,
+            onTabClick = {
+                coroutineScope.launch {
+                    pagerState.animateScrollToPage(it)
+                }
+            },
         )
         CustomSpacer(size = 8.dp)
-        when (state.selectedTab) {
-            0 -> {
-                if (state.userPosts.isNotEmpty()) {
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(2),
-                        content = {
-                            itemsIndexed(state.userPosts) { _, post ->
-                                ImagePostCardProfile(
-                                    postInfo = post,
-                                    onItemClicked = {
-                                        navigateTo("post_screen/postReference=${post.id}")
-                                    }
-                                )
+        HorizontalPager(
+            state = pagerState,
+            verticalAlignment = Alignment.Top,
+            pageSpacing = 8.dp,
+            modifier = Modifier
+                .fillMaxSize()
+        ) { index ->
+            when (index) {
+                0 -> {
+                    if (state.userPosts.isNotEmpty()) {
+                        PostsProfileGrid(
+                            userPosts = state.userPosts,
+                            onPostClick = {
+                                navigateTo("post_screen/postReference=$it")
                             }
-                        },
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    )
-                } else {
-                    Column(
-                        Modifier
-                            .padding(24.dp)
-                            .fillMaxSize(),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Icon(
-                            modifier = Modifier
-                                .size(48.dp),
-                            imageVector = Icons.Outlined.CameraAlt,
-                            contentDescription = "Posts not found"
                         )
-                        CustomSpacer(size = 16.dp)
-                        Text(
-                            text = stringResource(id = R.string.no_posts_yet),
-                            style = secondaryRegularBodyL
-                        )
+                    } else {
+                        NoAvailablePostsYet()
                     }
                 }
-            }
 
-            1 -> {
-                if (state.userSpots.isNotEmpty()) {
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(2),
-                        content = {
-                            itemsIndexed(state.userSpots) { _, spot ->
-                                ImageSpotCardProfile(
-                                    spotInfo = spot,
-                                    onItemClicked = {
-                                        navigateTo("spot_detail_screen/spotReference=${spot.id}")
-                                    }
-                                )
+                1 -> {
+                    if (state.userSpots.isNotEmpty()) {
+                        SpotsProfileGrid(
+                            userSpots = state.userSpots,
+                            onSpotClick = {
+                                navigateTo("spot_detail_screen/spotReference=$it")
                             }
-                        },
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    )
-                } else {
-                    Column(
-                        Modifier
-                            .padding(24.dp)
-                            .fillMaxSize(),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Icon(
-                            modifier = Modifier
-                                .size(48.dp),
-                            imageVector = Icons.Outlined.CameraAlt,
-                            contentDescription = "Posts not found"
                         )
-                        CustomSpacer(size = 16.dp)
-                        Text(
-                            text = stringResource(id = R.string.no_discovered_spots_yet),
-                            style = secondaryRegularBodyL
-                        )
+                    } else {
+                        NoAvailableSpotsYet()
                     }
                 }
-            }
-
-            2 -> {
-                // TODO: Save spots on lists feature still not developed
             }
         }
         CustomSpacer(size = 8.dp)
     }
+}
+
+@Composable
+fun NoAvailableSpotsYet() {
+    Column(
+        Modifier
+            .padding(24.dp)
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Icon(
+            modifier = Modifier
+                .size(48.dp),
+            imageVector = Icons.Outlined.CameraAlt,
+            contentDescription = "Posts not found"
+        )
+        CustomSpacer(size = 16.dp)
+        Text(
+            text = stringResource(id = R.string.no_discovered_spots_yet),
+            style = secondaryRegularBodyL
+        )
+    }
+}
+
+@Composable
+fun SpotsProfileGrid(
+    userSpots: List<Spot>,
+    onSpotClick: (String) -> Unit
+) {
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2),
+        content = {
+            itemsIndexed(userSpots) { _, spot ->
+                ImageSpotCardProfile(
+                    spotInfo = spot,
+                    onItemClicked = {
+                        onSpotClick(spot.id)
+                    }
+                )
+            }
+        },
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    )
+}
+
+@Composable
+fun NoAvailablePostsYet() {
+    Column(
+        Modifier
+            .padding(24.dp)
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Icon(
+            modifier = Modifier
+                .size(48.dp),
+            imageVector = Icons.Outlined.CameraAlt,
+            contentDescription = "Posts not found"
+        )
+        CustomSpacer(size = 16.dp)
+        Text(
+            text = stringResource(id = R.string.no_posts_yet),
+            style = secondaryRegularBodyL
+        )
+    }
+}
+
+@Composable
+fun PostsProfileGrid(
+    userPosts: List<SpotPost>,
+    onPostClick: (String) -> Unit
+) {
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2),
+        content = {
+            itemsIndexed(userPosts) { _, post ->
+                ImagePostCardProfile(
+                    postInfo = post,
+                    onItemClicked = {
+                        onPostClick(post.id)
+                    }
+                )
+            }
+        },
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    )
 }
 
 

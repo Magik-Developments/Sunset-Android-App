@@ -66,16 +66,15 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-
         <receiver
-            android:name=".ui.widget.sunsetpredictionwidget.SunsetPredictionWidgetReceiver"
+            android:name=".ui.widget.sunsetpredictionwidget.SmallSunsetHourWidgetReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/sunset_prediction_widget_info" />
+                android:resource="@xml/small_sunset_hour_widget_info" />
         </receiver>
     </application>
 

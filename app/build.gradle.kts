@@ -150,6 +150,10 @@ dependencies {
     implementation(libs.play.services.location)
     implementation(libs.maps.compose)
 
+    //Glance
+    implementation(libs.glance)
+    implementation(libs.glance.material3)
+
     // Room
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)

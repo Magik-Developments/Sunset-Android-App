@@ -187,4 +187,5 @@
     <string name="menu_tab_discover">Spots</string>
     <string name="menu_tab_prediction">Quality</string>
     <string name="menu_tab_home">Home</string>
+  <string name="small_hour_widget_description">Sunset time</string>
 </resources>

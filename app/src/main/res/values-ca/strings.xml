@@ -187,4 +187,5 @@
     <string name="menu_tab_discover">Spots</string>
     <string name="menu_tab_prediction">Qualitat</string>
     <string name="menu_tab_home">Inici</string>
+    <string name="small_hour_widget_description">Hora del Sunset</string>
 </resources>

@@ -1,7 +1,6 @@
 package com.madteam.sunset.ui.screens.myprofile.ui
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -192,7 +191,6 @@ fun MyProfileContent(
             .fillMaxSize()
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
-            .background(Color.White)
     ) {
         CustomSpacer(size = 16.dp)
         ProfileImage(imageUrl = state.userInfo.image, size = 80.dp)

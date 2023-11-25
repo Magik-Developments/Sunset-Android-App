@@ -3,6 +3,7 @@ package com.madteam.sunset.ui.screens.home.ui
 import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -147,23 +148,27 @@ fun HomeContent(
             .fillMaxSize()
             .verticalScroll(scrollState)
     ) {
-        if (state.remainingTimeToSunset.isNotEmpty()) {
-            CustomSpacer(size = 16.dp)
-            Text(
-                text = stringResource(id = R.string.dont_miss_sunset),
-                style = primaryBoldHeadlineS,
-                color = Color(0xFF333333),
-                modifier = Modifier
-                    .padding(horizontal = 24.dp)
-            )
-            CustomSpacer(size = 16.dp)
-            SunsetInfoModule(
-                sunsetTimeInformation = state.sunsetTimeInformation,
-                userLocality = state.userLocality,
-                remainingTimeToSunset = state.remainingTimeToSunset,
-                clickToExplore = { navigateTo(SunsetRoutes.DiscoverScreen.route) },
-                modifier = Modifier.padding(horizontal = 24.dp)
-            )
+        AnimatedVisibility(visible = state.remainingTimeToSunset.isNotEmpty()) {
+            Column(
+                Modifier.fillMaxSize()
+            ) {
+                CustomSpacer(size = 16.dp)
+                Text(
+                    text = stringResource(id = R.string.dont_miss_sunset),
+                    style = primaryBoldHeadlineS,
+                    color = Color(0xFF333333),
+                    modifier = Modifier
+                        .padding(horizontal = 24.dp)
+                )
+                CustomSpacer(size = 16.dp)
+                SunsetInfoModule(
+                    sunsetTimeInformation = state.sunsetTimeInformation,
+                    userLocality = state.userLocality,
+                    remainingTimeToSunset = state.remainingTimeToSunset,
+                    clickToExplore = { navigateTo(SunsetRoutes.DiscoverScreen.route) },
+                    modifier = Modifier.padding(horizontal = 24.dp)
+                )
+            }
         }
         CustomSpacer(size = 16.dp)
         SunsetButton(

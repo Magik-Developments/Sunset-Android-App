@@ -24,6 +24,10 @@
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="@string/GOOGLE_ADMOB_KEY" />
+        <meta-data
+            android:name="CodeName"
+            android:value="ALBACETE" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

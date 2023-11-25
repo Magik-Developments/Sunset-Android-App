@@ -3,6 +3,7 @@ package com.madteam.sunset.ui.screens.home.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
+import com.madteam.sunset.data.model.SunsetTimeResponse
 import com.madteam.sunset.data.repositories.AuthRepository
 import com.madteam.sunset.data.repositories.DatabaseRepository
 import com.madteam.sunset.data.repositories.LocationRepository
@@ -161,7 +162,11 @@ class HomeViewModel @Inject constructor(
                         )
                     )
                 )
-                delay(60000)
+                if (_state.value.sunsetTimeInformation != SunsetTimeResponse()) {
+                    delay(60000)
+                } else {
+                    delay(1000)
+                }
             }
         }
     }

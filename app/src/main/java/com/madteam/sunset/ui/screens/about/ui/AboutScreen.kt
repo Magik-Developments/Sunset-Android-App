@@ -81,7 +81,7 @@ fun AboutContent() {
         CustomSpacer(size = 16.dp)
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center
+            horizontalArrangement = Arrangement.SpaceAround
         ) {
             IconButton(onClick = {
                 uriHandler.openUri(INSTAGRAM_URL)

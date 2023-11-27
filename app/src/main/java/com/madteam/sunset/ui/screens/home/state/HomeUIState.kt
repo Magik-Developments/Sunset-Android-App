@@ -13,5 +13,6 @@ data class HomeUIState(
     val remainingTimeToSunset: String = "",
     val spotsList: List<Spot> = listOf(),
     val postsList: List<SpotPost> = listOf(),
-    val userInfo: UserProfile = UserProfile()
+    val userInfo: UserProfile = UserProfile(),
+    val showLocationPermissionDialog: Boolean = false
 )

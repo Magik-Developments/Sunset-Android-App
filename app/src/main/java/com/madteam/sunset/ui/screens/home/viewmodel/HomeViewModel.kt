@@ -3,6 +3,7 @@ package com.madteam.sunset.ui.screens.home.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
+import com.madteam.sunset.data.model.SunsetTimeResponse
 import com.madteam.sunset.data.repositories.AuthRepository
 import com.madteam.sunset.data.repositories.DatabaseRepository
 import com.madteam.sunset.data.repositories.LocationRepository
@@ -58,6 +59,10 @@ class HomeViewModel @Inject constructor(
 
             is HomeUIEvent.UpdateUserLocation -> {
                 updateUserLocation(event.location)
+            }
+
+            is HomeUIEvent.ShowLocationPermissionDialog -> {
+                updateLocationPermissionDialog(event.show)
             }
         }
     }
@@ -157,7 +162,11 @@ class HomeViewModel @Inject constructor(
                         )
                     )
                 )
-                delay(60000)
+                if (_state.value.sunsetTimeInformation != SunsetTimeResponse()) {
+                    delay(60000)
+                } else {
+                    delay(1000)
+                }
             }
         }
     }
@@ -219,6 +228,10 @@ class HomeViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun updateLocationPermissionDialog(show: Boolean) {
+        _state.value = _state.value.copy(showLocationPermissionDialog = show)
     }
 
 }

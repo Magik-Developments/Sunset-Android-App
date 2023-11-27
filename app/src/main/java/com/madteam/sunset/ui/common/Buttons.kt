@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -47,17 +48,18 @@ import com.madteam.sunset.ui.theme.secondarySemiBoldHeadLineS
 
 @Composable
 fun SunsetButton(
+    modifier: Modifier = Modifier,
     @StringRes text: Int,
     onClick: () -> Unit,
     enabled: Boolean = true,
-    modifier: Modifier = Modifier
+    maxLines: Int = 1
 ) {
     Button(
         onClick = onClick,
         enabled = enabled,
         modifier = modifier
             .fillMaxWidth()
-            .height(48.dp)
+            .defaultMinSize(minHeight = 48.dp)
             .clip(RoundedCornerShape(16.dp)),
         colors = ButtonDefaults.buttonColors(
             backgroundColor = Color(0xFFFFB600),
@@ -68,7 +70,10 @@ fun SunsetButton(
             modifier = Modifier.align(Alignment.CenterVertically),
             text = stringResource(text),
             color = Color(0xFFFFFFFF),
-            style = secondarySemiBoldHeadLineS
+            style = secondarySemiBoldHeadLineS,
+            maxLines = maxLines,
+            overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Center
         )
     }
 }

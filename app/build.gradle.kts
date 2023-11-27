@@ -22,8 +22,8 @@ android {
         applicationId = "com.madteam.sunset"
         minSdk = 26
         targetSdk = 34
-        versionCode = 7
-        versionName = "0.2"
+        versionCode = 9
+        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -59,6 +59,10 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        debug {
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-debug"
         }
     }
 
@@ -120,6 +124,10 @@ dependencies {
     // Google AdMob
     implementation(libs.play.services.ads)
 
+    //Google Play App Updates
+    implementation(libs.play.app.updates)
+    implementation(libs.play.app.updates.ktx)
+
     // Compose
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.ui)
@@ -145,6 +153,10 @@ dependencies {
     implementation(libs.play.services.maps)
     implementation(libs.play.services.location)
     implementation(libs.maps.compose)
+
+    //Glance
+    implementation(libs.glance)
+    implementation(libs.glance.material3)
 
     // Room
     implementation(libs.androidx.room.ktx)

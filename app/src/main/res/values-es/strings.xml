@@ -182,4 +182,10 @@
     <string name="go_to_web">Ir a la web</string>
     <string name="go_to_github">Ir a Github</string>
     <string name="made_with_love_from_bcn">Hecho con ❤️ desde Barcelona</string>
+    <string name="know_spot_quality">¡Descubre la calidad del Sunset!</string>
+    <string name="menu_tab_profile">Perfil</string>
+    <string name="menu_tab_discover">Spots</string>
+    <string name="menu_tab_prediction">Calidad</string>
+    <string name="menu_tab_home">Inicio</string>
+    <string name="small_hour_widget_description">Hora del Sunset</string>
 </resources>

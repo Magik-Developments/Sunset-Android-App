@@ -44,6 +44,7 @@ import com.madteam.sunset.R
 import com.madteam.sunset.navigation.SunsetBottomNavItem
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineM
 import com.madteam.sunset.ui.theme.secondaryRegularBodyL
+import com.madteam.sunset.ui.theme.secondaryRegularBodyM
 import com.madteam.sunset.utils.shadow
 
 @Composable
@@ -88,9 +89,23 @@ fun SunsetBottomNavigation(navController: NavController) {
                         restoreState = true
                     }
                 },
+                label = {
+                    val style = if (currentRoute == item.route) {
+                        secondaryRegularBodyL
+                    } else {
+                        secondaryRegularBodyM
+                    }
+                    Text(
+                        text = stringResource(id = item.title),
+                        style = style,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                },
                 icon = {
                     Icon(
-                        imageVector = item.icon, contentDescription = item.title,
+                        imageVector = item.icon,
+                        contentDescription = stringResource(id = item.title),
                         modifier = Modifier
                             .height(32.dp)
                             .width(32.dp)

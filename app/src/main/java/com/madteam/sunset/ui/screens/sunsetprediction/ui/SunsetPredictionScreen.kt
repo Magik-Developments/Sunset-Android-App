@@ -348,7 +348,7 @@ fun SunsetPredictionContent(
                         )
                     }
                 }
-                if (previsionDay < 2) {
+                if (previsionDay < 2 && !state.connectionError) {
                     IconButton(
                         onClick = {
                             setNextDayPrediction()

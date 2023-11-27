@@ -3,6 +3,7 @@ package com.madteam.sunset.ui.screens.home.ui
 import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,6 +23,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,14 +40,19 @@ import com.google.android.gms.maps.model.LatLng
 import com.madteam.sunset.R
 import com.madteam.sunset.navigation.SunsetRoutes
 import com.madteam.sunset.ui.common.CustomSpacer
+import com.madteam.sunset.ui.common.LocationPermissionDialog
 import com.madteam.sunset.ui.common.SunsetBottomNavigation
+import com.madteam.sunset.ui.common.SunsetButton
 import com.madteam.sunset.ui.common.SunsetInfoModule
 import com.madteam.sunset.ui.screens.home.state.HomeUIEvent
 import com.madteam.sunset.ui.screens.home.state.HomeUIState
 import com.madteam.sunset.ui.screens.home.viewmodel.HomeViewModel
 import com.madteam.sunset.ui.theme.primaryBoldHeadlineS
 import com.madteam.sunset.utils.getCurrentLocation
+import com.madteam.sunset.utils.hasLocationPermission
 import com.madteam.sunset.utils.shimmerBrush
+import com.madteam.sunset.utils.switchTab
+import kotlinx.coroutines.delay
 
 @Composable
 fun HomeScreen(
@@ -66,7 +75,15 @@ fun HomeScreen(
                     spotLikeClick = { viewModel.onEvent(HomeUIEvent.ModifyUserSpotLike(it)) },
                     postLikeClick = { viewModel.onEvent(HomeUIEvent.ModifyUserPostLike(it)) },
                     loadNextSpotsPage = { viewModel.onEvent(HomeUIEvent.LoadNextSpotsPage) },
-                    loadNextPostsPage = { viewModel.onEvent(HomeUIEvent.LoadNextPostsPage) }
+                    loadNextPostsPage = { viewModel.onEvent(HomeUIEvent.LoadNextPostsPage) },
+                    navigateToSunsetPrediction = { navController.switchTab(SunsetRoutes.SunsetPredictionScreen.route) },
+                    setShowLocationPermissionDialog = {
+                        viewModel.onEvent(
+                            HomeUIEvent.ShowLocationPermissionDialog(
+                                it
+                            )
+                        )
+                    }
                 )
             }
         }
@@ -81,13 +98,19 @@ fun HomeContent(
     spotLikeClick: (String) -> Unit,
     postLikeClick: (String) -> Unit,
     loadNextSpotsPage: () -> Unit,
-    loadNextPostsPage: () -> Unit
+    loadNextPostsPage: () -> Unit,
+    navigateToSunsetPrediction: () -> Unit,
+    setShowLocationPermissionDialog: (Boolean) -> Unit
 ) {
 
     val context = LocalContext.current
     val scrollState = rememberScrollState()
 
-    val requestPermissionLauncher =
+    var permissionNotGranted by remember {
+        mutableStateOf(false)
+    }
+
+    val requestLocationPermissionLauncher =
         rememberLauncherForActivityResult(
             contract = ActivityResultContracts.RequestPermission(),
             onResult = { isGranted ->
@@ -95,12 +118,29 @@ fun HomeContent(
                     getCurrentLocation(context) { lat, long ->
                         updateUserLocation(LatLng(lat, long))
                     }
+                } else {
+                    permissionNotGranted = true
+                }
+            })
+
+    LaunchedEffect(state.sunsetTimeInformation) {
+        delay(1000)
+        if (hasLocationPermission(context)) {
+            if (state.userLocation == LatLng(0.0, 0.0)) {
+                getCurrentLocation(context) { lat, long ->
+                    updateUserLocation(LatLng(lat, long))
                 }
             }
-        )
+        } else {
+            setShowLocationPermissionDialog(true)
+        }
+    }
 
-    LaunchedEffect(key1 = state.sunsetTimeInformation) {
-        requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+    if (state.showLocationPermissionDialog) {
+        LocationPermissionDialog {
+            requestLocationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            setShowLocationPermissionDialog(false)
+        }
     }
 
     Column(
@@ -108,24 +148,37 @@ fun HomeContent(
             .fillMaxSize()
             .verticalScroll(scrollState)
     ) {
-        if (state.remainingTimeToSunset.isNotEmpty()) {
-            CustomSpacer(size = 16.dp)
-            Text(
-                text = stringResource(id = R.string.dont_miss_sunset),
-                style = primaryBoldHeadlineS,
-                color = Color(0xFF333333),
-                modifier = Modifier
-                    .padding(horizontal = 24.dp)
-            )
-            CustomSpacer(size = 16.dp)
-            SunsetInfoModule(
-                sunsetTimeInformation = state.sunsetTimeInformation,
-                userLocality = state.userLocality,
-                remainingTimeToSunset = state.remainingTimeToSunset,
-                clickToExplore = { navigateTo(SunsetRoutes.DiscoverScreen.route) },
-                modifier = Modifier.padding(horizontal = 24.dp)
-            )
+        AnimatedVisibility(visible = state.remainingTimeToSunset.isNotEmpty()) {
+            Column(
+                Modifier.fillMaxSize()
+            ) {
+                CustomSpacer(size = 16.dp)
+                Text(
+                    text = stringResource(id = R.string.dont_miss_sunset),
+                    style = primaryBoldHeadlineS,
+                    color = Color(0xFF333333),
+                    modifier = Modifier
+                        .padding(horizontal = 24.dp)
+                )
+                CustomSpacer(size = 16.dp)
+                SunsetInfoModule(
+                    sunsetTimeInformation = state.sunsetTimeInformation,
+                    userLocality = state.userLocality,
+                    remainingTimeToSunset = state.remainingTimeToSunset,
+                    clickToExplore = { navigateTo(SunsetRoutes.DiscoverScreen.route) },
+                    modifier = Modifier.padding(horizontal = 24.dp)
+                )
+            }
         }
+        CustomSpacer(size = 16.dp)
+        SunsetButton(
+            modifier = Modifier.padding(horizontal = 24.dp),
+            onClick = {
+                navigateToSunsetPrediction()
+            },
+            text = R.string.know_spot_quality,
+            maxLines = 2
+        )
         CustomSpacer(size = 16.dp)
         Text(
             text = stringResource(id = R.string.last_spots_posted),

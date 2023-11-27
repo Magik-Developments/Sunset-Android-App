@@ -6,6 +6,7 @@ sealed class HomeUIEvent {
     data class UpdateUserLocation(val location: LatLng) : HomeUIEvent()
     data class ModifyUserSpotLike(val spotId: String) : HomeUIEvent()
     data class ModifyUserPostLike(val postId: String) : HomeUIEvent()
+    data class ShowLocationPermissionDialog(val show: Boolean) : HomeUIEvent()
     data object LoadNextSpotsPage : HomeUIEvent()
     data object LoadNextPostsPage : HomeUIEvent()
 }

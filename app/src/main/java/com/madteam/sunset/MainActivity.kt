@@ -123,6 +123,7 @@ class MainActivity : ComponentActivity() {
             ).apply {
                 lightColor = R.color.sunset
                 enableLights(true)
+                description = getString(R.string.sunsets_notifications)
             }
             val notificationManager =
                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

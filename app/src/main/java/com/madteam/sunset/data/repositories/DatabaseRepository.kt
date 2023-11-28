@@ -240,7 +240,7 @@ class DatabaseRepository @Inject constructor(
         }
         with(userProfileSnapshot.first()) {
             return UserProfile(
-                username = getString("username") ?: "",
+                username = getString("username")?.lowercase() ?: "",
                 email = getString("email") ?: "",
                 provider = getString("provider") ?: "",
                 creation_date = getString("creation_date") ?: "",

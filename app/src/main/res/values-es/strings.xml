@@ -188,4 +188,5 @@
     <string name="menu_tab_prediction">Calidad</string>
     <string name="menu_tab_home">Inicio</string>
     <string name="small_hour_widget_description">Hora del Sunset</string>
+    <string name="username_rules">El usuario debe tener entre 6 y 20 caracteres y no se permiten caracteres especiales</string>
 </resources>

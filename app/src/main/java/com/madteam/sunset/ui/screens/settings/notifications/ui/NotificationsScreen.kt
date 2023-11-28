@@ -48,7 +48,7 @@ import com.madteam.sunset.ui.theme.secondaryRegularBodyM
 import com.madteam.sunset.utils.hasNotificationsPermission
 
 const val SUNSETS_TIME_CHANNEL_ID = "com.madteam.sunset.sunsetsnotifications"
-const val SUNSETS_TIME_CHANNEL_NAME = R.string.sunsets_notices
+const val SUNSETS_TIME_CHANNEL_NAME = "Sunsets Time"
 
 @Composable
 fun NotificationsScreen(
@@ -164,7 +164,8 @@ fun NotificationsContent(
                     Switch(
                         checked = isSunsetsTimeChannelEnabled,
                         onCheckedChange = {
-                            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                            val intent = Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS)
+                            intent.putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
                             val uri = Uri.fromParts("package", context.packageName, null)
                             intent.data = uri
                             context.startActivity(intent)

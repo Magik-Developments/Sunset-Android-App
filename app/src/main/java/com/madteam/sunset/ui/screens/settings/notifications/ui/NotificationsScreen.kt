@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -166,8 +165,7 @@ fun NotificationsContent(
                         onCheckedChange = {
                             val intent = Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS)
                             intent.putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
-                            val uri = Uri.fromParts("package", context.packageName, null)
-                            intent.data = uri
+                            intent.putExtra(Settings.EXTRA_CHANNEL_ID, SUNSETS_TIME_CHANNEL_ID)
                             context.startActivity(intent)
                         },
                         colors = SwitchDefaults.colors(

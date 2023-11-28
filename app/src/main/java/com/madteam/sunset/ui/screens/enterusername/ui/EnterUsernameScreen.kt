@@ -118,8 +118,12 @@ fun EnterUsernameScreen(
                     ErrorIcon()
                 }
             },
-            isError = state.usernameAlreadyExists,
-            errorMessage = R.string.user_already_exists
+            isError = (state.usernameAlreadyExists || !state.usernameIsValid) && state.username.isNotBlank(),
+            errorMessage = if (state.usernameAlreadyExists) {
+                R.string.user_already_exists
+            } else {
+                R.string.username_rules
+            }
         )
         CustomSpacer(size = 24.dp)
         SmallButtonDark(onClick = {

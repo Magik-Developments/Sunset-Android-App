@@ -1,7 +1,11 @@
 package com.madteam.sunset
 
 import android.app.Activity
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -22,6 +26,8 @@ import com.google.android.play.core.install.model.UpdateAvailability
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.madteam.sunset.data.repositories.AuthRepository
 import com.madteam.sunset.navigation.SunsetNavigation
+import com.madteam.sunset.ui.screens.settings.notifications.ui.SUNSETS_TIME_CHANNEL_ID
+import com.madteam.sunset.ui.screens.settings.notifications.ui.SUNSETS_TIME_CHANNEL_NAME
 import com.madteam.sunset.ui.theme.SunsetTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -70,6 +76,9 @@ class MainActivity : ComponentActivity() {
         //Init In-App Update
         appUpdateManager = AppUpdateManagerFactory.create(this)
         checkIfUpdateIsAvailable()
+
+        //Create notifications channels
+        createNotificationsChannels()
     }
 
     private fun getRemoteConfig() {
@@ -102,6 +111,23 @@ class MainActivity : ComponentActivity() {
             ) {
                 startAppUpdate(appUpdateInfo, AppUpdateType.FLEXIBLE, FLEXIBLE_UPDATE_REQUEST_CODE)
             }
+        }
+    }
+
+    private fun createNotificationsChannels() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val channel = NotificationChannel(
+                SUNSETS_TIME_CHANNEL_ID,
+                SUNSETS_TIME_CHANNEL_NAME,
+                NotificationManager.IMPORTANCE_DEFAULT
+            ).apply {
+                lightColor = R.color.sunset
+                enableLights(true)
+                description = getString(R.string.sunsets_notifications)
+            }
+            val notificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
         }
     }
 

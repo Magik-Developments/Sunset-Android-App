@@ -189,4 +189,5 @@
     <string name="menu_tab_home">Inici</string>
     <string name="small_hour_widget_description">Hora del Sunset</string>
     <string name="username_rules">El usuari ha de tenir entre 6 i 20 caràcters i no es permeten caràcters especials</string>
+    <string name="accept_policies">Acceptar</string>
 </resources>

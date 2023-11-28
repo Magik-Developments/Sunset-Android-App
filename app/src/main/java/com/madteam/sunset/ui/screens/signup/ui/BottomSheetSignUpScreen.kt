@@ -110,7 +110,7 @@ fun BottomSheetSignUpContent(
                 setShowDialog(false)
             },
             dismissButtonText = string.read_policies,
-            positiveButtonText = string.sign_up,
+            positiveButtonText = string.accept_policies,
             dialogTitle = string.privacy_dialog_title,
             dialogDescription = string.privacy_dialog_description,
             image = R.drawable.sunset_vectorial_art_01,

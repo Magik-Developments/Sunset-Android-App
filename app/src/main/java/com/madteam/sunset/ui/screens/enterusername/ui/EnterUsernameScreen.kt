@@ -75,7 +75,7 @@ fun EnterUsernameScreen(
                     viewModel.onEvent(EnterUsernameUIEvent.SetShowDialog(false))
                 },
                 dismissButtonText = R.string.read_policies,
-                positiveButtonText = R.string.sign_up,
+                positiveButtonText = R.string.accept_policies,
                 dialogTitle = R.string.privacy_dialog_title,
                 dialogDescription = R.string.privacy_dialog_description,
                 image = R.drawable.sunset_vectorial_art_01,

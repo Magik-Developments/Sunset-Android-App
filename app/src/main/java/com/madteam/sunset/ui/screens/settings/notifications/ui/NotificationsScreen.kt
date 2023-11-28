@@ -42,6 +42,9 @@ import com.madteam.sunset.ui.theme.primaryBoldHeadlineS
 import com.madteam.sunset.ui.theme.secondaryRegularBodyM
 import com.madteam.sunset.utils.hasNotificationsPermission
 
+const val SUNSETS_TIME_CHANNEL_ID = "com.madteam.sunset.sunsetsnotifications"
+const val SUNSETS_TIME_CHANNEL_NAME = R.string.sunsets_notices
+
 @Composable
 fun NotificationsScreen(
     navController: NavController,

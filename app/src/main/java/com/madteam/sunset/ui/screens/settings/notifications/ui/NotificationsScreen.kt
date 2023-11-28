@@ -1,7 +1,12 @@
 package com.madteam.sunset.ui.screens.settings.notifications.ui
 
 import android.Manifest
+import android.app.NotificationManager
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
+import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -77,7 +82,6 @@ fun NotificationsScreen(
             }
         }
     )
-
 }
 
 @Composable
@@ -92,6 +96,10 @@ fun NotificationsContent(
         mutableStateOf(true)
     }
 
+    var isSunsetsTimeChannelEnabled by remember {
+        mutableStateOf(false)
+    }
+
     val requestLocationPermissionLauncher =
         rememberLauncherForActivityResult(
             contract = ActivityResultContracts.RequestPermission(),
@@ -104,6 +112,11 @@ fun NotificationsContent(
     LaunchedEffect(Unit) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             notificationsGranted = hasNotificationsPermission(context)
+            val notificationManager =
+                context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            isSunsetsTimeChannelEnabled = notificationManager.getNotificationChannel(
+                SUNSETS_TIME_CHANNEL_ID
+            )?.importance != NotificationManager.IMPORTANCE_NONE
         }
     }
 
@@ -149,8 +162,13 @@ fun NotificationsContent(
                     horizontalAlignment = Alignment.End
                 ) {
                     Switch(
-                        checked = true,
-                        onCheckedChange = {},
+                        checked = isSunsetsTimeChannelEnabled,
+                        onCheckedChange = {
+                            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                            val uri = Uri.fromParts("package", context.packageName, null)
+                            intent.data = uri
+                            context.startActivity(intent)
+                        },
                         colors = SwitchDefaults.colors(
                             checkedTrackColor = Color(0xFFFFB600),
                             disabledCheckedTrackColor = Color(0xFFFFE094)

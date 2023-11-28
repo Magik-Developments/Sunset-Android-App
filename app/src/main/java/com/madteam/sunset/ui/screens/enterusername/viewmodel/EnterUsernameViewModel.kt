@@ -53,8 +53,15 @@ class EnterUsernameViewModel @Inject constructor(
     }
 
     private fun validateUsername() {
-        if (_state.value.username.length > 5) {
+        val username = _state.value.username
+
+        val isLengthValid = username.length in 6..20
+        val containsNotValidChars = !username.matches(Regex("[A-Za-z0-9]+"))
+
+        if (isLengthValid && !containsNotValidChars) {
             _state.value = _state.value.copy(usernameIsValid = true)
+        } else {
+            _state.value = _state.value.copy(usernameIsValid = false)
         }
     }
 

@@ -118,7 +118,7 @@ class MainActivity : ComponentActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             val channel = NotificationChannel(
                 SUNSETS_TIME_CHANNEL_ID,
-                getString(SUNSETS_TIME_CHANNEL_NAME),
+                SUNSETS_TIME_CHANNEL_NAME,
                 NotificationManager.IMPORTANCE_DEFAULT
             ).apply {
                 lightColor = R.color.sunset

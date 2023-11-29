@@ -59,7 +59,7 @@ fun EnterUsernameScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(48.dp)
             .background(Color.White)
             .verticalScroll(verticalScroll),
         horizontalAlignment = Alignment.CenterHorizontally

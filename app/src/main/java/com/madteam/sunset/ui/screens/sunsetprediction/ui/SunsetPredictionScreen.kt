@@ -263,6 +263,9 @@ fun SunsetPredictionContent(
             if (permissionNotGranted && selectedLocation.longitude == 0.0 && selectedLocation.latitude == 0.0) {
                 Text(
                     text = stringResource(id = R.string.select_location),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    textAlign = TextAlign.Center,
                     style = primaryBoldHeadlineM,
                     modifier = Modifier
                         .constrainAs(location) {
@@ -291,13 +294,17 @@ fun SunsetPredictionContent(
                 Text(
                     text = state.userLocality,
                     style = primaryBoldHeadlineM,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                     modifier = Modifier
                         .constrainAs(location) {
                             top.linkTo(parent.top)
                             start.linkTo(parent.start)
                             end.linkTo(parent.end)
                         }
-                        .defaultMinSize(minWidth = 100.dp)
+                        .padding(horizontal = 48.dp)
+                        .defaultMinSize(minWidth = 10.dp)
                         .background(shimmerBrush(showShimmer = state.userLocality.isEmpty()))
                 )
                 IconButton(
@@ -308,7 +315,7 @@ fun SunsetPredictionContent(
                         .constrainAs(changeLocationButton) {
                             top.linkTo(location.top)
                             bottom.linkTo(location.bottom)
-                            start.linkTo(location.end)
+                            start.linkTo(location.end, (-24).dp)
                         }
                 ) {
                     Icon(

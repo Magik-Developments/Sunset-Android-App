@@ -842,7 +842,7 @@ class DatabaseRepository @Inject constructor(
         val spotsList = mutableListOf<Spot>()
 
         val spotsQuery = spotsCollection
-            .orderBy("creation_date", Query.Direction.DESCENDING)
+            .orderBy("creation_date", Query.Direction.ASCENDING)
 
         if (lastVisibleSpotOnHomeFeed != null) {
             spotsQuery.startAfter(lastVisibleSpotOnHomeFeed)
@@ -912,7 +912,7 @@ class DatabaseRepository @Inject constructor(
         val postsList = mutableListOf<SpotPost>()
 
         val postsQuery = postsCollection
-            .orderBy("creation_date", Query.Direction.DESCENDING)
+            .orderBy("creation_date", Query.Direction.ASCENDING)
 
         if (lastVisiblePostOnHomeFeed != null) {
             postsQuery.startAfter(lastVisiblePostOnHomeFeed)

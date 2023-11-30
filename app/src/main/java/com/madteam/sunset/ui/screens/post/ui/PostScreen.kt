@@ -39,7 +39,6 @@ import com.madteam.sunset.ui.common.GoBackTopAppBar
 import com.madteam.sunset.ui.common.ProfileImage
 import com.madteam.sunset.ui.common.RoundedLightGoToSpotButton
 import com.madteam.sunset.ui.common.RoundedLightLikeButton
-import com.madteam.sunset.ui.common.RoundedLightSaveButton
 import com.madteam.sunset.ui.common.RoundedLightSendButton
 import com.madteam.sunset.ui.screens.post.state.PostUIEvent
 import com.madteam.sunset.ui.screens.post.state.PostUIState
@@ -148,13 +147,13 @@ fun PostContent(
                     top.linkTo(parent.top, 16.dp)
                     start.linkTo(parent.start, 24.dp)
                 })
-            RoundedLightSaveButton(onClick = {}, modifier = Modifier.constrainAs(saveIconButton) {
+            /* RoundedLightSaveButton(onClick = {}, modifier = Modifier.constrainAs(saveIconButton) {
                 top.linkTo(parent.top, 16.dp)
                 end.linkTo(parent.end, 24.dp)
-            }, isSaved = false)
+            }, isSaved = false) */ //Todo: Implement save post
             RoundedLightSendButton(modifier = Modifier.constrainAs(sendIconButton) {
                 top.linkTo(parent.top, 16.dp)
-                end.linkTo(saveIconButton.start, 16.dp)
+                end.linkTo(parent.end, 16.dp)
             }, onClick = {
                 context.startActivity(
                     getShareIntent(

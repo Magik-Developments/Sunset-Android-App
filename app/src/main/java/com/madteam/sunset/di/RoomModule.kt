@@ -25,7 +25,9 @@ object RoomModule {
     fun providesSpotAttributesRoom(@ApplicationContext context: Context) =
         Room.databaseBuilder(
             context, SpotAttributeDatabase::class.java, SPOT_ATTRIBUTE_DATABASE_NAME
-        ).build()
+        )
+            .fallbackToDestructiveMigration()
+            .build()
 
     @Singleton
     @Provides
@@ -34,7 +36,6 @@ object RoomModule {
         Room.databaseBuilder(
             context, UserProfileDatabase::class.java, USER_PROFILE_DATABASE_NAME
         ).build()
-
 
     @Singleton
     @Provides

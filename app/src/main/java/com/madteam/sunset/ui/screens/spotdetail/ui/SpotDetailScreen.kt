@@ -72,7 +72,6 @@ import com.madteam.sunset.ui.common.RoundedLightBackButton
 import com.madteam.sunset.ui.common.RoundedLightEditButton
 import com.madteam.sunset.ui.common.RoundedLightLikeButton
 import com.madteam.sunset.ui.common.RoundedLightReportButton
-import com.madteam.sunset.ui.common.RoundedLightSaveButton
 import com.madteam.sunset.ui.common.RoundedLightSendButton
 import com.madteam.sunset.ui.screens.spotdetail.state.SpotDetailUIEvent
 import com.madteam.sunset.ui.screens.spotdetail.state.SpotDetailUIState
@@ -264,13 +263,13 @@ fun SpotDetailContent(
             }, onClick = {
                 navController.popBackStack()
             })
-            RoundedLightSaveButton(onClick = {}, modifier = Modifier.constrainAs(saveIconButton) {
+            /* RoundedLightSaveButton(onClick = {}, modifier = Modifier.constrainAs(saveIconButton) {
                 top.linkTo(parent.top, 16.dp)
                 end.linkTo(parent.end, 24.dp)
-            }, isSaved = false)
+            }, isSaved = false) */
             RoundedLightSendButton(modifier = Modifier.constrainAs(sendIconButton) {
                 top.linkTo(parent.top, 16.dp)
-                end.linkTo(saveIconButton.start, 16.dp)
+                end.linkTo(parent.end, 16.dp)
             }, onClick = {
                 context.startActivity(
                     getShareIntent(
@@ -286,8 +285,8 @@ fun SpotDetailContent(
                 }, onClick = { navigateTo("edit_spot_screen/spotReference=${state.spotInfo.id}") })
             }
             RoundedLightReportButton(modifier = Modifier.constrainAs(reportIconButton) {
-                top.linkTo(saveIconButton.bottom, 16.dp)
-                end.linkTo(parent.end, 24.dp)
+                top.linkTo(sendIconButton.bottom, 16.dp)
+                end.linkTo(parent.end, 16.dp)
             }, onClick = { setShowReportDialog(true) })
             RoundedLightLikeButton(
                 onClick = { spotLikeClick() },

@@ -33,7 +33,6 @@ import com.madteam.sunset.data.model.SpotPost
 import com.madteam.sunset.data.model.UserProfile
 import com.madteam.sunset.ui.common.ProfileImage
 import com.madteam.sunset.ui.common.RoundedLightLikeButton
-import com.madteam.sunset.ui.common.RoundedLightSaveButton
 import com.madteam.sunset.ui.common.RoundedLightSendButton
 import com.madteam.sunset.ui.theme.secondaryRegularBodyM
 import com.madteam.sunset.ui.theme.secondarySemiBoldBodyM
@@ -136,15 +135,15 @@ fun FeedPostItem(
                 verticalArrangement = Arrangement.Bottom,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {}
-            RoundedLightSaveButton(
-                onClick = { /*TODO*/ },
+            /* RoundedLightSaveButton(
+                onClick = {},
                 modifier = Modifier
                     .shadow(4.dp, RoundedCornerShape(20.dp))
                     .constrainAs(saveButton) {
                         top.linkTo(parent.top, 16.dp)
                         end.linkTo(parent.end, 24.dp)
                     }
-            )
+            ) */ //TODO: Disabled until save button is implemented
             RoundedLightLikeButton(
                 onClick = { postLikeClick() },
                 modifier = Modifier

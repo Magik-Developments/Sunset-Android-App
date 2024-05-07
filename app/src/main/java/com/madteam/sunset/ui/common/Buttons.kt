@@ -8,6 +8,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
@@ -52,7 +53,8 @@ fun SunsetButton(
     @StringRes text: Int,
     onClick: () -> Unit,
     enabled: Boolean = true,
-    maxLines: Int = 1
+    maxLines: Int = 1,
+    trailingIcon: ImageVector? = null
 ) {
     Button(
         onClick = onClick,
@@ -66,8 +68,23 @@ fun SunsetButton(
             contentColor = Color(0xFFFFFFFF),
         )
     ) {
+        trailingIcon?.let {
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.Start,
+            ) {
+                Icon(
+                    imageVector = it,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(24.dp)
+                )
+            }
+        }
         Text(
-            modifier = Modifier.align(Alignment.CenterVertically),
+            modifier = Modifier
+                .align(Alignment.CenterVertically)
+                .weight(1f),
             text = stringResource(text),
             color = Color(0xFFFFFFFF),
             style = secondarySemiBoldHeadLineS,

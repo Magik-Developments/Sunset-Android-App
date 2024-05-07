@@ -190,4 +190,5 @@
     <string name="small_hour_widget_description">Hora del Sunset</string>
     <string name="username_rules">El usuario debe tener entre 6 y 20 caracteres y no se permiten caracteres especiales</string>
     <string name="accept_policies">Acepto</string>
+    <string name="btn_continue_without_sign_in">Continua sin iniciar sesión</string>
 </resources>

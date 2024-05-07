@@ -16,6 +16,8 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue.Hidden
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Email
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -39,6 +41,7 @@ import com.madteam.sunset.navigation.SunsetRoutes
 import com.madteam.sunset.ui.common.CircularLoadingDialog
 import com.madteam.sunset.ui.common.CustomSpacer
 import com.madteam.sunset.ui.common.GoogleButton
+import com.madteam.sunset.ui.common.LargeLightButton
 import com.madteam.sunset.ui.common.MainTitle
 import com.madteam.sunset.ui.common.SubTitle
 import com.madteam.sunset.ui.common.SunsetButton
@@ -173,7 +176,8 @@ fun WelcomeScreen(
 @Composable
 fun WelcomeContent(
     onEmailClick: () -> Unit,
-    onGoogleClick: () -> Unit
+    onGoogleClick: () -> Unit,
+    onContinueWithoutSignIn: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -188,14 +192,16 @@ fun WelcomeContent(
         CustomSpacer(size = 8.dp)
         SubTitle(Modifier.align(Alignment.Start))
         CustomSpacer(size = 56.dp)
-        SunsetButton(text = R.string.btn_continue_email, onClick = onEmailClick)
+        SunsetButton(text = R.string.btn_continue_email, onClick = onEmailClick, trailingIcon = Icons.Outlined.Email)
         CustomSpacer(size = 16.dp)
         GoogleButton(onClick = onGoogleClick)
+        CustomSpacer(size = 16.dp)
+        LargeLightButton(onClick = onContinueWithoutSignIn, text = R.string.btn_continue_without_sign_in)
     }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun WelcomeScreenPrev() {
-    WelcomeContent({}, {})
+    WelcomeContent({}, {}, {})
 }

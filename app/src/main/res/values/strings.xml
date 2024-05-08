@@ -191,4 +191,7 @@
     <string name="username_rules">The username must contain between 6 and 20 characters and not contain any special character</string>
   <string name="accept_policies">Accept</string>
   <string name="btn_continue_without_sign_in">Continue without sign in</string>
+  <string name="only_for_users">Only for users!</string>
+  <string name="only_for_users_description">"You're trying to enter to an area only for users where you can post your own spots and posts. "</string>
+  <string name="go_back">Go back</string>
 </resources>

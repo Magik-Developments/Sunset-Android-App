@@ -45,7 +45,7 @@ fun SunsetNavigation(
     NavHost(
         navController = navController, startDestination =
         if (isAlreadyLoggedIn) {
-            SunsetRoutes.HomeScreen.route
+            SunsetRoutes.SunsetPredictionScreen.route
         } else {
             WelcomeScreen.route
         }

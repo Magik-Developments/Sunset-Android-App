@@ -191,4 +191,7 @@
     <string name="username_rules">El usuario debe tener entre 6 y 20 caracteres y no se permiten caracteres especiales</string>
     <string name="accept_policies">Acepto</string>
     <string name="btn_continue_without_sign_in">Continua sin iniciar sesión</string>
+    <string name="only_for_users">¡Solo para usuarios!</string>
+    <string name="only_for_users_description">Estás intentando entrar en un area solo para usuarios registrados donde puedes crear tus propios spots y posts.</string>
+    <string name="go_back">Volver</string>
 </resources>

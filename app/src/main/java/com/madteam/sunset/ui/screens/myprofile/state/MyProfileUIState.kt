@@ -10,5 +10,6 @@ data class MyProfileUIState(
     val userPosts: List<SpotPost> = mutableListOf(),
     val userSpots: List<Spot> = mutableListOf(),
     val showLogoutDialog: Boolean = false,
-    val hasToLogOut: Boolean = false
+    val hasToLogOut: Boolean = false,
+    val noLoggedDialog: Boolean = false,
 )

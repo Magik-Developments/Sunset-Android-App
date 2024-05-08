@@ -186,6 +186,23 @@ fun MyProfileContent(
             })
     }
 
+    if (state.noLoggedDialog) {
+        DismissAndPositiveDialog(
+            setShowDialog = {
+                //Cannot dismiss dialog
+            },
+            dialogTitle = R.string.only_for_users,
+            dialogDescription = R.string.only_for_users_description,
+            dismissButtonText = R.string.go_back,
+            positiveButtonText = R.string.sign_in,
+            positiveClickedAction = {
+                navigateTo(SunsetRoutes.WelcomeScreen.route)
+            },
+            dismissClickedAction = {
+                navigateTo(SunsetRoutes.SunsetPredictionScreen.route)
+            })
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()

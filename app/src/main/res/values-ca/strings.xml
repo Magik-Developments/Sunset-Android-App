@@ -191,4 +191,7 @@
     <string name="username_rules">El usuari ha de tenir entre 6 i 20 caràcters i no es permeten caràcters especials</string>
     <string name="accept_policies">Acceptar</string>
     <string name="btn_continue_without_sign_in">Continúa sense registrar</string>
+    <string name="only_for_users">Només per usuaris!</string>
+    <string name="only_for_users_description">"Estàs intentant entrar en una àrea només per a usuaris registrats on pots crear els teus propis espots i posts. "</string>
+    <string name="go_back">Tornar enrere</string>
 </resources>

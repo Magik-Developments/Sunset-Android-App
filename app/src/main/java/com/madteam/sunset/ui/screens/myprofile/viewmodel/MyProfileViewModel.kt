@@ -52,23 +52,27 @@ class MyProfileViewModel @Inject constructor(
 
     private fun initUI() {
         viewModelScope.launch {
-            getMyUserProfileInfoUseCase().let {
-                when (it) {
-                    is Resource.Error -> {
-                        _state.value = _state.value.copy(hasToLogOut = true)
+            if (authRepository.getCurrentUser() == null) {
+                _state.value = _state.value.copy(noLoggedDialog = true)
+            } else {
+                getMyUserProfileInfoUseCase().let {
+                    when (it) {
+                        is Resource.Error -> {
+                            _state.value = _state.value.copy(hasToLogOut = true)
+                        }
+
+                        is Resource.Loading -> {
+                            //Not implemented
+                        }
+
+                        is Resource.Success -> {
+                            _state.value = _state.value.copy(userInfo = it.data!!)
+                        }
                     }
 
-                    is Resource.Loading -> {
-                        //Not implemented
-                    }
-
-                    is Resource.Success -> {
-                        _state.value = _state.value.copy(userInfo = it.data!!)
-                    }
+                    getUserPosts()
+                    getUserSpots()
                 }
-
-                getUserPosts()
-                getUserSpots()
             }
         }
     }

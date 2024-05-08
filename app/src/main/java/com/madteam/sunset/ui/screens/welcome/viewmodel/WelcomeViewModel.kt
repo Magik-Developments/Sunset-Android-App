@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.madteam.sunset.data.repositories.AuthRepository
 import com.madteam.sunset.domain.usecases.SignInWithGoogleUseCase
 import com.madteam.sunset.ui.screens.welcome.state.WelcomeUIEvent
 import com.madteam.sunset.ui.screens.welcome.state.WelcomeUIState
@@ -18,7 +19,8 @@ import javax.inject.Inject
 @HiltViewModel
 class WelcomeViewModel @Inject constructor(
     private val signInWithGoogleUseCase: SignInWithGoogleUseCase,
-    val googleSignInClient: GoogleSignInClient
+    val googleSignInClient: GoogleSignInClient,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _state: MutableStateFlow<WelcomeUIState> = MutableStateFlow(WelcomeUIState())
@@ -33,7 +35,41 @@ class WelcomeViewModel @Inject constructor(
                     isLoading = event.show
                 )
             }
+            is WelcomeUIEvent.SignInAsGuest -> signInAsGuest()
         }
+    }
+
+    private fun signInAsGuest() {
+        viewModelScope.launch {
+            _state.value = _state.value.copy(
+                isLoading = true
+            )
+            authRepository.doSignInAsGuest().collectLatest {
+                when (it) {
+                    is Resource.Error -> {
+                        _state.value = _state.value.copy(
+                            signInState = Resource.Error(it.message!!)
+                        )
+                    }
+
+                    is Resource.Loading -> {
+                        _state.value = _state.value.copy(
+                            signInState = Resource.Loading()
+                        )
+                    }
+
+                    is Resource.Success -> {
+                        _state.value = _state.value.copy(
+                            signInState = Resource.Success(it.data)
+                        )
+                    }
+                }
+                _state.value = _state.value.copy(
+                    isLoading = false
+                )
+            }
+        }
+
     }
 
     private fun handleGoogleSignInResult(result: GoogleSignInAccount) {

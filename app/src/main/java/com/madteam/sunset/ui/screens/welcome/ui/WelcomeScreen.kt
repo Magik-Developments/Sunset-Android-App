@@ -111,6 +111,13 @@ fun WelcomeScreen(
             onGoogleClick = {
                 viewModel.onEvent(WelcomeUIEvent.ShowLoading(true))
                 startForResult.launch(viewModel.googleSignInClient.signInIntent)
+            },
+            onContinueWithoutSignIn = {
+                navController.navigate(SunsetRoutes.HomeScreen.route) {
+                    popUpTo(navController.graph.id) {
+                        inclusive = true
+                    }
+                }
             }
         )
     }
@@ -187,11 +194,11 @@ fun WelcomeContent(
         verticalArrangement = Arrangement.Center
     ) {
         SunsetLogoImage()
-        CustomSpacer(56.dp)
+        CustomSpacer(42.dp)
         MainTitle()
         CustomSpacer(size = 8.dp)
         SubTitle(Modifier.align(Alignment.Start))
-        CustomSpacer(size = 56.dp)
+        CustomSpacer(size = 42.dp)
         SunsetButton(text = R.string.btn_continue_email, onClick = onEmailClick, trailingIcon = Icons.Outlined.Email)
         CustomSpacer(size = 16.dp)
         GoogleButton(onClick = onGoogleClick)

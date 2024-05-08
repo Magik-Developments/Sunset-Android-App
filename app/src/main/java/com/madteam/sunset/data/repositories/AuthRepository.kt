@@ -48,6 +48,16 @@ class AuthRepository @Inject constructor(
       emit(Resource.Error(it.message.toString()))
     }
 
+  override fun doSignInAsGuest(): Flow<Resource<AuthResult?>> =
+    flow {
+      emit(Resource.Loading())
+      firebaseAuth.signInAnonymously().await().let { result ->
+        emit(Resource.Success(result))
+      }
+    }.catch {
+      emit(Resource.Error(it.message.toString()))
+    }
+
   override fun deleteCurrentUser(): Flow<Resource<Unit>> =
     flow {
       emit(Resource.Loading())
@@ -130,6 +140,7 @@ interface AuthContract {
 
   fun doSignUpWithPasswordAndEmail(email: String, password: String): Flow<Resource<AuthResult?>>
   fun doSignInWithPasswordAndEmail(email: String, password: String): Flow<Resource<AuthResult?>>
+  fun doSignInAsGuest(): Flow<Resource<AuthResult?>>
   fun deleteCurrentUser(): Flow<Resource<Unit>>
   fun getCurrentUser(): FirebaseUser?
   fun logout()
